@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
         } else if((strcmp(argv[i], "-c") == 0) || (strcmp(argv[i], "--custom") == 0)) {
             if((i+1) < argc) {
                 opt_custom = argv[i+1];
+                opt_manual = 1;
                 i++;
             } else {
                 usage(argv[0]);
@@ -146,7 +147,7 @@ int main(int argc, char *argv[])
 }
 
 void usage(const char *executable) {
-    printf("Usage: %s [-h] ...\n", executable);
+    printf("Usage: %s [-h|-a|-l|-c|-s|-as|-ac] ...\n", executable);
     printf("  -h|--help         Show this usage information\n");
     printf("  -a|--amount       The amount of passwords\n");
     printf("  -l|--length       The length of the passwords\n");
