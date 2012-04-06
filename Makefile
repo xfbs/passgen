@@ -5,6 +5,7 @@ LDFLAGS=-ggdb3
 SOURCES=havege.c timing.c passgen.c
 TARGET=passgen
 
+.DEFAULT: $(TARGET)
 .SUFFIXES: .c.o
 .c.o: 
 	$(CC) $(CFLAGS) -c $<
