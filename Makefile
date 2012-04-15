@@ -1,6 +1,6 @@
 CC=gcc
 RM=rm -f
-CFLAGS+=-std=c99
+CFLAGS+=-std=c99 -Wall -pedantic
 LDFLAGS=-ggdb3
 SOURCES=havege.c timing.c passgen.c
 TARGET=passgen
