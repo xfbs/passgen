@@ -18,3 +18,4 @@ install: $(TARGET)
 
 clean:
 	$(RM) $(SOURCES:.c=.o)
+	$(RM) $(TARGET)
