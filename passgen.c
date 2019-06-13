@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include "polarssl/havege.h"
+#include "random.h"
+#include <assert.h>
 
 void usage(const char *executable);
 void error(const char *err);
@@ -126,6 +128,9 @@ int main(int argc, char *argv[])
     havege_state hs;
     havege_init(&hs);
 
+    random_t *random = random_new();
+    assert(random != NULL);
+
     // generate passwords
     for(int i = 0; i < opt_amount; i++) {
         for(int j = 0; j < opt_length; j++) {
@@ -141,6 +146,8 @@ int main(int argc, char *argv[])
 
         printf("\t");
     }
+
+    random_close(random);
 
     printf("\n");
     return 0;
