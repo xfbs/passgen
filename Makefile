@@ -3,7 +3,7 @@ RM			 = rm -f
 AR			 = ar
 MKDIR		 = mkdir -p
 CFLAGS		+= -std=c99 -Wall -Wextra -pedantic -Iinclude
-LDFLAGS		 = -ggdb3
+LDFLAGS		 =
 SOURCES		 = random.c
 LIBNAME      = passgen
 BINARY		 = passgen.c
@@ -11,7 +11,7 @@ TESTS		 =
 
 default: release
 
-release: $(BINARY:%.c=build/release/bin/%)
+release: $(BINARY:%.c=build/release/%)
 
 build/release:
 	$(MKDIR) $@
