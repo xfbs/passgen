@@ -67,6 +67,8 @@ void random_close(random_t *random) {
   if(random != NULL) {
     fclose(random->device);
   }
+
+  free(random);
 }
 
 uint8_t  random_uint8 (random_t *random) {

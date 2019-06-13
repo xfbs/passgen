@@ -14,12 +14,12 @@ TESTS		 =
 
 default: release
 
+# release build
+# enables optimizations
 release: CFLAGS  += -O3
 release: LDFLAGS += -O3
 release: $(BINARY:%.c=build/release/%)
 
-# release build
-# enables optimizations
 build/release:
 	$(MKDIR) $@
 
@@ -35,8 +35,8 @@ build/release/%.o: src/%.c build/release
 
 # debug build
 # enables debug symbols, defines debug.
-debug: CFLAGS  += -O1 -g -DDEBUG
-debug: LDFLAGS += -O1 -g
+debug: CFLAGS  += -O1 -g -DDEBUG -fsanitize=leak
+debug: LDFLAGS += -O1 -g -fsanitize=leak
 debug: $(BINARY:%.c=build/debug/%)
 
 build/debug:

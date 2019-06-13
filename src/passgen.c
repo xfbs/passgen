@@ -145,6 +145,7 @@ int main(int argc, char *argv[])
     }
 
     random_close(random);
+    free(charlist);
 
     printf("\n");
     return 0;
