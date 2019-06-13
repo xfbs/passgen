@@ -5,7 +5,7 @@
 #define RANDOM_H_BUFEN 250
 
 typedef struct random_t {
-  uint8_t buffer[250];
+  uint8_t buffer[RANDOM_H_BUFEN];
   size_t pos;
   FILE *device;
 } random_t;

@@ -135,10 +135,11 @@ int main(int argc, char *argv[])
     for(int i = 0; i < opt_amount; i++) {
         for(int j = 0; j < opt_length; j++) {
             // get random number
-            unsigned int rnd = havege_rand(&hs);
+            //unsigned int rnd = havege_rand(&hs);
+            unsigned int rnd = random_uint64_max(random, charlength);
 
             // limit it from 0 to charlength
-            rnd = rnd % charlength;
+            rnd = rnd;
 
             // print random character
             printf("%c", charlist[rnd]);
