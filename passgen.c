@@ -3,9 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdbool.h>
-#include "polarssl/havege.h"
-#include "random.h"
 #include <assert.h>
+#include "random.h"
 
 void usage(const char *executable);
 void error(const char *err);
@@ -125,9 +124,6 @@ int main(int argc, char *argv[])
     }
 
     // initialize source of random numbers
-    havege_state hs;
-    havege_init(&hs);
-
     random_t *random = random_new();
     assert(random != NULL);
 
