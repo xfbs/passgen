@@ -1,21 +1,32 @@
-CC=gcc
-RM=rm -f
-CFLAGS+=-std=c99 -Wall -pedantic
-LDFLAGS=-ggdb3
-SOURCES=passgen.c random.c
-TARGET=passgen
+CC			 = clang
+RM			 = rm -f
+AR			 = ar
+MKDIR		 = mkdir -p
+CFLAGS		+= -std=c99 -Wall -Wextra -pedantic -Iinclude
+LDFLAGS		 = -ggdb3
+SOURCES		 = random.c
+LIBNAME      = passgen
+BINARY		 = passgen.c
+TESTS		 =
 
-.DEFAULT: $(TARGET)
-.SUFFIXES: .c.o
-.c.o: 
-	$(CC) $(CFLAGS) -c $<
+default: release
 
-$(TARGET): $(SOURCES:.c=.o)
-	$(CC) $(LDFLAGS) -o $(TARGET) $^
+release: $(BINARY:%.c=build/release/bin/%)
+
+build/release:
+	$(MKDIR) $@
+
+build/release/%: build/release/%.o build/release/$(LIBNAME).a
+	$(CC) -o $@ $(LDFLAGS) $^
+
+build/release/$(LIBNAME).a: $(SOURCES:%.c=build/release/%.o)
+	ar rcs $@ $^
+
+build/release/%.o: src/%.c build/release
+	$(CC) -c $(CFLAGS) $< -o $@
 
 install: $(TARGET)
 	cp $(TARGET) /usr/local/bin/
 
 clean:
-	$(RM) $(SOURCES:.c=.o)
-	$(RM) $(TARGET)
+	$(RM) -r build
