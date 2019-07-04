@@ -13,6 +13,8 @@ void test_pattern_range_range();
 void test_pattern_range_char();
 void test_pattern_range_combined();
 void test_pattern_range_err();
+void test_pattern_parse();
+void test_pattern_parse_reps();
 
 int main(int argc, char *argv[]) {
   test_random();
@@ -29,6 +31,27 @@ void test_random() {
 
 void test_pattern() {
   test_pattern_range();
+  test_pattern_parse();
+}
+
+void test_pattern_parse() {
+  test_pattern_parse_reps();
+}
+
+void test_pattern_parse_reps() {
+  const char *s = "{123,234}";
+  const char *p = &s[1];
+  pattern_reps_t reps = pattern_parse_reps(&p);
+  assert(*p == '}');
+  assert(reps.min == 123);
+  assert(reps.max == 234);
+
+  s = "{991}";
+  p = &s[1];
+  reps = pattern_parse_reps(&p);
+  assert(*p == '}');
+  assert(reps.min == 991);
+  assert(reps.max == 991);
 }
 
 void test_pattern_range() {

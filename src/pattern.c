@@ -74,8 +74,10 @@ pattern_t *pattern_parse(const char **string) {
   // parse the repetitions, if any.
   pattern_reps_t repetitions = {.min = 1, .max = 1};
   if(**string == '{') {
+    *string += 1;
     repetitions = pattern_parse_reps(string);
     if(**string != '}') goto fail;
+    *string += 1;
   }
 
   return NULL;
@@ -98,8 +100,29 @@ void pattern_free(pattern_t *pattern) {
   free(pattern);
 }
 
+size_t parse_size(const char **string) {
+  size_t out = 0;
+
+  while('0' <= **string && **string <= '9') {
+    out *= 10;
+    out += (**string - '0');
+    *string += 1;
+  }
+
+  return out;
+}
+
 pattern_reps_t pattern_parse_reps(const char **string) {
-  pattern_reps_t reps = {.min = 1, .max = 1};
+  pattern_reps_t reps = {.min = 0, .max = 0};
+
+  reps.min = parse_size(string);
+
+  if(**string == ',') {
+    *string += 1;
+    reps.max = parse_size(string);
+  } else {
+    reps.max = reps.min;
+  }
 
   return reps;
 }
