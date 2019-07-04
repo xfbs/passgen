@@ -72,18 +72,29 @@ pattern_t *pattern_parse(const char **string) {
   *string += 1;
 
   // parse the repetitions, if any.
-  pattern_reps_t repetitions = {.min = 1, .max = 1};
+  pattern_reps_t reps = {.min = 1, .max = 1};
   if(**string == '{') {
     *string += 1;
-    repetitions = pattern_parse_reps(string);
+    reps = pattern_parse_reps(string);
     if(**string != '}') goto fail;
     *string += 1;
   }
 
-  return NULL;
-
+  return pattern_new(kind, data, reps, pattern_parse(string));
 fail:
   return NULL;
+}
+
+pattern_t *pattern_new(pattern_kind kind, void *data, pattern_reps_t reps, pattern_t *next) {
+  pattern_t *pattern = malloc(sizeof(pattern_t));
+  assert(pattern);
+
+  pattern->kind = kind;
+  pattern->data = data;
+  pattern->reps = reps;
+  pattern->next = next;
+
+  return pattern;
 }
 
 void pattern_free(pattern_t *pattern) {
@@ -117,6 +128,7 @@ pattern_reps_t pattern_parse_reps(const char **string) {
 
   reps.min = parse_size(string);
 
+  // TODO: error handling. what if {,}? 
   if(**string == ',') {
     *string += 1;
     reps.max = parse_size(string);

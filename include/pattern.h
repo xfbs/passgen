@@ -26,8 +26,7 @@ struct pattern_t;
 struct pattern_t {
   pattern_kind kind;
   void *data;
-  size_t min;
-  size_t max;
+  pattern_reps_t reps;
   struct pattern_t *next;
 };
 
@@ -39,5 +38,6 @@ void pattern_range_free(pattern_range_t *range);
 
 pattern_reps_t pattern_parse_reps(const char **string);
 
+pattern_t *pattern_new(pattern_kind kind, void *data, pattern_reps_t reps, pattern_t *next);
 pattern_t *pattern_parse(const char **string);
 void pattern_free(pattern_t *pattern);

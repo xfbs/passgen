@@ -14,6 +14,9 @@ void test_pattern_range_char();
 void test_pattern_range_combined();
 void test_pattern_range_err();
 void test_pattern_parse();
+void test_pattern_parse_chars();
+void test_pattern_parse_range();
+void test_pattern_parse_group();
 void test_pattern_parse_reps();
 
 int main(int argc, char *argv[]) {
@@ -35,7 +38,40 @@ void test_pattern() {
 }
 
 void test_pattern_parse() {
+  test_pattern_parse_chars();
+  test_pattern_parse_range();
+  test_pattern_parse_group();
   test_pattern_parse_reps();
+}
+
+void test_pattern_parse_chars() {
+  const char *s = "a\\({2}b{11,12}";
+  const char *p = s;
+  pattern_t *pattern = pattern_parse(&p);
+  assert(pattern);
+  assert(pattern->kind == PATTERN_CHAR);
+  assert(pattern->data == &s[0]);
+  assert(pattern->reps.min == 1);
+  assert(pattern->reps.max == 1);
+  assert(pattern->next);
+  assert(pattern->next->kind == PATTERN_CHAR);
+  assert(pattern->next->data == &s[2]);
+  assert(pattern->next->reps.min == 2);
+  assert(pattern->next->reps.max == 2);
+  assert(pattern->next->next);
+  assert(pattern->next->next->kind == PATTERN_CHAR);
+  assert(pattern->next->next->data == &s[6]);
+  assert(pattern->next->next->reps.min == 11);
+  assert(pattern->next->next->reps.max == 12);
+  assert(!pattern->next->next->next);
+  assert(p == &s[14]);
+  pattern_free(pattern);
+}
+
+void test_pattern_parse_range() {
+}
+
+void test_pattern_parse_group() {
 }
 
 void test_pattern_parse_reps() {
