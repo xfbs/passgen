@@ -99,7 +99,7 @@ pattern_segment_t *pattern_segment_new(pattern_kind kind, void *data, pattern_re
 
 void pattern_segment_free(pattern_segment_t *pattern) {
   switch(pattern->kind) {
-    case PATTERN_RANGE: pattern_range_free(pattern->data); break;
+    case PATTERN_RANGE: pattern_range_free(pattern->range); break;
     case PATTERN_GROUP: break;
     case PATTERN_CHAR:  break;
   }
@@ -165,7 +165,7 @@ size_t pattern_segment_random_fill(pattern_segment_t *pattern, random_t *rand, c
 char *pattern_segment_random(pattern_segment_t *pattern, random_t *rand) {
   // create buffer that is big enough.
   size_t len = pattern_segment_maxlen(pattern);
-  char *buffer = malloc(len) + 1;
+  char *buffer = malloc(len + 1);
   assert(buffer);
 
   // write.

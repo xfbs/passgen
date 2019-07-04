@@ -22,6 +22,9 @@ void test_pattern_segment_parse_reps();
 void test_pattern_segment_maxlen();
 
 int main(int argc, char *argv[]) {
+  (void) argc;
+  (void) argv;
+
   test_random();
   test_pattern();
 

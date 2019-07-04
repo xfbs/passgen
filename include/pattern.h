@@ -31,9 +31,18 @@ typedef struct {
 
 // Pattern segment: chain of patterns, as linked list.
 struct pattern_segment_t {
+  // What kind of segment is this?
   pattern_kind kind;
-  void *data;
+  // The segment itself, as union.
+  union {
+    struct pattern_range_t *range;
+    struct pattern_t *group;
+    const char *chr;
+    void *data;
+  };
+  // How many times this item is repeated.
   pattern_reps_t reps;
+  // What comes after this item.
   struct pattern_segment_t *next;
 };
 
