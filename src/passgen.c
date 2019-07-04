@@ -134,9 +134,6 @@ int main(int argc, char *argv[])
             //unsigned int rnd = havege_rand(&hs);
             unsigned int rnd = random_uint64_max(random, charlength);
 
-            // limit it from 0 to charlength
-            rnd = rnd;
-
             // print random character
             printf("%c", charlist[rnd]);
         }
