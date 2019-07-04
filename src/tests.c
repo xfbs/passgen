@@ -69,6 +69,20 @@ void test_pattern_parse_chars() {
 }
 
 void test_pattern_parse_range() {
+  const char *s = "[a-z]{12,13}";
+  const char *p = s;
+  pattern_t *pattern = pattern_parse(&p);
+  assert(pattern);
+  assert(pattern->kind == PATTERN_RANGE);
+  assert(pattern->data);
+  assert(((pattern_range_t *)pattern->data)->start == 'a');
+  assert(((pattern_range_t *)pattern->data)->end== 'z');
+  assert(((pattern_range_t *)pattern->data)->next == NULL);
+  assert(pattern->reps.min == 12);
+  assert(pattern->reps.max == 13);
+  assert(!pattern->next);
+  assert(p == &s[12]);
+  pattern_free(pattern);
 }
 
 void test_pattern_parse_group() {
