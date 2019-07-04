@@ -59,6 +59,9 @@ char pattern_range_random(pattern_range_t *range, random_t *rand) {
       choice -= count;
     }
   }
+
+  // unreachable.
+  return '\0';
 }
 
 pattern_segment_t *pattern_segment_parse(const char **string) {
@@ -183,18 +186,27 @@ size_t pattern_segment_random_fill(pattern_segment_t *segment, random_t *rand, c
   size_t written = 0;
 
   while(written < len && segment) {
-    switch(segment->kind) {
-      case PATTERN_CHAR:
-        str[written] = segment->data.chr[0];
-        written += 1;
-        break;
-      case PATTERN_RANGE:
-        str[written] = pattern_range_random(segment->data.range, rand);
-        written += 1;
-        break;
-      case PATTERN_GROUP:
-        written += pattern_random_fill(segment->data.group, rand, &str[written], len - written);
-        break;
+    // determine how often this should be repeated.
+    size_t reps = segment->reps.min;
+    if(segment->reps.min != segment->reps.max) {
+      reps += random_uint64_max(rand, segment->reps.max - segment->reps.min);
+    }
+
+    // repeat segment reps times.
+    for(size_t i = 0; i < reps && written < len; ++i) {
+      switch(segment->kind) {
+        case PATTERN_CHAR:
+          str[written] = segment->data.chr[0];
+          written += 1;
+          break;
+        case PATTERN_RANGE:
+          str[written] = pattern_range_random(segment->data.range, rand);
+          written += 1;
+          break;
+        case PATTERN_GROUP:
+          written += pattern_random_fill(segment->data.group, rand, &str[written], len - written);
+          break;
+      }
     }
 
     segment = segment->next;
@@ -219,6 +231,7 @@ char *pattern_segment_random(pattern_segment_t *pattern, random_t *rand) {
 }
 
 pattern_t *pattern_parse(const char **string) {
+  (void) string;
   return NULL;
 }
 
@@ -246,9 +259,29 @@ size_t pattern_segment_count(pattern_t *pattern) {
 }
 
 size_t pattern_random_fill(pattern_t *pattern, random_t *rand, char *buffer, size_t len) {
-  return 0;
+  // choose a segment
+  size_t segments = pattern_segment_count(pattern);
+  size_t choice = random_uint64_max(rand, segments);
+
+  // find segment
+  while(choice) {
+    pattern = pattern->next;
+    choice -= 1;
+  }
+
+  return pattern_segment_random_fill(pattern->item, rand, buffer, len);
 }
 
 char *pattern_random(pattern_t *pattern, random_t *rand) {
-  return NULL;
+  // choose a segment
+  size_t segments = pattern_segment_count(pattern);
+  size_t choice = random_uint64_max(rand, segments);
+
+  // find segment
+  while(choice) {
+    pattern = pattern->next;
+    choice -= 1;
+  }
+
+  return pattern_segment_random(pattern->item, rand);
 }

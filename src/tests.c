@@ -21,6 +21,7 @@ void test_pattern_segment_parse_range();
 void test_pattern_segment_parse_group();
 void test_pattern_segment_parse_reps();
 void test_pattern_segment_maxlen();
+void test_pattern_segment_random();
 
 int main(int argc, char *argv[]) {
   (void) argc;
@@ -46,6 +47,34 @@ void test_pattern() {
 void test_pattern_segment() {
   test_pattern_segment_parse();
   test_pattern_segment_maxlen();
+  test_pattern_segment_random();
+}
+
+void test_pattern_segment_random() {
+  const char *s = "a\\({2}[ab]{10,12}";
+  pattern_segment_t *pattern = pattern_segment_parse(&s);
+  random_t *rand = random_new();
+  const char *out = pattern_segment_random(pattern, rand);
+  assert(out);
+  assert(out[0] == 'a');
+  assert(out[1] == '(');
+  assert(out[2] == '(');
+  assert(out[3] == 'a' || out[3] == 'b');
+  assert(out[4] == 'a' || out[4] == 'b');
+  assert(out[5] == 'a' || out[5] == 'b');
+  assert(out[6] == 'a' || out[6] == 'b');
+  assert(out[7] == 'a' || out[7] == 'b');
+  assert(out[8] == 'a' || out[8] == 'b');
+  assert(out[9] == 'a' || out[9] == 'b');
+  assert(out[10] == 'a' || out[10] == 'b');
+  assert(out[11] == 'a' || out[11] == 'b');
+  assert(out[12] == 'a' || out[12] == 'b');
+  assert(out[13] == 'a' || out[13] == 'b' || out[13] == '\0');
+  assert(out[14] == 'a' || out[14] == 'b' || out[14] == '\0');
+  free((void *)out);
+
+  pattern_segment_free(pattern);
+  random_close(rand);
 }
 
 void test_pattern_segment_parse() {
