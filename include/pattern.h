@@ -1,5 +1,6 @@
 #pragma once
 #include <stdlib.h>
+#include "random.h"
 
 typedef enum {
   PATTERN_RANGE,
@@ -21,16 +22,16 @@ typedef struct {
   size_t max;
 } pattern_reps_t;
 
-struct pattern_t;
+struct pattern_segment_t;
 
-struct pattern_t {
+struct pattern_segment_t {
   pattern_kind kind;
   void *data;
   pattern_reps_t reps;
-  struct pattern_t *next;
+  struct pattern_segment_t *next;
 };
 
-typedef struct pattern_t pattern_t;
+typedef struct pattern_segment_t pattern_segment_t;
 
 pattern_range_t *pattern_range_new(char start, char end, pattern_range_t *next);
 pattern_range_t *pattern_range_parse(const char **string);
@@ -38,6 +39,10 @@ void pattern_range_free(pattern_range_t *range);
 
 pattern_reps_t pattern_parse_reps(const char **string);
 
-pattern_t *pattern_new(pattern_kind kind, void *data, pattern_reps_t reps, pattern_t *next);
-pattern_t *pattern_parse(const char **string);
-void pattern_free(pattern_t *pattern);
+pattern_segment_t *pattern_new(pattern_kind kind, void *data, pattern_reps_t reps, pattern_segment_t *next);
+pattern_segment_t *pattern_parse(const char **string);
+void pattern_free(pattern_segment_t *pattern);
+
+size_t pattern_maxlen(pattern_segment_t *pattern);
+size_t pattern_random_fill(pattern_segment_t *pattern, random_t *rand, char *buffer, size_t len);
+char *pattern_random(pattern_segment_t *pattern, random_t *rand);

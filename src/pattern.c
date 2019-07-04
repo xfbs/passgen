@@ -41,7 +41,7 @@ void pattern_range_free(pattern_range_t *range) {
   free(range);
 }
 
-pattern_t *pattern_parse(const char **string) {
+pattern_segment_t *pattern_parse(const char **string) {
   if(is_end(**string)) return NULL;
 
   // parse the kind and data.
@@ -85,8 +85,8 @@ fail:
   return NULL;
 }
 
-pattern_t *pattern_new(pattern_kind kind, void *data, pattern_reps_t reps, pattern_t *next) {
-  pattern_t *pattern = malloc(sizeof(pattern_t));
+pattern_segment_t *pattern_new(pattern_kind kind, void *data, pattern_reps_t reps, pattern_segment_t *next) {
+  pattern_segment_t *pattern = malloc(sizeof(pattern_segment_t));
   assert(pattern);
 
   pattern->kind = kind;
@@ -97,7 +97,7 @@ pattern_t *pattern_new(pattern_kind kind, void *data, pattern_reps_t reps, patte
   return pattern;
 }
 
-void pattern_free(pattern_t *pattern) {
+void pattern_free(pattern_segment_t *pattern) {
   switch(pattern->kind) {
     case PATTERN_RANGE: pattern_range_free(pattern->data); break;
     case PATTERN_GROUP: break;
@@ -137,4 +137,42 @@ pattern_reps_t pattern_parse_reps(const char **string) {
   }
 
   return reps;
+}
+
+size_t pattern_maxlen(pattern_segment_t *pattern) {
+  size_t len = 0;
+
+  switch(pattern->kind) {
+    case PATTERN_RANGE:
+    case PATTERN_CHAR:
+      len += pattern->reps.max;
+      break;
+    case PATTERN_GROUP:
+      // TODO
+      break;
+  }
+
+  if(!pattern->next) {
+    return len;
+  } else {
+    return len + pattern_maxlen(pattern);
+  }
+}
+
+size_t pattern_random_fill(pattern_segment_t *pattern, random_t *rand, char *str, size_t len) {
+}
+
+char *pattern_random(pattern_segment_t *pattern, random_t *rand) {
+  // create buffer that is big enough.
+  size_t len = pattern_maxlen(pattern);
+  char *buffer = malloc(len) + 1;
+  assert(buffer);
+
+  // write.
+  size_t written = pattern_random_fill(pattern, rand, buffer, len);
+
+  // null-terminate.
+  buffer[written] = '\0';
+
+  return buffer;
 }
