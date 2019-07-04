@@ -90,7 +90,7 @@ pattern_segment_t *pattern_segment_new(pattern_kind kind, void *data, pattern_re
   assert(pattern);
 
   pattern->kind = kind;
-  pattern->data = data;
+  pattern->data.raw = data;
   pattern->reps = reps;
   pattern->next = next;
 
@@ -99,7 +99,7 @@ pattern_segment_t *pattern_segment_new(pattern_kind kind, void *data, pattern_re
 
 void pattern_segment_free(pattern_segment_t *pattern) {
   switch(pattern->kind) {
-    case PATTERN_RANGE: pattern_range_free(pattern->range); break;
+    case PATTERN_RANGE: pattern_range_free(pattern->data.range); break;
     case PATTERN_GROUP: break;
     case PATTERN_CHAR:  break;
   }

@@ -38,8 +38,8 @@ struct pattern_segment_t {
     struct pattern_range_t *range;
     struct pattern_t *group;
     const char *chr;
-    void *data;
-  };
+    void *raw;
+  } data;
   // How many times this item is repeated.
   pattern_reps_t reps;
   // What comes after this item.
