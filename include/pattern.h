@@ -58,6 +58,8 @@ typedef struct pattern_t pattern_t;
 typedef struct pattern_range_t pattern_range_t;
 typedef struct pattern_segment_t pattern_segment_t;
 
+pattern_t *pattern_new(pattern_segment_t *segment, pattern_t *next);
+void pattern_free(pattern_t *pattern);
 pattern_t *pattern_parse(const char **string);
 size_t pattern_maxlen(pattern_t *pattern);
 size_t pattern_random_fill(pattern_t *pattern, random_t *rand, char *buffer, size_t len);

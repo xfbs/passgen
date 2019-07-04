@@ -8,6 +8,7 @@ void test_random();
 void test_random_uint8();
 void test_random_uint8_max();
 void test_pattern();
+void test_pattern_parse();
 void test_pattern_range();
 void test_pattern_range_range();
 void test_pattern_range_char();
@@ -40,8 +41,31 @@ void test_random() {
 }
 
 void test_pattern() {
+  test_pattern_parse();
   test_pattern_range();
   test_pattern_segment();
+}
+
+void test_pattern_parse() {
+  const char *s = "abc|def";
+  pattern_t *pattern = pattern_parse(&s);
+  assert(pattern);
+  assert(pattern->item->kind == PATTERN_CHAR);
+  assert(pattern->item->data.chr[0] == 'a');
+  assert(pattern->item->next->kind == PATTERN_CHAR);
+  assert(pattern->item->next->data.chr[0] == 'b');
+  assert(pattern->item->next->next->kind == PATTERN_CHAR);
+  assert(pattern->item->next->next->data.chr[0] == 'c');
+  assert(!pattern->item->next->next->next);
+  assert(pattern->next->item->kind == PATTERN_CHAR);
+  assert(pattern->next->item->data.chr[0] == 'd');
+  assert(pattern->next->item->next->kind == PATTERN_CHAR);
+  assert(pattern->next->item->next->data.chr[0] == 'e');
+  assert(pattern->next->item->next->next->kind == PATTERN_CHAR);
+  assert(pattern->next->item->next->next->data.chr[0] == 'f');
+  assert(!pattern->next->item->next->next->next);
+  assert(!pattern->next->next);
+  pattern_free(pattern);
 }
 
 void test_pattern_segment() {

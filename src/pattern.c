@@ -3,7 +3,7 @@
 #include "pattern.h"
 
 bool is_end(char c) {
-  return c == ']' || c == ')' || c == '\0';
+  return c == ']' || c == ')' || c == '\0' || c == '|';
 }
 
 pattern_range_t *pattern_range_new(char start, char end, pattern_range_t *next) {
@@ -80,7 +80,7 @@ pattern_segment_t *pattern_segment_parse(const char **string) {
     case '(':
       *string += 1;
       kind = PATTERN_GROUP;
-      data = NULL;
+      data = pattern_parse(string);
       if(**string != ')') goto fail;
       break;
     case '\\':
@@ -123,7 +123,7 @@ pattern_segment_t *pattern_segment_new(pattern_kind kind, void *data, pattern_re
 void pattern_segment_free(pattern_segment_t *pattern) {
   switch(pattern->kind) {
     case PATTERN_RANGE: pattern_range_free(pattern->data.range); break;
-    case PATTERN_GROUP: break;
+    case PATTERN_GROUP: pattern_free(pattern->data.group);
     case PATTERN_CHAR:  break;
   }
 
@@ -230,9 +230,36 @@ char *pattern_segment_random(pattern_segment_t *pattern, random_t *rand) {
   return buffer;
 }
 
+pattern_t *pattern_new(pattern_segment_t *segment, pattern_t *next) {
+  pattern_t *pattern = malloc(sizeof(pattern_t));
+  assert(pattern);
+  pattern->item = segment;
+  pattern->next = next;
+  return pattern;
+}
+
+void pattern_free(pattern_t *pattern) {
+  pattern_t *next;
+
+  while(pattern) {
+    pattern_segment_free(pattern->item);
+    next = pattern->next;
+    free(pattern);
+    pattern = next;
+  }
+}
+
 pattern_t *pattern_parse(const char **string) {
-  (void) string;
-  return NULL;
+  pattern_t *pattern = pattern_new(pattern_segment_parse(string), NULL);
+
+  pattern_t *rest = pattern;
+  while(**string == '|') {
+    *string += 1;
+    rest->next = pattern_new(pattern_segment_parse(string), NULL);
+    rest = rest->next;
+  }
+
+  return pattern;
 }
 
 size_t pattern_maxlen(pattern_t *pattern) {
