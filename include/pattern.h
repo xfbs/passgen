@@ -2,28 +2,34 @@
 #include <stdlib.h>
 #include "random.h"
 
+// What type of patterns are there?
 typedef enum {
+  // Range of possible chars.
   PATTERN_RANGE,
+  // Single char.
   PATTERN_CHAR,
+  // Group (subpattern).
   PATTERN_GROUP,
 } pattern_kind;
 
 struct pattern_range_t;
+struct pattern_segment_t;
+struct pattern_t;
+
+// Range of possible characters. Linked list of [start, end] pairs.
 struct pattern_range_t {
   char start;
   char end;
   struct pattern_range_t *next;
 };
 
-typedef struct pattern_range_t pattern_range_t;
-
+// Represents how many times a pattern must be repeated.
 typedef struct {
   size_t min;
   size_t max;
 } pattern_reps_t;
 
-struct pattern_segment_t;
-
+// Pattern segment: chain of patterns, as linked list.
 struct pattern_segment_t {
   pattern_kind kind;
   void *data;
@@ -31,7 +37,20 @@ struct pattern_segment_t {
   struct pattern_segment_t *next;
 };
 
+// Pattern: list of possible pattern segments as linked list.
+struct pattern_t {
+  struct pattern_segment_t *item;
+  struct pattern_t *next;
+};
+
+typedef struct pattern_t pattern_t;
+typedef struct pattern_range_t pattern_range_t;
 typedef struct pattern_segment_t pattern_segment_t;
+
+pattern_t *pattern_parse(const char **string);
+size_t pattern_maxlen(pattern_t *pattern);
+size_t pattern_random_fill(pattern_t *pattern, random_t *rand, char *buffer, size_t len);
+char *pattern_random(pattern_t *pattern, random_t *rand);
 
 pattern_range_t *pattern_range_new(char start, char end, pattern_range_t *next);
 pattern_range_t *pattern_range_parse(const char **string);

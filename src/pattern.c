@@ -155,7 +155,7 @@ size_t pattern_segment_maxlen(pattern_segment_t *pattern) {
   if(!pattern->next) {
     return len;
   } else {
-    return len + pattern_segment_maxlen(pattern);
+    return len + pattern_segment_maxlen(pattern->next);
   }
 }
 
@@ -175,4 +175,28 @@ char *pattern_segment_random(pattern_segment_t *pattern, random_t *rand) {
   buffer[written] = '\0';
 
   return buffer;
+}
+
+pattern_t *pattern_parse(const char **string) {
+  return NULL;
+}
+
+size_t pattern_maxlen(pattern_t *pattern) {
+  size_t maxlen = 0;
+
+  // return the largest segment's maxlen.
+  while(pattern) {
+    size_t maxlen_cur = pattern_segment_maxlen(pattern->item);
+    if(maxlen_cur > maxlen) maxlen = maxlen_cur;
+  }
+
+  return maxlen;
+}
+
+size_t pattern_random_fill(pattern_t *pattern, random_t *rand, char *buffer, size_t len) {
+  return 0;
+}
+
+char *pattern_random(pattern_t *pattern, random_t *rand) {
+  return NULL;
 }
