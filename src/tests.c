@@ -13,6 +13,7 @@ void test_pattern_range_range();
 void test_pattern_range_char();
 void test_pattern_range_combined();
 void test_pattern_range_err();
+void test_pattern_range_random();
 void test_pattern_segment();
 void test_pattern_segment_parse();
 void test_pattern_segment_parse_chars();
@@ -108,6 +109,7 @@ void test_pattern_segment_parse_range() {
 }
 
 void test_pattern_segment_parse_group() {
+  // TODO
 }
 
 void test_pattern_segment_parse_reps() {
@@ -131,6 +133,23 @@ void test_pattern_range() {
   test_pattern_range_char();
   test_pattern_range_combined();
   test_pattern_range_err();
+  test_pattern_range_random();
+}
+
+void test_pattern_range_random() {
+  random_t *rand = random_new();
+  const char *s;
+  pattern_range_t *range;
+  s = "ace0-1";
+  range = pattern_range_parse(&s);
+
+  for(size_t i = 0; i < 256; i++) {
+    char c = pattern_range_random(range, rand);
+    assert(c == 'a' || c == 'c' || c == 'e' || c == '0' || c == '1');
+  }
+
+  pattern_range_free(range);
+  random_close(rand);
 }
 
 void test_pattern_range_range() {

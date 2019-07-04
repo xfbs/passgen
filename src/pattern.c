@@ -41,6 +41,26 @@ void pattern_range_free(pattern_range_t *range) {
   free(range);
 }
 
+char pattern_range_random(pattern_range_t *range, random_t *rand) {
+  // calculate sum of possible chars
+  size_t poss = 0;
+  for(pattern_range_t *pos = range; pos != NULL; pos = pos->next) {
+    poss += pos->end - pos->start + 1;
+  }
+
+  size_t choice = random_uint64_max(rand, poss);
+
+  for(pattern_range_t *pos = range; pos != NULL; pos = pos->next) {
+    size_t count = pos->end - pos->start + 1;
+
+    if(choice < count) {
+      return pos->start + choice;
+    } else {
+      choice -= count;
+    }
+  }
+}
+
 pattern_segment_t *pattern_segment_parse(const char **string) {
   if(is_end(**string)) return NULL;
 
@@ -159,7 +179,28 @@ size_t pattern_segment_maxlen(pattern_segment_t *pattern) {
   }
 }
 
-size_t pattern_segment_random_fill(pattern_segment_t *pattern, random_t *rand, char *str, size_t len) {
+size_t pattern_segment_random_fill(pattern_segment_t *segment, random_t *rand, char *str, size_t len) {
+  size_t written = 0;
+
+  while(written < len && segment) {
+    switch(segment->kind) {
+      case PATTERN_CHAR:
+        str[written] = segment->data.chr[0];
+        written += 1;
+        break;
+      case PATTERN_RANGE:
+        str[written] = pattern_range_random(segment->data.range, rand);
+        written += 1;
+        break;
+      case PATTERN_GROUP:
+        written += pattern_random_fill(segment->data.group, rand, &str[written], len - written);
+        break;
+    }
+
+    segment = segment->next;
+  }
+
+  return written;
 }
 
 char *pattern_segment_random(pattern_segment_t *pattern, random_t *rand) {
@@ -191,6 +232,17 @@ size_t pattern_maxlen(pattern_t *pattern) {
   }
 
   return maxlen;
+}
+
+size_t pattern_segment_count(pattern_t *pattern) {
+  size_t count = 0;
+
+  while(pattern) {
+    count += 1;
+    pattern = pattern->next;
+  }
+
+  return count;
 }
 
 size_t pattern_random_fill(pattern_t *pattern, random_t *rand, char *buffer, size_t len) {
