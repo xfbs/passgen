@@ -103,7 +103,7 @@ uint8_t  random_uint8_max (random_t *random, uint8_t max) {
   // FIXME: strip higher bits?
   do {
     num = random_uint8(random);
-  } while(num >= max);
+  } while(num > max);
 
   return num;
 }
@@ -117,7 +117,7 @@ uint16_t random_uint16_max(random_t *random, uint16_t max) {
 
   do {
     num = random_uint16(random);
-  } while(num >= max);
+  } while(num > max);
 
   return num;
 }
@@ -131,7 +131,7 @@ uint32_t random_uint32_max(random_t *random, uint32_t max) {
 
   do {
     num = random_uint32(random);
-  } while(num >= max);
+  } while(num > max);
 
   return num;
 }
@@ -145,7 +145,7 @@ uint64_t random_uint64_max(random_t *random, uint64_t max) {
 
   do {
     num = random_uint64(random);
-  } while(num >= max);
+  } while(num > max);
 
   return num;
 }
