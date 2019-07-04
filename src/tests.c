@@ -47,7 +47,7 @@ void test_pattern_segment_parse() {
 void test_pattern_segment_parse_chars() {
   const char *s = "a\\({2}b{11,12}";
   const char *p = s;
-  pattern_segment_t *pattern = pattern_parse(&p);
+  pattern_segment_t *pattern = pattern_segment_parse(&p);
   assert(pattern);
   assert(pattern->kind == PATTERN_CHAR);
   assert(pattern->data == &s[0]);
@@ -65,13 +65,13 @@ void test_pattern_segment_parse_chars() {
   assert(pattern->next->next->reps.max == 12);
   assert(!pattern->next->next->next);
   assert(p == &s[14]);
-  pattern_free(pattern);
+  pattern_segment_free(pattern);
 }
 
 void test_pattern_segment_parse_range() {
   const char *s = "[a-z]{12,13}";
   const char *p = s;
-  pattern_segment_t *pattern = pattern_parse(&p);
+  pattern_segment_t *pattern = pattern_segment_parse(&p);
   assert(pattern);
   assert(pattern->kind == PATTERN_RANGE);
   assert(pattern->data);
@@ -82,7 +82,7 @@ void test_pattern_segment_parse_range() {
   assert(pattern->reps.max == 13);
   assert(!pattern->next);
   assert(p == &s[12]);
-  pattern_free(pattern);
+  pattern_segment_free(pattern);
 }
 
 void test_pattern_segment_parse_group() {
@@ -91,14 +91,14 @@ void test_pattern_segment_parse_group() {
 void test_pattern_segment_parse_reps() {
   const char *s = "{123,234}";
   const char *p = &s[1];
-  pattern_reps_t reps = pattern_parse_reps(&p);
+  pattern_reps_t reps = pattern_segment_parse_reps(&p);
   assert(*p == '}');
   assert(reps.min == 123);
   assert(reps.max == 234);
 
   s = "{991}";
   p = &s[1];
-  reps = pattern_parse_reps(&p);
+  reps = pattern_segment_parse_reps(&p);
   assert(*p == '}');
   assert(reps.min == 991);
   assert(reps.max == 991);
