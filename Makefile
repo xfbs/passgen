@@ -7,9 +7,9 @@ STRIP		 = strip
 MKDIR		 = mkdir -p
 CFLAGS		+= -std=c99 -Wall -Wextra -pedantic -Iinclude
 LDFLAGS		 =
-SOURCES		 = random.c
+SOURCES		 = random.c pattern.c
 LIBNAME      = passgen
-BINARY		 = passgen.c
+BINARY		 = passgen.c tests.c
 TESTS		 =
 
 default: release

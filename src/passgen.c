@@ -18,8 +18,8 @@ int main(int argc, char *argv[])
     const char *symbols = "!@#$%^&*([{}])=+|<>?";
 
     // command line flags
-    int opt_amount = 10;
-    int opt_length = 8;
+    int opt_amount = 1;
+    int opt_length = 12;
     bool opt_manual = 0;
     bool opt_alpha_small = 0;
     bool opt_alpha_caps = 0;
