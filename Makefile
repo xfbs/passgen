@@ -16,10 +16,13 @@ TESTS		 =
 
 default: release
 
-all-debug: debug debug-leak debug-memory debug-address debug-undefined
+# run tests.
+tests: debug
+	build/debug/tests
+
+all-debug: debug debug-memory debug-address debug-undefined
 
 all-tests: all-debug
-	build/debug-leak/tests
 	build/debug-memory/tests
 	build/debug-address/tests
 	build/debug-undefined/tests
@@ -72,29 +75,7 @@ build/debug/obj-bin/%.o: src/bin/%.c build/debug
 build/debug/obj-lib/%.o: src/%.c build/debug
 	$(CC) -c $(CFLAGS) $< -o $@
 
-# debug-leak build with leak sanitizer
-# enables optimizations
-debug-leak: CFLAGS  += -O1 -g -DDEBUG -fsanitize=leak
-debug-leak: LDFLAGS += -O1 -g -fsanitize=leak
-debug-leak: $(BINARY:%.c=build/debug-leak/%)
-
-build/debug-leak:
-	$(MKDIR) $@ $@/obj-bin $@/obj-lib
-
-build/debug-leak/%: build/debug-leak/obj-bin/%.o build/debug-leak/$(LIBNAME).a
-	$(CC) -o $@ $(LDFLAGS) $^
-	$(STRIP) $@
-
-build/debug-leak/$(LIBNAME).a: $(SOURCES:%.c=build/debug-leak/obj-lib/%.o)
-	$(AR) rcs $@ $^
-
-build/debug-leak/obj-bin/%.o: src/bin/%.c build/debug-leak
-	$(CC) -c $(CFLAGS) $< -o $@
-
-build/debug-leak/obj-lib/%.o: src/%.c build/debug-leak
-	$(CC) -c $(CFLAGS) $< -o $@
-
-# debug-memory build with leak sanitizer
+# debug-memory build with memory sanitizer
 # enables optimizations
 debug-memory: CFLAGS  += -O1 -g -DDEBUG -fsanitize=memory
 debug-memory: LDFLAGS += -O1 -g -fsanitize=memory
@@ -116,7 +97,7 @@ build/debug-memory/obj-bin/%.o: src/bin/%.c build/debug-memory
 build/debug-memory/obj-lib/%.o: src/%.c build/debug-memory
 	$(CC) -c $(CFLAGS) $< -o $@
 
-# debug-address build with leak sanitizer
+# debug-address build with address sanitizer (and leak sanitizer)
 # enables optimizations
 debug-address: CFLAGS  += -O1 -g -DDEBUG -fsanitize=address
 debug-address: LDFLAGS += -O1 -g -fsanitize=address
