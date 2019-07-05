@@ -64,7 +64,6 @@ build/debug:
 
 build/debug/%: build/debug/obj-bin/%.o build/debug/$(LIBNAME).a
 	$(CC) -o $@ $(LDFLAGS) $^
-	$(STRIP) $@
 
 build/debug/$(LIBNAME).a: $(SOURCES:%.c=build/debug/obj-lib/%.o)
 	$(AR) rcs $@ $^
@@ -86,7 +85,6 @@ build/debug-memory:
 
 build/debug-memory/%: build/debug-memory/obj-bin/%.o build/debug-memory/$(LIBNAME).a
 	$(CC) -o $@ $(LDFLAGS) $^
-	$(STRIP) $@
 
 build/debug-memory/$(LIBNAME).a: $(SOURCES:%.c=build/debug-memory/obj-lib/%.o)
 	$(AR) rcs $@ $^
@@ -108,7 +106,6 @@ build/debug-address:
 
 build/debug-address/%: build/debug-address/obj-bin/%.o build/debug-address/$(LIBNAME).a
 	$(CC) -o $@ $(LDFLAGS) $^
-	$(STRIP) $@
 
 build/debug-address/$(LIBNAME).a: $(SOURCES:%.c=build/debug-address/obj-lib/%.o)
 	$(AR) rcs $@ $^
@@ -130,7 +127,6 @@ build/debug-undefined:
 
 build/debug-undefined/%: build/debug-undefined/obj-bin/%.o build/debug-undefined/$(LIBNAME).a
 	$(CC) -o $@ $(LDFLAGS) $^
-	$(STRIP) $@
 
 build/debug-undefined/$(LIBNAME).a: $(SOURCES:%.c=build/debug-undefined/obj-lib/%.o)
 	$(AR) rcs $@ $^
