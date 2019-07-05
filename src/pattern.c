@@ -1,4 +1,4 @@
-#include "pattern.h"
+#include "passgen/pattern.h"
 #include <assert.h>
 #include <stdbool.h>
 

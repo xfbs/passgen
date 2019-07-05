@@ -1,6 +1,6 @@
-#include "pattern.h"
-#include "random.h"
-#include "passgen.h"
+#include "passgen/pattern.h"
+#include "passgen/random.h"
+#include "passgen/passgen.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>

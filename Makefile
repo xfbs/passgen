@@ -6,7 +6,7 @@ AR			 = ar
 STRIP		 = strip
 MKDIR		 = mkdir -p
 FORMAT       = clang-format -i
-CFLAGS		+= -std=c99 -Wall -Wextra -pedantic -Iinclude
+CFLAGS		+= -std=c99 -Wall -Wextra -pedantic -I.
 LDFLAGS		 =
 SOURCES		 = random.c pattern.c passgen.c
 HEADERS      = random.h pattern.h
