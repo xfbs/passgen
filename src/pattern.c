@@ -38,8 +38,12 @@ pattern_range_t *pattern_range_parse(const char **string) {
 }
 
 void pattern_range_free(pattern_range_t *range) {
-  if (range->next)
+  if(!range) return;
+
+  if (range->next) {
     pattern_range_free(range->next);
+  }
+
   free(range);
 }
 
@@ -129,6 +133,8 @@ pattern_segment_t *pattern_segment_new(pattern_kind kind, void *data,
 }
 
 void pattern_segment_free(pattern_segment_t *pattern) {
+  if(!pattern) return;
+
   switch (pattern->kind) {
   case PATTERN_RANGE:
     pattern_range_free(pattern->data.range);
@@ -253,6 +259,8 @@ pattern_t *pattern_new(pattern_segment_t *segment, pattern_t *next) {
 }
 
 void pattern_free(pattern_t *pattern) {
+  if(!pattern) return;
+
   pattern_t *next;
 
   while (pattern) {
