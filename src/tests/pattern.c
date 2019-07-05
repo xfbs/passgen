@@ -17,7 +17,6 @@ test_ret test_pattern_segment_parse_reps();
 test_ret test_pattern_segment_maxlen();
 test_ret test_pattern_segment_random();
 
-
 test_t tests[] = {
   test(pattern_parse),
   test(pattern_range_range),
