@@ -9,7 +9,7 @@ CFLAGS		+= -std=c99 -Wall -Wextra -pedantic -Iinclude
 LDFLAGS		 =
 SOURCES		 = random.c pattern.c
 LIBNAME      = passgen
-BINARY		 = passgen.c tests.c patternpass.c
+BINARY		 = passgen.c tests.c
 TESTS		 =
 
 default: release
