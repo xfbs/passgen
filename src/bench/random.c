@@ -8,24 +8,24 @@ void bench_random_uint16();
 void bench_random_uint32();
 void bench_random_uint64();
 
-void bench_random_uint8_max_213();
-void bench_random_uint16_max_29302();
-void bench_random_uint32_max_128924398();
-void bench_random_uint64_max_10000000000();
+void bench_random_uint8_max();
+void bench_random_uint16_max();
+void bench_random_uint32_max();
+void bench_random_uint64_max();
 
 void bench(const char *name, bench_func func, void *data, size_t count);
 
 int main() {
   random_t *rand = random_new();
-  bench("random_uint8()", &bench_random_uint8, rand, 10000000);
-  bench("random_uint16()", &bench_random_uint16, rand, 10000000);
-  bench("random_uint32()", &bench_random_uint32, rand, 5000000);
-  bench("random_uint64()", &bench_random_uint64, rand, 2000000);
+  bench("random_uint8", &bench_random_uint8, rand, 10000000);
+  bench("random_uint16", &bench_random_uint16, rand, 10000000);
+  bench("random_uint32", &bench_random_uint32, rand, 5000000);
+  bench("random_uint64", &bench_random_uint64, rand, 2000000);
 
-  bench("random_uint8_max(213)", &bench_random_uint8_max_213, rand, 10000000);
-  bench("random_uint16_max(29302)", &bench_random_uint16_max_29302, rand, 10000000);
-  bench("random_uint32_max(128924398)", &bench_random_uint32_max_128924398, rand, 100000);
-  bench("random_uint64_max(10000000000)", &bench_random_uint64_max_10000000000, rand, 100000);
+  bench("random_uint8_max", &bench_random_uint8_max, rand, 10000000);
+  bench("random_uint16_max", &bench_random_uint16_max, rand, 10000000);
+  bench("random_uint32_max", &bench_random_uint32_max, rand, 100000);
+  bench("random_uint64_max", &bench_random_uint64_max, rand, 100000);
 
   random_close(rand);
   return 0;
@@ -40,7 +40,7 @@ void bench_random_uint8(void *data, size_t count) {
   }
 }
 
-void bench_random_uint8_max_213(void *data, size_t count) {
+void bench_random_uint8_max(void *data, size_t count) {
   random_t *rand = data;
   volatile uint8_t sum = 0;
 
@@ -58,7 +58,7 @@ void bench_random_uint16(void *data, size_t count) {
   }
 }
 
-void bench_random_uint16_max_29302(void *data, size_t count) {
+void bench_random_uint16_max(void *data, size_t count) {
   random_t *rand = data;
   volatile uint16_t sum = 0;
 
@@ -67,7 +67,7 @@ void bench_random_uint16_max_29302(void *data, size_t count) {
   }
 }
 
-void bench_random_uint32_max_128924398(void *data, size_t count) {
+void bench_random_uint32_max(void *data, size_t count) {
   random_t *rand = data;
   volatile uint32_t sum = 0;
 
@@ -76,7 +76,7 @@ void bench_random_uint32_max_128924398(void *data, size_t count) {
   }
 }
 
-void bench_random_uint64_max_10000000000(void *data, size_t count) {
+void bench_random_uint64_max(void *data, size_t count) {
   random_t *rand = data;
   volatile uint64_t sum = 0;
 
@@ -123,5 +123,5 @@ void bench(const char *name, bench_func func, void *data, size_t count) {
     prefix = "K";
   }
 
-  printf("%-30s %6.2lf %sops/s (in %0.2lfs)\n", name, ops, prefix, time);
+  printf("%-25s %6.2lf %sops/s (in %0.2lfs)\n", name, ops, prefix, time);
 }
