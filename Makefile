@@ -8,7 +8,8 @@ default: release
 
 # build and run tests.
 test: debug
-	ninja -C build/debug test
+	build/debug/random_tests
+	build/debug/pattern_tests
 
 # build and run tests, with address-sanitizer enabled.
 test-address: debug-address
