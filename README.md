@@ -17,21 +17,24 @@ Create 12-digit alphanumeric password.
     $ passgen "[a-zA-Z0-9]{12}"
     DnJ4bOIGmZbj
 
-## Installation
+## Building
 
-Install `clang` and `make` and build.
+Use the Makefile to build the project. For example, to build it in release mode, do:
 
-    $ make
+    $ make release
 
-Install to `/usr/local/bin`.
+When compiling, resulting files are placed in `./build/`. There are multiple targets:
 
-	$ sudo make install
+* `release` for a release build with optimisations enabled.
+* `debug` for a debug build without optimisations, with debug symbols and `DEBUG` defined.
+* `debug-address` for a debug build with LLVM AddressSanitizer.
+* `debug-memory` for a debug build with LLVM MemorySanitizer.
+* `debug-undefined` for a debug build with LLVM UndefinedSanitizer.
 
-## Makefile targets
+## Actions
 
-* `make format` formats the code with clang-format.
-* `make debug` creates a debug build in `./build/debug`.
-* `make release` creates a release build in `./build/release`.
+* `make format` to use clang-format to clean up the code.
+* `make clean` to remove all build output.
 
 ## License
 
