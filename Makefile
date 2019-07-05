@@ -10,6 +10,7 @@ default: release
 test: debug
 	ninja -C build/debug test
 
+# build and run tests, with address-sanitizer enabled.
 test-address: debug-address
 	ninja -C build/debug-address test
 
