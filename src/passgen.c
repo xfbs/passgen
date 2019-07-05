@@ -1,38 +1,13 @@
 #include "pattern.h"
 #include "random.h"
+#include "passgen.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-typedef enum {
-  PASSGEN_ERROR_NONE,
-  PASSGEN_ERROR_HELP,
-  PASSGEN_ERROR_MULTIPLE_FORMATS,
-  PASSGEN_ERROR_RANDOM_ALLOC,
-  PASSGEN_ERROR_PATTERN_PARSE,
-  PASSGEN_ERROR_ALLOC,
-} passgen_error;
-
-typedef struct {
-  size_t amount;
-  const char *format;
-} passgen_opts;
-
-void passgen_usage(const char *executable);
-void passgen_bail(passgen_error error, void *data);
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *)data)
-passgen_opts passgen_optparse(int argc, char *argv[]);
-void passgen_run(passgen_opts opts);
-
-int main(int argc, char *argv[]) {
-  passgen_opts opts = passgen_optparse(argc, argv);
-  passgen_run(opts);
-
-  return EXIT_SUCCESS;
-}
 
 void passgen_run(passgen_opts opts) {
   // initialize source of random numbers

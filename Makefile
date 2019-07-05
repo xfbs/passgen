@@ -8,10 +8,10 @@ MKDIR		 = mkdir -p
 FORMAT       = clang-format -i
 CFLAGS		+= -std=c99 -Wall -Wextra -pedantic -Iinclude
 LDFLAGS		 =
-SOURCES		 = random.c pattern.c
+SOURCES		 = random.c pattern.c passgen.c
 HEADERS      = random.h pattern.h
 LIBNAME      = passgen
-BINARY		 = passgen.c tests.c
+BINARY		 = tests.c passgen.c
 TESTS		 =
 
 default: release
@@ -27,38 +27,69 @@ release: LDFLAGS += -O3
 release: $(BINARY:%.c=build/release/%)
 
 build/release:
-	$(MKDIR) $@
+	$(MKDIR) $@ $@/obj-bin $@/obj-lib
 
-build/release/%: build/release/%.o build/release/$(LIBNAME).a
+build/release/%: build/release/obj-bin/%.o build/release/$(LIBNAME).a
 	$(CC) -o $@ $(LDFLAGS) $^
 	$(STRIP) $@
 
-build/release/$(LIBNAME).a: $(SOURCES:%.c=build/release/%.o)
+build/release/$(LIBNAME).a: $(SOURCES:%.c=build/release/obj-lib/%.o)
 	$(AR) rcs $@ $^
 
-build/release/%.o: src/%.c build/release
+build/release/obj-bin/%.o: src/bin/%.c build/release
+	$(CC) -c $(CFLAGS) $< -o $@
+
+build/release/obj-lib/%.o: src/%.c build/release
 	$(CC) -c $(CFLAGS) $< -o $@
 
 # debug build
 # enables debug symbols, defines debug.
-debug: CFLAGS  += -O1 -g -DDEBUG -fsanitize=leak
-debug: LDFLAGS += -O1 -g -fsanitize=leak
+#debug: CFLAGS  += -O1 -g -DDEBUG -fsanitize=leak
+#debug: LDFLAGS += -O1 -g -fsanitize=leak
+#debug: $(BINARY:%.c=build/debug/%)
+
+#build/debug:
+#	$(MKDIR) $@
+
+#build/debug/%: build/debug/%.o build/debug/$(LIBNAME).a
+#	$(CC) -o $@ $(LDFLAGS) $^
+
+#build/debug/$(LIBNAME).a: $(SOURCES:%.c=build/debug/%.o)
+#	$(AR) rcs $@ $^
+
+#build/debug/%.o: src/%.c build/debug
+#	$(CC) -c $(CFLAGS) $< -o $@
+
+# debug build
+# enables optimizations
+debug: CFLAGS  += -O1 -g -DDEBUG
+debug: LDFLAGS += -O1 -g
 debug: $(BINARY:%.c=build/debug/%)
 
 build/debug:
-	$(MKDIR) $@
+	$(MKDIR) $@ $@/obj-bin $@/obj-lib
 
-build/debug/%: build/debug/%.o build/debug/$(LIBNAME).a
+build/debug/%: build/debug/obj-bin/%.o build/debug/$(LIBNAME).a
 	$(CC) -o $@ $(LDFLAGS) $^
+	$(STRIP) $@
 
-build/debug/$(LIBNAME).a: $(SOURCES:%.c=build/debug/%.o)
+build/debug/$(LIBNAME).a: $(SOURCES:%.c=build/debug/obj-lib/%.o)
 	$(AR) rcs $@ $^
 
-build/debug/%.o: src/%.c build/debug
+build/debug/obj-bin/%.o: src/bin/%.c build/debug
 	$(CC) -c $(CFLAGS) $< -o $@
+
+build/debug/obj-lib/%.o: src/%.c build/debug
+	$(CC) -c $(CFLAGS) $< -o $@
+
+
+
+
 
 install: $(TARGET)
 	cp $(TARGET) /usr/local/bin/
 
 clean:
 	$(RM) -r build
+
+.PHONY: format release debug install clean
