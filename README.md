@@ -1,19 +1,21 @@
 # Passgen
 
-Generate password.
+Passgen generates passwords. It takes a format string, which is a kind of simplified regex, and creates a random string matching that. 
+
+## Usage
 
 ```
-Usage: passgen [-h|-a|-l|-c|-s|-as|-ac] ...
-  -h|--help         Show this usage information
-  -a|--amount       The amount of passwords
-  -l|--length       The length of the passwords
-  -c|--custom       Include custom characters
-  -s|--symbols      Include symbols in the passwords
-  -n|--numeric      Include numeric characters
-  --alpha           Include alphabetical characters
-  -as|--alpha-small Include small alphabetical characters
-  -ac|--alpha-caps  Include capitalized alphabetical characters
+Usage: passgen [OPTIONS] [FORMAT]
+  -h, --help         Show this usage information
+  -a, --amount       The amount of passwords
 ```
+
+## Examples
+
+Create 12-digit alphanumeric password.
+
+    $ passgen "[a-zA-Z0-9]{12}"
+    DnJ4bOIGmZbj
 
 ## Installation
 
@@ -25,6 +27,12 @@ Install to `/usr/local/bin`.
 
 	$ sudo make install
 
+## Makefile targets
+
+* `make format` formats the code with clang-format.
+* `make debug` creates a debug build in `./build/debug`.
+* `make release` creates a release build in `./build/release`.
+
 ## License
 
-MIT.
+MIT, see [License](LICENSE) file.
