@@ -21,7 +21,7 @@ typedef struct {
   const char *format;
 } passgen_opts;
 
-void usage(const char *executable);
+void passgen_usage(const char *executable);
 void passgen_bail(passgen_error error, void *data);
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_ ## kind, (void *) data)
 passgen_opts passgen_optparse(int argc, char *argv[]);
@@ -116,16 +116,16 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
     return opts;
 }
 
-void usage(const char *executable) {
+void passgen_usage(const char *executable) {
     printf("Usage: %s [OPTIONS] [FORMAT]\n", executable);
-    printf("  -h, --help         Show this usage information\n");
+    printf("  -h, --help         Show this passgen_usage information\n");
     printf("  -a, --amount       The amount of passwords\n");
 }
 
 void passgen_bail(passgen_error error, void *data) {
   switch(error) {
     case PASSGEN_ERROR_HELP:
-      usage(data);
+      passgen_usage(data);
       exit(-1);
     case PASSGEN_ERROR_MULTIPLE_FORMATS:
       printf("Error: multiple formats specified (%s).\n", data);
