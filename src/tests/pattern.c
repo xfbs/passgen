@@ -238,9 +238,27 @@ test_ret test_pattern_segment_parse_err() {
 }
 
 test_ret test_pattern_segment_parse_group() {
-  const char *s = "(abc){2,3}";
-  const char *p = s;
-  pattern_segment_t *pattern = pattern_segment_parse(&p);
+  const char *s;
+  const char *p;
+  pattern_segment_t *pattern;
+
+  p = s = "(a)|";
+  pattern = pattern_segment_parse(&p);
+  assert(pattern);
+  assert(pattern->kind == PATTERN_GROUP);
+  assert(pattern->data.group);
+  assert(pattern->data.group->item);
+  assert(pattern->data.group->item->kind == PATTERN_CHAR);
+  assert(pattern->data.group->item->data.chr[0] == 'a');
+  assert(!pattern->data.group->item->next);
+  assert(pattern->reps.min == 1);
+  assert(pattern->reps.max == 1);
+  assert(!pattern->next);
+  assert(*p == '|');
+  pattern_segment_free(pattern);
+
+  p = s = "(abc){2,3}";
+  pattern = pattern_segment_parse(&p);
   assert(pattern);
   assert(pattern->kind == PATTERN_GROUP);
   assert(pattern->reps.min == 2);
