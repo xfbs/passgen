@@ -19,8 +19,12 @@ typedef struct {
 } test_t;
 
 bool run(test_t test);
-#define test(id) {.name = #id, .fun = test_ ## id}
+#define test(id) \
+  { .name = #id, .fun = test_##id }
 
-#define assert(some) if(!(some)) return (test_ret) {.ok = false, .assertion = #some, .line = __LINE__, .func = __func__};
+#define assert(some)   \
+  if (!(some))         \
+    return (test_ret){ \
+        .ok = false, .assertion = #some, .line = __LINE__, .func = __func__};
 
 extern test_t tests[];

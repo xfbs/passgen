@@ -1,6 +1,6 @@
 #pragma once
-#include "random.h"
 #include <stdlib.h>
+#include "random.h"
 
 // TODO: remove PATTERN_CHAR, convert to use PATTERN_RANGE.
 

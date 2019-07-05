@@ -19,4 +19,3 @@ void passgen_usage(const char *executable);
 void passgen_bail(passgen_error error, void *data);
 passgen_opts passgen_optparse(int argc, char *argv[]);
 void passgen_run(passgen_opts opts);
-

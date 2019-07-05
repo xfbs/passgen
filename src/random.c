@@ -2,9 +2,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#define check(ptr)                                                             \
-  if (ptr == NULL)                                                             \
-  goto error
+#define check(ptr) \
+  if (ptr == NULL) goto error
 
 static const char *random_default_device = "/dev/urandom";
 

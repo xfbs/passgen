@@ -1,5 +1,3 @@
-#include "passgen/pattern.h"
-#include "passgen/random.h"
 #include "passgen/passgen.h"
 #include <assert.h>
 #include <stdbool.h>
@@ -7,13 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "passgen/pattern.h"
+#include "passgen/random.h"
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *)data)
 
 void passgen_run(passgen_opts opts) {
   // initialize source of random numbers
   random_t *random = random_new();
-  if (!random)
-    bail(RANDOM_ALLOC, NULL);
+  if (!random) bail(RANDOM_ALLOC, NULL);
 
   // parse format
   const char *parse_pos = opts.format;
@@ -102,20 +101,20 @@ void passgen_usage(const char *executable) {
 
 void passgen_bail(passgen_error error, void *data) {
   switch (error) {
-  case PASSGEN_ERROR_HELP:
-    passgen_usage(data);
-    exit(-1);
-  case PASSGEN_ERROR_MULTIPLE_FORMATS:
-    printf("Error: multiple formats specified (%s).\n", data);
-    exit(-2);
-  case PASSGEN_ERROR_RANDOM_ALLOC:
-    printf("Error: couldn't open random object.\n");
-    exit(-3);
-  case PASSGEN_ERROR_PATTERN_PARSE:
-    printf("Error: couldn't parse pattern (%s).\n", data);
-    exit(-4);
-  default:
-    printf("Error: unknown error.\n");
-    exit(-100);
+    case PASSGEN_ERROR_HELP:
+      passgen_usage(data);
+      exit(-1);
+    case PASSGEN_ERROR_MULTIPLE_FORMATS:
+      printf("Error: multiple formats specified (%s).\n", data);
+      exit(-2);
+    case PASSGEN_ERROR_RANDOM_ALLOC:
+      printf("Error: couldn't open random object.\n");
+      exit(-3);
+    case PASSGEN_ERROR_PATTERN_PARSE:
+      printf("Error: couldn't parse pattern (%s).\n", data);
+      exit(-4);
+    default:
+      printf("Error: unknown error.\n");
+      exit(-100);
   }
 }

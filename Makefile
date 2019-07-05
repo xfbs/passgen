@@ -22,7 +22,7 @@ bench: debug
 
 # format using clang-format.
 format:
-	$(FORMAT) passgen/*.h src/*.c src/bin/*.c
+	$(FORMAT) passgen/*.h util/*.c util/*.h src/*.c src/bin/*.c
 
 # targets.
 release: build/release

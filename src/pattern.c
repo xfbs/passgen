@@ -15,8 +15,7 @@ pattern_range_t *pattern_range_new(char start, char end,
 }
 
 pattern_range_t *pattern_range_parse(const char **string) {
-  if (is_end(**string))
-    return NULL;
+  if (is_end(**string)) return NULL;
 
   // TODO: read escaped \] \).
   char start = (*string)[0];
@@ -24,8 +23,7 @@ pattern_range_t *pattern_range_parse(const char **string) {
 
   if ((*string)[1] == '-') {
     // is a range.
-    if ((*string)[2] == '\0')
-      return NULL;
+    if ((*string)[2] == '\0') return NULL;
     end = (*string)[2];
     *string += 3;
   } else {
@@ -38,7 +36,7 @@ pattern_range_t *pattern_range_parse(const char **string) {
 }
 
 void pattern_range_free(pattern_range_t *range) {
-  if(!range) return;
+  if (!range) return;
 
   if (range->next) {
     pattern_range_free(range->next);
@@ -71,34 +69,31 @@ char pattern_range_random(pattern_range_t *range, random_t *rand) {
 }
 
 pattern_segment_t *pattern_segment_parse(const char **string) {
-  if (is_end(**string))
-    return NULL;
+  if (is_end(**string)) return NULL;
 
   // parse the kind and data.
   pattern_kind kind;
   void *data;
   switch (**string) {
-  case '[':
-    *string += 1;
-    kind = PATTERN_RANGE;
-    data = pattern_range_parse(string);
-    if (**string != ']')
-      goto fail;
-    break;
-  case '(':
-    *string += 1;
-    kind = PATTERN_GROUP;
-    data = pattern_parse(string);
-    if (**string != ')')
-      goto fail;
-    break;
-  case '\\':
-    *string += 1;
-    kind = PATTERN_CHAR;
-    data = (void *)*string;
-  default:
-    kind = PATTERN_CHAR;
-    data = (void *)*string;
+    case '[':
+      *string += 1;
+      kind = PATTERN_RANGE;
+      data = pattern_range_parse(string);
+      if (**string != ']') goto fail;
+      break;
+    case '(':
+      *string += 1;
+      kind = PATTERN_GROUP;
+      data = pattern_parse(string);
+      if (**string != ')') goto fail;
+      break;
+    case '\\':
+      *string += 1;
+      kind = PATTERN_CHAR;
+      data = (void *)*string;
+    default:
+      kind = PATTERN_CHAR;
+      data = (void *)*string;
   }
 
   *string += 1;
@@ -108,8 +103,7 @@ pattern_segment_t *pattern_segment_parse(const char **string) {
   if (**string == '{') {
     *string += 1;
     reps = pattern_segment_parse_reps(string);
-    if (**string != '}')
-      goto fail;
+    if (**string != '}') goto fail;
     *string += 1;
   }
 
@@ -133,16 +127,16 @@ pattern_segment_t *pattern_segment_new(pattern_kind kind, void *data,
 }
 
 void pattern_segment_free(pattern_segment_t *pattern) {
-  if(!pattern) return;
+  if (!pattern) return;
 
   switch (pattern->kind) {
-  case PATTERN_RANGE:
-    pattern_range_free(pattern->data.range);
-    break;
-  case PATTERN_GROUP:
-    pattern_free(pattern->data.group);
-  case PATTERN_CHAR:
-    break;
+    case PATTERN_RANGE:
+      pattern_range_free(pattern->data.range);
+      break;
+    case PATTERN_GROUP:
+      pattern_free(pattern->data.group);
+    case PATTERN_CHAR:
+      break;
   }
 
   if (pattern->next) {
@@ -184,13 +178,13 @@ size_t pattern_segment_maxlen(pattern_segment_t *pattern) {
   size_t len = 0;
 
   switch (pattern->kind) {
-  case PATTERN_RANGE:
-  case PATTERN_CHAR:
-    len += pattern->reps.max;
-    break;
-  case PATTERN_GROUP:
-    // TODO
-    break;
+    case PATTERN_RANGE:
+    case PATTERN_CHAR:
+      len += pattern->reps.max;
+      break;
+    case PATTERN_GROUP:
+      // TODO
+      break;
   }
 
   if (!pattern->next) {
@@ -214,18 +208,18 @@ size_t pattern_segment_random_fill(pattern_segment_t *segment, random_t *rand,
     // repeat segment reps times.
     for (size_t i = 0; i < reps && written < len; ++i) {
       switch (segment->kind) {
-      case PATTERN_CHAR:
-        str[written] = segment->data.chr[0];
-        written += 1;
-        break;
-      case PATTERN_RANGE:
-        str[written] = pattern_range_random(segment->data.range, rand);
-        written += 1;
-        break;
-      case PATTERN_GROUP:
-        written += pattern_random_fill(segment->data.group, rand, &str[written],
-                                       len - written);
-        break;
+        case PATTERN_CHAR:
+          str[written] = segment->data.chr[0];
+          written += 1;
+          break;
+        case PATTERN_RANGE:
+          str[written] = pattern_range_random(segment->data.range, rand);
+          written += 1;
+          break;
+        case PATTERN_GROUP:
+          written += pattern_random_fill(segment->data.group, rand,
+                                         &str[written], len - written);
+          break;
       }
     }
 
@@ -259,7 +253,7 @@ pattern_t *pattern_new(pattern_segment_t *segment, pattern_t *next) {
 }
 
 void pattern_free(pattern_t *pattern) {
-  if(!pattern) return;
+  if (!pattern) return;
 
   pattern_t *next;
 
@@ -290,8 +284,7 @@ size_t pattern_maxlen(pattern_t *pattern) {
   // return the largest segment's maxlen.
   while (pattern) {
     size_t maxlen_cur = pattern_segment_maxlen(pattern->item);
-    if (maxlen_cur > maxlen)
-      maxlen = maxlen_cur;
+    if (maxlen_cur > maxlen) maxlen = maxlen_cur;
   }
 
   return maxlen;
