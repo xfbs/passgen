@@ -5,31 +5,35 @@
 #include <stdbool.h>
 #include <assert.h>
 #include "random.h"
+#include "pattern.h"
+
+typedef enum {
+  PASSGEN_ERROR_MULTIPLE_FORMATS,
+  PASSGEN_ERROR_RANDOM_ALLOC,
+  PASSGEN_ERROR_PATTERN_PARSE,
+  PASSGEN_ERROR_ALLOC,
+} passgen_error;
 
 void usage(const char *executable);
-void error(const char *err);
+void passgen_bail(passgen_error error, void *data);
+#define bail(kind, data) passgen_bail(PASSGEN_ERROR_ ## kind, (void *) data)
 
 int main(int argc, char *argv[])
 {
-    // presets
-    const char *alpha_small = "abcdefghijklmnopqrstuvwxyz";
-    const char *alpha_caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const char *numeric = "0123456789";
-    const char *symbols = "!@#$%^&*([{}])=+|<>?";
-
     // command line flags
-    int opt_amount = 1;
-    int opt_length = 12;
-    bool opt_manual = 0;
-    bool opt_alpha_small = 0;
-    bool opt_alpha_caps = 0;
-    bool opt_numeric = 0;
-    bool opt_symbols = 0;
-    char *opt_custom = NULL;
+    int opt_amount = -1;
+    const char *opt_format = NULL;
 
     // parses the command line flags
+    bool flags = false;
     for(int i = 1; i < argc; i++) {
-        if((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0)) {
+        if(flags) {
+            if(opt_format) {
+                bail(MULTIPLE_FORMATS, (void *) argv[i]);
+            } else {
+                opt_format = argv[i];
+            }
+        } else if((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0)) {
             usage(argv[0]);
             return 0;
         } else if((strcmp(argv[i], "-a") == 0) || (strcmp(argv[i], "--amount") == 0)) {
@@ -40,128 +44,75 @@ int main(int argc, char *argv[])
                 usage(argv[0]);
                 return -1;
             }
-        } else if((strcmp(argv[i], "-l") == 0) || (strcmp(argv[i], "--length") == 0)) {
-            if((i+1) < argc) {
-                opt_length = atoi(argv[i+1]);
-                i++;
-            } else {
-                usage(argv[0]);
-                return -1;
-            }
-        } else if((strcmp(argv[i], "-c") == 0) || (strcmp(argv[i], "--custom") == 0)) {
-            if((i+1) < argc) {
-                opt_custom = argv[i+1];
-                opt_manual = 1;
-                i++;
-            } else {
-                usage(argv[0]);
-                return -1;
-            }
-        } else if((strcmp(argv[i], "-n") == 0) || (strcmp(argv[i], "--numeric") == 0)) {
-            opt_manual = opt_numeric = 1;
-        } else if((strcmp(argv[i], "-as") == 0) || (strcmp(argv[i], "--alpha-small") == 0)) {
-            opt_manual = opt_alpha_small = 1;
-        } else if((strcmp(argv[i], "-ac") == 0) || (strcmp(argv[i], "--alpha-caps") == 0)) {
-            opt_manual = opt_alpha_caps = 1;
-        } else if(strcmp(argv[i], "--alpha") == 0) {
-            opt_manual = opt_alpha_small = opt_alpha_caps = 1;
-        } else if((strcmp(argv[i], "-s") == 0) || (strcmp(argv[i], "--symbols") == 0)) {
-            opt_manual = opt_symbols = 1;
+        } else if(0 == strcmp(argv[i], "--")) {
+            flags = true;
         } else {
-            usage(argv[0]);
-            return -1;
+            opt_format = argv[i];
+            flags = true;
         }
-    }
-
-    // turn on alphanumeric if the user didn't specify anything
-    if(!opt_manual) {
-        opt_alpha_small = opt_alpha_caps = opt_numeric = 1;
     }
 
     // if the amonut is set to something illegal, rectify it
     if(opt_amount <= 0) {
-        opt_amount = 10;
-    }
-
-    // if the length is set to something illegal, rectify it
-    if(opt_length <= 0) {
-        opt_length = 8;
-    }
-
-
-    // construct the string of possible chars
-    int charlength = 0;
-    charlength += (opt_alpha_small) ? strlen(alpha_small) : 0;
-    charlength += (opt_alpha_caps) ? strlen(alpha_caps) : 0;
-    charlength += (opt_numeric) ? strlen(numeric) : 0;
-    charlength += (opt_symbols) ? strlen(symbols) : 0;
-    charlength += (opt_custom) ? strlen(opt_custom) : 0;
-
-    char *charlist = malloc(charlength+1);
-    if(charlist == NULL) {
-        error("can't allocate memory!");
-    }
-    memset(charlist, 0, (charlength+1));
-
-    if(opt_custom) {
-        strcpy(charlist, opt_custom);
-    }
-
-    if(opt_alpha_small) {
-        strcpy((charlist + strlen(charlist)), alpha_small);
-    }
-
-    if(opt_alpha_caps) {
-        strcpy((charlist + strlen(charlist)), alpha_caps);
-    }
-
-    if(opt_numeric) {
-        strcpy((charlist + strlen(charlist)), numeric);
-    }
-
-    if(opt_symbols) {
-        strcpy((charlist + strlen(charlist)), symbols);
+        opt_amount = 1;
     }
 
     // initialize source of random numbers
     random_t *random = random_new();
-    assert(random != NULL);
+    if(!random) bail(RANDOM_ALLOC, NULL);
 
-    // generate passwords
-    for(int i = 0; i < opt_amount; i++) {
-        for(int j = 0; j < opt_length; j++) {
-            // get random number
-            //unsigned int rnd = havege_rand(&hs);
-            unsigned int rnd = random_uint64_max(random, charlength);
-
-            // print random character
-            printf("%c", charlist[rnd]);
-        }
-
-        printf("\t");
+    // parse format
+    const char *parse_pos = opt_format;
+    pattern_t *pattern = pattern_parse(&parse_pos);
+    if(!pattern) {
+      random_close(random);
+      bail(PATTERN_PARSE, opt_format);
     }
 
-    random_close(random);
-    free(charlist);
+    // allocate some space for pass.
+    //size_t pass_len = pattern_maxlen(pattern);
+    size_t pass_len = 256;
+    char *pass = malloc(pass_len + 1);
+    if(!pass) {
+      random_close(random);
+      bail(ALLOC, NULL);
+    }
+
+    for(size_t i = 0; i < opt_amount; ++i) {
+      // get a NULL-terminated, random pass.
+      size_t written = pattern_random_fill(pattern, random, pass, pass_len);
+      pass[written] = '\0';
+
+      printf((i == 0) ? "%s" : "\t%s", pass);
+    }
 
     printf("\n");
+    free(pass);
+    pattern_free(pattern);
+    random_close(random);
+
     return 0;
 }
 
 void usage(const char *executable) {
-    printf("Usage: %s [-h|-a|-l|-c|-s|-as|-ac] ...\n", executable);
-    printf("  -h|--help         Show this usage information\n");
-    printf("  -a|--amount       The amount of passwords\n");
-    printf("  -l|--length       The length of the passwords\n");
-    printf("  -c|--custom       Include custom characters\n");
-    printf("  -s|--symbols      Include symbols in the passwords\n");
-    printf("  -n|--numeric      Include numeric characters\n");
-    printf("  --alpha           Include alphabetical characters\n");
-    printf("  -as|--alpha-small Include small alphabetical characters\n");
-    printf("  -ac|--alpha-caps  Include capitalized alphabetical characters\n");
+    printf("Usage: %s [OPTIONS] [FORMAT]\n", executable);
+    printf("  -h, --help         Show this usage information\n");
+    printf("  -a, --amount       The amount of passwords\n");
 }
 
-void error(const char *err) {
-    printf("%s", err);
-    exit(-1);
+void passgen_bail(passgen_error error, void *data) {
+  switch(error) {
+    case PASSGEN_ERROR_MULTIPLE_FORMATS:
+      printf("Error: multiple formats specified (%s).\n", data);
+      exit(-1);
+    case PASSGEN_ERROR_RANDOM_ALLOC:
+      printf("Error: couldn't open random object.\n");
+      exit(-2);
+    case PASSGEN_ERROR_PATTERN_PARSE:
+      printf("Error: couldn't parse pattern (%s).\n", data);
+      exit(-3);
+    default:
+      printf("Error: unknown error.\n");
+      exit(-100);
+  }
 }
