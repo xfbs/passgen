@@ -5,14 +5,20 @@ RM			 = rm -f
 AR			 = ar
 STRIP		 = strip
 MKDIR		 = mkdir -p
+FORMAT       = clang-format -i
 CFLAGS		+= -std=c99 -Wall -Wextra -pedantic -Iinclude
 LDFLAGS		 =
 SOURCES		 = random.c pattern.c
+HEADERS      = random.h pattern.h
 LIBNAME      = passgen
 BINARY		 = passgen.c tests.c
 TESTS		 =
 
 default: release
+
+# format using clang-format.
+format:
+	$(FORMAT) $(HEADERS:%.h=include/%.h) $(SOURCES:%.c=src/%.c) $(BINARY:%.c=src/%.c)
 
 # release build
 # enables optimizations

@@ -1,6 +1,6 @@
 #pragma once
-#include <stdlib.h>
 #include "random.h"
+#include <stdlib.h>
 
 // TODO: remove PATTERN_CHAR, convert to use PATTERN_RANGE.
 
@@ -62,7 +62,8 @@ pattern_t *pattern_new(pattern_segment_t *segment, pattern_t *next);
 void pattern_free(pattern_t *pattern);
 pattern_t *pattern_parse(const char **string);
 size_t pattern_maxlen(pattern_t *pattern);
-size_t pattern_random_fill(pattern_t *pattern, random_t *rand, char *buffer, size_t len);
+size_t pattern_random_fill(pattern_t *pattern, random_t *rand, char *buffer,
+                           size_t len);
 char *pattern_random(pattern_t *pattern, random_t *rand);
 size_t pattern_segment_count(pattern_t *pattern);
 
@@ -73,10 +74,13 @@ char pattern_range_random(pattern_range_t *range, random_t *rand);
 
 pattern_reps_t pattern_segment_parse_reps(const char **string);
 
-pattern_segment_t *pattern_segment_new(pattern_kind kind, void *data, pattern_reps_t reps, pattern_segment_t *next);
+pattern_segment_t *pattern_segment_new(pattern_kind kind, void *data,
+                                       pattern_reps_t reps,
+                                       pattern_segment_t *next);
 pattern_segment_t *pattern_segment_parse(const char **string);
 void pattern_segment_free(pattern_segment_t *pattern);
 
 size_t pattern_segment_maxlen(pattern_segment_t *pattern);
-size_t pattern_segment_random_fill(pattern_segment_t *pattern, random_t *rand, char *buffer, size_t len);
+size_t pattern_segment_random_fill(pattern_segment_t *pattern, random_t *rand,
+                                   char *buffer, size_t len);
 char *pattern_segment_random(pattern_segment_t *pattern, random_t *rand);

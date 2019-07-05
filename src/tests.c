@@ -1,8 +1,8 @@
-#include <stdio.h>
+#include "pattern.h"
+#include "random.h"
 #include <assert.h>
 #include <stdbool.h>
-#include "random.h"
-#include "pattern.h"
+#include <stdio.h>
 
 void test_random();
 void test_random_uint8();
@@ -25,8 +25,8 @@ void test_pattern_segment_maxlen();
 void test_pattern_segment_random();
 
 int main(int argc, char *argv[]) {
-  (void) argc;
-  (void) argv;
+  (void)argc;
+  (void)argv;
 
   test_random();
   test_pattern();
@@ -152,7 +152,7 @@ void test_pattern_segment_parse_range() {
   assert(pattern->kind == PATTERN_RANGE);
   assert(pattern->data.range);
   assert(pattern->data.range->start == 'a');
-  assert(pattern->data.range->end== 'z');
+  assert(pattern->data.range->end == 'z');
   assert(pattern->data.range->next == NULL);
   assert(pattern->reps.min == 12);
   assert(pattern->reps.max == 13);
@@ -196,7 +196,7 @@ void test_pattern_range_random() {
   s = "ace0-1";
   range = pattern_range_parse(&s);
 
-  for(size_t i = 0; i < 256; i++) {
+  for (size_t i = 0; i < 256; i++) {
     char c = pattern_range_random(range, rand);
     assert(c == 'a' || c == 'c' || c == 'e' || c == '0' || c == '1');
   }
@@ -275,12 +275,12 @@ void test_random_uint8() {
 
   // generate random nubers until we got almost all of them.
   bool gotten[UINT8_MAX] = {false};
-  for(size_t i = 0; i < (32 * UINT8_MAX); ++i) {
+  for (size_t i = 0; i < (32 * UINT8_MAX); ++i) {
     gotten[random_uint8(rand)] = true;
   }
 
   // there's still a (255/256)^(8*256) = 0.03% chance this fails.
-  for(size_t i = 0; i < UINT8_MAX; ++i) {
+  for (size_t i = 0; i < UINT8_MAX; ++i) {
     assert(gotten[i]);
   }
 
@@ -291,17 +291,17 @@ void test_random_uint8_max() {
   random_t *rand = random_new();
   assert(rand);
 
-  for(size_t max = 1; max < UINT8_MAX; ++max) {
+  for (size_t max = 1; max < UINT8_MAX; ++max) {
     // generate random nubers until we got almost all of them.
     bool gotten[UINT8_MAX] = {false};
-    for(size_t i = 0; i < (16 * UINT8_MAX); ++i) {
+    for (size_t i = 0; i < (16 * UINT8_MAX); ++i) {
       uint8_t r = random_uint8_max(rand, max);
       assert(r <= max);
       gotten[r] = true;
     }
 
     // there's still a (255/256)^(8*256) = 0.03% chance this fails.
-    for(size_t i = 0; i < max; ++i) {
+    for (size_t i = 0; i < max; ++i) {
       assert(gotten[i]);
     }
   }
