@@ -7,6 +7,7 @@ executable('passgen', 'src/bin/passgen.c', link_with : passgen)
 
 # tools
 executable('pattern-dump', 'src/bin/pattern-dump.c', link_with: passgen)
+executable('pattern-choices', 'src/bin/pattern-choices.c', link_with: passgen)
 
 # benchmarks
 executable('bench_random', 'src/bench/random.c', link_with: passgen)

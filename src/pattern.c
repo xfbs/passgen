@@ -389,21 +389,32 @@ size_t pattern_range_choices(pattern_range_t *range) {
 }
 
 size_t pattern_segment_choices(pattern_segment_t *segment) {
-  size_t choices = 1;
+  size_t choices = 0;
 
   while(segment) {
+    size_t lchoices;
     switch(segment->kind) {
       case PATTERN_CHAR:
+        lchoices = 1;
         break;
       case PATTERN_RANGE:
-        choices *= pattern_range_choices(segment->data.range);
+        lchoices = pattern_range_choices(segment->data.range);
         break;
       case PATTERN_GROUP:
-        choices *= pattern_choices(segment->data.group);
+        lchoices = pattern_choices(segment->data.group);
         break;
     }
 
-    choices *= (segment->reps.max - segment->reps.min + 1);
+    size_t mchoices = 1;
+    for(size_t i = 0; i < segment->reps.min; ++i) {
+      mchoices *= lchoices;
+    }
+
+    for(size_t num = segment->reps.min; num <= segment->reps.max; ++num) {
+      choices += mchoices;
+      mchoices *= lchoices;
+    }
+
     segment = segment->next;
   }
 
