@@ -18,16 +18,28 @@ format:
 
 # targets.
 release: build/release
-	ninja -C build/release
-
-build/release:
-	meson build/release
+	ninja -C $<
 
 debug: build/debug
-	ninja -C build/debug
+	ninja -C $<
+
+debug-address: build/debug-address
+	ninja -C $<
+
+debug-memory: build/debug-memory
+	ninja -C $<
+
+build/release:
+	meson $@
 
 build/debug:
-	meson build/debug --buildtype=debug
+	meson $@ --buildtype=debug
+
+build/debug-address:
+	meson $@ --buildtype=debug -Db_sanitize=address,undefined
+
+build/debug-memory:
+	meson $@ --buildtype=debug -Db_sanitize=memory
 
 install: $(TARGET)
 	cp $(TARGET) /usr/local/bin/
