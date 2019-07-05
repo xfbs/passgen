@@ -33,7 +33,7 @@ int main() {
 
 void bench_random_uint8(void *data, size_t count) {
   random_t *rand = data;
-  volatile uint8_t sum;
+  volatile uint8_t sum = 0;
 
   for(size_t i = 0; i < count; i++) {
     sum += random_uint8(rand);
@@ -42,7 +42,7 @@ void bench_random_uint8(void *data, size_t count) {
 
 void bench_random_uint8_max_213(void *data, size_t count) {
   random_t *rand = data;
-  volatile uint8_t sum;
+  volatile uint8_t sum = 0;
 
   for(size_t i = 0; i < count; i++) {
     sum += random_uint8_max(rand, 213);
@@ -51,7 +51,7 @@ void bench_random_uint8_max_213(void *data, size_t count) {
 
 void bench_random_uint16(void *data, size_t count) {
   random_t *rand = data;
-  volatile uint16_t sum;
+  volatile uint16_t sum = 0;
 
   for(size_t i = 0; i < count; i++) {
     sum += random_uint16(rand);
@@ -60,7 +60,7 @@ void bench_random_uint16(void *data, size_t count) {
 
 void bench_random_uint16_max_29302(void *data, size_t count) {
   random_t *rand = data;
-  volatile uint16_t sum;
+  volatile uint16_t sum = 0;
 
   for(size_t i = 0; i < count; i++) {
     sum += random_uint16_max(rand, 10000);
@@ -69,7 +69,7 @@ void bench_random_uint16_max_29302(void *data, size_t count) {
 
 void bench_random_uint32_max_128924398(void *data, size_t count) {
   random_t *rand = data;
-  volatile uint32_t sum;
+  volatile uint32_t sum = 0;
 
   for(size_t i = 0; i < count; i++) {
     sum += random_uint32_max(rand, 128924398);
@@ -78,7 +78,7 @@ void bench_random_uint32_max_128924398(void *data, size_t count) {
 
 void bench_random_uint64_max_10000000000(void *data, size_t count) {
   random_t *rand = data;
-  volatile uint64_t sum;
+  volatile uint64_t sum = 0;
 
   for(size_t i = 0; i < count; i++) {
     sum += random_uint64_max(rand, 10000000000);
@@ -87,7 +87,7 @@ void bench_random_uint64_max_10000000000(void *data, size_t count) {
 
 void bench_random_uint32(void *data, size_t count) {
   random_t *rand = data;
-  volatile uint32_t sum;
+  volatile uint32_t sum = 0;
 
   for(size_t i = 0; i < count; i++) {
     sum += random_uint32(rand);
@@ -96,7 +96,7 @@ void bench_random_uint32(void *data, size_t count) {
 
 void bench_random_uint64(void *data, size_t count) {
   random_t *rand = data;
-  volatile uint64_t sum;
+  volatile uint64_t sum = 0;
 
   for(size_t i = 0; i < count; i++) {
     sum += random_uint64(rand);
