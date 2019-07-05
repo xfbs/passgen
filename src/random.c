@@ -95,11 +95,14 @@ uint64_t random_uint64(random_t *random) {
 }
 
 uint8_t random_uint8_max(random_t *random, uint8_t max) {
-  uint8_t num;
+  uint8_t mask = max;
+  mask |= mask >> 4;
+  mask |= mask >> 2;
+  mask |= mask >> 1;
 
-  // FIXME: strip higher bits?
+  uint8_t num;
   do {
-    num = random_uint8(random);
+    num = random_uint8(random) & mask;
   } while (num >= max);
 
   return num;
@@ -110,10 +113,16 @@ uint16_t random_uint16_max(random_t *random, uint16_t max) {
     return random_uint8_max(random, max);
   }
 
+  uint16_t mask = max;
+  mask |= mask >> 8;
+  mask |= mask >> 4;
+  mask |= mask >> 2;
+  mask |= mask >> 1;
+
   uint16_t num;
 
   do {
-    num = random_uint16(random);
+    num = random_uint16(random) & mask;
   } while (num >= max);
 
   return num;
