@@ -19,8 +19,8 @@ NINJA        = ninja
 default: release
 
 # run tests.
-tests: debug
-	build/debug/tests
+test: debug
+	ninja -C build/debug test
 
 #all-debug: debug debug-memory debug-address debug-undefined
 
