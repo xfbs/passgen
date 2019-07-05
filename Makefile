@@ -14,6 +14,9 @@ test: debug
 test-address: debug-address
 	ninja -C build/debug-address test
 
+bench: debug
+	build/debug/bench_random
+
 #all-debug: debug debug-memory debug-address debug-undefined
 
 # format using clang-format.
