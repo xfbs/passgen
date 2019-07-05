@@ -71,6 +71,7 @@ void pattern_segment_dump(pattern_segment_t *segment, int indent) {
         pattern_segment_char_dump(segment, indent);
         break;
       case PATTERN_RANGE:
+        pattern_segment_range_dump(segment, indent);
         break;
       case PATTERN_GROUP:
         pattern_segment_group_dump(segment, indent);
@@ -106,6 +107,29 @@ void pattern_segment_group_dump(pattern_segment_t *segment, int indent) {
   while(pattern) {
     pattern_segment_dump(pattern->item, indent + 2);
     pattern = pattern->next;
+  }
+
+  pattern_reps_dump(segment->reps, indent + 2);
+  printf("%*s}\n", indent, "");
+}
+
+void pattern_segment_range_dump(pattern_segment_t *segment, int indent) {
+  pattern_range_t *range = segment->data.range;
+
+  if(!range) {
+    printf("%*sgroup NULL\n", indent, "");
+    return;
+  }
+
+  printf("%*srange {\n", indent, "");
+
+  while(range) {
+    if(range->start == range->end) {
+      printf("%*schar '%c'\n", indent + 2, "", range->start);
+    } else {
+      printf("%*schars '%c'-'%c'\n", indent + 2, "", range->start, range->end);
+    }
+    range = range->next;
   }
 
   pattern_reps_dump(segment->reps, indent + 2);
