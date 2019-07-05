@@ -1,79 +1,22 @@
 #include "passgen/pattern.h"
 #include "passgen/random.h"
+#include "util/tests.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
-
-typedef struct {
-  bool ok;
-  const char *assertion;
-  const char *func;
-  size_t line;
-} test_ret;
-
-test_ret test_ok = {.ok = true};
-
-typedef test_ret test_fun(void);
 
 test_ret test_random_uint8(void);
 test_ret test_random_uint8_max(void);
 test_ret test_random_uint16(void);
 test_ret test_random_uint16_max(void);
 
-typedef struct {
-  const char *name;
-  test_fun *fun;
-} test_t;
-
-bool run(test_t test);
-#define test(id) {.name = #id, .fun = test_ ## id}
-
-#define assert(some) if(!(some)) return (test_ret) {.ok = false, .assertion = #some, .line = __LINE__, .func = __func__};
-
-int main() {
-  test_t tests[] = {
-    test(random_uint8),
-    test(random_uint8_max),
-    test(random_uint16),
-    test(random_uint16_max),
-    {NULL, NULL}
-  };
-
-  size_t failures = 0;
-  size_t success = 0;
-  for(size_t i = 0; tests[i].name; ++i) {
-    if(run(tests[i])) {
-      success += 1;
-    } else {
-      failures += 1;
-    }
-  }
-
-  printf("\033[1;34m=>\033[0m %zi/%zi tests passed.\n", success, success + failures);
-
-  if(failures) {
-    return -1;
-  } else {
-    return 0;
-  }
-}
-
-bool run(test_t test) {
-  clock_t before = clock();
-  test_ret ret = test.fun();
-  clock_t total = clock() - before;
-
-  double time = total / (CLOCKS_PER_SEC * 1.0);
-
-  if(ret.ok) {
-    printf("%-20s \033[0;32mpassed\033[0m in %4.3lfs.\n", test.name, time);
-  } else {
-    printf("%-20s \033[0;31mfailed\033[0m in %4.3lfs.\n", test.name, time);
-    printf("    \033[0;31m%s\033[0m failed at %s:%zi\n", ret.assertion, ret.func, ret.line);
-  }
-
-  return ret.ok;
-}
+test_t tests[] = {
+  test(random_uint8),
+  test(random_uint8_max),
+  test(random_uint16),
+  test(random_uint16_max),
+  {NULL, NULL}
+};
 
 test_ret test_random_uint8(void) {
   random_t *rand = random_new();
