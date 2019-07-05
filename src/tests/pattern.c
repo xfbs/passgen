@@ -4,35 +4,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-test_ret test_pattern_parse();
-test_ret test_pattern_range_range();
-test_ret test_pattern_range_char();
-test_ret test_pattern_range_combined();
-test_ret test_pattern_range_err();
-test_ret test_pattern_range_random();
-test_ret test_pattern_segment_parse_chars();
-test_ret test_pattern_segment_parse_range();
-test_ret test_pattern_segment_parse_group();
-test_ret test_pattern_segment_parse_reps();
-test_ret test_pattern_segment_maxlen();
-test_ret test_pattern_segment_random();
-
-test_t tests[] = {
-  test(pattern_parse),
-  test(pattern_range_range),
-  test(pattern_range_char),
-  test(pattern_range_combined),
-  test(pattern_range_err),
-  test(pattern_range_random),
-  test(pattern_segment_parse_chars),
-  test(pattern_segment_parse_range),
-  test(pattern_segment_parse_group),
-  test(pattern_segment_parse_reps),
-  test(pattern_segment_maxlen),
-  test(pattern_segment_random),
-  {NULL, NULL}
-};
-
 test_ret test_pattern_parse() {
   const char *s = "abc|def";
   pattern_t *pattern = pattern_parse(&s);
@@ -257,3 +228,56 @@ test_ret test_pattern_range_err() {
 
   return test_ok;
 }
+
+test_ret test_pattern_range_choices() {
+  // single char.
+  pattern_range_t *range = pattern_range_new('a', 'a', NULL);
+  assert(range);
+  assert(pattern_range_choices(range) == 1);
+  pattern_range_free(range);
+
+  // char range.
+  range = pattern_range_new('a', 'c', NULL);
+  assert(range);
+  assert(pattern_range_choices(range) == 3);
+  pattern_range_free(range);
+
+  // multi chars.
+  range = pattern_range_new('a', 'a', NULL);
+  assert(range);
+  range = pattern_range_new('c', 'c', range);
+  assert(range);
+  range = pattern_range_new('e', 'e', range);
+  assert(range);
+  assert(pattern_range_choices(range) == 3);
+  pattern_range_free(range);
+
+  // multi char range.
+  range = pattern_range_new('a', 'c', NULL);
+  assert(range);
+  range = pattern_range_new('e', 'f', range);
+  assert(range);
+  range = pattern_range_new('h', 'k', range);
+  assert(range);
+  assert(pattern_range_choices(range) == (3 + 2 + 4));
+  pattern_range_free(range);
+
+  return test_ok;
+}
+
+test_t tests[] = {
+  test(pattern_parse),
+  test(pattern_range_range),
+  test(pattern_range_char),
+  test(pattern_range_combined),
+  test(pattern_range_err),
+  test(pattern_range_random),
+  test(pattern_range_choices),
+  test(pattern_segment_parse_chars),
+  test(pattern_segment_parse_range),
+  test(pattern_segment_parse_group),
+  test(pattern_segment_parse_reps),
+  test(pattern_segment_maxlen),
+  test(pattern_segment_random),
+  {NULL, NULL}
+};

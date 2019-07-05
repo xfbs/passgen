@@ -341,3 +341,47 @@ char *pattern_random(pattern_t *pattern, random_t *rand) {
 
   return pattern_segment_random(pattern->item, rand);
 }
+
+size_t pattern_choices(pattern_t *pattern) {
+  size_t choices = 0;
+
+  while(pattern) {
+    choices += pattern_segment_choices(pattern->item);
+    pattern = pattern->next;
+  }
+
+  return choices;
+}
+
+size_t pattern_range_choices(pattern_range_t *range) {
+  size_t choices = 0;
+
+  while(range) {
+    choices += range->end - range->start + 1;
+    range = range->next;
+  }
+
+  return choices;
+}
+
+size_t pattern_segment_choices(pattern_segment_t *segment) {
+  size_t choices = 1;
+
+  while(segment) {
+    switch(segment->kind) {
+      case PATTERN_CHAR:
+        break;
+      case PATTERN_RANGE:
+        choices *= pattern_range_choices(segment->data.range) || 1;
+        break;
+      case PATTERN_GROUP:
+        choices *= pattern_choices(segment->data.group) || 1;
+        break;
+    }
+
+    choices *= (segment->reps.max - segment->reps.min + 1);
+    segment = segment->next;
+  }
+
+  return choices;
+}
