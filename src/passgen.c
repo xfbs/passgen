@@ -22,6 +22,11 @@ void passgen_run(passgen_opts opts) {
     bail(PATTERN_PARSE, opts.format);
   }
 
+  if(*parse_pos != '\0') {
+    random_close(random);
+    bail(PATTERN_PARSE, opts.format);
+  }
+
   // allocate some space for pass.
   // size_t pass_len = pattern_maxlen(pattern);
   size_t pass_len = 256;
@@ -105,13 +110,13 @@ void passgen_bail(passgen_error error, void *data) {
       passgen_usage(data);
       exit(-1);
     case PASSGEN_ERROR_MULTIPLE_FORMATS:
-      printf("Error: multiple formats specified (%s).\n", data);
+      printf("Error: multiple formats specified (%s).\n", (const char *) data);
       exit(-2);
     case PASSGEN_ERROR_RANDOM_ALLOC:
       printf("Error: couldn't open random object.\n");
       exit(-3);
     case PASSGEN_ERROR_PATTERN_PARSE:
-      printf("Error: couldn't parse pattern (%s).\n", data);
+      printf("Error: couldn't parse pattern '%s'.\n", (const char *) data);
       exit(-4);
     default:
       printf("Error: unknown error.\n");

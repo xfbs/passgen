@@ -83,9 +83,7 @@ char pattern_range_random(pattern_range_t *range, random_t *rand) {
 }
 
 pattern_segment_t *pattern_segment_parse(const char **string) {
-  if (is_illegal(**string)) return NULL;
-
-  if(is_end(**string) || is_sep(**string)) {
+  if(is_end(**string) || is_sep(**string) || is_illegal(**string)) {
     // TODO: empty segment.
     pattern_reps_t reps = {.min = 0, .max = 0};
     return pattern_segment_new(PATTERN_CHAR, (void *) *string, reps, NULL);
@@ -128,7 +126,7 @@ pattern_segment_t *pattern_segment_parse(const char **string) {
   }
 
   // don't recurse if we're at the end.
-  if(is_end(**string) || is_sep(**string)) {
+  if(is_end(**string) || is_sep(**string) || is_illegal(**string)) {
     return pattern_segment_new(kind, data, reps, NULL);
   }
 
@@ -304,8 +302,6 @@ void pattern_free(pattern_t *pattern) {
 }
 
 pattern_t *pattern_parse(const char **string) {
-  if(is_illegal(**string)) return NULL;
-
   pattern_t *pattern = pattern_new(pattern_segment_parse(string), NULL);
 
   pattern_t *rest = pattern;

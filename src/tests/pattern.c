@@ -42,6 +42,13 @@ test_ret test_pattern_parse() {
   assert(pattern->item);
   pattern_free(pattern);
 
+  s = ")";
+  pattern = pattern_parse(&s);
+  assert(pattern);
+  assert(!pattern->next);
+  assert(pattern->item);
+  pattern_free(pattern);
+
   return test_ok;
 }
 
@@ -241,6 +248,11 @@ test_ret test_pattern_segment_parse_group() {
   const char *s;
   const char *p;
   pattern_segment_t *pattern;
+
+  p = s = "()";
+  pattern = pattern_segment_parse(&p);
+  assert(pattern);
+  pattern_segment_free(pattern);
 
   p = s = "(a)|";
   pattern = pattern_segment_parse(&p);
