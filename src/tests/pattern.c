@@ -447,7 +447,7 @@ test_ret test_pattern_segment_choices() {
   segment = pattern_segment_new(PATTERN_RANGE, range, (pattern_reps_t){.min = 8, .max = 8}, NULL);
   assert(segment);
   assert(pattern_range_choices(range) == 3);
-  assert(pattern_segment_choices(segment) == 3); // 5, 6, 7, or 8 repetitions.
+  assert(pattern_segment_choices(segment) == (3*3*3*3*3*3*3*3)); // 5, 6, 7, or 8 repetitions.
   pattern_range_free(range);
   pattern_segment_free(segment);
 
@@ -457,7 +457,7 @@ test_ret test_pattern_segment_choices() {
   segment = pattern_segment_new(PATTERN_RANGE, range, (pattern_reps_t){.min = 5, .max = 8}, NULL);
   assert(segment);
   assert(pattern_range_choices(range) == 3);
-  assert(pattern_segment_choices(segment) == (4 * 3)); // 5, 6, 7, or 8 repetitions.
+  assert(pattern_segment_choices(segment) == (3*3*3*3*3 + 3*3*3*3*3*3 + 3*3*3*3*3*3*3 + 3*3*3*3*3*3*3*3)); // 5, 6, 7, or 8 repetitions.
   pattern_range_free(range);
   pattern_segment_free(segment);
 
