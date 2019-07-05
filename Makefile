@@ -8,8 +8,8 @@ default: release
 
 # build and run tests.
 test: debug
-	build/debug/random_tests
-	build/debug/pattern_tests
+	build/debug/test_random
+	build/debug/test_pattern
 
 # build and run tests, with address-sanitizer enabled.
 test-address: debug-address
