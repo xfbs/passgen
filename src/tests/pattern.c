@@ -1,38 +1,41 @@
 #include "passgen/pattern.h"
 #include "passgen/random.h"
+#include "util/tests.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 
-void test_pattern_parse();
-void test_pattern_range();
-void test_pattern_range_range();
-void test_pattern_range_char();
-void test_pattern_range_combined();
-void test_pattern_range_err();
-void test_pattern_range_random();
-void test_pattern_segment();
-void test_pattern_segment_parse();
-void test_pattern_segment_parse_chars();
-void test_pattern_segment_parse_range();
-void test_pattern_segment_parse_group();
-void test_pattern_segment_parse_reps();
-void test_pattern_segment_maxlen();
-void test_pattern_segment_random();
+test_ret test_pattern_parse();
+test_ret test_pattern_range_range();
+test_ret test_pattern_range_char();
+test_ret test_pattern_range_combined();
+test_ret test_pattern_range_err();
+test_ret test_pattern_range_random();
+test_ret test_pattern_segment_parse_chars();
+test_ret test_pattern_segment_parse_range();
+test_ret test_pattern_segment_parse_group();
+test_ret test_pattern_segment_parse_reps();
+test_ret test_pattern_segment_maxlen();
+test_ret test_pattern_segment_random();
 
-int main(int argc, char *argv[]) {
-  (void)argc;
-  (void)argv;
 
-  test_pattern_parse();
-  test_pattern_range();
-  test_pattern_segment();
+test_t tests[] = {
+  test(pattern_parse),
+  test(pattern_range_range),
+  test(pattern_range_char),
+  test(pattern_range_combined),
+  test(pattern_range_err),
+  test(pattern_range_random),
+  test(pattern_segment_parse_chars),
+  test(pattern_segment_parse_range),
+  test(pattern_segment_parse_group),
+  test(pattern_segment_parse_reps),
+  test(pattern_segment_maxlen),
+  test(pattern_segment_random),
+  {NULL, NULL}
+};
 
-  fprintf(stdout, "all tests passed.\n");
-  return 0;
-}
-
-void test_pattern_parse() {
+test_ret test_pattern_parse() {
   const char *s = "abc|def";
   pattern_t *pattern = pattern_parse(&s);
   assert(pattern);
@@ -52,15 +55,11 @@ void test_pattern_parse() {
   assert(!pattern->next->item->next->next->next);
   assert(!pattern->next->next);
   pattern_free(pattern);
+
+  return test_ok;
 }
 
-void test_pattern_segment() {
-  test_pattern_segment_parse();
-  test_pattern_segment_maxlen();
-  test_pattern_segment_random();
-}
-
-void test_pattern_segment_random() {
+test_ret test_pattern_segment_random() {
   const char *s = "a\\({2}[ab]{10,12}";
   pattern_segment_t *pattern = pattern_segment_parse(&s);
   random_t *rand = random_new();
@@ -85,16 +84,11 @@ void test_pattern_segment_random() {
 
   pattern_segment_free(pattern);
   random_close(rand);
+
+  return test_ok;
 }
 
-void test_pattern_segment_parse() {
-  test_pattern_segment_parse_chars();
-  test_pattern_segment_parse_range();
-  test_pattern_segment_parse_group();
-  test_pattern_segment_parse_reps();
-}
-
-void test_pattern_segment_maxlen() {
+test_ret test_pattern_segment_maxlen() {
   const char *s = "a\\({2}b{11,12}";
   pattern_segment_t *pattern = pattern_segment_parse(&s);
   assert(pattern_segment_maxlen(pattern) == 15);
@@ -104,9 +98,11 @@ void test_pattern_segment_maxlen() {
   pattern = pattern_segment_parse(&s);
   assert(pattern_segment_maxlen(pattern) == 10);
   pattern_segment_free(pattern);
+
+  return test_ok;
 }
 
-void test_pattern_segment_parse_chars() {
+test_ret test_pattern_segment_parse_chars() {
   const char *s = "a\\({2}b{11,12}";
   const char *p = s;
   pattern_segment_t *pattern = pattern_segment_parse(&p);
@@ -128,9 +124,11 @@ void test_pattern_segment_parse_chars() {
   assert(!pattern->next->next->next);
   assert(p == &s[14]);
   pattern_segment_free(pattern);
+
+  return test_ok;
 }
 
-void test_pattern_segment_parse_range() {
+test_ret test_pattern_segment_parse_range() {
   const char *s = "[a-z]{12,13}";
   const char *p = s;
   pattern_segment_t *pattern = pattern_segment_parse(&p);
@@ -145,13 +143,17 @@ void test_pattern_segment_parse_range() {
   assert(!pattern->next);
   assert(p == &s[12]);
   pattern_segment_free(pattern);
+
+  return test_ok;
 }
 
-void test_pattern_segment_parse_group() {
+test_ret test_pattern_segment_parse_group() {
   // TODO
+
+  return test_ok;
 }
 
-void test_pattern_segment_parse_reps() {
+test_ret test_pattern_segment_parse_reps() {
   const char *s = "{123,234}";
   const char *p = &s[1];
   pattern_reps_t reps = pattern_segment_parse_reps(&p);
@@ -165,17 +167,11 @@ void test_pattern_segment_parse_reps() {
   assert(*p == '}');
   assert(reps.min == 991);
   assert(reps.max == 991);
+
+  return test_ok;
 }
 
-void test_pattern_range() {
-  test_pattern_range_range();
-  test_pattern_range_char();
-  test_pattern_range_combined();
-  test_pattern_range_err();
-  test_pattern_range_random();
-}
-
-void test_pattern_range_random() {
+test_ret test_pattern_range_random() {
   random_t *rand = random_new();
   const char *s;
   pattern_range_t *range;
@@ -189,9 +185,11 @@ void test_pattern_range_random() {
 
   pattern_range_free(range);
   random_close(rand);
+
+  return test_ok;
 }
 
-void test_pattern_range_range() {
+test_ret test_pattern_range_range() {
   const char *s = "[a-z]";
   const char *p = &s[1];
   pattern_range_t *range = pattern_range_parse(&p);
@@ -201,9 +199,11 @@ void test_pattern_range_range() {
   assert(range->end == 'z');
   assert(range->next == NULL);
   pattern_range_free(range);
+
+  return test_ok;
 }
 
-void test_pattern_range_char() {
+test_ret test_pattern_range_char() {
   const char *s = "[a]";
   const char *p = &s[1];
   pattern_range_t *range = pattern_range_parse(&p);
@@ -213,9 +213,11 @@ void test_pattern_range_char() {
   assert(range->end == 'a');
   assert(range->next == NULL);
   pattern_range_free(range);
+
+  return test_ok;
 }
 
-void test_pattern_range_combined() {
+test_ret test_pattern_range_combined() {
   const char *s = "[a-z0-9%#]";
   const char *p = &s[1];
   pattern_range_t *range = pattern_range_parse(&p);
@@ -234,9 +236,11 @@ void test_pattern_range_combined() {
   assert(range->next->next->next->end == '#');
   assert(range->next->next->next->next == NULL);
   pattern_range_free(range);
+
+  return test_ok;
 }
 
-void test_pattern_range_err() {
+test_ret test_pattern_range_err() {
   const char *s = "]";
   const char *p = s;
   assert(!pattern_range_parse(&p));
@@ -253,4 +257,6 @@ void test_pattern_range_err() {
   p = s = "";
   assert(!pattern_range_parse(&p));
   assert(p == s);
+
+  return test_ok;
 }

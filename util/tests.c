@@ -33,9 +33,9 @@ bool run(test_t test) {
   double time = total / (CLOCKS_PER_SEC * 1.0);
 
   if(ret.ok) {
-    printf("%-20s \033[0;32mpassed\033[0m in %4.3lfs.\n", test.name, time);
+    printf("%-30s \033[0;32mpassed\033[0m in %4.3lfs.\n", test.name, time);
   } else {
-    printf("%-20s \033[0;31mfailed\033[0m in %4.3lfs.\n", test.name, time);
+    printf("%-30s \033[0;31mfailed\033[0m in %4.3lfs.\n", test.name, time);
     printf("    \033[0;31m%s\033[0m failed at %s:%zi\n", ret.assertion, ret.func, ret.line);
   }
 
