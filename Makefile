@@ -10,6 +10,9 @@ default: release
 test: debug
 	ninja -C build/debug test
 
+test-address: debug-address
+	ninja -C build/debug-address test
+
 #all-debug: debug debug-memory debug-address debug-undefined
 
 # format using clang-format.
