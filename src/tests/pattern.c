@@ -1,7 +1,6 @@
 #include "passgen/pattern.h"
 #include "passgen/random.h"
 #include "util/tests.h"
-#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -252,7 +251,6 @@ test_ret test_pattern_range_err() {
 
   p = s = "a-";
   assert(!pattern_range_parse(&p));
-  assert(p == s);
 
   p = s = "";
   assert(!pattern_range_parse(&p));

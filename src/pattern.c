@@ -17,19 +17,31 @@ pattern_range_t *pattern_range_new(char start, char end,
 pattern_range_t *pattern_range_parse(const char **string) {
   if (is_end(**string)) return NULL;
 
-  // TODO: read escaped \] \).
-  char start = (*string)[0];
-  char end;
+  // char might be escaped.
+  if(**string == '\\') {
+    *string += 1;
+  }
 
-  if ((*string)[1] == '-') {
+  char start = **string;
+  *string += 1;
+
+  if(!start) {
+    return NULL;
+  }
+
+  char end;
+  if (**string == '-') {
     // is a range.
-    if ((*string)[2] == '\0') return NULL;
-    end = (*string)[2];
-    *string += 3;
+    *string += 1;
+    end = **string;
+    *string += 1;
   } else {
     // is a single char.
     end = start;
-    *string += 1;
+  }
+
+  if(!end) {
+    return NULL;
   }
 
   return pattern_range_new(start, end, pattern_range_parse(string));
