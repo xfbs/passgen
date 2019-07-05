@@ -265,6 +265,47 @@ test_ret test_pattern_range_choices() {
   return test_ok;
 }
 
+test_ret test_pattern_segment_choices() {
+  pattern_segment_t *segment;
+  pattern_range_t *range;
+
+  // single char.
+  segment = pattern_segment_new(PATTERN_CHAR, NULL, (pattern_reps_t){.min = 1, .max = 1}, NULL);
+  assert(segment);
+  assert(pattern_segment_choices(segment) == 1);
+  pattern_segment_free(segment);
+
+  // single char, variable length.
+  segment = pattern_segment_new(PATTERN_CHAR, NULL, (pattern_reps_t){.min = 5, .max = 8}, NULL);
+  assert(segment);
+  assert(pattern_segment_choices(segment) == 4); // 5, 6, 7, or 8 repetitions.
+  pattern_segment_free(segment);
+
+  // range.
+  range = pattern_range_new('a', 'c', NULL);
+  assert(range);
+  segment = pattern_segment_new(PATTERN_RANGE, range, (pattern_reps_t){.min = 8, .max = 8}, NULL);
+  assert(segment);
+  assert(pattern_range_choices(range) == 3);
+  assert(pattern_segment_choices(segment) == 3); // 5, 6, 7, or 8 repetitions.
+  pattern_range_free(range);
+  pattern_segment_free(segment);
+
+  // range, variable repetitions.
+  range = pattern_range_new('a', 'c', NULL);
+  assert(range);
+  segment = pattern_segment_new(PATTERN_RANGE, range, (pattern_reps_t){.min = 5, .max = 8}, NULL);
+  assert(segment);
+  assert(pattern_range_choices(range) == 3);
+  assert(pattern_segment_choices(segment) == (4 * 3)); // 5, 6, 7, or 8 repetitions.
+  pattern_range_free(range);
+  pattern_segment_free(segment);
+
+  // TODO: test group.
+
+  return test_ok;
+}
+
 test_t tests[] = {
   test(pattern_parse),
   test(pattern_range_range),
@@ -279,5 +320,6 @@ test_t tests[] = {
   test(pattern_segment_parse_reps),
   test(pattern_segment_maxlen),
   test(pattern_segment_random),
+  test(pattern_segment_choices),
   {NULL, NULL}
 };

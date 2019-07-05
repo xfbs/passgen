@@ -372,10 +372,10 @@ size_t pattern_segment_choices(pattern_segment_t *segment) {
       case PATTERN_CHAR:
         break;
       case PATTERN_RANGE:
-        choices *= pattern_range_choices(segment->data.range) || 1;
+        choices *= pattern_range_choices(segment->data.range);
         break;
       case PATTERN_GROUP:
-        choices *= pattern_choices(segment->data.group) || 1;
+        choices *= pattern_choices(segment->data.group);
         break;
     }
 
