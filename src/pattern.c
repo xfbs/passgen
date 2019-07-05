@@ -2,7 +2,9 @@
 #include <assert.h>
 #include <stdbool.h>
 
-bool is_end(char c) { return c == ']' || c == ')' || c == '\0' || c == '|'; }
+bool is_illegal(char c) { return c == ']' || c == ')'; }
+bool is_end(char c) { return c == '\0'; }
+bool is_sep(char c) { return c == '|'; }
 
 pattern_range_t *pattern_range_new(char start, char end,
                                    pattern_range_t *next) {
@@ -15,7 +17,7 @@ pattern_range_t *pattern_range_new(char start, char end,
 }
 
 pattern_range_t *pattern_range_parse(const char **string) {
-  if (is_end(**string)) return NULL;
+  if (is_illegal(**string) || is_end(**string) || is_sep(**string)) return NULL;
 
   // char might be escaped.
   if(**string == '\\') {
@@ -81,23 +83,29 @@ char pattern_range_random(pattern_range_t *range, random_t *rand) {
 }
 
 pattern_segment_t *pattern_segment_parse(const char **string) {
-  if (is_end(**string)) return NULL;
+  if (is_illegal(**string)) return NULL;
+
+  if(is_end(**string) || is_sep(**string)) {
+    // TODO: empty segment.
+    pattern_reps_t reps = {.min = 0, .max = 0};
+    return pattern_segment_new(PATTERN_CHAR, (void *) *string, reps, NULL);
+  }
 
   // parse the kind and data.
   pattern_kind kind;
-  void *data;
+  void *data = NULL;
   switch (**string) {
     case '[':
       *string += 1;
       kind = PATTERN_RANGE;
       data = pattern_range_parse(string);
-      if (**string != ']') goto fail;
+      if (!data || **string != ']') goto fail;
       break;
     case '(':
       *string += 1;
       kind = PATTERN_GROUP;
       data = pattern_parse(string);
-      if (**string != ')') goto fail;
+      if (!data || **string != ')') goto fail;
       break;
     case '\\':
       *string += 1;
@@ -119,8 +127,26 @@ pattern_segment_t *pattern_segment_parse(const char **string) {
     *string += 1;
   }
 
+  // don't recurse if we're at the end.
+  if(is_end(**string) || is_sep(**string)) {
+    return pattern_segment_new(kind, data, reps, NULL);
+  }
+
   return pattern_segment_new(kind, data, reps, pattern_segment_parse(string));
 fail:
+  if(data) {
+    switch(kind) {
+      case PATTERN_GROUP:
+        pattern_free(data);
+        break;
+      case PATTERN_RANGE:
+        pattern_range_free(data);
+        break;
+      case PATTERN_CHAR:
+        break;
+    }
+  }
+
   return NULL;
 }
 
@@ -278,10 +304,12 @@ void pattern_free(pattern_t *pattern) {
 }
 
 pattern_t *pattern_parse(const char **string) {
+  if(is_illegal(**string)) return NULL;
+
   pattern_t *pattern = pattern_new(pattern_segment_parse(string), NULL);
 
   pattern_t *rest = pattern;
-  while (**string == '|') {
+  while (!is_illegal(**string) && !is_end(**string)) {
     *string += 1;
     rest->next = pattern_new(pattern_segment_parse(string), NULL);
     rest = rest->next;

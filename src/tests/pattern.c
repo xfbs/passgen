@@ -25,6 +25,23 @@ test_ret test_pattern_parse() {
   assert(!pattern->next->next);
   pattern_free(pattern);
 
+  s = "a";
+  pattern = pattern_parse(&s);
+  assert(pattern);
+  assert(!pattern->next);
+  assert(pattern->item);
+  assert(pattern->item->kind == PATTERN_CHAR);
+  assert(pattern->item->data.chr[0] == 'a');
+  assert(!pattern->item->next);
+  pattern_free(pattern);
+
+  s = "";
+  pattern = pattern_parse(&s);
+  assert(pattern);
+  assert(!pattern->next);
+  assert(pattern->item);
+  pattern_free(pattern);
+
   return test_ok;
 }
 
@@ -72,9 +89,94 @@ test_ret test_pattern_segment_maxlen() {
 }
 
 test_ret test_pattern_segment_parse_chars() {
-  const char *s = "a\\({2}b{11,12}";
-  const char *p = s;
-  pattern_segment_t *pattern = pattern_segment_parse(&p);
+  const char *s;
+  const char *p;
+  pattern_segment_t *pattern;
+
+  p = s = "a";
+  pattern = pattern_segment_parse(&p);
+  assert(pattern);
+  assert(!pattern->next);
+  assert(pattern->kind == PATTERN_CHAR);
+  assert(pattern->data.chr[0] == 'a');
+  assert(*p == '\0');
+  pattern_segment_free(pattern);
+
+  // stop at sep
+  p = s = "a|";
+  pattern = pattern_segment_parse(&p);
+  assert(pattern);
+  assert(!pattern->next);
+  assert(pattern->kind == PATTERN_CHAR);
+  assert(pattern->data.chr[0] == 'a');
+  assert(pattern->reps.min == 1);
+  assert(pattern->reps.max == 1);
+  assert(*p == '|');
+  pattern_segment_free(pattern);
+
+  // stop at illegal
+  p = s = "a)";
+  pattern = pattern_segment_parse(&p);
+  assert(pattern);
+  assert(!pattern->next);
+  assert(pattern->kind == PATTERN_CHAR);
+  assert(pattern->data.chr[0] == 'a');
+  assert(pattern->reps.min == 1);
+  assert(pattern->reps.max == 1);
+  assert(*p == ')');
+  pattern_segment_free(pattern);
+
+  // stop at illegal
+  p = s = "a]";
+  pattern = pattern_segment_parse(&p);
+  assert(pattern);
+  assert(!pattern->next);
+  assert(pattern->kind == PATTERN_CHAR);
+  assert(pattern->data.chr[0] == 'a');
+  assert(pattern->reps.min == 1);
+  assert(pattern->reps.max == 1);
+  assert(*p == ']');
+  pattern_segment_free(pattern);
+
+  // parse escaped
+  p = s = "\\]";
+  pattern = pattern_segment_parse(&p);
+  assert(pattern);
+  assert(!pattern->next);
+  assert(pattern->kind == PATTERN_CHAR);
+  assert(pattern->data.chr[0] == ']');
+  assert(pattern->reps.min == 1);
+  assert(pattern->reps.max == 1);
+  assert(*p == '\0');
+  pattern_segment_free(pattern);
+
+  // parse repetitons.
+  p = s = "a{12}";
+  pattern = pattern_segment_parse(&p);
+  assert(pattern);
+  assert(!pattern->next);
+  assert(pattern->kind == PATTERN_CHAR);
+  assert(pattern->data.chr[0] == 'a');
+  assert(pattern->reps.min == 12);
+  assert(pattern->reps.max == 12);
+  assert(*p == '\0');
+  pattern_segment_free(pattern);
+
+  // parse repetitons.
+  p = s = "a{12,23}";
+  pattern = pattern_segment_parse(&p);
+  assert(pattern);
+  assert(!pattern->next);
+  assert(pattern->kind == PATTERN_CHAR);
+  assert(pattern->data.chr[0] == 'a');
+  assert(pattern->reps.min == 12);
+  assert(pattern->reps.max == 23);
+  assert(*p == '\0');
+  pattern_segment_free(pattern);
+
+  // parse complex.
+  p = s = "a\\({2}b{11,12}";
+  pattern = pattern_segment_parse(&p);
   assert(pattern);
   assert(pattern->kind == PATTERN_CHAR);
   assert(pattern->data.chr == &s[0]);
@@ -98,9 +200,12 @@ test_ret test_pattern_segment_parse_chars() {
 }
 
 test_ret test_pattern_segment_parse_range() {
-  const char *s = "[a-z]{12,13}";
-  const char *p = s;
-  pattern_segment_t *pattern = pattern_segment_parse(&p);
+  const char *s;
+  const char *p;
+  pattern_segment_t *pattern;
+
+  p = s = "[a-z]{12,13}";
+  pattern = pattern_segment_parse(&p);
   assert(pattern);
   assert(pattern->kind == PATTERN_RANGE);
   assert(pattern->data.range);
@@ -116,8 +221,33 @@ test_ret test_pattern_segment_parse_range() {
   return test_ok;
 }
 
+test_ret test_pattern_segment_parse_err() {
+  const char *s;
+  const char *p;
+  pattern_segment_t *pattern;
+
+  p = s = "[a-z){12,13}";
+  pattern = pattern_segment_parse(&p);
+  assert(!pattern);
+
+  p = s = "(a-z]{12,13}";
+  pattern = pattern_segment_parse(&p);
+  assert(!pattern);
+
+  return test_ok;
+}
+
 test_ret test_pattern_segment_parse_group() {
-  // TODO
+  const char *s = "(abc){2,3}";
+  const char *p = s;
+  pattern_segment_t *pattern = pattern_segment_parse(&p);
+  assert(pattern);
+  assert(pattern->kind == PATTERN_GROUP);
+  assert(pattern->reps.min == 2);
+  assert(pattern->reps.max == 3);
+  assert(!pattern->next);
+  assert(*p == '\0');
+  pattern_segment_free(pattern);
 
   return test_ok;
 }
@@ -318,6 +448,7 @@ test_t tests[] = {
   test(pattern_segment_parse_range),
   test(pattern_segment_parse_group),
   test(pattern_segment_parse_reps),
+  test(pattern_segment_parse_err),
   test(pattern_segment_maxlen),
   test(pattern_segment_random),
   test(pattern_segment_choices),
