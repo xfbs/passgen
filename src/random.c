@@ -133,10 +133,17 @@ uint32_t random_uint32_max(random_t *random, uint32_t max) {
     return random_uint16_max(random, max);
   }
 
+  uint32_t mask = max;
+  mask |= mask >> 16;
+  mask |= mask >> 8;
+  mask |= mask >> 4;
+  mask |= mask >> 2;
+  mask |= mask >> 1;
+
   uint32_t num;
 
   do {
-    num = random_uint32(random);
+    num = random_uint32(random) & mask;
   } while (num >= max);
 
   return num;
@@ -147,10 +154,18 @@ uint64_t random_uint64_max(random_t *random, uint64_t max) {
     return random_uint32_max(random, max);
   }
 
+  uint64_t mask = max;
+  mask |= mask >> 32;
+  mask |= mask >> 16;
+  mask |= mask >> 8;
+  mask |= mask >> 4;
+  mask |= mask >> 2;
+  mask |= mask >> 1;
+
   uint64_t num;
 
   do {
-    num = random_uint64(random);
+    num = random_uint64(random) & mask;
   } while (num >= max);
 
   return num;
