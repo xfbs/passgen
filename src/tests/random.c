@@ -5,25 +5,12 @@
 #include <stdio.h>
 #include <time.h>
 
-test_ret test_random_uint8(void);
-test_ret test_random_uint8_max(void);
-test_ret test_random_uint16(void);
-test_ret test_random_uint16_max(void);
-
-test_t tests[] = {
-  test(random_uint8),
-  test(random_uint8_max),
-  test(random_uint16),
-  test(random_uint16_max),
-  {NULL, NULL}
-};
-
 test_ret test_random_uint8(void) {
   random_t *rand = random_new();
   assert(rand);
 
   // generate random nubers until we got almost all of them.
-  bool gotten[UINT8_MAX] = {false};
+  bool gotten[UINT8_MAX + 1] = {false};
   for (size_t i = 0; i < (32 * UINT8_MAX); ++i) {
     gotten[random_uint8(rand)] = true;
   }
@@ -67,7 +54,7 @@ test_ret test_random_uint16(void) {
   assert(rand);
 
   // generate random nubers until we got almost all of them.
-  bool gotten[UINT16_MAX] = {false};
+  bool gotten[UINT16_MAX + 1] = {false};
   for (size_t i = 0; i < (32 * UINT16_MAX); ++i) {
     gotten[random_uint16(rand)] = true;
   }
@@ -105,3 +92,40 @@ test_ret test_random_uint16_max(void) {
 
   return test_ok;
 }
+
+test_ret test_random_uint32_max(void) {
+  random_t *rand = random_new();
+  assert(rand);
+
+  for (size_t max = 1; max <= UINT32_MAX; max += UINT16_MAX) {
+    assert(random_uint32_max(rand, max) < max);
+  }
+
+  random_close(rand);
+
+  return test_ok;
+}
+
+test_ret test_random_uint64_max(void) {
+  random_t *rand = random_new();
+  assert(rand);
+
+  for (size_t max = 1; max <= (UINT64_MAX >> 1); max += 1) {
+    assert(random_uint64_max(rand, max) < max);
+    max = 1.001 * max;
+  }
+
+  random_close(rand);
+
+  return test_ok;
+}
+
+test_t tests[] = {
+  test(random_uint8),
+  test(random_uint8_max),
+  test(random_uint16),
+  test(random_uint16_max),
+  test(random_uint32_max),
+  test(random_uint64_max),
+  {NULL, NULL}
+};
