@@ -60,4 +60,4 @@ install: $(TARGET)
 clean:
 	$(RM) -r build
 
-.PHONY: format release debug install clean
+.PHONY: format release debug install clean docs
