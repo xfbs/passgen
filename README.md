@@ -35,6 +35,16 @@ When compiling, resulting files are placed in `./build/`. There are multiple tar
 
 * `make format` to use clang-format to clean up the code.
 * `make clean` to remove all build output.
+* `make test` build and run tests
+* `make bench` build and run benchmarks.
+* `make docs` build docs using doxygen.
+
+## Tools
+
+This repository also contains a few tools that are useful in working with or inspecting the parsed data.
+
+* `pattern-dump` parses a pattern and dumps it in a human-readable format.
+* `pattern-choices` calculates how many possible choices there are for a given pattern.
 
 ## License
 
