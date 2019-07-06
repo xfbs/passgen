@@ -3,8 +3,13 @@
 FORMAT       = clang-format -i
 MESON        = meson
 NINJA        = ninja
+DOXYGEN      = doxygen
 
 default: release
+
+# generate documentations using doxygen
+docs:
+	$(DOXYGEN) Doxyfile
 
 # build and run tests.
 test: debug
