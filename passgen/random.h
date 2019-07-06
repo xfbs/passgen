@@ -12,7 +12,13 @@ typedef struct random_t {
 
 random_t *random_new();
 random_t *random_new_full(const char *device);
+random_t *random_open(random_t *random);
+random_t *random_open_full(const char *device);
+
 void random_close(random_t *random);
+void random_free(random_t *random);
+
+void random_read(random_t *random, void *dest, size_t bytes);
 
 uint8_t random_uint8(random_t *random);
 uint16_t random_uint16(random_t *random);
