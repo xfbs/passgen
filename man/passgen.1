@@ -1,0 +1,53 @@
+.Dd July 7, 2019
+.Dt PASSGEN 1 URM
+.Os Passgen v1.0.0
+.Sh NAME
+.Nm passgen
+.Nd Generate passwords.
+.Sh SYNOPSIS
+.Nm
+.Op Fl vVh
+.Op Fl a Ar amount
+.Op Fl p Ar preset
+.Op Ar pattern
+.Sh DESCRIPTION          \" Section Header - required - don't modify
+Generate passwords according to a given pattern, which is a regex-line string
+description of the format of the password, or use a preset.
+.Bl -tag -width -indent
+.It Ar preset
+The name of a preset to use as pattern for the password. See section PRESET for
+a list of available presets.
+.It Ar pattern
+The pattern to use for generating the password. See section PATTERN for more
+information.
+.El
+.Pp
+A list of flags and their descriptions:
+.Bl -tag -width -indent  \" Differs from above in tag removed
+.It Fl a, Fl -amount Ar amount                \"-a flag as a list item
+Set the amount of passwords to generate.
+.It Fl h, Fl -help
+Show help.
+.It Fl p, Fl -preset Ar preset
+Use the specified preset to generate a password.
+.El
+.Sh PRESET
+Presets are some sane defaults for generating passwords if you don't
+specifically care about their format.
+.Sh PATTERN
+Patterns are regular-expression-like strings that allow specifying the format of
+generated passwords. The allowed grammar is a subset of what regular regexes
+support.
+.Sh EXAMPLES
+Generate a password using the "apple" preset.
+.Pp
+    $ passgen -p apple
+.Pp
+Generate 5 lowercase alphanumeric passwords with length 12.
+.Pp
+    $ passgen -a 5 "[a-z0-9]{12}"
+.Sh SEE ALSO
+.Xr apg 1 ,
+.Xr passwd 1
+.Sh AUTHORS
+.An "Patrick M. Elsen" Aq pelsen@xfbs.net
