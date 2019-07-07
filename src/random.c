@@ -9,37 +9,16 @@ static const char *random_default_device = "/dev/urandom";
 
 void random_reload(random_t *random) {
   assert(random != NULL);
-  // printf("pre-reload pos: %zi\n", random->pos);
 
-  // FIXME: don't overwrite everything.
+  // read random data.
   size_t bytes = fread(&random->buffer, sizeof(random->buffer[0]),
                        sizeof(random->buffer), random->device);
 
+  // make sure we've read enough.
   assert(bytes == sizeof(random->buffer));
 
+  // reset position in ring buffer.
   random->pos = 0;
-
-  // printf("post-reload pos: %zi, read: %zi\n", random->pos, bytes);
-}
-
-uint8_t *random_extract(random_t *random, size_t bytes) {
-  assert(random != NULL);
-  // printf("pre-extract pos: %zi, bytes: %zi\n", random->pos, bytes);
-
-  assert(bytes < sizeof(random->buffer));
-
-  if (random->pos >= (sizeof(random->buffer) - bytes)) {
-    random_reload(random);
-  }
-
-  assert(random->pos <= (sizeof(random->buffer) - bytes));
-
-  random->pos += bytes;
-
-  assert(random->pos < sizeof(random->buffer));
-  assert(random->pos >= bytes);
-
-  return &random->buffer[random->pos - bytes];
 }
 
 void random_read(random_t *random, void *data, size_t bytes) {
@@ -56,6 +35,7 @@ void random_read(random_t *random, void *data, size_t bytes) {
       memcpy(data, random->buffer, left);
       random_reload(random);
 
+      // if there's more to be read, recurse.
       if(bytes != left) {
         random_read(random, data + left, bytes - left);
       }
@@ -128,29 +108,27 @@ void random_free(random_t *random) {
 }
 
 uint8_t random_uint8(random_t *random) {
-  uint8_t *data = random_extract(random, sizeof(uint8_t));
-  return *data;
+  uint8_t data;
+  random_read(random, &data, sizeof(data));
+  return data;
 }
 
 uint16_t random_uint16(random_t *random) {
-  uint8_t *data = random_extract(random, sizeof(uint16_t));
-  uint16_t num;
-  memcpy(&num, data, sizeof(uint16_t));
-  return num;
+  uint16_t data;
+  random_read(random, &data, sizeof(data));
+  return data;
 }
 
 uint32_t random_uint32(random_t *random) {
-  uint8_t *data = random_extract(random, sizeof(uint32_t));
-  uint32_t num;
-  memcpy(&num, data, sizeof(uint32_t));
-  return num;
+  uint32_t data;
+  random_read(random, &data, sizeof(data));
+  return data;
 }
 
 uint64_t random_uint64(random_t *random) {
-  uint8_t *data = random_extract(random, sizeof(uint64_t));
-  uint64_t num;
-  memcpy(&num, data, sizeof(uint64_t));
-  return num;
+  uint64_t data;
+  random_read(random, &data, sizeof(data));
+  return data;
 }
 
 uint8_t random_uint8_max(random_t *random, uint8_t max) {
