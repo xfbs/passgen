@@ -15,3 +15,9 @@ executable('bench_random', 'src/bench/random.c', link_with: passgen)
 # tests
 test('random', executable('test_random', 'src/tests/random.c', 'util/tests.c', link_with: passgen))
 test('pattern', executable('test_pattern', 'src/tests/pattern.c', 'util/tests.c', link_with: passgen))
+
+# man pages
+install_man('man/passgen.1')
+
+# headers
+install_headers('passgen/random.h', 'passgen/passgen.h', 'passgen/pattern.h', subdir : 'passgen')
