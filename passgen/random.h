@@ -40,8 +40,13 @@ typedef struct random_t {
 /// ```
 random_t *random_new();
 
-/// Allocates and opens a new random object using the specified random device.
-random_t *random_new_full(const char *device);
+/// Allocates and opens a new random object using @p path as random device.
+/// Not recommended to use `/dev/random` as randomness device, use the default
+/// `/dev/urandom` instead.
+random_t *random_new_path(const char *path);
+
+/// Allocates and opens a new random object with @p file as randomness source.
+random_t *random_new_file(FILE *file);
 
 /// Opens a new, existing random object. Returns `NULL` on failure. Uses
 /// `/dev/urandom` as random device.
@@ -59,10 +64,10 @@ random_t *random_new_full(const char *device);
 /// ```
 random_t *random_open(random_t *random);
 
-/// Opens a new, existing random object using the specified random device.
-random_t *random_open_path(random_t *random, const char *device);
+/// Opens a new, existing random object using @p path as random device.
+random_t *random_open_path(random_t *random, const char *path);
 
-/// Opens a new random object with a given file object as randomness source.
+/// Opens a new random object with @p file as randomness source.
 random_t *random_open_file(random_t *random, FILE *file);
 
 /// Close @p random. Use this with object opened by random_open().

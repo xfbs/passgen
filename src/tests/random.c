@@ -20,7 +20,7 @@ test_ret test_random_uint8(void) {
     assert(gotten[i]);
   }
 
-  random_close(rand);
+  random_free(rand);
 
   return test_ok;
 }
@@ -44,7 +44,7 @@ test_ret test_random_uint8_max(void) {
     }
   }
 
-  random_close(rand);
+  random_free(rand);
 
   return test_ok;
 }
@@ -64,7 +64,7 @@ test_ret test_random_uint16(void) {
     assert(gotten[i]);
   }
 
-  random_close(rand);
+  random_free(rand);
 
   return test_ok;
 }
@@ -88,7 +88,7 @@ test_ret test_random_uint16_max(void) {
     }
   }
 
-  random_close(rand);
+  random_free(rand);
 
   return test_ok;
 }
@@ -101,7 +101,7 @@ test_ret test_random_uint32_max(void) {
     assert(random_uint32_max(rand, max) < max);
   }
 
-  random_close(rand);
+  random_free(rand);
 
   return test_ok;
 }
@@ -115,7 +115,7 @@ test_ret test_random_uint64_max(void) {
     max = 1.001 * max;
   }
 
-  random_close(rand);
+  random_free(rand);
 
   return test_ok;
 }

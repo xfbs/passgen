@@ -43,13 +43,26 @@ uint8_t *random_extract(random_t *random, size_t bytes) {
 }
 
 random_t *random_new() {
+  return random_new_path(random_default_device);
+}
+
+random_t *random_new_path(const char *path) {
   random_t *random = malloc(sizeof(random_t));
   if(!random) return NULL;
 
-  if(!random_open_path(random, random_default_device)) {
+  if(!random_open_path(random, path)) {
     free(random);
     return NULL;
   }
+
+  return random;
+}
+
+random_t *random_new_file(FILE *file) {
+  random_t *random = malloc(sizeof(random_t));
+  if(!random) return NULL;
+
+  random_open_file(random, file);
 
   return random;
 }
@@ -80,8 +93,6 @@ void random_close(random_t *random) {
     fclose(random->device);
     random->device = NULL;
   }
-
-  free(random);
 }
 
 void random_free(random_t *random) {
