@@ -8,6 +8,24 @@ When bumping the version, be sure to change it in all places:
 * man/passgen.1
 * Code
 
+## Generating documentation
+
+The documentation is published in the `gh-pages` branch. Use this workflow to
+update it:
+
+    $ git worktree add docs/html gh-pages
+    $ make docs
+    $ cd docs/html
+    $ git add .
+    $ git commit -m "updates docs"
+    $ git push origin gh-pages
+    $ cd ../../
+
+To undo the worktree, do (from the main project dir)
+
+    $ git worktree remove docs/html
+    $ make clean
+
 ## Todo
 
 ### Unicode Support
