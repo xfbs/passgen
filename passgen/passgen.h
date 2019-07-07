@@ -8,6 +8,7 @@ typedef enum {
   PASSGEN_ERROR_RANDOM_ALLOC,
   PASSGEN_ERROR_PATTERN_PARSE,
   PASSGEN_ERROR_ALLOC,
+  PASSGEN_ERROR_ILLEGAL_AMOUNT,
 } passgen_error;
 
 typedef struct {
