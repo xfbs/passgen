@@ -1,7 +1,6 @@
 <map id="passgen/random.h" name="passgen/random.h">
-<area shape="rect" id="node1" title=" " alt="" coords="93,5,224,31"/>
-<area shape="rect" id="node2" href="$pattern_8h.html" title=" " alt="" coords="94,79,223,104"/>
-<area shape="rect" id="node3" href="$passgen_8c.html" title=" " alt="" coords="5,152,109,177"/>
-<area shape="rect" id="node5" href="$random_8c.html" title=" " alt="" coords="247,79,345,104"/>
-<area shape="rect" id="node4" href="$pattern_8c.html" title=" " alt="" coords="132,152,227,177"/>
+<area shape="rect" id="node2" href="$pattern_8h.html" title="passgen/pattern.h" alt="" coords="95,80,222,107"/>
+<area shape="rect" id="node3" href="$passgen_8c.html" title="src/passgen.c" alt="" coords="5,155,109,181"/>
+<area shape="rect" id="node5" href="$random_8c.html" title="src/random.c" alt="" coords="247,80,345,107"/>
+<area shape="rect" id="node4" href="$pattern_8c.html" title="src/pattern.c" alt="" coords="134,155,229,181"/>
 </map>

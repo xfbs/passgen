@@ -1,0 +1,5 @@
+<map id="random_open" name="random_open">
+<area shape="rect" id="node2" href="$random_8c.html#aafb10b99784c2b2ba62e82017c45d7de" title="Opens a new, existing random object using path as random device. " alt="" coords="153,31,285,57"/>
+<area shape="rect" id="node3" href="$random_8c.html#a836c38d31d4b7ea3f4e0bf9e59c64723" title="Opens a new random object with file as randomness source. " alt="" coords="333,5,457,32"/>
+<area shape="rect" id="node4" href="$random_8c.html#adaf132627659c1e3f98c099556721008" title="random_reload" alt="" coords="505,31,612,57"/>
+</map>

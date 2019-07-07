@@ -1,6 +1,5 @@
 <map id="pattern_choices" name="pattern_choices">
-<area shape="rect" id="node1" title=" " alt="" coords="5,55,121,80"/>
-<area shape="rect" id="node2" href="$pattern_8c.html#aca7b31040d51574b92a3904642e5952f" title=" " alt="" coords="169,55,343,80"/>
-<area shape="rect" id="node3" href="$pattern_8c.html#a1878f4248ebf1a641811c9d0e059cd97" title=" " alt="" coords="391,5,548,31"/>
-<area shape="rect" id="node4" href="$pattern_8c.html#a0e492f46d5ef99590a1bb1d964498ffa" title=" " alt="" coords="412,55,527,80"/>
+<area shape="rect" id="node2" href="$pattern_8c.html#aca7b31040d51574b92a3904642e5952f" title="pattern_segment_choices" alt="" coords="168,56,339,83"/>
+<area shape="rect" id="node3" href="$pattern_8c.html#a1878f4248ebf1a641811c9d0e059cd97" title="pattern_range_choices" alt="" coords="387,5,540,32"/>
+<area shape="rect" id="node4" href="$pattern_8c.html#a0e492f46d5ef99590a1bb1d964498ffa" title="pattern_choices" alt="" coords="406,56,521,83"/>
 </map>
