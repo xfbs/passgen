@@ -26,6 +26,10 @@ To undo the worktree, do (from the main project dir)
     $ git worktree remove docs/html
     $ make clean
 
+## Generating debian package
+
+Experimental. There's a tutorial for it [here](http://www.tldp.org/HOWTO/html_single/Debian-Binary-Package-Building-HOWTO/). Also see [this](https://www.debian.org/doc/debian-policy/ch-source.html#debian-changelog-debian-changelog).
+
 ## Todo
 
 ### Unicode Support
