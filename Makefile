@@ -4,8 +4,32 @@ FORMAT       = clang-format -i
 MESON        = meson
 NINJA        = ninja
 DOXYGEN      = doxygen
+NAME         = passgen
+VERSION      = 1.0.0
 
 default: release
+
+# install locally.
+install: release
+	cd build/release && meson install
+	gzip /usr/local/share/man/man1/passgen.1
+
+# generate debian package.
+deb: DEBNAME=$(NAME)-$(VERSION)
+deb: CONTROL=build/release/$(NAME)-$(VERSION)/DEBIAN/control
+deb: release
+	mkdir -p build/release/$(DEBNAME)/DEBIAN
+	echo "Package: passgen" > $(CONTROL)
+	echo "Version: $(VERSION)" >> $(CONTROL)
+	echo "Section: custom" >> $(CONTROL)
+	echo "Priority: optional" >> $(CONTROL)
+	echo "Architecture: all" >> $(CONTROL)
+	echo "Essential: no" >> $(CONTROL)
+	echo "Installed-Size: 1024" >> $(CONTROL)
+	echo "Maintainer: Patrick M. Elsen" >> $(CONTROL)
+	echo "Description: Generate passwords using a regex-like pattern." >> $(CONTROL)
+	cd build/release && DESTDIR=$(DEBNAME) meson install
+	cd build/release && dpkg-deb --build $(DEBNAME)
 
 # generate documentations using doxygen.
 docs:
@@ -53,9 +77,6 @@ build/debug-address:
 
 build/debug-memory:
 	meson $@ --buildtype=debug -Db_sanitize=memory
-
-install: $(TARGET)
-	cp $(TARGET) /usr/local/bin/
 
 clean:
 	$(RM) -r build
