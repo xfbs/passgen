@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <getopt.h>
 #include "passgen/pattern.h"
 #include "passgen/random.h"
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *)data)
@@ -111,20 +112,21 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
 }
 
 void passgen_usage(const char *executable) {
-  fprintf(stderr, "Usage: %s [OPTIONS] PATTERN|PRESET\n\n", executable);
-  fprintf(stderr, "PATTERN is a regex-like string describing the password.\n");
-  fprintf(stderr, "  abc|def          Matches string 'abc' or 'def' (choice).\n");
-  fprintf(stderr, "  [a-cf]           Matches character 'a', 'b', 'c', and 'f' (range).\n");
-  fprintf(stderr, "  (abc)            Matches strings 'abc' (group).\n");
-  fprintf(stderr, "  [a-c]{2,3}       Matches between 2 and 3 repetition of element (repeat).\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "OPTIONS\n");
-  fprintf(stderr, "  -h, --help       Show this help information\n");
-  fprintf(stderr, "  -a, --amount     The amount of passwords\n");
-  fprintf(stderr, "\n");
-  fprintf(stderr, "PRESETS\n");
-  fprintf(stderr, "  --apple          Generate passwords like Apple.\n");
-  fprintf(stderr, "  --apple-old      Generate passwords like Apple before Mojave.\n");
+  fprintf(stderr,
+      "Usage: %s [OPTIONS] PATTERN|PRESET\n\n"
+      "PATTERN is a regex-like string describing the password.\n"
+      "  abc|def          Matches string 'abc' or 'def' (choice).\n"
+      "  [a-cf]           Matches character 'a', 'b', 'c', and 'f' (range).\n"
+      "  (abc)            Matches strings 'abc' (group).\n"
+      "  [a-c]{2,3}       Matches between 2 and 3 repetition of element (repeat).\n"
+      "\n"
+      "OPTIONS\n"
+      "  -h, --help       Show this help information\n"
+      "  -a, --amount     The amount of passwords\n"
+      "\n"
+      "PRESETS\n"
+      "  --apple          Generate passwords like Apple.\n"
+      "  --apple-old      Generate passwords like Apple before Mojave.\n", executable);
 }
 
 void passgen_bail(passgen_error error, void *data) {
