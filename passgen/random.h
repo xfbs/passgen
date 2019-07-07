@@ -10,7 +10,7 @@
 /// Size of the random data ring buffer.
 /// Requests for more than this result in a direct call to read(),
 /// requests smaller than this are read from the buffer.
-#define RANDOM_H_BUFEN 250
+#define RANDOM_H_BUFEN 1024
 
 /// Random object. Caches some random data to reduce read() syscalls.
 typedef struct random_t {
