@@ -50,6 +50,12 @@ void passgen_run(passgen_opts opts) {
   random_close(&random);
 }
 
+bool is(const char *arg, const char *s, const char *o) {
+  if(s && 0 == strcmp(arg, s)) return true;
+  if(o && 0 == strcmp(arg, o)) return true;
+  return false;
+}
+
 passgen_opts passgen_optparse(int argc, char *argv[]) {
   // command line flags
   int opt_amount = -1;
@@ -68,11 +74,13 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
       } else {
         opt_format = argv[i];
       }
-    } else if ((strcmp(argv[i], "-h") == 0) ||
-               (strcmp(argv[i], "--help") == 0)) {
+    } else if (is(argv[i], "-h", "--help")) {
       bail(HELP, argv[0]);
-    } else if ((strcmp(argv[i], "-a") == 0) ||
-               (strcmp(argv[i], "--amount") == 0)) {
+    } else if (is(argv[i], NULL, "--apple-old")) {
+      opt_format = "[a-zA-Z0-9]{3}(-[a-zA-Z0-9]{3}){3}";
+    } else if (is(argv[i], NULL, "--apple")) {
+      opt_format = "[a-zA-Z0-9]{5}(-[a-zA-Z0-9]{5}){2}";
+    } else if (is(argv[i], "-a", "--amount")) {
       if ((i + 1) < argc) {
         opt_amount = atoi(argv[i + 1]);
         i++;
@@ -92,6 +100,10 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
     opt_amount = 1;
   }
 
+  if(!opt_format) {
+    bail(HELP, argv[0]);
+  }
+
   opts.amount = opt_amount;
   opts.format = opt_format;
 
@@ -99,9 +111,20 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
 }
 
 void passgen_usage(const char *executable) {
-  printf("Usage: %s [OPTIONS] [FORMAT]\n", executable);
-  printf("  -h, --help         Show this passgen_usage information\n");
-  printf("  -a, --amount       The amount of passwords\n");
+  fprintf(stderr, "Usage: %s [OPTIONS] PATTERN|PRESET\n\n", executable);
+  fprintf(stderr, "PATTERN is a regex-like string describing the password.\n");
+  fprintf(stderr, "  abc|def          Matches string 'abc' or 'def' (choice).\n");
+  fprintf(stderr, "  [a-cf]           Matches character 'a', 'b', 'c', and 'f' (range).\n");
+  fprintf(stderr, "  (abc)            Matches strings 'abc' (group).\n");
+  fprintf(stderr, "  [a-c]{2,3}       Matches between 2 and 3 repetition of element (repeat).\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "OPTIONS\n");
+  fprintf(stderr, "  -h, --help       Show this help information\n");
+  fprintf(stderr, "  -a, --amount     The amount of passwords\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "PRESETS\n");
+  fprintf(stderr, "  --apple          Generate passwords like Apple.\n");
+  fprintf(stderr, "  --apple-old      Generate passwords like Apple before Mojave.\n");
 }
 
 void passgen_bail(passgen_error error, void *data) {
