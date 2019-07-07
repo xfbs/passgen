@@ -54,6 +54,10 @@ random_t *random_new() {
   return random;
 }
 
+random_t *random_open(random_t *random) {
+  return random_open_path(random, random_default_device);
+}
+
 random_t *random_open_path(random_t *random, const char *path) {
   FILE *device = fopen(path, "r");
   if(!device) return NULL;

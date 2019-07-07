@@ -11,19 +11,19 @@
 
 void passgen_run(passgen_opts opts) {
   // initialize source of random numbers
-  random_t *random = random_new();
-  if (!random) bail(RANDOM_ALLOC, NULL);
+  random_t random;
+  if (!random_open(&random)) bail(RANDOM_ALLOC, NULL);
 
   // parse format
   const char *parse_pos = opts.format;
   pattern_t *pattern = pattern_parse(&parse_pos);
   if (!pattern) {
-    random_close(random);
+    random_close(&random);
     bail(PATTERN_PARSE, opts.format);
   }
 
   if(*parse_pos != '\0') {
-    random_close(random);
+    random_close(&random);
     bail(PATTERN_PARSE, opts.format);
   }
 
@@ -32,13 +32,13 @@ void passgen_run(passgen_opts opts) {
   size_t pass_len = 256;
   char *pass = malloc(pass_len + 1);
   if (!pass) {
-    random_close(random);
+    random_close(&random);
     bail(ALLOC, NULL);
   }
 
   for (size_t i = 0; i < opts.amount; ++i) {
     // get a NULL-terminated, random pass.
-    size_t written = pattern_random_fill(pattern, random, pass, pass_len);
+    size_t written = pattern_random_fill(pattern, &random, pass, pass_len);
     pass[written] = '\0';
 
     printf((i == 0) ? "%s" : "\t%s", pass);
@@ -47,7 +47,7 @@ void passgen_run(passgen_opts opts) {
   printf("\n");
   free(pass);
   pattern_free(pattern);
-  random_close(random);
+  random_close(&random);
 }
 
 passgen_opts passgen_optparse(int argc, char *argv[]) {
