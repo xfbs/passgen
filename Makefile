@@ -7,7 +7,7 @@ DOXYGEN      = doxygen
 
 default: release
 
-# generate documentations using doxygen
+# generate documentations using doxygen.
 docs:
 	$(DOXYGEN) Doxyfile
 
@@ -16,14 +16,14 @@ test: debug
 	build/debug/test_random
 	build/debug/test_pattern
 
-# build and run tests, with address-sanitizer enabled.
+# build and run tests with address sanitizer.
 test-address: debug-address
-	ninja -C build/debug-address test
+	build/debug-address/test_random
+	build/debug-address/test_pattern
 
+# build and run benchmarks.
 bench: debug
 	build/debug/bench_random
-
-#all-debug: debug debug-memory debug-address debug-undefined
 
 # format using clang-format.
 format:

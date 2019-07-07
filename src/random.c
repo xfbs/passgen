@@ -42,6 +42,29 @@ uint8_t *random_extract(random_t *random, size_t bytes) {
   return &random->buffer[random->pos - bytes];
 }
 
+void random_read(random_t *random, void *data, size_t bytes) {
+  if(bytes <= sizeof(random->buffer)) {
+    // maximum bytes we can have right now
+    size_t left = sizeof(random->buffer) - random->pos;
+
+    if(bytes < left) {
+      // if we have enough, just copy it over.
+      memcpy(data, &random->buffer[random->pos], bytes);
+      random->pos += bytes;
+    } else {
+      // if we don't have enough, copy over whatever we have and reload.
+      memcpy(data, random->buffer, left);
+      random_reload(random);
+
+      if(bytes != left) {
+        random_read(random, data + left, bytes - left);
+      }
+    }
+  } else {
+    assert(fread(data, 1, bytes, random->device) == bytes);
+  }
+}
+
 random_t *random_new() {
   return random_new_path(random_default_device);
 }
