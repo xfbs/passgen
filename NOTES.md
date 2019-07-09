@@ -38,6 +38,26 @@ To support generating passwords in truly any language, the pattern
 parser needs to be adjusted to understand unicode. For this, libraries
 for parsing and emitting UTF-8 are necessary.
 
+Use utf8proc as support library for this.
+
+### Range parsing
+
+When parsing `[c-a]`, rewrite it to `a-c`.
+
+### Linear parsing
+
+Intead of parsing into a tree-like structure with linked lists, allow
+parsing into a linear buffer.
+
+### Add return wrapper type for parsing
+
+How about a `parse_result` type with an okay field and an optional error?
+
+### Abstract reading
+
+Add a `read_type` struct that is generic over where to read from (such that
+UTF-8 support can be made optional)
+
 ### Using getrandom
 
 Reading from `/dev/urandom` could be replaced with the `getrandom()`
