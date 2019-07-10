@@ -1,6 +1,6 @@
 project('passgen', 'c', default_options : ['c_std=c11'])
 
-passgen = library('passgen', 'src/passgen.c', 'src/pattern.c', 'src/random.c')
+passgen = library('passgen', 'src/passgen.c', 'src/pattern.c', 'src/random.c', 'src/reader.c')
 
 # main executable
 executable('passgen', 'src/bin/passgen.c', link_with : passgen)
