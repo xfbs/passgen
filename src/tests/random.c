@@ -176,7 +176,7 @@ test_ret test_random_read(void) {
   random_t random;
   assert(random_open(&random));
 
-  uint8_t data[1000] = {0};
+  uint8_t data[2000] = {0};
 
   // fill small.
   random_read(&random, &data[0], 1);
