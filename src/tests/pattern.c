@@ -448,7 +448,7 @@ test_ret test_pattern_segment_choices() {
   assert(segment);
   assert(pattern_range_choices(range) == 3);
   assert(pattern_segment_choices(segment) == (3*3*3*3*3*3*3*3)); // 5, 6, 7, or 8 repetitions.
-  pattern_range_free(range);
+  //pattern_range_free(range);
   pattern_segment_free(segment);
 
   // range, variable repetitions.
@@ -458,7 +458,7 @@ test_ret test_pattern_segment_choices() {
   assert(segment);
   assert(pattern_range_choices(range) == 3);
   assert(pattern_segment_choices(segment) == (3*3*3*3*3 + 3*3*3*3*3*3 + 3*3*3*3*3*3*3 + 3*3*3*3*3*3*3*3)); // 5, 6, 7, or 8 repetitions.
-  pattern_range_free(range);
+  //pattern_range_free(range);
   pattern_segment_free(segment);
 
   // TODO: test group.
