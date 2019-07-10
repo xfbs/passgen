@@ -77,3 +77,7 @@ be implemented.
 
 Supporting escape codes like `\n`, `\t`, `\uAAFF`, `\xAF`, etc. should be
 implemented.
+
+### Migrate pattern\_parse into pattern\_group\_parse
+
+That makes more sense, and it allows pattern\_parse to do some error checking/handling.
