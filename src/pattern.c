@@ -64,10 +64,7 @@ pattern_range_t *pattern_range_parse(const char **string) {
 
     // make sure end is smaller than start.
     if(start > end) {
-      // swap start and end.
-      char tmp = start;
-      start = end;
-      end = tmp;
+      return NULL;
     }
   } else {
     // is a single char.
