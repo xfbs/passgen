@@ -16,16 +16,36 @@ pattern_range_t *pattern_range_new(char start, char end,
   return new;
 }
 
+// parses and consumes a character (incrementing string).
+// returns 0 on error.
+uint32_t parse_char(const char **string) {
+  if(**string == '\0') {
+    return 0;
+  }
+
+  // this character might be escaped.
+  if(**string == '\\') {
+    switch((*string)[1]) {
+      case 'n':
+        *string += 2;
+        return '\n';
+      case 't':
+        *string += 2;
+        return '\t';
+      default: return 0;
+    }
+  }
+
+  uint32_t out = **string;
+
+  *string += 1;
+  return out;
+}
+
 pattern_range_t *pattern_range_parse(const char **string) {
   if (is_illegal(**string) || is_end(**string) || is_sep(**string)) return NULL;
 
-  // char might be escaped.
-  if(**string == '\\') {
-    *string += 1;
-  }
-
-  char start = **string;
-  *string += 1;
+  char start = parse_char(string);
 
   if(!start) {
     return NULL;
@@ -33,10 +53,22 @@ pattern_range_t *pattern_range_parse(const char **string) {
 
   char end;
   if (**string == '-') {
-    // is a range.
+    // skip the dash.
     *string += 1;
-    end = **string;
-    *string += 1;
+    end = parse_char(string);
+
+    // make sure end exists.
+    if(!end) {
+      return NULL;
+    }
+
+    // make sure end is smaller than start.
+    if(start > end) {
+      // swap start and end.
+      char tmp = start;
+      start = end;
+      end = tmp;
+    }
   } else {
     // is a single char.
     end = start;

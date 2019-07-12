@@ -380,7 +380,8 @@ test_ret test_pattern_range_err() {
   assert(p == s);
 
   p = s = "a-";
-  assert(!pattern_range_parse(&p));
+  pattern_range_t *range = pattern_range_parse(&p);
+  assert(!range);
 
   p = s = "";
   assert(!pattern_range_parse(&p));
