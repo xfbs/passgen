@@ -6,6 +6,27 @@ bool is_illegal(char c) { return c == ']' || c == ')'; }
 bool is_end(char c) { return c == '\0'; }
 bool is_sep(char c) { return c == '|'; }
 
+typedef uint32_t parse_char_func(const char **string);
+
+uint32_t parse_char_unicode(const char **string);
+
+static struct escaped_chars {
+  uint32_t chr;
+  uint32_t dest;
+  parse_char_func *func;
+} escape_chars[] = {
+  {'a', '\a', NULL},
+  {'b', '\b', NULL},
+  {'e', '\033', NULL},
+  {'f', '\f', NULL},
+  {'n', '\n', NULL},
+  {'r', '\r', NULL},
+  {'t', '\t', NULL},
+  {'\\', '\\', NULL},
+  //{'u', 0, parse_char_unicode},
+  {0, 0, NULL},
+};
+
 pattern_range_t *pattern_range_new(char start, char end,
                                    pattern_range_t *next) {
   pattern_range_t *new = malloc(sizeof(pattern_range_t));
@@ -25,16 +46,20 @@ uint32_t parse_char(const char **string) {
 
   // this character might be escaped.
   if(**string == '\\') {
-    switch((*string)[1]) {
-      case 'n':
+    for(size_t i = 0; escape_chars[i].chr; ++i) {
+      if((*string)[1] == escape_chars[i].chr) {
         *string += 2;
-        return '\n';
-      case 't':
-        *string += 2;
-        return '\t';
-      default:
-        return 0;
+
+        if(escape_chars[i].dest) {
+          return escape_chars[i].dest;
+        } else {
+          return escape_chars[i].func(string);
+        }
+      }
     }
+
+    // nothing matched.
+    return 0;
   }
 
   uint32_t out = **string;

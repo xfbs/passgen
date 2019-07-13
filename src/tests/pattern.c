@@ -361,7 +361,7 @@ test_ret test_pattern_range_escaped() {
   pattern_range_free(range);
 
   // error
-  p = s = "\\b";
+  p = s = "\\d";
   range = pattern_range_parse(&p);
   assert(!range);
 
