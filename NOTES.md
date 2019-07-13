@@ -112,6 +112,9 @@ specified.
 Use a custom random data stream (or a key file that is hashed and the hash used
 to seed a PRNG?)
 
+Idea: use `libsodium`'s stream ciphers, such as ChaCha20, XChaCha20, Salsa20 or
+XSalsa20, along with a secret key or keyfile, to generate reproducible passes.
+
 ### Add disclaimer about timing sidechannels
 
 When generating variable-length passwords, the length is a sidechannel.
