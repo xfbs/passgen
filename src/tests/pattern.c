@@ -360,6 +360,55 @@ test_ret test_pattern_range_escaped() {
   assert(range->next->next == NULL);
   pattern_range_free(range);
 
+  p = s = "\\a";
+  range = pattern_range_parse(&p);
+  assert(range);
+  assert(range->start == '\a');
+  assert(range->next == NULL);
+  pattern_range_free(range);
+
+  p = s = "\\b";
+  range = pattern_range_parse(&p);
+  assert(range);
+  assert(range->start == '\b');
+  assert(range->next == NULL);
+  pattern_range_free(range);
+
+  p = s = "\\e";
+  range = pattern_range_parse(&p);
+  assert(range);
+  assert(range->start == '\033');
+  assert(range->next == NULL);
+  pattern_range_free(range);
+
+  p = s = "\\f";
+  range = pattern_range_parse(&p);
+  assert(range);
+  assert(range->start == '\f');
+  assert(range->next == NULL);
+  pattern_range_free(range);
+
+  p = s = "\\n";
+  range = pattern_range_parse(&p);
+  assert(range);
+  assert(range->start == '\n');
+  assert(range->next == NULL);
+  pattern_range_free(range);
+
+  p = s = "\\t";
+  range = pattern_range_parse(&p);
+  assert(range);
+  assert(range->start == '\t');
+  assert(range->next == NULL);
+  pattern_range_free(range);
+
+  p = s = "\\\\";
+  range = pattern_range_parse(&p);
+  assert(range);
+  assert(range->start == '\\');
+  assert(range->next == NULL);
+  pattern_range_free(range);
+
   // error
   p = s = "\\d";
   range = pattern_range_parse(&p);
