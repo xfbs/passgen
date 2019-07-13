@@ -10,6 +10,12 @@
 #include "passgen/random.h"
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *)data)
 
+pattern_preset pattern_presets[] = {
+  {"apple1", "[a-zA-Z0-9]{3}(-[a-zA-Z0-9]{3}){3}"},
+  {"apple2", "[a-zA-Z0-9]{6}(-[a-zA-Z0-9]{6}){2}"},
+  {NULL, NULL},
+};
+
 void passgen_run(passgen_opts opts) {
   // initialize source of random numbers
   random_t random;
@@ -58,21 +64,14 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
       .amount = 1,
   };
 
-  enum presets {
-    PRESET_NONE,
-    PRESET_APPLE,
-    PRESET_APPLE_OLD,
-  };
 
-  static int preset;
   const char *short_opts = "a:p:h";
+  const char *preset = NULL;
 
   static struct option long_opts[] = {
     {"amount", required_argument, NULL, 'a'},
     {"help", no_argument, NULL, 'h'},
-    {"pattern", no_argument, NULL, 'p'},
-    {"apple", no_argument, &preset, PRESET_APPLE},
-    {"apple-old", no_argument, &preset, PRESET_APPLE_OLD},
+    {"preset", required_argument, NULL, 'p'},
     {NULL, no_argument, NULL, 0}
   };
 
@@ -95,7 +94,7 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
         opts.amount = opt;
         break;
       case 'p':
-        opts.format = optarg;
+        preset = optarg;
         break;
       case '?':
       default:
@@ -109,6 +108,14 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
     bail(MULTIPLE_FORMATS, opts.format);
   }
 
+  for(size_t i = 0; pattern_presets[i].name; ++i) {
+    if(0 == strcmp(pattern_presets[i].name, preset)) {
+      opts.format = pattern_presets[i].format;
+      break;
+    }
+  }
+
+  /*
   switch(preset) {
     case PRESET_APPLE:
       opts.format = "[a-zA-Z0-9]{3}(-[a-zA-Z0-9]{3}){3}";
@@ -117,6 +124,7 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
       opts.format = "[a-zA-Z0-9]{5}(-[a-zA-Z0-9]{5}){2}";
       break;
   }
+  */
 
   if(optind < argc) {
     if(opts.format || (argc - optind) > 1) {

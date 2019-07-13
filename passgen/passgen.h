@@ -11,6 +11,13 @@ typedef enum {
   PASSGEN_ERROR_ILLEGAL_AMOUNT,
 } passgen_error;
 
+typedef struct pattern_preset {
+  const char *name;
+  const char *format;
+} pattern_preset;
+
+extern pattern_preset pattern_presets[];
+
 typedef struct {
   size_t amount;
   const char *format;
