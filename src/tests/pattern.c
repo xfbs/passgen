@@ -360,6 +360,11 @@ test_ret test_pattern_range_escaped() {
   assert(range->next->next == NULL);
   pattern_range_free(range);
 
+  // error
+  p = s = "\\b";
+  range = pattern_range_parse(&p);
+  assert(!range);
+
   return test_ok;
 }
 
