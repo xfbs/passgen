@@ -39,11 +39,13 @@ docs:
 test: debug
 	build/debug/test_random
 	build/debug/test_pattern
+	build/debug/test_reader
 
 # build and run tests with address sanitizer.
 test-address: debug-address
 	build/debug-address/test_random
 	build/debug-address/test_pattern
+	build/debug-address/test_reader
 
 # build and run benchmarks.
 bench: debug
