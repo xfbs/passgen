@@ -140,7 +140,7 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
 
 void passgen_usage(const char *executable) {
   fprintf(stderr,
-      "Usage: %s [OPTIONS] PATTERN|PRESET\n\n"
+      "Usage: %s [OPTIONS] [PATTERN]\n\n"
       "PATTERN is a regex-like string describing the password.\n"
       "  abc|def          Matches string 'abc' or 'def' (choice).\n"
       "  [a-cf]           Matches character 'a', 'b', 'c', and 'f' (range).\n"
@@ -150,6 +150,7 @@ void passgen_usage(const char *executable) {
       "OPTIONS\n"
       "  -a, --amount     The amount of passwords\n"
       "  -h, --help       Show this help information\n"
+      "  -p, --preset n   Use the given preset.\n"
       "  -v, --version    Show the version of this build.\n"
       "\n"
       "PRESETS\n"
