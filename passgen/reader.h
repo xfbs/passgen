@@ -11,7 +11,7 @@ struct reader_t;
 struct bufreader_t;
 
 struct read_result {
-  size_t size;
+  size_t read;
   bool ok;
   bool eof;
   int errno;

@@ -10,25 +10,43 @@ read_result reader_fread(reader_t *reader, void *dest, size_t size) {
     .ok = !ferror(reader->data),
     .eof = feof(reader->data),
     .errno = 0,
-    .size = read,
+    .read = read,
   };
 
   return ret;
 }
 
-read_result reader_string_read(reader_t *reader, void *dest, size_t size) {
-  char *pos = stpncpy((char *) dest, (const char *) reader->data, size);
-  size_t read = pos - (char *) dest;
+read_result reader_string_read(reader_t *reader, void *_dest, size_t size) {
+  const char *data = reader->data;
+  char *dest = _dest;
+  size_t pos = reader->pos;
+  size_t read;
+  bool eof = false;
 
-  // advance pointer.
-  reader->data = ((char *) reader->data) + read;
+  // read until we hit a NULL character.
+  for(read = 0; read < size; ++read) {
+    if(!data[pos+read]) {
+      eof = true;
+      break;
+    }
+
+    dest[read] = data[pos+read];
+  }
+
+  // update the position in the string.
   reader->pos += read;
+
+  // still write out termination if hit NULL.
+  if(eof) {
+    dest[read] = '\0';
+    read += 1;
+  }
 
   read_result ret = {
     .ok = true,
-    .eof = read < size,
+    .eof = eof,
     .errno = 0,
-    .size = size
+    .read = read,
   };
 
   return ret;
