@@ -9,7 +9,6 @@
 #include "passgen/pattern.h"
 #include "passgen/random.h"
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *)data)
-void passgen_version(void);
 
 pattern_preset pattern_presets[] = {
   {"apple1", "[a-zA-Z0-9]{3}(-[a-zA-Z0-9]{3}){3}"},
@@ -141,22 +140,25 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
 
 void passgen_usage(const char *executable) {
   fprintf(stderr,
+      "passgen version 0.1.0\n"
+      "Generate passwords from a regex-like pattern.\n"
       "Usage: %s [OPTIONS] [PATTERN]\n\n"
       "PATTERN is a regex-like string describing the password.\n"
-      "  abc|def          Matches string 'abc' or 'def' (choice).\n"
-      "  [a-cf]           Matches character 'a', 'b', 'c', and 'f' (range).\n"
-      "  (abc)            Matches strings 'abc' (group).\n"
-      "  [a-c]{2,3}       Matches between 2 and 3 repetition of element (repeat).\n"
+      "  abc|def            Matches string 'abc' or 'def' (choice).\n"
+      "  [a-cf]             Matches character 'a', 'b', 'c', and 'f' (range).\n"
+      "  (abc)              Matches strings 'abc' (group).\n"
+      "  [a-c]{2,3}         Matches between 2 and 3 repetition of element (repeat).\n"
       "\n"
       "OPTIONS\n"
-      "  -a, --amount     The amount of passwords\n"
-      "  -h, --help       Show this help information\n"
-      "  -p, --preset n   Use the given preset.\n"
-      "  -v, --version    Show the version of this build.\n"
+      "  -a, --amount       The amount of passwords\n"
+      "  -h, --help         Show this help information\n"
+      "  -p, --preset name  Use the given preset.\n"
+      "  -v, --version      Show the version of this build.\n"
       "\n"
       "PRESETS\n"
-      "  --apple          Generate passwords like Apple.\n"
-      "  --apple-old      Generate passwords like Apple before Mojave.\n", executable);
+      "  apple1             Generate passwords like 'oKC-T37-Dew-Qyn'.\n"
+      "  apple2             Generate passwords like 'mHXr4X-CiK4w6-hbjF7T'.\n",
+      executable);
 }
 
 void passgen_version(void) {
