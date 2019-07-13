@@ -10,9 +10,17 @@ typedef uint32_t parse_char_func(const char **string);
 
 uint32_t parse_char_unicode(const char **string);
 
+// list of escape chars and what they map to. has either a char it maps to or
+// a function that is called to parse it further.
 static struct escaped_chars {
+  // when encountering a sequence like "\a", it checks for an entry where chr
+  // is 'a'.
   uint32_t chr;
+  // the char the sequence "\a" maps to, in this case the character '\a'
+  // (alert).
   uint32_t dest;
+  // If dest is zero, we instead call this function to parse whatever is coming
+  // after, to be able to parse things like "\u{ABCD}".
   parse_char_func *func;
 } escape_chars[] = {
   {'a', '\a', NULL},
