@@ -118,3 +118,5 @@ XSalsa20, along with a secret key or keyfile, to generate reproducible passes.
 ### Add disclaimer about timing sidechannels
 
 When generating variable-length passwords, the length is a sidechannel.
+
+### Write pkg-config to be able to load libpassgen.
