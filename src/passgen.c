@@ -65,7 +65,6 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
       .amount = 1,
   };
 
-
   const char *short_opts = "a:p:hv";
   const char *preset = NULL;
 
@@ -108,6 +107,7 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
     }
   }
 
+  // can't have both a preset and a format at the same time.
   if(preset && opts.format) {
     bail(MULTIPLE_FORMATS, opts.format);
   }
@@ -131,6 +131,7 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
     }
   }
 
+  // if no format or preset was given, show help.
   if(!opts.format) {
     bail(HELP, argv[0]);
   }
