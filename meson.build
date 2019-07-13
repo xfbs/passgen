@@ -1,6 +1,6 @@
 project('passgen', 'c', default_options : ['c_std=c11'])
 
-passgen = library('passgen', 'src/passgen.c', 'src/pattern.c', 'src/random.c', 'src/reader.c')
+passgen = library('passgen', 'src/passgen.c', 'src/pattern.c', 'src/random.c', 'src/reader.c', 'src/unicode.c')
 
 utf8proc = meson.get_compiler('c').find_library('utf8proc')
 
