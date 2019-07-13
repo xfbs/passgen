@@ -346,6 +346,23 @@ test_ret test_pattern_range_char() {
   return test_ok;
 }
 
+test_ret test_pattern_range_escaped() {
+  const char *s = "\\t\\n";
+  const char *p = s;
+  pattern_range_t *range = pattern_range_parse(&p);
+  assert(range);
+  assert(p == &s[4]);
+  assert(range->start == '\t');
+  assert(range->end == '\t');
+  assert(range->next);
+  assert(range->next->start == '\n');
+  assert(range->next->end == '\n');
+  assert(range->next->next == NULL);
+  pattern_range_free(range);
+
+  return test_ok;
+}
+
 test_ret test_pattern_range_combined() {
   const char *s = "[a-z0-9%#]";
   const char *p = &s[1];
@@ -472,6 +489,7 @@ test_t tests[] = {
   test(pattern_range_range),
   test(pattern_range_char),
   test(pattern_range_combined),
+  test(pattern_range_escaped),
   test(pattern_range_err),
   test(pattern_range_random),
   test(pattern_range_choices),

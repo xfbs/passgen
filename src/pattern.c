@@ -32,7 +32,8 @@ uint32_t parse_char(const char **string) {
       case 't':
         *string += 2;
         return '\t';
-      default: return 0;
+      default:
+        return 0;
     }
   }
 
