@@ -9,6 +9,7 @@
 #include "passgen/pattern.h"
 #include "passgen/random.h"
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *)data)
+void passgen_version(void);
 
 pattern_preset pattern_presets[] = {
   {"apple1", "[a-zA-Z0-9]{3}(-[a-zA-Z0-9]{3}){3}"},
@@ -65,13 +66,14 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
   };
 
 
-  const char *short_opts = "a:p:h";
+  const char *short_opts = "a:p:hv";
   const char *preset = NULL;
 
   static struct option long_opts[] = {
     {"amount", required_argument, NULL, 'a'},
     {"help", no_argument, NULL, 'h'},
     {"preset", required_argument, NULL, 'p'},
+    {"version", no_argument, NULL, 'v'},
     {NULL, no_argument, NULL, 0}
   };
 
@@ -96,6 +98,8 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
       case 'p':
         preset = optarg;
         break;
+      case 'v':
+        bail(VERSION, NULL);
       case '?':
       default:
         fprintf(stderr, "Error unrecognised: %s\n", argv[optind]);
@@ -151,18 +155,27 @@ void passgen_usage(const char *executable) {
       "  [a-c]{2,3}       Matches between 2 and 3 repetition of element (repeat).\n"
       "\n"
       "OPTIONS\n"
-      "  -h, --help       Show this help information\n"
       "  -a, --amount     The amount of passwords\n"
+      "  -h, --help       Show this help information\n"
+      "  -v, --version    Show the version of this build.\n"
       "\n"
       "PRESETS\n"
       "  --apple          Generate passwords like Apple.\n"
       "  --apple-old      Generate passwords like Apple before Mojave.\n", executable);
 }
 
+void passgen_version(void) {
+  fprintf(stderr,
+      "passgen, version 0.1.0\n");
+}
+
 void passgen_bail(passgen_error error, void *data) {
   switch (error) {
     case PASSGEN_ERROR_HELP:
       passgen_usage(data);
+      exit(-1);
+    case PASSGEN_ERROR_VERSION:
+      passgen_version();
       exit(-1);
     case PASSGEN_ERROR_MULTIPLE_FORMATS:
       printf("Error: multiple formats specified (%s).\n", (const char *) data);
