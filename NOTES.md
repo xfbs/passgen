@@ -97,7 +97,8 @@ implemented. This needs to be done in the `parse\_char` method, most likely.
 
 ### Migrate pattern\_parse into pattern\_group\_parse
 
-That makes more sense, and it allows pattern\_parse to do some error checking/handling.
+That makes more sense, and it allows pattern\_parse to do some error
+checking/handling.
 
 ### Implement probability
 
@@ -110,3 +111,7 @@ specified.
 
 Use a custom random data stream (or a key file that is hashed and the hash used
 to seed a PRNG?)
+
+### Add disclaimer about timing sidechannels
+
+When generating variable-length passwords, the length is a sidechannel.
