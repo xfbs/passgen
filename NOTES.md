@@ -71,8 +71,11 @@ UTF-8 support can be made optional)
 
 ### Using getrandom
 
-Reading from `/dev/urandom` could be replaced with the `getrandom()`
-syscall.
+~Reading from `/dev/urandom` could be replaced with the `getrandom()`
+syscall.~
+
+Alternative idea: use `libsodium` randomness functions for operating system
+independence.
 
 ### Word List
 
