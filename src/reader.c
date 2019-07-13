@@ -1,6 +1,10 @@
 #include "passgen/reader.h"
 #include <string.h>
 
+#define STATUS_EOF 1
+#define is_status_eof(n) ((n) & STATUS_EOF)
+#define set_status_eof(n) (n) |= STATUS_EOF
+
 read_result reader_fread(reader_t *reader, void *dest, size_t size) {
   size_t read = fread(dest, 1, size, reader->data);
 
@@ -37,9 +41,10 @@ read_result reader_string_read(reader_t *reader, void *_dest, size_t size) {
   reader->pos += read;
 
   // still write out termination if hit NULL.
-  if(eof) {
+  if(eof && !is_status_eof(reader->status)) {
     dest[read] = '\0';
     read += 1;
+    set_status_eof(reader->status);
   }
 
   read_result ret = {

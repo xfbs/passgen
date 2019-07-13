@@ -36,6 +36,7 @@ test_ret test_reader_string() {
   assert(data[1] == 'd');
   assert(data[2] == 0);
 
+  // reading past EOF should only read up to EOF.
   res = reader_read(&reader, &data[0], 10);
   assert(reader_pos(&reader) == 5);
   assert(res.ok);
@@ -43,6 +44,13 @@ test_ret test_reader_string() {
   assert(res.read == 2);
   assert(data[0] == 'e');
   assert(data[1] == '\0');
+
+  // once EOF has been set, don't read any more data.
+  res = reader_read(&reader, &data[0], 10);
+  assert(reader_pos(&reader) == 5);
+  assert(res.ok);
+  assert(res.eof == true);
+  assert(res.read == 0);
 
   return test_ok;
 }

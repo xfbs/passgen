@@ -23,6 +23,8 @@ struct reader_t {
   read_function *read;
   void *data;
   size_t pos;
+  size_t len;
+  int status;
 };
 
 struct bufreader_t {
