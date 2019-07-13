@@ -95,3 +95,15 @@ implemented. This needs to be done in the `parse\_char` method, most likely.
 ### Migrate pattern\_parse into pattern\_group\_parse
 
 That makes more sense, and it allows pattern\_parse to do some error checking/handling.
+
+### Implement probability
+
+For a range `[abc]`, implement something like `[a{9}bc]` to make `a` have 9
+times the relative probability of the whole thing. This allows one to adjust
+how often which items should be picked with a similar format to how lengths are
+specified.
+
+### Implement custom randomness source
+
+Use a custom random data stream (or a key file that is hashed and the hash used
+to seed a PRNG?)
