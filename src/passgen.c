@@ -112,24 +112,17 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
     bail(MULTIPLE_FORMATS, opts.format);
   }
 
-  for(size_t i = 0; pattern_presets[i].name; ++i) {
-    if(0 == strcmp(pattern_presets[i].name, preset)) {
-      opts.format = pattern_presets[i].format;
-      break;
+  // if a preset was given, parse it.
+  if(preset) {
+    for(size_t i = 0; pattern_presets[i].name; ++i) {
+      if(0 == strcmp(pattern_presets[i].name, preset)) {
+        opts.format = pattern_presets[i].format;
+        break;
+      }
     }
   }
 
-  /*
-  switch(preset) {
-    case PRESET_APPLE:
-      opts.format = "[a-zA-Z0-9]{3}(-[a-zA-Z0-9]{3}){3}";
-      break;
-    case PRESET_APPLE_OLD:
-      opts.format = "[a-zA-Z0-9]{5}(-[a-zA-Z0-9]{5}){2}";
-      break;
-  }
-  */
-
+  // parse a given format, making sure we don't have multiple."
   if(optind < argc) {
     if(opts.format || (argc - optind) > 1) {
       bail(MULTIPLE_FORMATS, (void *)argv[optind]);
