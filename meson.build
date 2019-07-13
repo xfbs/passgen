@@ -1,8 +1,13 @@
 project('passgen', 'c', default_options : ['c_std=c11'])
 
+# main library
 passgen = library('passgen', 'src/passgen.c', 'src/pattern.c', 'src/random.c', 'src/reader.c', 'src/unicode.c')
 
+# library used to decode and encode utf8
 utf8proc = meson.get_compiler('c').find_library('utf8proc')
+
+# library used for cryptographic routines
+libsodium = meson.get_compiler('c').find_library('sodium')
 
 # main executable
 executable('passgen', 'src/bin/passgen.c', link_with : passgen)
