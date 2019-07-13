@@ -5,6 +5,7 @@
 
 #pragma once
 #include <stdlib.h>
+#include <stdbool.h>
 #include "random.h"
 
 // TODO: remove PATTERN_CHAR, convert to use PATTERN_RANGE.
@@ -65,9 +66,31 @@ struct pattern_t {
   struct pattern_t *next;
 };
 
+enum pattern_error_kind {
+  PATTERN_ERROR_UNKNOWN,
+  PATTERN_ERROR_ALLOC,
+};
+
+struct pattern_error_t {
+  enum pattern_error_kind kind;
+  size_t prev;
+  size_t pos;
+};
+
+struct pattern_range_result_t {
+  bool ok;
+  union {
+    struct pattern_range_t *range;
+    struct pattern_error_t error;
+  } data;
+};
+
 typedef struct pattern_t pattern_t;
 typedef struct pattern_range_t pattern_range_t;
 typedef struct pattern_segment_t pattern_segment_t;
+
+typedef struct pattern_range_result_t pattern_range_result_t;
+typedef struct pattern_error_t pattern_error_t;
 
 /// Allocate a new pattern.
 pattern_t *pattern_new(pattern_segment_t *segment, pattern_t *next);
@@ -96,6 +119,13 @@ size_t pattern_segment_count(pattern_t *pattern);
 /// Find out how many possible (not necessarily distinct) strings can be
 /// generated from this pattern.
 size_t pattern_choices(pattern_t *pattern);
+
+
+/// Creates a new pattern error object.
+pattern_error_t pattern_error(enum pattern_error_kind kind, size_t prev, size_t pos);
+
+/// Format string to print out a pattern error object.
+const char *pattern_error_fmtstr(pattern_error_t error);
 
 pattern_range_t *pattern_range_new(char start, char end, pattern_range_t *next);
 pattern_range_t *pattern_range_parse(const char **string);

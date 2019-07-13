@@ -489,6 +489,23 @@ test_ret test_pattern_segment_choices() {
   return test_ok;
 }
 
+
+test_ret test_pattern_error() {
+  pattern_error_t error;
+
+  error = pattern_error(PATTERN_ERROR_UNKNOWN, 0, 0);
+  assert(error.kind == PATTERN_ERROR_UNKNOWN);
+  assert(error.prev == 0);
+  assert(error.pos  == 0);
+
+  error = pattern_error(PATTERN_ERROR_ALLOC, 0, 0);
+  assert(error.kind == PATTERN_ERROR_ALLOC);
+  assert(error.prev == 0);
+  assert(error.pos  == 0);
+
+  return test_ok;
+}
+
 test_t tests[] = {
   test(pattern_parse),
   test(pattern_range_range),
@@ -506,5 +523,6 @@ test_t tests[] = {
   test(pattern_segment_maxlen),
   test(pattern_segment_random),
   test(pattern_segment_choices),
+  test(pattern_error),
   {NULL, NULL}
 };

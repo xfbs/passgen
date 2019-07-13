@@ -450,3 +450,22 @@ size_t pattern_segment_choices(pattern_segment_t *segment) {
 
   return choices;
 }
+
+pattern_error_t pattern_error(enum pattern_error_kind kind, size_t prev, size_t pos) {
+  return (pattern_error_t) {
+    .kind = kind,
+    .prev = prev,
+    .pos  = pos,
+  };
+}
+
+const char *pattern_error_fmtstr(pattern_error_t error) {
+  switch(error.kind) {
+    case PATTERN_ERROR_UNKNOWN:
+      return "Unknown error happened while parsing.";
+    case PATTERN_ERROR_ALLOC:
+      return "Error happened while allocating memory.";
+    default:
+      return "Illegal error happened.";
+  }
+}
