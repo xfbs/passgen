@@ -489,7 +489,6 @@ test_ret test_pattern_segment_choices() {
   return test_ok;
 }
 
-
 test_ret test_pattern_error() {
   pattern_error_t error;
 
