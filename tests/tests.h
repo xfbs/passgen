@@ -18,24 +18,24 @@ typedef struct {
   const char *func;
   /// The line in which the assertion failed.
   size_t line;
-} test_ret;
+} test_result;
 
-test_ret test_ok;
+test_result test_ok;
 
-typedef test_ret test_fun(void);
+typedef test_result test_fun(void);
 
 typedef struct {
   const char *name;
   test_fun *fun;
-} test_t;
+} test_entry;
 
-bool run(test_t test);
+bool run(test_entry test);
 #define test(id) \
   { .name = #id, .fun = test_##id }
 
 #define assert(some)   \
   if (!(some))         \
-    return (test_ret){ \
+    return (test_result){ \
         .ok = false, .assertion = #some, .line = __LINE__, .func = __func__};
 
-extern test_t tests[];
+extern test_entry tests[];

@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-test_ret test_reader_string() {
+test_result test_reader_string() {
   reader_t reader = reader_from_string("abcde");
   char data[100] = {0};
 
@@ -55,7 +55,7 @@ test_ret test_reader_string() {
   return test_ok;
 }
 
-test_t tests[] = {
+test_entry tests[] = {
   test(reader_string),
   {NULL, NULL}
 };

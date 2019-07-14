@@ -2,7 +2,7 @@
 #include <time.h>
 #include <string.h>
 
-test_ret test_ok = {.ok = true};
+test_result test_ok = {.ok = true};
 
 int main(int argc, char *argv[]) {
   size_t failures = 0;
@@ -45,9 +45,9 @@ int main(int argc, char *argv[]) {
   }
 }
 
-bool run(test_t test) {
+bool run(test_entry test) {
   clock_t before = clock();
-  test_ret ret = test.fun();
+  test_result ret = test.fun();
   clock_t total = clock() - before;
 
   double time = total / (CLOCKS_PER_SEC * 1.0);

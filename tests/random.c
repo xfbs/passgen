@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 
-test_ret test_random_uint8(void) {
+test_result test_random_uint8(void) {
   random_t *rand = random_new();
   assert(rand);
 
@@ -25,7 +25,7 @@ test_ret test_random_uint8(void) {
   return test_ok;
 }
 
-test_ret test_random_uint8_max(void) {
+test_result test_random_uint8_max(void) {
   random_t *rand = random_new();
   assert(rand);
 
@@ -49,7 +49,7 @@ test_ret test_random_uint8_max(void) {
   return test_ok;
 }
 
-test_ret test_random_uint16(void) {
+test_result test_random_uint16(void) {
   random_t *rand = random_new();
   assert(rand);
 
@@ -69,7 +69,7 @@ test_ret test_random_uint16(void) {
   return test_ok;
 }
 
-test_ret test_random_uint16_max(void) {
+test_result test_random_uint16_max(void) {
   random_t *rand = random_new();
   assert(rand);
 
@@ -93,7 +93,7 @@ test_ret test_random_uint16_max(void) {
   return test_ok;
 }
 
-test_ret test_random_uint32_max(void) {
+test_result test_random_uint32_max(void) {
   random_t *rand = random_new();
   assert(rand);
 
@@ -106,7 +106,7 @@ test_ret test_random_uint32_max(void) {
   return test_ok;
 }
 
-test_ret test_random_uint64_max(void) {
+test_result test_random_uint64_max(void) {
   random_t *rand = random_new();
   assert(rand);
 
@@ -120,7 +120,7 @@ test_ret test_random_uint64_max(void) {
   return test_ok;
 }
 
-test_ret test_random_new(void) {
+test_result test_random_new(void) {
   random_t *random = random_new();
   assert(random);
   assert(random->device);
@@ -129,7 +129,7 @@ test_ret test_random_new(void) {
   return test_ok;
 }
 
-test_ret test_random_new_path(void) {
+test_result test_random_new_path(void) {
   random_t *random;
   random = random_new_path("/dev/nonexistent");
   assert(!random);
@@ -146,7 +146,7 @@ test_ret test_random_new_path(void) {
   return test_ok;
 }
 
-test_ret test_random_open(void) {
+test_result test_random_open(void) {
   random_t random;
   assert(random_open(&random));
   assert(random.device);
@@ -156,7 +156,7 @@ test_ret test_random_open(void) {
   return test_ok;
 }
 
-test_ret test_random_open_path(void) {
+test_result test_random_open_path(void) {
   random_t random;
   assert(!random_open_path(&random, "/dev/nonexistent"));
 
@@ -172,7 +172,7 @@ test_ret test_random_open_path(void) {
   return test_ok;
 }
 
-test_ret test_random_read(void) {
+test_result test_random_read(void) {
   random_t random;
   assert(random_open(&random));
 
@@ -234,7 +234,7 @@ test_ret test_random_read(void) {
   return test_ok;
 }
 
-test_t tests[] = {
+test_entry tests[] = {
   test(random_new),
   test(random_new_path),
   test(random_open),
