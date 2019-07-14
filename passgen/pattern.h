@@ -4,8 +4,8 @@
 /// Methods for parsing a regex-subset used to generate custom data.
 
 #pragma once
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "random.h"
 
 // TODO: remove PATTERN_CHAR, convert to use PATTERN_RANGE.
@@ -106,8 +106,11 @@ pattern_t *pattern_parse(const char **string);
 size_t pattern_maxlen(pattern_t *pattern);
 
 /// Use a pattern to fill a buffer with a string matching that pattern.
-size_t pattern_random_fill(pattern_t *pattern, random_t *rand, char *buffer,
-                           size_t len);
+size_t pattern_random_fill(
+    pattern_t *pattern,
+    random_t *rand,
+    char *buffer,
+    size_t len);
 
 /// Generate a string matching the pattern @p pattern using @p as a randomness
 /// source.
@@ -120,9 +123,11 @@ size_t pattern_segment_count(pattern_t *pattern);
 /// generated from this pattern.
 size_t pattern_choices(pattern_t *pattern);
 
-
 /// Creates a new pattern error object.
-pattern_error_t pattern_error(enum pattern_error_kind kind, size_t prev, size_t pos);
+pattern_error_t pattern_error(
+    enum pattern_error_kind kind,
+    size_t prev,
+    size_t pos);
 
 /// Format string to print out a pattern error object.
 const char *pattern_error_fmtstr(pattern_error_t error);
@@ -135,14 +140,19 @@ size_t pattern_range_choices(pattern_range_t *range);
 
 pattern_reps_t pattern_segment_parse_reps(const char **string);
 
-pattern_segment_t *pattern_segment_new(pattern_kind kind, void *data,
-                                       pattern_reps_t reps,
-                                       pattern_segment_t *next);
+pattern_segment_t *pattern_segment_new(
+    pattern_kind kind,
+    void *data,
+    pattern_reps_t reps,
+    pattern_segment_t *next);
 pattern_segment_t *pattern_segment_parse(const char **string);
 void pattern_segment_free(pattern_segment_t *pattern);
 size_t pattern_segment_choices(pattern_segment_t *segment);
 
 size_t pattern_segment_maxlen(pattern_segment_t *pattern);
-size_t pattern_segment_random_fill(pattern_segment_t *pattern, random_t *rand,
-                                   char *buffer, size_t len);
+size_t pattern_segment_random_fill(
+    pattern_segment_t *pattern,
+    random_t *rand,
+    char *buffer,
+    size_t len);
 char *pattern_segment_random(pattern_segment_t *pattern, random_t *rand);

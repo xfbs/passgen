@@ -3,8 +3,8 @@
 /// Methods for reading from strings and files.
 
 #pragma once
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 struct read_result;
 struct reader_t;
@@ -17,7 +17,10 @@ struct read_result {
   int errno;
 };
 
-typedef struct read_result read_function(struct reader_t *reader, void *dest, size_t size);
+typedef struct read_result read_function(
+    struct reader_t *reader,
+    void *dest,
+    size_t size);
 
 struct reader_t {
   read_function *read;

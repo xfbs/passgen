@@ -53,7 +53,7 @@ bench: debug
 
 # format using clang-format.
 format:
-	$(FORMAT) passgen/*.h util/*.c util/*.h src/*.c src/bin/*.c
+	$(FORMAT) passgen/*.h tests/*.c src/*.c src/bin/*.c src/bench/*.c
 
 # targets.
 release: build/release

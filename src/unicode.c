@@ -4,15 +4,18 @@
 #define MIN_BUFLEN 8
 
 unicode_reader_t unicode_reader(reader_t reader) {
-  return (unicode_reader_t) {
+  return (unicode_reader_t){
     .reader = reader,
-    .buffer = {0},
+    .buffer = { 0 },
     .buffered = 0,
     .amount = 0,
   };
 }
 
-read_result unicode_read(unicode_reader_t *reader, uint32_t *dest, size_t amount) {
+read_result unicode_read(
+    unicode_reader_t *reader,
+    uint32_t *dest,
+    size_t amount) {
   size_t read;
   for(read = 0; read < amount; ++read) {
     if(reader->buffered < MIN_BUFLEN) {

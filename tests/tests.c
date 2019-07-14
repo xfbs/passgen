@@ -1,8 +1,8 @@
 #include "tests/tests.h"
-#include <time.h>
 #include <string.h>
+#include <time.h>
 
-test_result test_ok = {.ok = true};
+test_result test_ok = { .ok = true };
 
 int main(int argc, char *argv[]) {
   size_t failures = 0;
@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
         // find the test with the name that is the current argument.
         if(0 == strcmp(argv[r], tests[i].name)) {
           // run the testl
-          if (run(tests[i])) {
+          if(run(tests[i])) {
             success += 1;
           } else {
             failures += 1;
@@ -26,8 +26,8 @@ int main(int argc, char *argv[]) {
       }
     }
   } else {
-    for (size_t i = 0; tests[i].name; ++i) {
-      if (run(tests[i])) {
+    for(size_t i = 0; tests[i].name; ++i) {
+      if(run(tests[i])) {
         success += 1;
       } else {
         failures += 1;
@@ -35,10 +35,12 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  printf("\033[1;34m=>\033[0m %zi/%zi tests passed.\n", success,
-         success + failures);
+  printf(
+      "\033[1;34m=>\033[0m %zi/%zi tests passed.\n",
+      success,
+      success + failures);
 
-  if (failures) {
+  if(failures) {
     return -1;
   } else {
     return 0;
@@ -52,12 +54,15 @@ bool run(test_entry test) {
 
   double time = total / (CLOCKS_PER_SEC * 1.0);
 
-  if (ret.ok) {
+  if(ret.ok) {
     printf("%-30s \033[0;32mpassed\033[0m in %4.3lfs.\n", test.name, time);
   } else {
     printf("%-30s \033[0;31mfailed\033[0m in %4.3lfs.\n", test.name, time);
-    printf("    \033[0;31m%s\033[0m failed at %s:%zi\n", ret.assertion,
-           ret.func, ret.line);
+    printf(
+        "    \033[0;31m%s\033[0m failed at %s:%zi\n",
+        ret.assertion,
+        ret.func,
+        ret.line);
   }
 
   return ret.ok;

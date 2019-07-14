@@ -1,22 +1,22 @@
-#include "passgen/pattern.h"
 #include "passgen/random.h"
-#include "tests/tests.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
+#include "passgen/pattern.h"
+#include "tests/tests.h"
 
 test_result test_random_uint8(void) {
   random_t *rand = random_new();
   assert(rand);
 
   // generate random nubers until we got almost all of them.
-  bool gotten[UINT8_MAX + 1] = {false};
-  for (size_t i = 0; i < (32 * UINT8_MAX); ++i) {
+  bool gotten[UINT8_MAX + 1] = { false };
+  for(size_t i = 0; i < (32 * UINT8_MAX); ++i) {
     gotten[random_uint8(rand)] = true;
   }
 
   // there's still a (255/256)^(8*256) = 0.03% chance this fails.
-  for (size_t i = 0; i < UINT8_MAX; ++i) {
+  for(size_t i = 0; i < UINT8_MAX; ++i) {
     assert(gotten[i]);
   }
 
@@ -29,17 +29,17 @@ test_result test_random_uint8_max(void) {
   random_t *rand = random_new();
   assert(rand);
 
-  for (size_t max = 1; max < UINT8_MAX; ++max) {
+  for(size_t max = 1; max < UINT8_MAX; ++max) {
     // generate random nubers until we got almost all of them.
-    bool gotten[UINT8_MAX] = {false};
-    for (size_t i = 0; i < (16 * UINT8_MAX); ++i) {
+    bool gotten[UINT8_MAX] = { false };
+    for(size_t i = 0; i < (16 * UINT8_MAX); ++i) {
       uint8_t r = random_uint8_max(rand, max);
       assert(r < max);
       gotten[r] = true;
     }
 
     // there's still a (255/256)^(8*256) = 0.03% chance this fails.
-    for (size_t i = 0; i < max; ++i) {
+    for(size_t i = 0; i < max; ++i) {
       assert(gotten[i]);
     }
   }
@@ -54,13 +54,13 @@ test_result test_random_uint16(void) {
   assert(rand);
 
   // generate random nubers until we got almost all of them.
-  bool gotten[UINT16_MAX + 1] = {false};
-  for (size_t i = 0; i < (32 * UINT16_MAX); ++i) {
+  bool gotten[UINT16_MAX + 1] = { false };
+  for(size_t i = 0; i < (32 * UINT16_MAX); ++i) {
     gotten[random_uint16(rand)] = true;
   }
 
   // there's still a (255/256)^(8*256) = 0.03% chance this fails.
-  for (size_t i = 0; i < UINT16_MAX; ++i) {
+  for(size_t i = 0; i < UINT16_MAX; ++i) {
     assert(gotten[i]);
   }
 
@@ -73,17 +73,19 @@ test_result test_random_uint16_max(void) {
   random_t *rand = random_new();
   assert(rand);
 
-  size_t max[] = {1, 2, 3, 4, 5, 100, 200, 500, 1000, 1500, 2000, 5000, 10000, 15000, 20000, 30000, 45000, 60000, 0};
+  size_t max[] = { 1,     2,     3,     4,     5,    100,   200,
+                   500,   1000,  1500,  2000,  5000, 10000, 15000,
+                   20000, 30000, 45000, 60000, 0 };
 
-  for (size_t n = 1; max[n]; ++n) {
-    bool gotten[UINT16_MAX] = {false};
-    for (size_t i = 0; i < (16 * max[n]); ++i) {
+  for(size_t n = 1; max[n]; ++n) {
+    bool gotten[UINT16_MAX] = { false };
+    for(size_t i = 0; i < (16 * max[n]); ++i) {
       uint16_t r = random_uint16_max(rand, max[n]);
       assert(r < max[n]);
       gotten[r] = true;
     }
 
-    for (size_t i = 0; i < max[n]; ++i) {
+    for(size_t i = 0; i < max[n]; ++i) {
       assert(gotten[i]);
     }
   }
@@ -97,7 +99,7 @@ test_result test_random_uint32_max(void) {
   random_t *rand = random_new();
   assert(rand);
 
-  for (size_t max = 1; max <= UINT32_MAX; max += UINT16_MAX) {
+  for(size_t max = 1; max <= UINT32_MAX; max += UINT16_MAX) {
     assert(random_uint32_max(rand, max) < max);
   }
 
@@ -110,7 +112,7 @@ test_result test_random_uint64_max(void) {
   random_t *rand = random_new();
   assert(rand);
 
-  for (size_t max = 1; max <= (UINT64_MAX >> 1); max += 1) {
+  for(size_t max = 1; max <= (UINT64_MAX >> 1); max += 1) {
     assert(random_uint64_max(rand, max) < max);
     max = 1.001 * max;
   }
@@ -176,7 +178,7 @@ test_result test_random_read(void) {
   random_t random;
   assert(random_open(&random));
 
-  uint8_t data[2000] = {0};
+  uint8_t data[2000] = { 0 };
 
   // fill small.
   random_read(&random, &data[0], 1);
@@ -234,6 +236,7 @@ test_result test_random_read(void) {
   return test_ok;
 }
 
+// clang-format off
 test_entry tests[] = {
   test(random_new),
   test(random_new_path),
@@ -248,3 +251,4 @@ test_entry tests[] = {
   test(random_uint64_max),
   {NULL, NULL}
 };
+// clang-format on

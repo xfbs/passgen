@@ -3,8 +3,8 @@
 /// Methods for decoding unicode characters from a reader.
 
 #pragma once
-#include "passgen/reader.h"
 #include <stdint.h>
+#include "passgen/reader.h"
 
 struct unicode_reader_t;
 
@@ -28,7 +28,10 @@ typedef struct unicode_reader_t unicode_reader_t;
 unicode_reader_t unicode_reader(reader_t reader);
 
 /// Read @p amount unicode characters into @p dest.
-read_result unicode_read(unicode_reader_t *reader, uint32_t *dest, size_t amount);
+read_result unicode_read(
+    unicode_reader_t *reader,
+    uint32_t *dest,
+    size_t amount);
 
 /// How many unicode characters we've read so far.
 size_t unicode_amount(unicode_reader_t *reader);

@@ -1,11 +1,11 @@
 #include "passgen/reader.h"
-#include "tests/tests.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include "tests/tests.h"
 
 test_result test_reader_string() {
   reader_t reader = reader_from_string("abcde");
-  char data[100] = {0};
+  char data[100] = { 0 };
 
   assert(reader_pos(&reader) == 0);
 
@@ -55,7 +55,9 @@ test_result test_reader_string() {
   return test_ok;
 }
 
+// clang-format off
 test_entry tests[] = {
   test(reader_string),
   {NULL, NULL}
 };
+// clang-format on

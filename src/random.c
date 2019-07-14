@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define check(ptr) \
-  if (ptr == NULL) goto error
+  if(ptr == NULL) goto error
 
 static const char *random_default_device = "/dev/urandom";
 
@@ -11,8 +11,11 @@ void random_reload(random_t *random) {
   assert(random != NULL);
 
   // read random data.
-  size_t bytes = fread(&random->buffer, sizeof(random->buffer[0]),
-                       sizeof(random->buffer), random->device);
+  size_t bytes = fread(
+      &random->buffer,
+      sizeof(random->buffer[0]),
+      sizeof(random->buffer),
+      random->device);
 
   // make sure we've read enough.
   assert(bytes == sizeof(random->buffer));
@@ -92,14 +95,14 @@ random_t *random_open_file(random_t *random, FILE *file) {
 }
 
 void random_close(random_t *random) {
-  if (random != NULL) {
+  if(random != NULL) {
     fclose(random->device);
     random->device = NULL;
   }
 }
 
 void random_free(random_t *random) {
-  if (random != NULL) {
+  if(random != NULL) {
     fclose(random->device);
     random->device = NULL;
   }
@@ -140,13 +143,13 @@ uint8_t random_uint8_max(random_t *random, uint8_t max) {
   uint8_t num;
   do {
     num = random_uint8(random) & mask;
-  } while (num >= max);
+  } while(num >= max);
 
   return num;
 }
 
 uint16_t random_uint16_max(random_t *random, uint16_t max) {
-  if (max <= UINT8_MAX) {
+  if(max <= UINT8_MAX) {
     return random_uint8_max(random, max);
   }
 
@@ -160,13 +163,13 @@ uint16_t random_uint16_max(random_t *random, uint16_t max) {
 
   do {
     num = random_uint16(random) & mask;
-  } while (num >= max);
+  } while(num >= max);
 
   return num;
 }
 
 uint32_t random_uint32_max(random_t *random, uint32_t max) {
-  if (max < UINT16_MAX) {
+  if(max < UINT16_MAX) {
     return random_uint16_max(random, max);
   }
 
@@ -181,13 +184,13 @@ uint32_t random_uint32_max(random_t *random, uint32_t max) {
 
   do {
     num = random_uint32(random) & mask;
-  } while (num >= max);
+  } while(num >= max);
 
   return num;
 }
 
 uint64_t random_uint64_max(random_t *random, uint64_t max) {
-  if (max < UINT32_MAX) {
+  if(max < UINT32_MAX) {
     return random_uint32_max(random, max);
   }
 
@@ -203,7 +206,7 @@ uint64_t random_uint64_max(random_t *random, uint64_t max) {
 
   do {
     num = random_uint64(random) & mask;
-  } while (num >= max);
+  } while(num >= max);
 
   return num;
 }
