@@ -1,0 +1,5 @@
+<map id="pattern_range_result_t" name="pattern_range_result_t">
+<area shape="rect" id="node1" title=" " alt="" coords="125,92,281,117"/>
+<area shape="rect" id="node2" href="$structpattern__range__t.html" title="Range of possible characters. Linked list of [start, end] pairs." alt="" coords="5,5,121,31"/>
+<area shape="rect" id="node3" href="$structpattern__error__t.html" title=" " alt="" coords="196,5,306,31"/>
+</map>

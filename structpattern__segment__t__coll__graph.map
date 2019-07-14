@@ -1,5 +1,6 @@
 <map id="pattern_segment_t" name="pattern_segment_t">
-<area shape="rect" id="node3" href="$structpattern__t.html" title="pattern_t" alt="" coords="69,184,143,211"/>
-<area shape="rect" id="node2" href="$structpattern__reps__t.html" title="pattern_reps_t" alt="" coords="5,5,111,32"/>
-<area shape="rect" id="node4" href="$structpattern__range__t.html" title="pattern_range_t" alt="" coords="134,5,246,32"/>
+<area shape="rect" id="node1" title="Pattern segment: chain of patterns, as linked list." alt="" coords="22,92,155,117"/>
+<area shape="rect" id="node3" href="$structpattern__t.html" title="Pattern: list of possible pattern segments as linked list." alt="" coords="51,179,125,204"/>
+<area shape="rect" id="node2" href="$structpattern__reps__t.html" title="Represents how many times a pattern must be repeated." alt="" coords="5,5,113,31"/>
+<area shape="rect" id="node4" href="$structpattern__range__t.html" title="Range of possible characters. Linked list of [start, end] pairs." alt="" coords="137,5,253,31"/>
 </map>

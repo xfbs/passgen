@@ -1,2 +1,3 @@
 <map id="pattern_range_t" name="pattern_range_t">
+<area shape="rect" id="node1" title="Range of possible characters. Linked list of [start, end] pairs." alt="" coords="5,5,121,31"/>
 </map>

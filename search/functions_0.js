@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['is_5fend',['is_end',['../pattern_8c.html#ac803d342cecb5e37e2c7330c3d4a2960',1,'pattern.c']]],
-  ['is_5fillegal',['is_illegal',['../pattern_8c.html#a7d2b525d8182def3cfb2d8d4c166bccd',1,'pattern.c']]],
-  ['is_5fsep',['is_sep',['../pattern_8c.html#a8f19e55b846b7892e88f9e29abc3b5cd',1,'pattern.c']]]
+  ['bufreader_5ffrom_5freader',['bufreader_from_reader',['../reader_8c.html#a9b158a8b19bbfb31a176a928966b6cdf',1,'bufreader_from_reader(reader_t reader):&#160;reader.c'],['../reader_8h.html#a9b158a8b19bbfb31a176a928966b6cdf',1,'bufreader_from_reader(reader_t reader):&#160;reader.h']]],
+  ['bufreader_5fread',['bufreader_read',['../reader_8c.html#a3641b585913c53532ddd83860e1f11d6',1,'bufreader_read(bufreader_t *reader, void *dest, size_t size):&#160;reader.c'],['../reader_8h.html#a3641b585913c53532ddd83860e1f11d6',1,'bufreader_read(bufreader_t *reader, void *dest, size_t size):&#160;reader.h']]]
 ];

@@ -1,5 +1,6 @@
 <map id="random_new_path" name="random_new_path">
-<area shape="rect" id="node2" href="$random_8c.html#aafb10b99784c2b2ba62e82017c45d7de" title="Opens a new, existing random object using path as random device. " alt="" coords="181,31,313,57"/>
-<area shape="rect" id="node3" href="$random_8c.html#a836c38d31d4b7ea3f4e0bf9e59c64723" title="Opens a new random object with file as randomness source. " alt="" coords="361,5,485,32"/>
-<area shape="rect" id="node4" href="$random_8c.html#adaf132627659c1e3f98c099556721008" title="random_reload" alt="" coords="533,31,640,57"/>
+<area shape="rect" id="node1" title="Allocates and opens a new random object using path as random device." alt="" coords="5,31,137,56"/>
+<area shape="rect" id="node2" href="$random_8c.html#aafb10b99784c2b2ba62e82017c45d7de" title="Opens a new, existing random object using path as random device." alt="" coords="185,31,322,56"/>
+<area shape="rect" id="node3" href="$random_8c.html#a836c38d31d4b7ea3f4e0bf9e59c64723" title="Opens a new random object with file as randomness source." alt="" coords="370,5,498,31"/>
+<area shape="rect" id="node4" href="$random_8c.html#adaf132627659c1e3f98c099556721008" title=" " alt="" coords="546,31,657,56"/>
 </map>

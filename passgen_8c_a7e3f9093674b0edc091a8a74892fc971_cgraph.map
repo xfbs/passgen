@@ -1,3 +1,5 @@
 <map id="passgen_bail" name="passgen_bail">
-<area shape="rect" id="node2" href="$passgen_8c.html#a269c046b6462b8fb57affbdd2ee33778" title="passgen_usage" alt="" coords="152,5,265,32"/>
+<area shape="rect" id="node1" title="Exit the program early using the specified error and data." alt="" coords="5,31,105,56"/>
+<area shape="rect" id="node2" href="$passgen_8c.html#a269c046b6462b8fb57affbdd2ee33778" title="Print usage (help text) using executable as the name of the program." alt="" coords="157,5,272,31"/>
+<area shape="rect" id="node3" href="$passgen_8c.html#a689b42780045a54e62b97210d58198f5" title="Print the version of the program." alt="" coords="153,55,275,80"/>
 </map>

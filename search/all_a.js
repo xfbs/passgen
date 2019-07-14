@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['next',['next',['../structpattern__range__t.html#adad9b96b7d0fa0f10b63f2b9f6402d89',1,'pattern_range_t::next()'],['../structpattern__segment__t.html#a0e16f2cc2a4cb469dd2c1cdfa73dbf7e',1,'pattern_segment_t::next()'],['../structpattern__t.html#afc14040fd054c7fe7e2fcf0f576e85ee',1,'pattern_t::next()']]]
+  ['max',['max',['../structpattern__reps__t.html#a2f9ce5f01c066eb6ef649c9a2b0dbf0e',1,'pattern_reps_t']]],
+  ['min',['min',['../structpattern__reps__t.html#aad7b5c4273d6e8ee61d4d4f6a4d087f1',1,'pattern_reps_t']]],
+  ['min_5fbuflen',['MIN_BUFLEN',['../unicode_8c.html#a6133ca3b299c673aa77cf83f6311fea9',1,'unicode.c']]]
 ];

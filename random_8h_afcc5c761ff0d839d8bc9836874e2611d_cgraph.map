@@ -1,11 +1,12 @@
 <map id="random_uint64_max" name="random_uint64_max">
-<area shape="rect" id="node2" href="$random_8c.html#a1de6eab64c1db9074949c8437d62ac05" title="Read a uint32_t that is strictly smaller than max from random. " alt="" coords="192,107,331,133"/>
-<area shape="rect" id="node10" href="$random_8c.html#a12cc4f4159ae8cf62283bd7f5f34a53e" title="Read a uint64_t from random. " alt="" coords="395,157,501,184"/>
-<area shape="rect" id="node3" href="$random_8c.html#ab35aa42597e14e5657ed45a4e29e5d73" title="Read a uint16_t that is strictly smaller than max from random. " alt="" coords="379,56,517,83"/>
-<area shape="rect" id="node9" href="$random_8c.html#a3d8f07f860ee597c4110b5e3a117ea21" title="Read a uint32_t from random. " alt="" coords="578,107,685,133"/>
-<area shape="rect" id="node4" href="$random_8c.html#abd41f6fbe448fa5e4f1159123936b291" title="Read a uint8_t that is strictly smaller than max from random. " alt="" coords="565,5,697,32"/>
-<area shape="rect" id="node8" href="$random_8c.html#aad7ea871ff12b13f1000550357cdeb2e" title="Read a uint16_t from random. " alt="" coords="745,56,852,83"/>
-<area shape="rect" id="node5" href="$random_8c.html#acc304350ae3f5e8dff8a6fa39a308170" title="Read a uint8_t from random. " alt="" coords="749,5,849,32"/>
-<area shape="rect" id="node6" href="$random_8c.html#aa4196ebff1f11a2da0af7bc8b77ad461" title="Read random data from random. " alt="" coords="900,81,997,108"/>
-<area shape="rect" id="node7" href="$random_8c.html#adaf132627659c1e3f98c099556721008" title="random_reload" alt="" coords="1045,81,1152,108"/>
+<area shape="rect" id="node1" title="Read a uint64_t that is strictly smaller than max from random." alt="" coords="5,132,148,157"/>
+<area shape="rect" id="node2" href="$random_8c.html#a1de6eab64c1db9074949c8437d62ac05" title="Read a uint32_t that is strictly smaller than max from random." alt="" coords="196,107,339,132"/>
+<area shape="rect" id="node10" href="$random_8c.html#a12cc4f4159ae8cf62283bd7f5f34a53e" title="Read a uint64_t from random." alt="" coords="403,157,514,183"/>
+<area shape="rect" id="node3" href="$random_8c.html#ab35aa42597e14e5657ed45a4e29e5d73" title="Read a uint16_t that is strictly smaller than max from random." alt="" coords="387,56,530,81"/>
+<area shape="rect" id="node9" href="$random_8c.html#a3d8f07f860ee597c4110b5e3a117ea21" title="Read a uint32_t from random." alt="" coords="591,107,701,132"/>
+<area shape="rect" id="node4" href="$random_8c.html#abd41f6fbe448fa5e4f1159123936b291" title="Read a uint8_t that is strictly smaller than max from random." alt="" coords="578,5,713,31"/>
+<area shape="rect" id="node8" href="$random_8c.html#aad7ea871ff12b13f1000550357cdeb2e" title="Read a uint16_t from random." alt="" coords="761,56,872,81"/>
+<area shape="rect" id="node5" href="$random_8c.html#acc304350ae3f5e8dff8a6fa39a308170" title="Read a uint8_t from random." alt="" coords="765,7,868,32"/>
+<area shape="rect" id="node6" href="$random_8c.html#aa4196ebff1f11a2da0af7bc8b77ad461" title="Read random data from random." alt="" coords="920,81,1020,107"/>
+<area shape="rect" id="node7" href="$random_8c.html#adaf132627659c1e3f98c099556721008" title=" " alt="" coords="1068,81,1179,107"/>
 </map>

@@ -1,5 +1,6 @@
 <map id="pattern_segment_free" name="pattern_segment_free">
-<area shape="rect" id="node2" href="$pattern_8c.html#a98ece898626f55a65e23fd0edf60ea83" title="pattern_range_free" alt="" coords="536,29,667,56"/>
-<area shape="rect" id="node3" href="$pattern_8c.html#a341363263edc241df9b22c8bbe4a12f9" title="pattern_free" alt="" coords="201,55,292,81"/>
-<area shape="rect" id="node4" href="$pattern_8c.html#a688238c0f8c1032036d945951266296f" title="pattern_segment_free" alt="" coords="340,67,488,93"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,55,157,80"/>
+<area shape="rect" id="node2" href="$pattern_8c.html#a98ece898626f55a65e23fd0edf60ea83" title=" " alt="" coords="546,29,681,55"/>
+<area shape="rect" id="node3" href="$pattern_8c.html#a341363263edc241df9b22c8bbe4a12f9" title="Free a pattern created by pattern_new() or pattern_parse()." alt="" coords="205,55,298,80"/>
+<area shape="rect" id="node4" href="$pattern_8c.html#a688238c0f8c1032036d945951266296f" title=" " alt="" coords="346,67,498,92"/>
 </map>

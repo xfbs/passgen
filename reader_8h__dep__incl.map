@@ -1,0 +1,6 @@
+<map id="passgen/reader.h" name="passgen/reader.h">
+<area shape="rect" id="node1" title="Methods for reading from strings and files." alt="" coords="57,5,181,31"/>
+<area shape="rect" id="node2" href="$reader_8c.html" title=" " alt="" coords="5,79,96,104"/>
+<area shape="rect" id="node3" href="$unicode_8h.html" title="Methods for decoding unicode characters from a reader." alt="" coords="120,79,253,104"/>
+<area shape="rect" id="node4" href="$unicode_8c.html" title=" " alt="" coords="137,152,237,177"/>
+</map>

@@ -1,3 +1,4 @@
 <map id="pattern_maxlen" name="pattern_maxlen">
-<area shape="rect" id="node2" href="$pattern_8c.html#aec4c04752e10e2f634475f1ae152a3b8" title="pattern_segment_maxlen" alt="" coords="164,29,332,56"/>
+<area shape="rect" id="node1" title="Determine how long the longest possible string that could be generated from this pattern is." alt="" coords="5,29,119,55"/>
+<area shape="rect" id="node2" href="$pattern_8c.html#aec4c04752e10e2f634475f1ae152a3b8" title=" " alt="" coords="167,29,338,55"/>
 </map>

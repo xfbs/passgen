@@ -1,7 +1,8 @@
 <map id="random_uint16_max" name="random_uint16_max">
-<area shape="rect" id="node2" href="$random_8c.html#abd41f6fbe448fa5e4f1159123936b291" title="Read a uint8_t that is strictly smaller than max from random. " alt="" coords="192,5,324,32"/>
-<area shape="rect" id="node6" href="$random_8c.html#aad7ea871ff12b13f1000550357cdeb2e" title="Read a uint16_t from random. " alt="" coords="372,56,479,83"/>
-<area shape="rect" id="node3" href="$random_8c.html#acc304350ae3f5e8dff8a6fa39a308170" title="Read a uint8_t from random. " alt="" coords="375,5,475,32"/>
-<area shape="rect" id="node4" href="$random_8c.html#aa4196ebff1f11a2da0af7bc8b77ad461" title="Read random data from random. " alt="" coords="527,31,624,57"/>
-<area shape="rect" id="node5" href="$random_8c.html#adaf132627659c1e3f98c099556721008" title="random_reload" alt="" coords="672,31,779,57"/>
+<area shape="rect" id="node1" title="Read a uint16_t that is strictly smaller than max from random." alt="" coords="5,31,148,56"/>
+<area shape="rect" id="node2" href="$random_8c.html#abd41f6fbe448fa5e4f1159123936b291" title="Read a uint8_t that is strictly smaller than max from random." alt="" coords="196,5,332,31"/>
+<area shape="rect" id="node6" href="$random_8c.html#aad7ea871ff12b13f1000550357cdeb2e" title="Read a uint16_t from random." alt="" coords="380,56,490,81"/>
+<area shape="rect" id="node3" href="$random_8c.html#acc304350ae3f5e8dff8a6fa39a308170" title="Read a uint8_t from random." alt="" coords="383,7,486,32"/>
+<area shape="rect" id="node4" href="$random_8c.html#aa4196ebff1f11a2da0af7bc8b77ad461" title="Read random data from random." alt="" coords="538,32,639,57"/>
+<area shape="rect" id="node5" href="$random_8c.html#adaf132627659c1e3f98c099556721008" title=" " alt="" coords="687,32,798,57"/>
 </map>

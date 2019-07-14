@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['pos',['pos',['../structrandom__t.html#a5438a597ee291f523ae04a9fe355924f',1,'random_t']]]
+  ['name',['name',['../structpattern__preset.html#a8f8f80d37794cde9472343e4487ba3eb',1,'pattern_preset']]],
+  ['next',['next',['../structpattern__range__t.html#adad9b96b7d0fa0f10b63f2b9f6402d89',1,'pattern_range_t::next()'],['../structpattern__segment__t.html#a0e16f2cc2a4cb469dd2c1cdfa73dbf7e',1,'pattern_segment_t::next()'],['../structpattern__t.html#afc14040fd054c7fe7e2fcf0f576e85ee',1,'pattern_t::next()']]]
 ];

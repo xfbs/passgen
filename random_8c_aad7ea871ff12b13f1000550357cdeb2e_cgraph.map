@@ -1,4 +1,5 @@
 <map id="random_uint16" name="random_uint16">
-<area shape="rect" id="node2" href="$random_8c.html#aa4196ebff1f11a2da0af7bc8b77ad461" title="Read random data from random. " alt="" coords="160,29,257,56"/>
-<area shape="rect" id="node3" href="$random_8c.html#adaf132627659c1e3f98c099556721008" title="random_reload" alt="" coords="305,29,412,56"/>
+<area shape="rect" id="node1" title="Read a uint16_t from random." alt="" coords="5,29,116,55"/>
+<area shape="rect" id="node2" href="$random_8c.html#aa4196ebff1f11a2da0af7bc8b77ad461" title="Read random data from random." alt="" coords="164,29,264,55"/>
+<area shape="rect" id="node3" href="$random_8c.html#adaf132627659c1e3f98c099556721008" title=" " alt="" coords="312,29,423,55"/>
 </map>
