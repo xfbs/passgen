@@ -1,5 +1,5 @@
 #language: c
-#dist: xenial
+dist: xenial
 #compiler:
 #  - clang
 #  - gcc
@@ -16,7 +16,7 @@ script: make test
 sudo: false
 
 os: linux
-dist: trusty
+#dist: trusty
 
 language: python
 
