@@ -1,6 +1,6 @@
-# Passgen
+# Passgen [![Build Status](https://travis-ci.org/xfbs/passgen.svg?branch=master)](https://travis-ci.org/xfbs/passgen) ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/xfbs/passgen.svg)
 
-Passgen generates passwords. It takes a format string, which is a kind of simplified regex, and creates a random string matching that. 
+Passgen is a tool to generate passwords from a regex-like format string.
 
 ## Usage
 
@@ -17,34 +17,20 @@ Create 12-digit alphanumeric password.
     $ passgen "[a-zA-Z0-9]{12}"
     DnJ4bOIGmZbj
 
-## Building
+## Installing
 
-Use the Makefile to build the project. For example, to build it in release mode, do:
+You can install this project by downloading the latest release, extracting it,
+and running:
 
-    $ make release
+    make release
+    make install
 
-When compiling, resulting files are placed in `./build/`. There are multiple targets:
+See the [notes](NOTES.md) for more information about building the project.
 
-* `release` for a release build with optimisations enabled.
-* `debug` for a debug build without optimisations, with debug symbols and `DEBUG` defined.
-* `debug-address` for a debug build with LLVM AddressSanitizer.
-* `debug-memory` for a debug build with LLVM MemorySanitizer.
-* `debug-undefined` for a debug build with LLVM UndefinedSanitizer.
+## Prior art
 
-## Actions
-
-* `make format` to use clang-format to clean up the code.
-* `make clean` to remove all build output.
-* `make test` build and run tests
-* `make bench` build and run benchmarks.
-* `make docs` build docs using doxygen.
-
-## Tools
-
-This repository also contains a few tools that are useful in working with or inspecting the parsed data.
-
-* `pattern-dump` parses a pattern and dumps it in a human-readable format.
-* `pattern-choices` calculates how many possible choices there are for a given pattern.
+* [pwgen](https://linux.die.net/man/1/pwgen).
+* [apg](https://linux.die.net/man/1/apg).
 
 ## License
 
