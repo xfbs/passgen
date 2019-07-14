@@ -1,18 +1,37 @@
 #include "tests/tests.h"
 #include <time.h>
+#include <string.h>
 
 test_ret test_ok = {.ok = true};
 
 int main(int argc, char *argv[]) {
-  printf("\033[1;34m=>\033[0m running %s.\n", argv[0]);
-
   size_t failures = 0;
   size_t success = 0;
-  for (size_t i = 0; tests[i].name; ++i) {
-    if (run(tests[i])) {
-      success += 1;
-    } else {
-      failures += 1;
+  if(argc > 1) {
+    // go through the arguments.
+    for(size_t r = 1; r < argc; ++r) {
+      // go through the tests.
+      for(size_t i = 0; tests[i].name; ++i) {
+        // find the test with the name that is the current argument.
+        if(0 == strcmp(argv[r], tests[i].name)) {
+          // run the testl
+          if (run(tests[i])) {
+            success += 1;
+          } else {
+            failures += 1;
+          }
+
+          break;
+        }
+      }
+    }
+  } else {
+    for (size_t i = 0; tests[i].name; ++i) {
+      if (run(tests[i])) {
+        success += 1;
+      } else {
+        failures += 1;
+      }
     }
   }
 

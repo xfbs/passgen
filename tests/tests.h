@@ -1,11 +1,22 @@
+/// @file tests.h
+/// @author Patrick M. Elsen
+/// @license MIT.
+///
+/// Small testing framework.
+
 #pragma once
 #include <stdbool.h>
 #include <stdio.h>
 
+/// Result of a test.
 typedef struct {
+  /// True if the test worked okay, false if there was an error.
   bool ok;
+  /// If false, a string of the assertion that failed.
   const char *assertion;
+  /// If false, the name of the function in which the failure happened.
   const char *func;
+  /// The line in which the assertion failed.
   size_t line;
 } test_ret;
 
