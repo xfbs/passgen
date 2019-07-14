@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 
 bool run(test_entry test) {
   clock_t before = clock();
-  test_result ret = test.fun();
+  test_result ret = test.func();
   clock_t total = clock() - before;
 
   double time = total / (CLOCKS_PER_SEC * 1.0);

@@ -22,16 +22,16 @@ typedef struct {
 
 test_result test_ok;
 
-typedef test_result test_fun(void);
+typedef test_result test_func(void);
 
 typedef struct {
   const char *name;
-  test_fun *fun;
+  test_func *func;
 } test_entry;
 
 bool run(test_entry test);
 #define test(id) \
-  { .name = #id, .fun = test_##id }
+  { .name = #id, .func = test_##id }
 
 #define assert(some)   \
   if (!(some))         \
