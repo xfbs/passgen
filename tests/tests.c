@@ -1,4 +1,4 @@
-#include "tests.h"
+#include "tests/tests.h"
 #include <time.h>
 
 test_ret test_ok = {.ok = true};

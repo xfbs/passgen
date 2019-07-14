@@ -21,9 +21,9 @@ bench_random = executable('bench_random', 'src/bench/random.c', link_with: passg
 benchmark('random', bench_random)
 
 # tests
-test_random = executable('test_random', 'src/tests/random.c', 'util/tests.c', link_with: passgen)
-test_pattern = executable('test_pattern', 'src/tests/pattern.c', 'util/tests.c', link_with: passgen)
-test_reader = executable('test_reader', 'src/tests/reader.c', 'util/tests.c', link_with: passgen)
+test_random = executable('test_random', 'tests/random.c', 'tests/tests.c', link_with: passgen)
+test_pattern = executable('test_pattern', 'tests/pattern.c', 'tests/tests.c', link_with: passgen)
+test_reader = executable('test_reader', 'tests/reader.c', 'tests/tests.c', link_with: passgen)
 test('random', test_random)
 test('pattern', test_pattern)
 test('reader', test_reader)

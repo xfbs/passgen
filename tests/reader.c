@@ -1,5 +1,5 @@
 #include "passgen/reader.h"
-#include "util/tests.h"
+#include "tests/tests.h"
 #include <stdbool.h>
 #include <stdio.h>
 
