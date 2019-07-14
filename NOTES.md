@@ -1,5 +1,34 @@
 # Notes
 
+## Building
+
+Use the Makefile to build the project. For example, to build it in release mode, do:
+
+    $ make release
+
+When compiling, resulting files are placed in `./build/`. There are multiple targets:
+
+* `release` for a release build with optimisations enabled.
+* `debug` for a debug build without optimisations, with debug symbols and `DEBUG` defined.
+* `debug-address` for a debug build with LLVM AddressSanitizer.
+* `debug-memory` for a debug build with LLVM MemorySanitizer.
+* `debug-undefined` for a debug build with LLVM UndefinedSanitizer.
+
+## Actions
+
+* `make format` to use clang-format to clean up the code.
+* `make clean` to remove all build output.
+* `make test` build and run tests
+* `make bench` build and run benchmarks.
+* `make docs` build docs using doxygen.
+
+## Tools
+
+This repository also contains a few tools that are useful in working with or inspecting the parsed data.
+
+* `pattern-dump` parses a pattern and dumps it in a human-readable format.
+* `pattern-choices` calculates how many possible choices there are for a given pattern.
+
 ## Version
 
 When bumping the version, be sure to change it in all places:
@@ -126,3 +155,13 @@ See some pkg-config tutorial.
 ### Write proper tokenizer for the parser.
 
 Use a buffered tokenizer with peek().
+
+### Implement 
+
+[RFC972](https://tools.ietf.org/html/rfc972) is about password generation.
+Maybe there are more RFCs that are relevant.
+
+### Security features
+
+`mprotect` to avoid passwords being swapped out? seccomp or similar mechanisms
+to add protection?
