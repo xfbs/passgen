@@ -4,15 +4,14 @@ FORMAT       = clang-format -i
 MESON        = meson
 NINJA        = ninja
 DOXYGEN      = doxygen
-NAME         = passgen
-VERSION      = 0.1.0
+DESTDIR		 = /
+PREFIX		 = /usr
 
 default: release
 
 # install locally.
 install: release
 	cd build/release && meson install
-	gzip /usr/local/share/man/man1/passgen.1
 
 # generate debian package.
 deb: DEBNAME=$(NAME)-$(VERSION)
@@ -67,7 +66,7 @@ debug-memory: build/debug-memory
 	ninja -C $<
 
 build/release:
-	meson $@
+	meson --prefix=$(PREFIX) $@
 
 build/debug:
 	meson $@ --buildtype=debug
