@@ -46,7 +46,7 @@ typedef struct {
 void passgen_usage(const char *executable);
 
 /// Print the version of the program.
-void passgen_version(void);
+void passgen_show_version(void);
 
 /// Exit the program early using the specified error and data.
 void passgen_bail(passgen_error error, void *data);

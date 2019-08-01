@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include "passgen/pattern.h"
 #include "passgen/random.h"
+#include "passgen/version.h"
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *)data)
 
 pattern_preset pattern_presets[] = {
@@ -142,7 +143,7 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
 void passgen_usage(const char *executable) {
   fprintf(
       stderr,
-      "passgen version 0.1.0\n"
+      "passgen version %s\n"
       "Generate passwords from a regex-like pattern.\n"
       "Usage: %s [OPTIONS] [PATTERN]\n\n"
       "PATTERN is a regex-like string describing the password.\n"
@@ -161,11 +162,12 @@ void passgen_usage(const char *executable) {
       "PRESETS\n"
       "  apple1             Generate passwords like 'oKC-T37-Dew-Qyn'.\n"
       "  apple2             Generate passwords like 'mHXr4X-CiK4w6-hbjF7T'.\n",
+      passgen_version_str(),
       executable);
 }
 
-void passgen_version(void) {
-  fprintf(stderr, "passgen, version 0.1.0\n");
+void passgen_show_version(void) {
+  fprintf(stderr, "passgen, version %s\n", passgen_version_str());
 }
 
 void passgen_bail(passgen_error error, void *data) {
@@ -174,7 +176,7 @@ void passgen_bail(passgen_error error, void *data) {
       passgen_usage(data);
       exit(-1);
     case PASSGEN_ERROR_VERSION:
-      passgen_version();
+      passgen_show_version();
       exit(-1);
     case PASSGEN_ERROR_MULTIPLE_FORMATS:
       printf("Error: multiple formats specified (%s).\n", (const char *)data);

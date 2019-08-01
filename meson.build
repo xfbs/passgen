@@ -9,11 +9,19 @@ project(
 # create man page
 conf_data = configuration_data()
 conf_data.set('version', meson.project_version())
+conf_data.set('VERSION', meson.project_version())
+conf_data.set('VERSION_MAJ', meson.project_version().split('.')[0])
+conf_data.set('VERSION_MIN', meson.project_version().split('.')[1])
+conf_data.set('VERSION_REV', meson.project_version().split('.')[2])
 configure_file(
   input: 'man/passgen.1.in',
   output: 'passgen.1',
   configuration: conf_data,
   install_dir: 'share/man/man1/')
+version_src = configure_file(
+  input: 'src/version.c.in',
+  output: 'version.c',
+  configuration: conf_data)
 
 # main library
 passgen = library(
@@ -22,7 +30,8 @@ passgen = library(
   'src/pattern.c',
   'src/random.c',
   'src/reader.c',
-  'src/unicode.c')
+  'src/unicode.c',
+  version_src)
 
 # library used to decode and encode utf8
 libutf8proc = dependency('libutf8proc')

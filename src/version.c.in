@@ -1,0 +1,17 @@
+#include "passgen/version.h"
+
+passgen_version_t passgen_version() {
+  return (passgen_version_t) {
+    .maj = @VERSION_MAJ@,
+    .min = @VERSION_MIN@,
+    .rev = @VERSION_REV@,
+  };
+}
+
+const char *passgen_version_str() {
+  return "@VERSION@";
+}
+
+bool passgen_version_min(passgen_version_t version) {
+  return false;
+}
