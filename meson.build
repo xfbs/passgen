@@ -1,4 +1,18 @@
-project('passgen', 'c', default_options : ['c_std=c11'])
+project(
+  'passgen',
+  'c',
+  default_options: ['c_std=c11'],
+  version: '0.1.0',
+  license: 'MIT')
+
+# create man page
+conf_data = configuration_data()
+conf_data.set('version', meson.project_version())
+configure_file(
+  input: 'man/passgen.1.in',
+  output: 'passgen.1',
+  configuration: conf_data,
+  install_dir: 'share/man/man1/')
 
 # main library
 passgen = library('passgen', 'src/passgen.c', 'src/pattern.c', 'src/random.c', 'src/reader.c', 'src/unicode.c')
@@ -29,7 +43,11 @@ test('pattern', test_pattern)
 test('reader', test_reader)
 
 # man pages
-install_man('man/passgen.1')
+#install_man('passgen.1')
 
 # headers
 install_headers('passgen/random.h', 'passgen/passgen.h', 'passgen/pattern.h', subdir : 'passgen')
+
+# pkgconfig gile
+pkg = import('pkgconfig')
+pkg.generate(passgen, description: 'Regex-based password generation')
