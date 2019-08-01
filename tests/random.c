@@ -235,20 +235,3 @@ test_result test_random_read(void) {
 
   return test_ok;
 }
-
-// clang-format off
-test_entry tests[] = {
-  test(random_new),
-  test(random_new_path),
-  test(random_open),
-  test(random_open_path),
-  test(random_read),
-  test(random_uint8),
-  test(random_uint8_max),
-  test(random_uint16),
-  test(random_uint16_max),
-  test(random_uint32_max),
-  test(random_uint64_max),
-  {NULL, NULL}
-};
-// clang-format on

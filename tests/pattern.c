@@ -562,26 +562,3 @@ test_result test_pattern_error() {
 
   return test_ok;
 }
-
-// clang-format off
-test_entry tests[] = {
-  test(pattern_parse),
-  test(pattern_range_range),
-  test(pattern_range_char),
-  test(pattern_range_combined),
-  test(pattern_range_escaped),
-  test(pattern_range_err),
-  test(pattern_range_random),
-  test(pattern_range_choices),
-  test(pattern_segment_parse_chars),
-  test(pattern_segment_parse_range),
-  test(pattern_segment_parse_group),
-  test(pattern_segment_parse_reps),
-  test(pattern_segment_parse_err),
-  test(pattern_segment_maxlen),
-  test(pattern_segment_random),
-  test(pattern_segment_choices),
-  test(pattern_error),
-  {NULL, NULL}
-};
-// clang-format on

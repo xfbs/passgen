@@ -37,9 +37,7 @@ docs:
 
 # build and run tests.
 test: debug
-	build/debug/test_random
-	build/debug/test_pattern
-	build/debug/test_reader
+	build/debug/tests
 
 # build and run tests with address sanitizer.
 test-address: debug-address
