@@ -21,7 +21,7 @@ outfile.puts
 outfile.puts "test_entry tests[] = {"
 
 outfile.puts tests
-  .map{|test| "    test(" + test.last[5..] + "),"}
+  .map{|test| "    test(" + test.last[5..-1] + "),"}
   .join("\n")
 
 outfile.puts "    {NULL, NULL},"
