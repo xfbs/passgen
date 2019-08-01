@@ -5,9 +5,25 @@ Passgen is a tool to generate passwords from a regex-like format string.
 ## Usage
 
 ```
-Usage: passgen [OPTIONS] [FORMAT]
-  -h, --help         Show this usage information
+passgen version 0.1.0
+Generate passwords from a regex-like pattern.
+Usage: ./build/release/passgen [OPTIONS] [PATTERN]
+
+PATTERN is a regex-like string describing the password.
+  abc|def            Matches string 'abc' or 'def' (choice).
+  [a-cf]             Matches character 'a', 'b', 'c', and 'f' (range).
+  (abc)              Matches strings 'abc' (group).
+  [a-c]{2,3}         Matches between 2 and 3 repetition of element (repeat).
+
+OPTIONS
   -a, --amount       The amount of passwords
+  -h, --help         Show this help information
+  -p, --preset name  Use the given preset.
+  -v, --version      Show the version of this build.
+
+PRESETS
+  apple1             Generate passwords like 'oKC-T37-Dew-Qyn'.
+  apple2             Generate passwords like 'mHXr4X-CiK4w6-hbjF7T'.
 ```
 
 ## Examples
@@ -19,11 +35,11 @@ Create 12-digit alphanumeric password.
 
 ## Installing
 
-You can install this project by downloading the latest release, extracting it,
-and running:
+If you are on macOS, you can install this using homebrew.
 
-    make release
-    make install
+    brew install xfbs/local/passgen
+
+# Building
 
 See the [notes](NOTES.md) for more information about building the project.
 
