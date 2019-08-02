@@ -31,7 +31,8 @@ passgen = library(
   'src/random.c',
   'src/reader.c',
   'src/unicode.c',
-  version_src)
+  version_src,
+  install: true)
 
 # library used to decode and encode utf8
 libutf8proc = dependency('libutf8proc')
