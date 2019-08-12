@@ -68,7 +68,12 @@ tests = executable(
 test('tests', tests)
 
 # headers
-install_headers('passgen/random.h', 'passgen/passgen.h', 'passgen/pattern.h', subdir : 'passgen')
+install_headers(
+  'passgen/random.h',
+  'passgen/passgen.h',
+  'passgen/pattern.h',
+  'passgen/version.h',
+  subdir : 'passgen')
 
 # pkgconfig file
 pkg = import('pkgconfig')
