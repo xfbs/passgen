@@ -23,6 +23,15 @@ version_src = configure_file(
   output: 'version.c',
   configuration: conf_data)
 
+# library used to decode and encode utf8
+libutf8proc = dependency('libutf8proc')
+
+# library used for cryptographic routines
+libsodium = dependency('libsodium')
+
+deps = [libutf8proc]
+
+
 # main library
 passgen = library(
   'passgen',
@@ -32,13 +41,8 @@ passgen = library(
   'src/reader.c',
   'src/unicode.c',
   version_src,
-  install: true)
-
-# library used to decode and encode utf8
-libutf8proc = dependency('libutf8proc')
-
-# library used for cryptographic routines
-libsodium = dependency('libsodium')
+  install: true,
+  dependencies: deps)
 
 # main executable
 executable('passgen', 'src/bin/passgen.c', link_with : passgen)
@@ -53,7 +57,7 @@ benchmark('random', bench_random)
 
 # tests
 generate_all = find_program('tests/generate.rb')
-test_files = ['tests/random.c', 'tests/reader.c', 'tests/pattern.c']
+test_files = ['tests/random.c', 'tests/reader.c', 'tests/pattern.c', 'tests/unicode.c']
 all_tests = custom_target(
   'all.c',
   input: test_files,

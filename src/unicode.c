@@ -1,40 +1,53 @@
 #include "passgen/unicode.h"
 #include <utf8proc.h>
+#include <string.h>
 
 #define MIN_BUFLEN 8
 
-unicode_reader_t unicode_reader(reader_t reader) {
-  return (unicode_reader_t){
-    .reader = reader,
-    .buffer = { 0 },
-    .buffered = 0,
-    .amount = 0,
-  };
+struct unicode_iter unicode_iter(const char *data) {
+  return unicode_iter_sized(data, strlen(data));
 }
 
-read_result unicode_read(
-    unicode_reader_t *reader,
-    uint32_t *dest,
-    size_t amount) {
-  size_t read;
-  for(read = 0; read < amount; ++read) {
-    if(reader->buffered < MIN_BUFLEN) {
-    }
+struct unicode_iter unicode_iter_sized(const char *data, size_t length) {
+  struct unicode_iter iter = {
+    .data = data,
+    .length = length,
+    .pos = 0,
+  };
+
+  return iter;
+}
+
+struct unicode_iter_result unicode_iter_peek(const struct unicode_iter *iter) {
+  struct unicode_iter_result result;
+
+  if(iter->pos >= iter->length) {
+    result.ok = false;
+    result.error = 0;
+    result.codepoint = 0;
+    return result;
   }
 
-  read_result res = {
-    .ok = true,
-    .eof = true,
-    .read = read,
-  };
+  result.error = utf8proc_iterate(
+      (const int8_t *)(iter->data + iter->pos),
+      iter->length - iter->pos,
+      &result.codepoint);
 
-  return res;
+  if(result.error > 0) {
+    result.ok = true;
+  } else {
+    result.ok = false;
+  }
+
+  return result;
 }
 
-size_t unicode_amount(unicode_reader_t *reader) {
-  return reader->amount;
-}
+struct unicode_iter_result unicode_iter_next(struct unicode_iter *iter) {
+  struct unicode_iter_result result = unicode_iter_peek(iter);
 
-size_t unicode_size(unicode_reader_t *reader) {
-  return reader_pos(&reader->reader) - reader->buffered;
+  if(result.ok) {
+    iter->pos += result.error;
+  }
+
+  return result;
 }

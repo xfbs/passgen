@@ -6,35 +6,26 @@
 #include <stdint.h>
 #include "passgen/reader.h"
 
-struct unicode_reader_t;
-
-struct unicode_reader_t {
-  /// The reader to read from.
-  reader_t reader;
-
-  /// The buffer, since we don't know how long each unicode character is.
-  char buffer[4];
-
-  /// How much data is still in the buffer.
-  size_t buffered;
-
-  /// How many unicode characters we've read.
-  size_t amount;
+struct unicode_iter {
+  const char *data;
+  size_t length;
+  size_t pos;
 };
 
-typedef struct unicode_reader_t unicode_reader_t;
+struct unicode_iter_result {
+  bool ok;
+  int32_t codepoint;
+  ssize_t error;
+};
 
-/// Creates a new unicode reader from a given reader.
-unicode_reader_t unicode_reader(reader_t reader);
+/// Creates a new unicode iterator.
+struct unicode_iter unicode_iter(const char *data);
 
-/// Read @p amount unicode characters into @p dest.
-read_result unicode_read(
-    unicode_reader_t *reader,
-    uint32_t *dest,
-    size_t amount);
+/// Creates a new unicode iterator from a given reader.
+struct unicode_iter unicode_iter_sized(const char *data, size_t length);
 
-/// How many unicode characters we've read so far.
-size_t unicode_amount(unicode_reader_t *reader);
+/// Get the next unicode character without advancing the iterator.
+struct unicode_iter_result unicode_iter_peek(const struct unicode_iter *iter);
 
-/// How many bytes we've consumed so far.
-size_t unicode_size(unicode_reader_t *reader);
+/// Read the next unicode character.
+struct unicode_iter_result unicode_iter_next(struct unicode_iter *iter);
