@@ -6,14 +6,10 @@ dist: xenial
 addons:
   apt:
     packages:
-      - libutf8proc-dev
-      - libutf8proc1
-      - meson
       - libsodium-dev
-      - libsodium18
 script: make test
 
-sudo: false
+sudo: true
 
 os: linux
 #dist: trusty
@@ -28,8 +24,10 @@ matrix:
     - env: CC=clang
 
 install:
-  - export NINJA_LATEST=$(curl -s https://api.github.com/repos/ninja-build/ninja/releases/latest | grep browser_download_url | cut -d '"' -f 4 | grep ninja-linux.zip)
-  - wget "$NINJA_LATEST"
+  - wget "https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-linux.zip"
+  - wget "https://github.com/JuliaStrings/utf8proc/archive/v2.4.0.tar.gz" -o utf8proc.tar.gz
   - unzip -q ninja-linux.zip -d build
   - export PATH="$PWD/build:$PATH"
+  - tar xvf utf8proc.tar.gz
+  - cd utf8proc-* && make && sudo make install && cd ..
   - pip install meson
