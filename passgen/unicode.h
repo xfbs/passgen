@@ -7,15 +7,28 @@
 #include <sys/types.h>
 #include "passgen/reader.h"
 
+/// Unicode iterator. Iterates through a string and returns unicode
+/// characters on-demand.
 struct unicode_iter {
+  /// The string to iterate over. Neither allocated nor freed by us.
   const char *data;
+
+  /// How many bytes the string has.
   size_t length;
+
+  /// Offset (in bytes) into the string.
   size_t pos;
 };
 
+/// Result of decoding a character.
 struct unicode_iter_result {
+  /// Whether the operation succeeded.
   bool ok;
+
+  /// The decoded codepoint.
   int32_t codepoint;
+
+  /// The error code (if an error happened).
   ssize_t error;
 };
 
