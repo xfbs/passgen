@@ -4,6 +4,7 @@
 
 #pragma once
 #include <stdint.h>
+#include <sys/types.h>
 #include "passgen/reader.h"
 
 struct unicode_iter {
