@@ -196,6 +196,10 @@ complicate the random generation code a bit in order to allow something like
 `\w{5,8}` for a random word of length 5—8. Also, it means that passgen would
 likely need to bundle some kind of wordlist.
 
+Source for German words: [wortliste](https://github.com/davidak/wortliste).
+
+Should the word lists be configurable?
+
 ### Pronounceable character strings
 
 Supporting some kind of mechanism to generated pronounceable passwords should
@@ -242,6 +246,9 @@ highlighting.
 
 Support something like `\l{English}` or `\l{German}` to generate words from
 that language or script.
+
+To do this, data from
+[CLDR](https://www.unicode.org/cldr/charts/35/summary/root.html) can be used.
 
 ### Implement 
 
