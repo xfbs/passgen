@@ -2,14 +2,17 @@
 
 ## Building
 
-Use the Makefile to build the project. For example, to build it in release mode, do:
+Use the Makefile to build the project. For example, to build it in release
+mode, do:
 
     $ make release
 
-When compiling, resulting files are placed in `./build/`. There are multiple targets:
+When compiling, resulting files are placed in `./build/`. There are multiple
+targets:
 
 * `release` for a release build with optimisations enabled.
-* `debug` for a debug build without optimisations, with debug symbols and `DEBUG` defined.
+* `debug` for a debug build without optimisations, with debug symbols and
+  `DEBUG` defined.
 * `debug-address` for a debug build with LLVM AddressSanitizer.
 * `debug-memory` for a debug build with LLVM MemorySanitizer.
 * `debug-undefined` for a debug build with LLVM UndefinedSanitizer.
@@ -24,18 +27,18 @@ When compiling, resulting files are placed in `./build/`. There are multiple tar
 
 ## Tools
 
-This repository also contains a few tools that are useful in working with or inspecting the parsed data.
+This repository also contains a few tools that are useful in working with or
+inspecting the parsed data.
 
 * `pattern-dump` parses a pattern and dumps it in a human-readable format.
-* `pattern-choices` calculates how many possible choices there are for a given pattern.
+* `pattern-choices` calculates how many possible choices there are for a given
+  pattern.
 
 ## Version
 
-When bumping the version, be sure to change it in all places:
-
-* Makefile
-* man/passgen.1
-* Code
+When bumping the version, be sure to change it in the `meson.build` file, which
+contains the autoratative version number that is used to generate the man page
+and the code.
 
 ## Generating documentation
 
