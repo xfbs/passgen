@@ -521,3 +521,62 @@ const char *pattern_error_fmtstr(pattern_error_t error) {
       return "Illegal error happened.";
   }
 }
+
+struct pattern_token pattern_token_error(size_t pos) {
+  return (struct pattern_token) {
+    .type = PATTERN_TOKEN_ERROR,
+    .data.offset = pos
+  };
+}
+
+struct pattern_token pattern_token_eof(void) {
+  return (struct pattern_token) {
+    .type = PATTERN_TOKEN_EOF,
+  };
+}
+
+struct pattern_token pattern_token_regular(int32_t codepoint) {
+  return (struct pattern_token) {
+    .type = PATTERN_TOKEN_REGULAR,
+    .codepoint = codepoint
+  };
+}
+
+/// Parse the next token, without advancing the unicode reader.
+struct pattern_token pattern_token_peek(const struct unicode_iter *iter) {
+  struct unicode_iter iter_copy = *iter;
+  return pattern_token_next(&iter_copy);
+}
+
+struct pattern_token pattern_token_next_complex(struct unicode_iter *iter) {
+  struct unicode_iter_result result;
+
+  // this is not a regular token. see what comes next.
+  result = unicode_iter_next(iter);
+  if(!result.ok) {
+    return pattern_token_error(iter->pos);
+  }
+
+  return pattern_token_error(0);
+}
+
+/// Parse the next token, advancing the unicode reader.
+struct pattern_token pattern_token_next(struct unicode_iter *iter) {
+  struct unicode_iter_result result;
+
+  result = unicode_iter_next(iter);
+  if(!result.ok) {
+    if(result.error == 0 && result.codepoint == 0) {
+      return pattern_token_eof();
+    } else {
+      return pattern_token_error(iter->pos);
+    }
+  }
+
+  // this is a regular token.
+  if(result.codepoint != '\\') {
+    return pattern_token_regular(result.codepoint);
+  }
+
+  return pattern_token_next_complex(iter);
+}

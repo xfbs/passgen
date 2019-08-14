@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "random.h"
+#include "unicode.h"
 
 // TODO: remove PATTERN_CHAR, convert to use PATTERN_RANGE.
 // TODO: implement special chars \w (word), \s (space), etc.
@@ -92,6 +93,31 @@ typedef struct pattern_segment_t pattern_segment_t;
 typedef struct pattern_range_result_t pattern_range_result_t;
 typedef struct pattern_error_t pattern_error_t;
 
+enum pattern_token_type {
+  PATTERN_TOKEN_EOF,
+  PATTERN_TOKEN_ERROR,
+  PATTERN_TOKEN_REGULAR,
+  PATTERN_TOKEN_SPECIAL,
+  PATTERN_TOKEN_UNICODE,
+  PATTERN_TOKEN_ESCAPED,
+};
+
+struct pattern_substring {
+  size_t offset;
+  size_t length;
+};
+
+struct pattern_token {
+  /// What kind of token is this?
+  enum pattern_token_type type;
+
+  /// What is the unicode codepoint of this token?
+  int32_t codepoint;
+
+  /// If this token has data, where is it?
+  struct pattern_substring data;
+};
+
 /// Allocate a new pattern.
 pattern_t *pattern_new(pattern_segment_t *segment, pattern_t *next);
 
@@ -156,3 +182,9 @@ size_t pattern_segment_random_fill(
     char *buffer,
     size_t len);
 char *pattern_segment_random(pattern_segment_t *pattern, random_t *rand);
+
+/// Parse the next token, without advancing the unicode reader.
+struct pattern_token pattern_token_peek(const struct unicode_iter *iter);
+
+/// Parse the next token, advancing the unicode reader.
+struct pattern_token pattern_token_next(struct unicode_iter *iter);
