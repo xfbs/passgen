@@ -127,6 +127,10 @@ There is a Makefile target for creating a debian package, but it is currently br
 
     make deb
 
+## Bugs
+
+It doesn't seem to parse `(a|b)[dfg912]` right?
+
 ## Todo
 
 ### Unicode Support
