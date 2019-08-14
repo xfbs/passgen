@@ -27,7 +27,7 @@ deb: release
 	echo "Installed-Size: 1024" >> $(CONTROL)
 	echo "Maintainer: Patrick M. Elsen" >> $(CONTROL)
 	echo "Description: Generate passwords using a regex-like pattern." >> $(CONTROL)
-	cd build/release && DESTDIR=$(DEBNAME) meson install
+	cd build/release && DESTDIR=$(DEBNAME) meson install --prefix=/usr
 	cd build/release && dpkg-deb --build $(DEBNAME)
 
 # generate documentations using doxygen.
