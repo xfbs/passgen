@@ -8,7 +8,6 @@ project(
 
 # create man page
 conf_data = configuration_data()
-conf_data.set('version', meson.project_version())
 conf_data.set('VERSION', meson.project_version())
 conf_data.set('VERSION_MAJ', meson.project_version().split('.')[0])
 conf_data.set('VERSION_MIN', meson.project_version().split('.')[1])
@@ -33,7 +32,7 @@ deps = [libutf8proc]
 
 
 # main library
-passgen = library(
+libpassgen = library(
   'passgen',
   'src/passgen.c',
   'src/pattern.c',
@@ -45,19 +44,36 @@ passgen = library(
   dependencies: deps)
 
 # main executable
-executable('passgen', 'src/bin/passgen.c', link_with : passgen)
+passgen = executable(
+  'passgen',
+  'src/bin/passgen.c',
+  link_with: libpassgen,
+  install: true)
 
 # tools
-executable('pattern-dump', 'src/bin/pattern-dump.c', link_with: passgen)
-executable('pattern-choices', 'src/bin/pattern-choices.c', link_with: passgen)
+pattern_dump = executable(
+  'pattern-dump',
+  'src/bin/pattern-dump.c',
+  link_with: libpassgen)
+pattern_choices = executable(
+  'pattern-choices',
+  'src/bin/pattern-choices.c',
+  link_with: libpassgen)
 
 # benchmarks
-bench_random = executable('bench_random', 'src/bench/random.c', link_with: passgen)
+bench_random = executable(
+  'bench_random',
+  'src/bench/random.c',
+  link_with: libpassgen)
 benchmark('random', bench_random)
 
 # tests
 generate_all = find_program('tests/generate.rb')
-test_files = ['tests/random.c', 'tests/reader.c', 'tests/pattern.c', 'tests/unicode.c']
+test_files = [
+  'tests/random.c',
+  'tests/reader.c',
+  'tests/pattern.c',
+  'tests/unicode.c']
 all_tests = custom_target(
   'all.c',
   input: test_files,
@@ -68,7 +84,7 @@ tests = executable(
   'tests/tests.c',
   test_files,
   all_tests,
-  link_with: passgen)
+  link_with: libpassgen)
 test('tests', tests)
 
 # headers
@@ -77,8 +93,11 @@ install_headers(
   'passgen/passgen.h',
   'passgen/pattern.h',
   'passgen/version.h',
+  'passgen/unicode.h',
   subdir : 'passgen')
 
 # pkgconfig file
 pkg = import('pkgconfig')
-pkg.generate(passgen, description: 'Regex-based password generation')
+pkg.generate(
+  libpassgen,
+  description: 'Regex-based password generation')

@@ -1,6 +1,6 @@
 .Dd July 7, 2019
 .Dt PASSGEN 1 URM
-.Os Passgen v@version@
+.Os Passgen v@VERSION@
 .Sh NAME
 .Nm passgen
 .Nd Generate passwords.
