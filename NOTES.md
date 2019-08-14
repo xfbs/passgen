@@ -73,6 +73,9 @@ need to be patched to use `uint32_t` instead of chars, and the
 `utf8proc_encode_char()` needs to be used in the random pattern generation
 functions to write out utf8.
 
+UTF8 iterator parsing has already been implemented, what is still needed is to
+bake this API into the code. Also, emitting UTF8 has yet to be done.
+
 ### [DONE] Range parsing
 
 When parsing `[c-a]`, ~rewrite it to `a-c`~ cause an error and stop parsing.
@@ -86,8 +89,11 @@ the error kind but also some context like the position?
 
 ### Linear parsing
 
-Intead of parsing into a tree-like structure with linked lists, allow
-parsing into a linear buffer. Not really necessary.
+~Intead of parsing into a tree-like structure with linked lists, allow
+parsing into a linear buffer.~ Not really necessary.
+
+Instead, maybe some of the code could be changed from using linked lists to
+using an array.
 
 ### Add return wrapper type for parsing
 
@@ -95,8 +101,8 @@ How about a `parse\_result` type with an okay field and an optional error?
 
 ### Abstract reading
 
-Add a `read\_type` struct that is generic over where to read from (such that
-UTF-8 support can be made optional)
+~Add a `read\_type` struct that is generic over where to read from (such that
+UTF-8 support can be made optional)~ overcomplicated, not really needed.
 
 ### Using getrandom
 
@@ -105,6 +111,14 @@ syscall.~
 
 Alternative idea: use `libsodium` randomness functions for operating system
 independence.
+
+### Implement custom randomness source
+
+Use a custom random data stream (or a key file that is hashed and the hash used
+to seed a PRNG?)
+
+Idea: use `libsodium`'s stream ciphers, such as ChaCha20, XChaCha20, Salsa20 or
+XSalsa20, along with a secret key or keyfile, to generate reproducible passes.
 
 ### Word List
 
@@ -136,14 +150,6 @@ times the relative probability of the whole thing. This allows one to adjust
 how often which items should be picked with a similar format to how lengths are
 specified.
 
-### Implement custom randomness source
-
-Use a custom random data stream (or a key file that is hashed and the hash used
-to seed a PRNG?)
-
-Idea: use `libsodium`'s stream ciphers, such as ChaCha20, XChaCha20, Salsa20 or
-XSalsa20, along with a secret key or keyfile, to generate reproducible passes.
-
 ### Add disclaimer about timing sidechannels
 
 When generating variable-length passwords, the length is a sidechannel.
@@ -151,6 +157,23 @@ When generating variable-length passwords, the length is a sidechannel.
 ### Write proper tokenizer for the parser.
 
 Use a buffered tokenizer with peek().
+
+This should be made to handle:
+
+- escaped chars `\\, \n, \r, \(, \[`
+- raw unicode chars `\u{a4}`
+- regex special chars `\w, \s`
+
+### Store offsets in the parsed structure
+
+When parsign something, always store the offset in the source string.  That way
+we can used the parsed data structure for other things, such as syntax
+highlighting.
+
+### Generate characters from custom languages
+
+Support something like `\l{English}` or `\l{German}` to generate words from
+that language or script.
 
 ### Implement 
 
