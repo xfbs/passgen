@@ -148,10 +148,6 @@ XSalsa20, along with a secret key or keyfile, to generate reproducible passes.
 
 When generating variable-length passwords, the length is a sidechannel.
 
-### Write pkg-config to be able to load libpassgen.
-
-See some pkg-config tutorial.
-
 ### Write proper tokenizer for the parser.
 
 Use a buffered tokenizer with peek().
