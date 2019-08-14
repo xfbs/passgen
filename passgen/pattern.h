@@ -9,9 +9,6 @@
 #include "random.h"
 #include "unicode.h"
 
-// TODO: remove PATTERN_CHAR, convert to use PATTERN_RANGE.
-// TODO: implement special chars \w (word), \s (space), etc.
-
 /// What type of patterns are there?
 typedef enum {
   /// Range of possible chars.

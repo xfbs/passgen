@@ -219,6 +219,9 @@ implemented. This needs to be done in the `parse\_char` method, most likely.
 That makes more sense, and it allows pattern\_parse to do some error
 checking/handling.
 
+Also add another data structure, pattern_group, and make that wrapped by
+pattern_t.
+
 ### Implement probability
 
 For a range `[abc]`, implement something like `[a{9}bc]` to make `a` have 9
