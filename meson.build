@@ -28,8 +28,9 @@ libutf8proc = dependency('libutf8proc')
 # library used for cryptographic routines
 libsodium = dependency('libsodium')
 
-deps = [libutf8proc]
+libjansson = dependency('jansson')
 
+deps = [libutf8proc]
 
 # main library
 libpassgen = library(
@@ -66,6 +67,12 @@ bench_random = executable(
   'src/bench/random.c',
   link_with: libpassgen)
 benchmark('random', bench_random)
+bench_parse = executable(
+  'bench_parse',
+  'src/bench/parse.c',
+  link_with: libpassgen,
+  dependencies: [libjansson])
+benchmark('parse', bench_parse)
 
 # tests
 generate_all = find_program('tests/generate.rb')
