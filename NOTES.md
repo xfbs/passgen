@@ -1,5 +1,11 @@
 # Notes
 
+## Dependencies
+
+Passgen depends on `utf8proc`, `libsodium` and `jansson`. It also depends on `meson` and `pkg-config` for building.
+
+    brew install pkg-config meson ninja utf8proc libsodium jansson
+
 ## Building
 
 Use the Makefile to build the project. For example, to build it in release
@@ -261,6 +267,11 @@ To do this, data from
 
 [RFC972](https://tools.ietf.org/html/rfc972) is about password generation.
 Maybe there are more RFCs that are relevant.
+
+### Remove PATTERN TYPE CHAR
+
+Remove pattern type char and replace with pattern type sequence, reusing the
+substring struct.
 
 ### Security features
 
