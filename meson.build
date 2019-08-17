@@ -70,6 +70,8 @@ benchmark('random', bench_random)
 bench_parse = executable(
   'bench_parse',
   'src/bench/parse.c',
+  'src/bench/bench.c',
+  'src/bench/all.c',
   link_with: libpassgen,
   dependencies: [libjansson])
 benchmark('parse', bench_parse)
