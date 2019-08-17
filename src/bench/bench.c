@@ -326,7 +326,7 @@ void bench_help(const char *prog) {
       "OPTIONS\n"
       "  -l, --list         List all available benchmarks.\n"
       "  -d, --duration     The duration to run each test. Default is 50ms. Can be any length,\n"
-      "                     accepted units are 's', 'ms', 'us' and 'ns'.\n"
+      "                     accepted units are h, m, s, ms, us, ns.\n"
       "  -t, --threads      How many threads to launch to run benchmarks. Using too many threads\n"
       "                     will slow down the benchmarks.\n"
       "  -v, --version      Show the version of this build.\n"
@@ -338,6 +338,49 @@ void bench_help(const char *prog) {
 }
 
 void bench_version(void) {
+  fprintf(
+      stderr,
+      "passgen_bench version %s\n",
+      passgen_version_str());
+}
+
+static double parse_time(const char *str) {
+  double number;
+  char prefix[3];
+  int ret = sscanf(str, "%lf%c%c%c", &number, &prefix[0], &prefix[1], &prefix[2]);
+
+  if(ret < 2) {
+    return NAN;
+  }
+
+  if(ret == 2) {
+    switch(prefix[0]) {
+      case 'h':
+        number *= 60;
+      case 'm':
+        number *= 60;
+      case 's':
+        return number;
+      default:
+        break;
+    }
+  }
+
+  if(ret == 3 && prefix[1] == 's') {
+    switch(prefix[0]) {
+      case 'n':
+        number /= 1000;
+      case 'u':
+        number /= 1000;
+      case 'm':
+        number /= 1000;
+        return number;
+      default:
+        break;
+    }
+  }
+
+  return NAN;
 }
 
 struct bench_options bench_parse_opts(int argc, char *argv[]) {
@@ -380,10 +423,11 @@ struct bench_options bench_parse_opts(int argc, char *argv[]) {
         opts.threads = opt;
         break;
       case 'd':
-        opt = atoi(optarg);
-        if(opt < 1) {
+        opts.time = parse_time(optarg);
+        if(isnan(opts.time)) {
+          fprintf(stderr, "Error parsing time '%s'.\n", optarg);
+          opts.error = true;
         }
-        opts.time = opt;
         break;
       case 'v':
         opts.version = true;
