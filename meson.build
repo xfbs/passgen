@@ -3,7 +3,7 @@ project(
   'passgen',
   'c',
   default_options: ['c_std=c11'],
-  version: '0.1.1',
+  version: '0.1.2',
   license: 'MIT')
 
 # create man page

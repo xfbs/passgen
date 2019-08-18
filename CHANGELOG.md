@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2019-08-18
+### Added
+- Benchmarking tool.
+
+### Fixed
+- Installing the passgen binary.
+
 ## [0.1.1] - 2019-08-14
 ### Added
 - Revamped testing system, now uses autogeneration.
