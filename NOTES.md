@@ -9,7 +9,7 @@ on `meson` and `pkg-config` for building.
     brew install pkg-config meson ninja utf8proc libsodium jansson
 
     # on ubuntu
-    apt install build-essential pkg-config meson ninja-build libutf8proc-dev libsodium-dev libjansson-dev
+    apt install build-essential pkg-config meson ninja-build libutf8proc-dev libsodium-dev libjansson-dev ruby
 
 ## Building
 

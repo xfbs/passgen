@@ -37,6 +37,12 @@ libsodium = dependency('libsodium')
 # library used for generating JSON.
 libjansson = dependency('jansson')
 
+# math lib
+libm = cc.find_library('m')
+
+# threads
+threads = dependency('threads')
+
 deps = [libutf8proc]
 
 # main library
@@ -80,7 +86,7 @@ bench_parse = executable(
   'src/bench/bench.c',
   'src/bench/all.c',
   link_with: libpassgen,
-  dependencies: [libjansson])
+  dependencies: [libjansson, libm, threads])
 benchmark('parse', bench_parse)
 
 # tests
