@@ -5,6 +5,7 @@ stdenv.mkDerivation {
   buildInputs = [
     pkgs.utf8proc
     pkgs.libsodium
+    pkgs.jansson
   ];
 
   nativeBuildInputs = [
