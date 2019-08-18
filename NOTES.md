@@ -2,9 +2,14 @@
 
 ## Dependencies
 
-Passgen depends on `utf8proc`, `libsodium` and `jansson`. It also depends on `meson` and `pkg-config` for building.
+Passgen depends on `libutf8proc`, `libsodium` and `libjansson`. It also depends
+on `meson` and `pkg-config` for building.
 
+    # on macOS
     brew install pkg-config meson ninja utf8proc libsodium jansson
+
+    # on ubuntu
+    apt install build-essential pkg-config meson ninja-build libutf8proc-dev libsodium-dev libjansson-dev
 
 ## Building
 

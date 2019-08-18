@@ -22,12 +22,19 @@ version_src = configure_file(
   output: 'version.c',
   configuration: conf_data)
 
-# library used to decode and encode utf8
-libutf8proc = dependency('libutf8proc')
+cc = meson.get_compiler('c')
 
-# library used for cryptographic routines
+# library used to decode and encode utf8.
+libutf8proc = dependency('libutf8proc', required: false)
+
+if not libutf8proc.found()
+  libutf8proc = cc.find_library('utf8proc')
+endif
+
+# library used for cryptographic routines.
 libsodium = dependency('libsodium')
 
+# library used for generating JSON.
 libjansson = dependency('jansson')
 
 deps = [libutf8proc]
