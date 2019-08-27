@@ -65,14 +65,14 @@ passgen = executable(
   install: true)
 
 # tools
-pattern_dump = executable(
-  'pattern-dump',
-  'src/bin/pattern-dump.c',
-  link_with: libpassgen)
-pattern_choices = executable(
-  'pattern-choices',
-  'src/bin/pattern-choices.c',
-  link_with: libpassgen)
+#pattern_dump = executable(
+#  'pattern-dump',
+#  'src/bin/pattern-dump.c',
+#  link_with: libpassgen)
+#pattern_choices = executable(
+#  'pattern-choices',
+#  'src/bin/pattern-choices.c',
+#  link_with: libpassgen)
 
 # benchmarks
 bench_random = executable(

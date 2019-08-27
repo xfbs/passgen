@@ -24,7 +24,7 @@ void passgen_run(passgen_opts opts) {
 
   // parse format
   const char *parse_pos = opts.format;
-  pattern_t *pattern = pattern_parse(&parse_pos);
+  pattern_t *pattern = 0; // pattern_parse(&parse_pos);
   if(!pattern) {
     random_close(&random);
     bail(PATTERN_PARSE, opts.format);
