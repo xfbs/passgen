@@ -2,16 +2,67 @@
 #include <assert.h>
 #include <stdbool.h>
 
+static const pattern_result_t result_ok = {
+    .ok = true,
+};
+
+pattern_result_t pattern_error_illegal(struct unicode_iter *iter) {
+    return (pattern_result_t) {
+        .ok = false,
+        .kind = PATTERN_ERROR_ILLEGAL,
+        .pos.offset = iter->pos,
+        .pos.length = 1,
+    };
+}
+
 void pattern_free(pattern_t *pattern) {
 }
 
-pattern_result_t pattern_parse(pattern_t *out, const char *data) {
+#define array_init(name) \
+    name##_size.avail = 10; \
+    name##_size.count = 0; \
+    name = malloc(10 * sizeof(*name)); \
+    assert(name)
+
+/// Parse the content of a group.
+pattern_result_t pattern_group_parse(
+        struct pattern_group *group,
+        struct unicode_iter *iter)
+{
+    // save the current position.
+    group->pos.offset = iter->pos;
+    group->pos.length = 0;
+
+    array_init(group->segments);
+
+    return result_ok;
+}
+
+pattern_result_t pattern_parse(pattern_t *pattern, const char *data) {
+    pattern->pattern = data;
+
+    // parse segments and make sure everything went okay.
+    struct unicode_iter iter = unicode_iter(data);
+    pattern_result_t result = pattern_group_parse(&pattern->group, &iter);
+    if(!result.ok) {
+        return result;
+    }
+
+    // make sure we really have reached EOF.
+    struct pattern_token token = pattern_token_peek(&iter);
+    if(token.type != PATTERN_TOKEN_EOF) {
+        return pattern_error_illegal(&iter);
+    }
+
+    return result_ok;
 }
 
 size_t pattern_maxlen(pattern_t *pattern) {
+    return 0;
 }
 
 size_t pattern_minlen(pattern_t *pattern) {
+    return 0;
 }
 
 size_t pattern_random_fill(
@@ -19,9 +70,11 @@ size_t pattern_random_fill(
     random_t *rand,
     char *buffer,
     size_t len) {
+    return 0;
 }
 
 size_t pattern_choices(pattern_t *pattern) {
+    return 0;
 }
 
 /*
@@ -546,108 +599,3 @@ const char *pattern_error_fmtstr(pattern_error_t error) {
 }
 */
 
-struct pattern_token pattern_token_error(size_t pos) {
-  return (struct pattern_token) {
-    .type = PATTERN_TOKEN_ERROR,
-    .data.offset = pos
-  };
-}
-
-struct pattern_token pattern_token_eof(void) {
-  return (struct pattern_token) {
-    .type = PATTERN_TOKEN_EOF,
-  };
-}
-
-struct pattern_token pattern_token_regular(int32_t codepoint) {
-  return (struct pattern_token) {
-    .type = PATTERN_TOKEN_REGULAR,
-    .codepoint = codepoint
-  };
-}
-
-struct pattern_token pattern_token_escaped(int32_t codepoint) {
-  return (struct pattern_token) {
-    .type = PATTERN_TOKEN_ESCAPED,
-    .codepoint = codepoint
-  };
-}
-
-/// Parse the next token, without advancing the unicode reader.
-struct pattern_token pattern_token_peek(const struct unicode_iter *iter) {
-  struct unicode_iter iter_copy = *iter;
-  return pattern_token_next(&iter_copy);
-}
-
-struct pattern_token pattern_token_unicode(struct unicode_iter *iter) {
-}
-
-struct pattern_token pattern_token_wordlist(struct unicode_iter *iter) {
-}
-
-typedef struct pattern_token pattern_token_special(struct unicode_iter *iter);
-
-struct special_chars {
-  int32_t chr;
-  int32_t dest;
-  pattern_token_special *parser;
-};
-
-static struct special_chars special_chars[] = {
-  {'a', '\a', NULL}, /// alert
-  {'b', '\b', NULL}, /// no idea
-  {'e', '\033', NULL}, /// escape
-  {'f', '\f', NULL}, /// no idea
-  {'n', '\n', NULL}, /// newline
-  {'r', '\r', NULL}, /// carriage return
-  {'t', '\t', NULL}, /// tab
-  {'v', '\v', NULL}, /// vertical tab
-  {'\\', '\\', NULL}, /// backspace
-  {'u', 0, pattern_token_unicode},
-  {'w', 0, pattern_token_wordlist},
-};
-
-static const size_t special_chars_size = sizeof(special_chars);
-
-struct pattern_token pattern_token_next_complex(struct unicode_iter *iter) {
-  struct unicode_iter_result result;
-
-  // this is not a regular token. see what comes next.
-  result = unicode_iter_next(iter);
-  if(!result.ok) {
-    return pattern_token_error(iter->pos);
-  }
-
-  for(size_t i = 0; i < special_chars_size; ++i) {
-    if(result.codepoint == special_chars[i].chr) {
-      if(special_chars[i].parser) {
-        return special_chars[i].parser(iter);
-      } else {
-        return pattern_token_escaped(special_chars[i].dest);
-      }
-    }
-  }
-
-  return pattern_token_error(iter->pos);
-}
-
-/// Parse the next token, advancing the unicode reader.
-struct pattern_token pattern_token_next(struct unicode_iter *iter) {
-  struct unicode_iter_result result;
-
-  result = unicode_iter_next(iter);
-  if(!result.ok) {
-    if(result.error == 0 && result.codepoint == 0) {
-      return pattern_token_eof();
-    } else {
-      return pattern_token_error(iter->pos);
-    }
-  }
-
-  // this is a regular token.
-  if(result.codepoint != '\\') {
-    return pattern_token_regular(result.codepoint);
-  }
-
-  return pattern_token_next_complex(iter);
-}

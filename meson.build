@@ -53,6 +53,7 @@ libpassgen = library(
   'src/random.c',
   'src/reader.c',
   'src/unicode.c',
+  'src/token.c',
   version_src,
   install: true,
   dependencies: deps)
@@ -116,6 +117,7 @@ install_headers(
   'passgen/pattern.h',
   'passgen/version.h',
   'passgen/unicode.h',
+  'passgen/token.h',
   subdir : 'passgen')
 
 # pkgconfig file

@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "random.h"
 #include "unicode.h"
+#include "token.h"
 
 enum pattern_kind {
   PATTERN_RANGE,
@@ -19,19 +20,20 @@ struct pattern_sequence;
 struct pattern_special;
 struct pattern_group;
 struct pattern_range;
+struct pattern_range_item;
 struct pattern_segment;
+struct pattern_segment_item;
 struct pattern;
-
-/// Represents a valid substring of a string.
-struct pattern_substring {
-  size_t offset;
-  size_t length;
-};
 
 /// Represents how many times a pattern must be repeated.
 struct pattern_reps {
   size_t min;
   size_t max;
+};
+
+struct pattern_array_size {
+  size_t count;
+  size_t avail;
 };
 
 /// Represents a sequence that is copied verbatim.
@@ -55,25 +57,33 @@ struct pattern_range {
   struct pattern_substring pos;
 
   struct pattern_range_item *items;
-  size_t items_count;
-  size_t items_avail;
+  struct pattern_array_size items_size;
 
   struct pattern_reps reps;
 };
 
-/// Group. Represents something like `(abc|def){3}`.
+/// Segment. Represents something like `abc[def](g|h)`
+struct pattern_segment {
+  struct pattern_substring pos;
+
+  struct pattern_segment_item *items;
+  struct pattern_array_size items_size;
+
+  struct pattern_reps reps;
+};
+
+/// Group. Represents something like `abc[d0]|[def]g|(h|i)j`.
 struct pattern_group {
   struct pattern_substring pos;
 
   struct pattern_segment *segments;
-  size_t segments_count;
-  size_t segments_avail;
+  struct pattern_array_size segments_size;
 
   struct pattern_reps reps;
 };
 
 /// Pattern segment: single segment (range, group or sequence).
-struct pattern_segment {
+struct pattern_segment_item {
   enum pattern_kind kind;
 
   union {
@@ -85,15 +95,13 @@ struct pattern_segment {
 
 /// Pattern: list of possible pattern segments as linked list.
 struct pattern {
-  struct pattern_segment *segments;
-  size_t segments_count;
-  size_t segments_avail;
-
+  struct pattern_group group;
   const char *pattern;
 };
 
 enum pattern_error {
   PATTERN_ERROR_ALLOC,
+  PATTERN_ERROR_ILLEGAL,
 };
 
 struct pattern_result {
@@ -102,20 +110,6 @@ struct pattern_result {
   enum pattern_error kind;
 };
 
-enum pattern_token_type {
-  PATTERN_TOKEN_EOF,
-  PATTERN_TOKEN_ERROR,
-  PATTERN_TOKEN_REGULAR,
-  PATTERN_TOKEN_SPECIAL,
-  PATTERN_TOKEN_UNICODE,
-  PATTERN_TOKEN_ESCAPED,
-};
-
-struct pattern_token {
-  enum pattern_token_type type;
-  int32_t codepoint;
-  struct pattern_substring data;
-};
 
 typedef struct pattern pattern_t;
 typedef struct pattern_result pattern_result_t;
@@ -134,9 +128,3 @@ size_t pattern_random_fill(
     size_t len);
 
 size_t pattern_choices(pattern_t *pattern);
-
-/// Parse the next token, without advancing the unicode reader.
-struct pattern_token pattern_token_peek(const struct unicode_iter *iter);
-
-/// Parse the next token, advancing the unicode reader.
-struct pattern_token pattern_token_next(struct unicode_iter *iter);
