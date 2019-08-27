@@ -2,6 +2,29 @@
 #include <assert.h>
 #include <stdbool.h>
 
+void pattern_free(pattern_t *pattern) {
+}
+
+pattern_result_t pattern_parse(pattern_t *out, const char *data) {
+}
+
+size_t pattern_maxlen(pattern_t *pattern) {
+}
+
+size_t pattern_minlen(pattern_t *pattern) {
+}
+
+size_t pattern_random_fill(
+    pattern_t *pattern,
+    random_t *rand,
+    char *buffer,
+    size_t len) {
+}
+
+size_t pattern_choices(pattern_t *pattern) {
+}
+
+/*
 bool is_illegal(char c) {
   return c == ']' || c == ')';
 }
@@ -521,6 +544,7 @@ const char *pattern_error_fmtstr(pattern_error_t error) {
       return "Illegal error happened.";
   }
 }
+*/
 
 struct pattern_token pattern_token_error(size_t pos) {
   return (struct pattern_token) {
