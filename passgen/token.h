@@ -9,15 +9,14 @@ struct passgen_substring {
 
 enum passgen_token_type {
     PATTERN_TOKEN_EOF,
-    PATTERN_TOKEN_ERROR,
     PATTERN_TOKEN_REGULAR,
     PATTERN_TOKEN_SPECIAL,
     PATTERN_TOKEN_UNICODE,
     PATTERN_TOKEN_ESCAPED,
-    PASSGEN_TOKEN_ERROR_ESCAPE_ILLEGAL,
-    PASSGEN_TOKEN_ERROR_ESCAPE_LBRACE,
-    PASSGEN_TOKEN_ERROR_ESCAPE_RBRACE,
-    PASSGEN_TOKEN_ERROR_ESCAPE_UNICODE,
+    PASSGEN_TOKEN_ERROR_ESCAPE,
+    PASSGEN_TOKEN_ERROR_LBRACE,
+    PASSGEN_TOKEN_ERROR_RBRACE,
+    PASSGEN_TOKEN_ERROR_UNICODE,
     PASSGEN_TOKEN_ERROR_UTF8 = (1 << 10),
 };
 
@@ -38,6 +37,10 @@ passgen_token_t passgen_token_peek(const unicode_iter_t *iter);
 passgen_token_t passgen_token_next(unicode_iter_t *iter);
 
 bool passgen_token_is_normal(passgen_token_t *token);
+bool passgen_token_is_regular(passgen_token_t *token);
+bool passgen_token_is_escaped(passgen_token_t *token);
+bool passgen_token_is_unicode(passgen_token_t *token);
 bool passgen_token_is_eof(passgen_token_t *token);
+bool passgen_token_is_error(passgen_token_t *token);
 bool passgen_token_is_result(passgen_token_t *token);
 

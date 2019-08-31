@@ -273,9 +273,12 @@ bool pattern_segment_is_end(passgen_token_t token) {
         }
     }
 
+    // FIXME!
+    /*
     if(token.type == PATTERN_TOKEN_ERROR) {
         return true;
     }
+    */
 
     if(token.type == PATTERN_TOKEN_EOF) {
         return true;
