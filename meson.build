@@ -54,6 +54,7 @@ libpassgen = library(
   'src/reader.c',
   'src/unicode.c',
   'src/token.c',
+  'src/memory.c',
   version_src,
   install: true,
   dependencies: deps)
