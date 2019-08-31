@@ -10,6 +10,8 @@ test_result test_pattern_parse() {
   const char *str = "abc";
 
   result = pattern_parse(&pattern, str, NULL);
+  assert(pattern.mem == NULL);
+  assert(pattern.group.pos.offset == NULL);
   assert(result.ok);
   assert(pattern.pattern == str);
   /*

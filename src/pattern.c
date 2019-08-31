@@ -9,6 +9,8 @@ bool pattern_group_is_end(passgen_token_t token);
 bool pattern_range_is_start(passgen_token_t token);
 bool pattern_range_is_end(passgen_token_t token);
 
+bool pattern_segment_is_end(passgen_token_t token);
+
 pattern_result_t pattern_group_parse_inner(pattern_group_t *group, unicode_iter_t *iter, passgen_mem_t *mem);
 pattern_result_t pattern_group_parse(pattern_group_t *group, unicode_iter_t *iter, passgen_mem_t *mem);
 
@@ -19,16 +21,21 @@ pattern_result_t pattern_range_item_parse(pattern_range_item_t *item, unicode_it
 pattern_result_t pattern_segment_parse(pattern_segment_t *segment, unicode_iter_t *iter, passgen_mem_t *mem);
 pattern_result_t pattern_segment_item_parse(pattern_segment_item_t *item, unicode_iter_t *iter, passgen_mem_t *mem);
 
+pattern_result_t pattern_char_parse(
+        pattern_char_t *character,
+        unicode_iter_t *iter,
+        passgen_mem_t *mem);
+
 static const pattern_result_t result_ok = {
     .ok = true,
 };
 
-pattern_result_t pattern_error_illegal(unicode_iter_t *iter) {
+pattern_result_t pattern_error_illegal(passgen_token_t *token) {
     return (pattern_result_t) {
         .ok = false,
         .kind = PATTERN_ERROR_ILLEGAL,
-        .pos.offset = iter->pos,
-        .pos.length = 1,
+        .pos.offset = token->pos.offset,
+        .pos.length = token->pos.length,
     };
 }
 
@@ -44,36 +51,99 @@ pattern_result_t pattern_error_alloc(unicode_iter_t *iter) {
 void pattern_free(pattern_t *pattern) {
 }
 
-/*
-pattern_result_t pattern_segment_parse(struct pattern_segment *segment, struct unicode_iter *iter) {
+pattern_result_t pattern_segment_parse(
+        pattern_segment_t *segment,
+        unicode_iter_t *iter,
+        passgen_mem_t *mem)
+{
+    // save the current position.
+    segment->pos.offset = iter->pos;
+    segment->pos.length = 0;
+
+    segment->items = passgen_array_init();
+    bool first = true;
+
+    while(!pattern_segment_is_end(passgen_token_peek(iter))) {
+        pattern_segment_item_t *item = passgen_array_push(
+                &segment->items,
+                sizeof(pattern_segment_item_t),
+                mem);
+        if(!item) {
+            return pattern_error_alloc(iter);
+        }
+
+        pattern_result_t result = pattern_segment_item_parse(item, iter, mem);
+        if(!result.ok) {
+            return result;
+        }
+
+        // update length
+        segment->pos.length = iter->pos - segment->pos.offset;
+        first = false;
+    }
+
     return result_ok;
 }
 
-pattern_result_t pattern_segment_item_parse(struct pattern_segment_item *item, struct unicode_iter *iter) {
+pattern_result_t pattern_group_parse(
+        pattern_group_t *group,
+        unicode_iter_t *iter,
+        passgen_mem_t *mem)
+{
+    return result_ok;
+}
+
+pattern_result_t pattern_segment_item_parse(
+        pattern_segment_item_t *item,
+        unicode_iter_t *iter,
+        passgen_mem_t *mem)
+{
     pattern_result_t result;
 
     passgen_token_t token = passgen_token_peek(iter);
 
     if(pattern_group_is_start(token)) {
         item->kind = PATTERN_GROUP;
-        result = pattern_group_parse(&item->data.group, iter);
+        result = pattern_group_parse(&item->data.group, iter, mem);
     } else if(pattern_range_is_start(token)) {
         item->kind = PATTERN_RANGE;
-        result = pattern_range_parse(&item->data.range, iter);
+        result = pattern_range_parse(&item->data.range, iter, mem);
     } else {
+        item->kind = PATTERN_CHAR;
+        result = pattern_char_parse(&item->data.character, iter, mem);
     }
 
     return result;
 }
 
-pattern_result_t pattern_range_parse_inner(struct pattern_range *range, struct unicode_iter *iter) {
+pattern_result_t pattern_char_parse(
+        pattern_char_t *character,
+        unicode_iter_t *iter,
+        passgen_mem_t *mem)
+{
+    character->pos.offset = iter->pos;
+    passgen_token_t token = passgen_token_next(iter);
+    character->pos.length = iter->pos - character->pos.offset;
+    character->codepoint = token.codepoint;
+
     return result_ok;
 }
 
-pattern_result_t pattern_range_parse(struct pattern_range *range, struct unicode_iter *iter) {
+pattern_result_t pattern_range_parse_inner(
+        pattern_range_t *range,
+        unicode_iter_t *iter,
+        passgen_mem_t *mem)
+{
     return result_ok;
 }
-*/
+
+pattern_result_t pattern_range_parse(
+        pattern_range_t *range,
+        unicode_iter_t *iter,
+        passgen_mem_t *mem)
+{
+    return result_ok;
+}
 
 /// Parse the content of a group.
 pattern_result_t pattern_group_parse_inner(
@@ -81,44 +151,37 @@ pattern_result_t pattern_group_parse_inner(
         unicode_iter_t *iter,
         passgen_mem_t *mem)
 {
-    /*
     // save the current position.
     group->pos.offset = iter->pos;
     group->pos.length = 0;
 
-    array_init(group->segments);
+    group->segments = passgen_array_init();
     bool first = true;
 
     while(first || pattern_group_is_separator(passgen_token_peek(iter))) {
-        array_space(group->segments);
-
         // skip separator.
         if(!first) {
             passgen_token_next(iter);
         }
 
-        pattern_result_t result = pattern_segment_parse(array_next(group->segments), iter);
-        if(!result.ok) {
-            // calculate length and exit.
-            group->pos.length = result.pos.offset - group->pos.offset;
-            return result;
-        } else {
-            array_push(group->segments);
+        pattern_segment_t *segment = passgen_array_push(
+                &group->segments,
+                sizeof(pattern_segment_t),
+                mem);
+        if(!segment) {
+            return pattern_error_alloc(iter);
         }
 
+        pattern_result_t result = pattern_segment_parse(segment, iter, mem);
+        if(!result.ok) {
+            return result;
+        }
+
+        // update length
+        group->pos.length = iter->pos - group->pos.offset;
         first = false;
     }
 
-    // calculate length.
-    group->pos.length = iter->pos - group->pos.offset;
-
-    // TODO: check for unicode error?
-    */
-
-    return result_ok;
-}
-
-pattern_result_t pattern_group_parse(pattern_group_t *group, unicode_iter_t *iter, passgen_mem_t *mem) {
     return result_ok;
 }
 
@@ -140,7 +203,7 @@ pattern_result_t pattern_parse(pattern_t *pattern, const char *data, passgen_mem
     // make sure we really have reached EOF.
     passgen_token_t token = passgen_token_peek(&iter);
     if(token.type != PATTERN_TOKEN_EOF) {
-        return pattern_error_illegal(&iter);
+        return pattern_error_illegal(&token);
     }
 
     return result_ok;
@@ -192,6 +255,29 @@ bool pattern_range_is_start(passgen_token_t token) {
 
 bool pattern_range_is_end(passgen_token_t token) {
     if(token.type == PATTERN_TOKEN_REGULAR && token.codepoint == ']') {
+        return true;
+    }
+
+    return false;
+}
+
+bool pattern_segment_is_end(passgen_token_t token) {
+    if(token.type == PATTERN_TOKEN_REGULAR) {
+        switch(token.codepoint) {
+            case ']':
+            case ')':
+            case '|':
+                return true;
+            default:
+                break;
+        }
+    }
+
+    if(token.type == PATTERN_TOKEN_ERROR) {
+        return true;
+    }
+
+    if(token.type == PATTERN_TOKEN_EOF) {
         return true;
     }
 

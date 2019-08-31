@@ -17,9 +17,10 @@ enum passgen_token_type {
 };
 
 struct passgen_token {
-  enum passgen_token_type type;
-  int32_t codepoint;
-  struct passgen_substring data;
+    struct passgen_substring pos;
+    enum passgen_token_type type;
+    int32_t codepoint;
+    struct passgen_substring data;
 };
 
 typedef struct passgen_token passgen_token_t;

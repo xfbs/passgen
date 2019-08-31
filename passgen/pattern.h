@@ -102,7 +102,7 @@ struct pattern_segment_item {
     union {
         struct pattern_range range;
         struct pattern_group group;
-        struct pattern_char sequence;
+        struct pattern_char character;
         struct pattern_special special;
     } data;
 };

@@ -309,3 +309,7 @@ Does it make sense to support something like
     (abc|def)\1\1
 
 Probably not, but might be fun to implement anyways.
+
+### Token
+
+Add positions to token.
