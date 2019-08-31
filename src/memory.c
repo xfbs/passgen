@@ -1,4 +1,5 @@
 #include "passgen/memory.h"
+#include <stdlib.h>
 
 void *passgen_malloc(struct passgen_mem *mem, size_t size) {
     if(!mem) {

@@ -1,5 +1,5 @@
 #pragma once
-#include <stdlib.h>
+#include <stddef.h>
 #include <stdbool.h>
 
 struct passgen_mem;
