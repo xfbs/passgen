@@ -60,9 +60,37 @@ static void *passgen_malloc_limited(void *state, size_t size) {
 }
 
 static void *passgen_calloc_limited(void *state, size_t count, size_t size) {
+    struct passgen_mem_limits *limits = state;
+
+    if(limits->allocs_limit && limits->allocs_limit == limits->allocs) {
+        return NULL;
+    }
+
+    if(limits->size_limit && limits->size_limit < (limits->size + count * size)) {
+        return NULL;
+    }
+
+    limits->allocs += 1;
+    limits->size += count * size;
+
+    return passgen_calloc(limits->mem, count, size);
 }
 
 static void *passgen_realloc_limited(void *state, void *ptr, size_t size) {
+    struct passgen_mem_limits *limits = state;
+
+    if(limits->allocs_limit && limits->allocs_limit == limits->allocs) {
+        return NULL;
+    }
+
+    if(limits->size_limit && limits->size_limit < (limits->size + size)) {
+        return NULL;
+    }
+
+    limits->allocs += 1;
+    limits->size += size;
+
+    return passgen_realloc(limits->mem, ptr, size);
 }
 
 static void passgen_free_limited(void *state, void *ptr) {
@@ -74,8 +102,8 @@ static void passgen_free_limited(void *state, void *ptr) {
 passgen_mem_t passgen_mem_limited(passgen_mem_limits_t *limits) {
     return (passgen_mem_t) {
         .malloc = passgen_malloc_limited,
-        .realloc = NULL,
-        .calloc = NULL,
+        .realloc = passgen_realloc_limited,
+        .calloc = passgen_calloc_limited,
         .free = passgen_free_limited,
         .state = limits,
     };

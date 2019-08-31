@@ -65,8 +65,8 @@ test_result test_memory_limited(void) {
     passgen_mem_t mem = passgen_mem_limited(&limits);
 
     assert(mem.malloc != NULL);
-    assert(mem.calloc == NULL);
-    assert(mem.realloc == NULL);
+    assert(mem.calloc != NULL);
+    assert(mem.realloc != NULL);
     assert(mem.free != NULL);
     assert(mem.state == &limits);
 
