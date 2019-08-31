@@ -121,6 +121,7 @@ enum pattern_error {
 
 struct pattern_result {
     bool ok;
+    bool consistent;
     struct pattern_substring pos;
     enum pattern_error kind;
 };
