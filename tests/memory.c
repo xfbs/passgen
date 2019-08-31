@@ -3,28 +3,14 @@
 #include <string.h>
 
 test_result test_memory_stdlib(void) {
-    passgen_mem_t mem = passgen_mem_stdlib();
-
-    assert(mem.malloc == NULL);
-    assert(mem.calloc == NULL);
-    assert(mem.realloc == NULL);
-    assert(mem.free == NULL);
-    assert(mem.state == NULL);
-
-    return test_ok;
-}
-
-test_result test_memory_stdlib_alloc(void) {
-    passgen_mem_t mem = passgen_mem_stdlib();
-
-    char *m_data = passgen_malloc(&mem, 32);
+    char *m_data = passgen_malloc(NULL, 32);
     assert(m_data);
     memset(m_data, 0, 32);
 
-    char *c_data = passgen_calloc(&mem, 2, 16);
+    char *c_data = passgen_calloc(NULL, 2, 16);
     assert(c_data);
 
-    char *r_data = passgen_realloc(&mem, NULL, 32);
+    char *r_data = passgen_realloc(NULL, NULL, 32);
     assert(r_data);
     memset(r_data, 0, 32);
 
@@ -34,15 +20,15 @@ test_result test_memory_stdlib_alloc(void) {
         assert(r_data[i] == 0);
     }
 
-    m_data = passgen_realloc(&mem, m_data, 1024);
+    m_data = passgen_realloc(NULL, m_data, 1024);
     assert(m_data);
     memset(m_data, 0, 1024);
 
-    r_data = passgen_realloc(&mem, r_data, 1024);
+    r_data = passgen_realloc(NULL, r_data, 1024);
     assert(r_data);
     memset(r_data, 0, 1024);
 
-    c_data = passgen_realloc(&mem, c_data, 1024);
+    c_data = passgen_realloc(NULL, c_data, 1024);
     assert(c_data);
     memset(c_data, 0, 1024);
 
@@ -52,16 +38,15 @@ test_result test_memory_stdlib_alloc(void) {
         assert(r_data[i] == 0);
     }
 
-    passgen_free(&mem, m_data);
-    passgen_free(&mem, c_data);
-    passgen_free(&mem, r_data);
+    passgen_free(NULL, m_data);
+    passgen_free(NULL, c_data);
+    passgen_free(NULL, r_data);
 
     return test_ok;
 }
 
 test_result test_memory_limited(void) {
-    passgen_mem_t std_mem = passgen_mem_stdlib();
-    passgen_mem_limits_t limits = passgen_mem_limits(&std_mem, 32, 8);
+    passgen_mem_limits_t limits = passgen_mem_limits(NULL, 32, 8);
     passgen_mem_t mem = passgen_mem_limited(&limits);
 
     assert(mem.malloc != NULL);
@@ -74,8 +59,7 @@ test_result test_memory_limited(void) {
 }
 
 test_result test_memory_limited_malloc(void) {
-    passgen_mem_t std_mem = passgen_mem_stdlib();
-    passgen_mem_limits_t limits = passgen_mem_limits(&std_mem, 32, 0);
+    passgen_mem_limits_t limits = passgen_mem_limits(NULL, 32, 0);
     passgen_mem_t mem = passgen_mem_limited(&limits);
     void *data1, *data2, *data3;
 
@@ -88,7 +72,7 @@ test_result test_memory_limited_malloc(void) {
 
     passgen_free(&mem, data1);
 
-    limits = passgen_mem_limits(&std_mem, 0, 2);
+    limits = passgen_mem_limits(NULL, 0, 2);
 
     data1 = passgen_malloc(&mem, 32);
     assert(data1);

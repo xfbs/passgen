@@ -33,7 +33,6 @@ void *passgen_calloc(struct passgen_mem *mem, size_t count, size_t size);
 void *passgen_realloc(struct passgen_mem *mem, void *ptr, size_t size);
 void passgen_free(struct passgen_mem *mem, void *ptr);
 
-passgen_mem_t passgen_mem_stdlib(void);
 passgen_mem_t passgen_mem_limited(passgen_mem_limits_t *limits);
 
 passgen_mem_limits_t passgen_mem_limits(passgen_mem_t *mem, size_t size, size_t allocs);
