@@ -22,6 +22,8 @@ struct pattern_token {
   struct pattern_substring data;
 };
 
+typedef struct pattern_token pattern_token_t;
+
 /// Parse the next token, without advancing the unicode reader.
 struct pattern_token pattern_token_peek(const struct unicode_iter *iter);
 

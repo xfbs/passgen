@@ -9,7 +9,7 @@ test_result test_pattern_parse() {
   pattern_result_t result;
   const char *str = "abc";
 
-  result = pattern_parse(&pattern, str);
+  result = pattern_parse(&pattern, str, NULL);
   assert(result.ok);
   assert(pattern.pattern == str);
   /*

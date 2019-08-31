@@ -2,28 +2,37 @@
 #include <assert.h>
 #include <stdbool.h>
 
-bool pattern_group_is_separator(struct pattern_token token);
-bool pattern_group_is_start(struct pattern_token token);
-bool pattern_group_is_end(struct pattern_token token);
+bool pattern_group_is_separator(pattern_token_t token);
+bool pattern_group_is_start(pattern_token_t token);
+bool pattern_group_is_end(pattern_token_t token);
 
-bool pattern_range_is_start(struct pattern_token token);
-bool pattern_range_is_end(struct pattern_token token);
+bool pattern_range_is_start(pattern_token_t token);
+bool pattern_range_is_end(pattern_token_t token);
 
-pattern_result_t pattern_group_parse_inner(struct pattern_group *group, struct unicode_iter *iter);
-pattern_result_t pattern_group_parse(struct pattern_group *group, struct unicode_iter *iter);
+pattern_result_t pattern_group_parse_inner(pattern_group_t *group, unicode_iter_t *iter, passgen_mem_t *mem);
+pattern_result_t pattern_group_parse(pattern_group_t *group, unicode_iter_t *iter, passgen_mem_t *mem);
 
-pattern_result_t pattern_range_parse_inner(struct pattern_range *range, struct unicode_iter *iter);
-pattern_result_t pattern_range_parse(struct pattern_range *range, struct unicode_iter *iter);
-pattern_result_t pattern_range_item_parse(struct pattern_range_item *item, struct unicode_iter *iter);
+pattern_result_t pattern_range_parse_inner(pattern_range_t *range, unicode_iter_t *iter, passgen_mem_t *mem);
+pattern_result_t pattern_range_parse(pattern_range_t *range, unicode_iter_t *iter, passgen_mem_t *mem);
+pattern_result_t pattern_range_item_parse(pattern_range_item_t *item, unicode_iter_t *iter, passgen_mem_t *mem);
 
-pattern_result_t pattern_segment_parse(struct pattern_segment *segment, struct unicode_iter *iter);
-pattern_result_t pattern_segment_item_parse(struct pattern_segment_item *item, struct unicode_iter *iter);
+pattern_result_t pattern_segment_parse(pattern_segment_t *segment, unicode_iter_t *iter, passgen_mem_t *mem);
+pattern_result_t pattern_segment_item_parse(pattern_segment_item_t *item, unicode_iter_t *iter, passgen_mem_t *mem);
 
 static const pattern_result_t result_ok = {
     .ok = true,
 };
 
-pattern_result_t pattern_error_illegal(struct unicode_iter *iter) {
+pattern_result_t pattern_error_illegal(unicode_iter_t *iter) {
+    return (pattern_result_t) {
+        .ok = false,
+        .kind = PATTERN_ERROR_ILLEGAL,
+        .pos.offset = iter->pos,
+        .pos.length = 1,
+    };
+}
+
+pattern_result_t pattern_error_alloc(unicode_iter_t *iter) {
     return (pattern_result_t) {
         .ok = false,
         .kind = PATTERN_ERROR_ILLEGAL,
@@ -35,23 +44,7 @@ pattern_result_t pattern_error_illegal(struct unicode_iter *iter) {
 void pattern_free(pattern_t *pattern) {
 }
 
-/// Initialise an empty array.
-#define array_init(name) \
-    name##_size.avail = 10; \
-    name##_size.count = 0; \
-    name = malloc(10 * sizeof(*name)); \
-    assert(name)
-
-/// Make enough space in the array to hold another item.
-#define array_space(name) \
-    (void) name
-
-#define array_next(name) \
-    &name[name##_size.count]
-
-#define array_push(name) \
-    name##_size.count++
-
+/*
 pattern_result_t pattern_segment_parse(struct pattern_segment *segment, struct unicode_iter *iter) {
     return result_ok;
 }
@@ -59,7 +52,7 @@ pattern_result_t pattern_segment_parse(struct pattern_segment *segment, struct u
 pattern_result_t pattern_segment_item_parse(struct pattern_segment_item *item, struct unicode_iter *iter) {
     pattern_result_t result;
 
-    struct pattern_token token = pattern_token_peek(iter);
+    pattern_token_t token = pattern_token_peek(iter);
 
     if(pattern_group_is_start(token)) {
         item->kind = PATTERN_GROUP;
@@ -80,12 +73,15 @@ pattern_result_t pattern_range_parse_inner(struct pattern_range *range, struct u
 pattern_result_t pattern_range_parse(struct pattern_range *range, struct unicode_iter *iter) {
     return result_ok;
 }
+*/
 
 /// Parse the content of a group.
 pattern_result_t pattern_group_parse_inner(
-        struct pattern_group *group,
-        struct unicode_iter *iter)
+        pattern_group_t *group,
+        unicode_iter_t *iter,
+        passgen_mem_t *mem)
 {
+    /*
     // save the current position.
     group->pos.offset = iter->pos;
     group->pos.length = 0;
@@ -117,20 +113,22 @@ pattern_result_t pattern_group_parse_inner(
     group->pos.length = iter->pos - group->pos.offset;
 
     // TODO: check for unicode error?
+    */
 
     return result_ok;
 }
 
-pattern_result_t pattern_group_parse(struct pattern_group *group, struct unicode_iter *iter) {
+pattern_result_t pattern_group_parse(pattern_group_t *group, unicode_iter_t *iter, passgen_mem_t *mem) {
     return result_ok;
 }
 
-pattern_result_t pattern_parse(pattern_t *pattern, const char *data) {
+pattern_result_t pattern_parse(pattern_t *pattern, const char *data, passgen_mem_t *mem) {
+    pattern->mem = mem;
     pattern->pattern = data;
 
     // parse segments and make sure everything went okay.
-    struct unicode_iter iter = unicode_iter(data);
-    pattern_result_t result = pattern_group_parse_inner(&pattern->group, &iter);
+    unicode_iter_t iter = unicode_iter(data);
+    pattern_result_t result = pattern_group_parse_inner(&pattern->group, &iter, mem);
     if(!result.ok) {
         return result;
     }
@@ -140,7 +138,7 @@ pattern_result_t pattern_parse(pattern_t *pattern, const char *data) {
     pattern->group.repeat.max = 1;
 
     // make sure we really have reached EOF.
-    struct pattern_token token = pattern_token_peek(&iter);
+    pattern_token_t token = pattern_token_peek(&iter);
     if(token.type != PATTERN_TOKEN_EOF) {
         return pattern_error_illegal(&iter);
     }
@@ -168,7 +166,7 @@ size_t pattern_choices(pattern_t *pattern) {
     return 0;
 }
 
-bool pattern_group_is_separator(struct pattern_token token) {
+bool pattern_group_is_separator(pattern_token_t token) {
     if(token.type == PATTERN_TOKEN_REGULAR && token.codepoint == '|') {
         return true;
     }
@@ -176,7 +174,7 @@ bool pattern_group_is_separator(struct pattern_token token) {
     return false;
 }
 
-bool pattern_group_is_start(struct pattern_token token) {
+bool pattern_group_is_start(pattern_token_t token) {
     if(token.type == PATTERN_TOKEN_REGULAR && token.codepoint == '(') {
         return true;
     }
@@ -184,7 +182,7 @@ bool pattern_group_is_start(struct pattern_token token) {
     return false;
 }
 
-bool pattern_range_is_start(struct pattern_token token) {
+bool pattern_range_is_start(pattern_token_t token) {
     if(token.type == PATTERN_TOKEN_REGULAR && token.codepoint == '[') {
         return true;
     }
@@ -192,7 +190,7 @@ bool pattern_range_is_start(struct pattern_token token) {
     return false;
 }
 
-bool pattern_range_is_end(struct pattern_token token) {
+bool pattern_range_is_end(pattern_token_t token) {
     if(token.type == PATTERN_TOKEN_REGULAR && token.codepoint == ']') {
         return true;
     }

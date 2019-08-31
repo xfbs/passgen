@@ -301,3 +301,11 @@ Add two memory managers:
 
 - static memory (preallocated buckets)
 - checked memory (keep track of allocations, make sure everything is freed).
+
+### Capturing groups
+
+Does it make sense to support something like
+
+    (abc|def)\1\1
+
+Probably not, but might be fun to implement anyways.
