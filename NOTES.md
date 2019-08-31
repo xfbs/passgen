@@ -294,3 +294,10 @@ The project should be available from some package managers.
 - add a launchpad project for it
 - add it to the AUR
 - add it to homebrew
+
+### Memory
+
+Add two memory managers:
+
+- static memory (preallocated buckets)
+- checked memory (keep track of allocations, make sure everything is freed).
