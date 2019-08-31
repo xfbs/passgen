@@ -9,6 +9,8 @@
 #include "random.h"
 #include "unicode.h"
 #include "token.h"
+#include "memory.h"
+#include "array.h"
 
 enum pattern_kind {
   PATTERN_RANGE,
@@ -17,14 +19,14 @@ enum pattern_kind {
   PATTERN_GROUP,
 };
 
+struct pattern;
+struct pattern_segment;
+struct pattern_segment_item;
 struct pattern_char;
 struct pattern_special;
 struct pattern_group;
 struct pattern_range;
 struct pattern_range_item;
-struct pattern_segment;
-struct pattern_segment_item;
-struct pattern;
 
 /// Represents how many times a pattern must be repeated.
 struct pattern_repeat {
