@@ -95,6 +95,7 @@ benchmark('parse', bench_parse)
 generate_all = find_program('tests/generate.rb')
 test_files = [
   'tests/random.c',
+  'tests/memory.c',
   'tests/reader.c',
   'tests/pattern.c',
   'tests/unicode.c']
