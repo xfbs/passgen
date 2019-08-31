@@ -1,4 +1,5 @@
 #include "passgen/array.h"
+#include "passgen/memory.h"
 #include <assert.h>
 
 #define BINS_INITIAL 4

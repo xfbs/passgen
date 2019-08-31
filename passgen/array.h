@@ -1,5 +1,8 @@
 #pragma once
-#include "passgen/memory.h"
+#include <stddef.h>
+
+struct passgen_mem;
+typedef struct passgen_mem passgen_mem_t;
 
 struct passgen_array {
     void **data;
