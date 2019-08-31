@@ -1,6 +1,12 @@
+/// @file array.h
+///
+/// Defines an array with cheap insertion. Array elements may not be larger
+/// than 1024 bytes. All elements must have the same size.
+
 #pragma once
 #include <stddef.h>
 
+// forward declaration, to remove dependency.
 struct passgen_mem;
 typedef struct passgen_mem passgen_mem_t;
 
