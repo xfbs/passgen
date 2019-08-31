@@ -2,12 +2,12 @@
 #include <assert.h>
 #include <stdbool.h>
 
-bool pattern_group_is_separator(pattern_token_t token);
-bool pattern_group_is_start(pattern_token_t token);
-bool pattern_group_is_end(pattern_token_t token);
+bool pattern_group_is_separator(passgen_token_t token);
+bool pattern_group_is_start(passgen_token_t token);
+bool pattern_group_is_end(passgen_token_t token);
 
-bool pattern_range_is_start(pattern_token_t token);
-bool pattern_range_is_end(pattern_token_t token);
+bool pattern_range_is_start(passgen_token_t token);
+bool pattern_range_is_end(passgen_token_t token);
 
 pattern_result_t pattern_group_parse_inner(pattern_group_t *group, unicode_iter_t *iter, passgen_mem_t *mem);
 pattern_result_t pattern_group_parse(pattern_group_t *group, unicode_iter_t *iter, passgen_mem_t *mem);
@@ -52,7 +52,7 @@ pattern_result_t pattern_segment_parse(struct pattern_segment *segment, struct u
 pattern_result_t pattern_segment_item_parse(struct pattern_segment_item *item, struct unicode_iter *iter) {
     pattern_result_t result;
 
-    pattern_token_t token = pattern_token_peek(iter);
+    passgen_token_t token = passgen_token_peek(iter);
 
     if(pattern_group_is_start(token)) {
         item->kind = PATTERN_GROUP;
@@ -89,12 +89,12 @@ pattern_result_t pattern_group_parse_inner(
     array_init(group->segments);
     bool first = true;
 
-    while(first || pattern_group_is_separator(pattern_token_peek(iter))) {
+    while(first || pattern_group_is_separator(passgen_token_peek(iter))) {
         array_space(group->segments);
 
         // skip separator.
         if(!first) {
-            pattern_token_next(iter);
+            passgen_token_next(iter);
         }
 
         pattern_result_t result = pattern_segment_parse(array_next(group->segments), iter);
@@ -138,7 +138,7 @@ pattern_result_t pattern_parse(pattern_t *pattern, const char *data, passgen_mem
     pattern->group.repeat.max = 1;
 
     // make sure we really have reached EOF.
-    pattern_token_t token = pattern_token_peek(&iter);
+    passgen_token_t token = passgen_token_peek(&iter);
     if(token.type != PATTERN_TOKEN_EOF) {
         return pattern_error_illegal(&iter);
     }
@@ -166,7 +166,7 @@ size_t pattern_choices(pattern_t *pattern) {
     return 0;
 }
 
-bool pattern_group_is_separator(pattern_token_t token) {
+bool pattern_group_is_separator(passgen_token_t token) {
     if(token.type == PATTERN_TOKEN_REGULAR && token.codepoint == '|') {
         return true;
     }
@@ -174,7 +174,7 @@ bool pattern_group_is_separator(pattern_token_t token) {
     return false;
 }
 
-bool pattern_group_is_start(pattern_token_t token) {
+bool pattern_group_is_start(passgen_token_t token) {
     if(token.type == PATTERN_TOKEN_REGULAR && token.codepoint == '(') {
         return true;
     }
@@ -182,7 +182,7 @@ bool pattern_group_is_start(pattern_token_t token) {
     return false;
 }
 
-bool pattern_range_is_start(pattern_token_t token) {
+bool pattern_range_is_start(passgen_token_t token) {
     if(token.type == PATTERN_TOKEN_REGULAR && token.codepoint == '[') {
         return true;
     }
@@ -190,7 +190,7 @@ bool pattern_range_is_start(pattern_token_t token) {
     return false;
 }
 
-bool pattern_range_is_end(pattern_token_t token) {
+bool pattern_range_is_end(passgen_token_t token) {
     if(token.type == PATTERN_TOKEN_REGULAR && token.codepoint == ']') {
         return true;
     }

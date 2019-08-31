@@ -28,6 +28,11 @@ struct pattern_group;
 struct pattern_range;
 struct pattern_range_item;
 
+struct pattern_substring {
+  size_t offset;
+  size_t length;
+};
+
 /// Represents how many times a pattern must be repeated.
 struct pattern_repeat {
   size_t min;
