@@ -55,6 +55,7 @@ libpassgen = library(
   'src/unicode.c',
   'src/token.c',
   'src/memory.c',
+  'src/array.c',
   version_src,
   install: true,
   dependencies: deps)
@@ -98,7 +99,9 @@ test_files = [
   'tests/memory.c',
   'tests/reader.c',
   'tests/pattern.c',
-  'tests/unicode.c']
+  'tests/unicode.c',
+  'tests/array.c',
+]
 all_tests = custom_target(
   'all.c',
   input: test_files,
