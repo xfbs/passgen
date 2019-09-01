@@ -51,6 +51,23 @@ passgen_token_t passgen_token_error_unicode_hex(
   };
 }
 
+passgen_token_t passgen_token_error_unicode_char(
+        size_t start,
+        size_t end,
+        size_t data_start,
+        size_t data_end)
+{
+  return (passgen_token_t) {
+    .ok = false,
+    .type = PASSGEN_TOKEN_ERROR_UNICODE_CHAR,
+    .pos.offset = start,
+    .pos.length = end - start,
+    .data.offset = data_start,
+    .data.length = data_end - data_start,
+    .error = data_start,
+  };
+}
+
 passgen_token_t passgen_token_error_rbrace(size_t start, size_t pos, size_t end) {
   return (passgen_token_t) {
     .ok = false,
@@ -158,6 +175,10 @@ passgen_token_t passgen_token_parse_unicode(size_t start, unicode_iter_t *iter) 
 
     if(result.codepoint != '}') {
         return passgen_token_error_rbrace(start, pos, iter->pos);
+    }
+
+    if(!utf8proc_codepoint_valid(codepoint)) {
+        return passgen_token_error_unicode_hex(start, iter->pos, data_start, data_end);
     }
 
     return passgen_token_unicode(start, iter->pos, data_start, data_end, codepoint);

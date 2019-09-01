@@ -115,8 +115,6 @@ test_result test_passgen_token_types(void) {
     iter = unicode_iter(unichars);
 
     token = passgen_token_next(&iter);
-
-    // check typ
     assert(!passgen_token_is_error(&token));
     assert(passgen_token_is_normal(&token));
     assert(passgen_token_is_unicode(&token));
@@ -126,6 +124,28 @@ test_result test_passgen_token_types(void) {
     assert(token.codepoint == 0xFC);
     assert(token.pos.offset == 0);
     assert(token.pos.length == 6);
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_error(&token));
+    assert(passgen_token_is_normal(&token));
+    assert(passgen_token_is_unicode(&token));
+    assert(!passgen_token_is_regular(&token));
+    assert(!passgen_token_is_eof(&token));
+    assert(token.type == PATTERN_TOKEN_UNICODE);
+    assert(token.codepoint == 0xB5);
+    assert(token.pos.offset == 6);
+    assert(token.pos.length == 6);
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_error(&token));
+    assert(passgen_token_is_normal(&token));
+    assert(passgen_token_is_unicode(&token));
+    assert(!passgen_token_is_regular(&token));
+    assert(!passgen_token_is_eof(&token));
+    assert(token.type == PATTERN_TOKEN_UNICODE);
+    assert(token.codepoint == 0x3F4);
+    assert(token.pos.offset == 12);
+    assert(token.pos.length == 7);
 
     return test_ok;
 }
