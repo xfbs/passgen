@@ -13,10 +13,10 @@
 #include "array.h"
 
 enum pattern_kind {
-  PATTERN_RANGE,
-  PATTERN_CHAR,
-  PATTERN_SPECIAL,
-  PATTERN_GROUP,
+    PATTERN_RANGE,
+    PATTERN_CHAR,
+    PATTERN_SPECIAL,
+    PATTERN_GROUP,
 };
 
 struct pattern;
@@ -29,14 +29,14 @@ struct pattern_ranges;
 struct pattern_range;
 
 struct pattern_substring {
-  size_t offset;
-  size_t length;
+    size_t offset;
+    size_t length;
 };
 
 /// Represents how many times a pattern must be repeated.
 struct pattern_repeat {
-  size_t min;
-  size_t max;
+    size_t min;
+    size_t max;
 };
 
 /// Represents a sequence that is copied verbatim.
