@@ -149,3 +149,153 @@ test_result test_passgen_token_types(void) {
 
     return test_ok;
 }
+
+test_result test_passgen_token_errors(void) {
+    struct unicode_iter iter;
+    passgen_token_t token;
+
+    // test EOF
+    iter = unicode_iter(" ");
+
+    token = passgen_token_next(&iter);
+    assert(passgen_token_is_regular(&token));
+    assert(token.codepoint == ' ');
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_normal(&token));
+    assert(!passgen_token_is_error(&token));
+    assert(passgen_token_is_eof(&token));
+    assert(token.type == PATTERN_TOKEN_EOF);
+    assert(token.pos.offset == 1);
+    assert(token.pos.length == 0);
+
+    // illegal escape
+    iter = unicode_iter(" \\m");
+
+    token = passgen_token_next(&iter);
+    assert(passgen_token_is_regular(&token));
+    assert(token.codepoint == ' ');
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_normal(&token));
+    assert(passgen_token_is_error(&token));
+    assert(!passgen_token_is_eof(&token));
+    assert(token.type == PASSGEN_TOKEN_ERROR_ESCAPE);
+    assert(token.pos.offset == 1);
+    assert(token.pos.length == 2);
+    assert(token.error == 2);
+
+    // lbrace
+    iter = unicode_iter(" \\u[x]");
+
+    token = passgen_token_next(&iter);
+    assert(passgen_token_is_regular(&token));
+    assert(token.codepoint == ' ');
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_normal(&token));
+    assert(passgen_token_is_error(&token));
+    assert(!passgen_token_is_eof(&token));
+    assert(token.type == PASSGEN_TOKEN_ERROR_LBRACE);
+    assert(token.pos.offset == 1);
+    assert(token.pos.length == 3);
+    assert(token.error == 3);
+
+    // hex
+    iter = unicode_iter(" \\u{axb}");
+
+    token = passgen_token_next(&iter);
+    assert(passgen_token_is_regular(&token));
+    assert(token.codepoint == ' ');
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_normal(&token));
+    assert(passgen_token_is_error(&token));
+    assert(!passgen_token_is_eof(&token));
+    assert(token.type == PASSGEN_TOKEN_ERROR_UNICODE_HEX);
+    assert(token.pos.offset == 1);
+    assert(token.pos.length == 5);
+    assert(token.error == 5);
+
+    // char out of range
+    iter = unicode_iter(" \\u{110000}");
+
+    token = passgen_token_next(&iter);
+    assert(passgen_token_is_regular(&token));
+    assert(token.codepoint == ' ');
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_normal(&token));
+    assert(passgen_token_is_error(&token));
+    assert(!passgen_token_is_eof(&token));
+    assert(token.type == PASSGEN_TOKEN_ERROR_UNICODE_CHAR);
+    assert(token.pos.offset == 1);
+    assert(token.pos.length == 10);
+    assert(token.error == 4);
+
+    // char out of range
+    iter = unicode_iter(" \\u{d8f3}");
+
+    token = passgen_token_next(&iter);
+    assert(passgen_token_is_regular(&token));
+    assert(token.codepoint == ' ');
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_normal(&token));
+    assert(passgen_token_is_error(&token));
+    assert(!passgen_token_is_eof(&token));
+    assert(token.type == PASSGEN_TOKEN_ERROR_UNICODE_CHAR);
+    assert(token.pos.offset == 1);
+    assert(token.pos.length == 8);
+    assert(token.error == 4);
+
+    // hex too long
+    iter = unicode_iter(" \\u{000000f6}");
+
+    token = passgen_token_next(&iter);
+    assert(passgen_token_is_regular(&token));
+    assert(token.codepoint == ' ');
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_normal(&token));
+    assert(passgen_token_is_error(&token));
+    assert(!passgen_token_is_eof(&token));
+    assert(token.type == PASSGEN_TOKEN_ERROR_UNICODE_CHAR);
+    assert(token.pos.offset == 1);
+    assert(token.pos.length == 10);
+    assert(token.error == 4);
+
+    // hex too long
+    iter = unicode_iter(" \xc3\x28");
+
+    token = passgen_token_next(&iter);
+    assert(passgen_token_is_regular(&token));
+    assert(token.codepoint == ' ');
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_normal(&token));
+    assert(passgen_token_is_error(&token));
+    assert(!passgen_token_is_eof(&token));
+    assert(token.type >= PASSGEN_TOKEN_ERROR_UTF8);
+    assert(token.pos.offset == 1);
+    assert(token.pos.length == 0);
+    assert(token.error == 1);
+
+    // hex too long
+    iter = unicode_iter(" \\\xc3\x28");
+
+    token = passgen_token_next(&iter);
+    assert(passgen_token_is_regular(&token));
+    assert(token.codepoint == ' ');
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_normal(&token));
+    assert(passgen_token_is_error(&token));
+    assert(!passgen_token_is_eof(&token));
+    assert(token.type >= PASSGEN_TOKEN_ERROR_UTF8);
+    assert(token.pos.offset == 1);
+    assert(token.pos.length == 1);
+    assert(token.error == 2);
+
+    return test_ok;
+}
