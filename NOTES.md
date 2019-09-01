@@ -310,6 +310,10 @@ Does it make sense to support something like
 
 Probably not, but might be fun to implement anyways.
 
-### Token
+### [done] Token
 
 Add positions to token.
+
+### Limit recursion depth
+
+This might be useful to prevent stack overflows.

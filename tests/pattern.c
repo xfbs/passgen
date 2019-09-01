@@ -5,15 +5,16 @@
 #include "tests/tests.h"
 
 test_result test_pattern_parse() {
-  pattern_t pattern;
-  pattern_result_t result;
-  const char *str = "abc";
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
 
-  result = pattern_parse(&pattern, str, NULL);
-  assert(pattern.mem == NULL);
-  assert(pattern.group.pos.offset == NULL);
-  assert(result.ok);
-  assert(pattern.pattern == str);
+    str = "abc";
+    result = pattern_parse(&pattern, str, NULL);
+    assert(pattern.mem == NULL);
+    assert(pattern.group.pos.offset == 0);
+    assert(result.ok);
+    assert(pattern.pattern == str);
   /*
   const char *s = "abc|def";
   pattern_t *pattern = pattern_parse(&s);
