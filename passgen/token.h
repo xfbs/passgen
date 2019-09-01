@@ -16,16 +16,18 @@ enum passgen_token_type {
     PASSGEN_TOKEN_ERROR_ESCAPE,
     PASSGEN_TOKEN_ERROR_LBRACE,
     PASSGEN_TOKEN_ERROR_RBRACE,
-    PASSGEN_TOKEN_ERROR_UNICODE,
+    PASSGEN_TOKEN_ERROR_UNICODE_HEX,
+    PASSGEN_TOKEN_ERROR_UNICODE_CHAR,
     PASSGEN_TOKEN_ERROR_UTF8 = (1 << 10),
 };
 
 struct passgen_token {
     bool ok;
-    struct passgen_substring pos;
     enum passgen_token_type type;
-    int32_t codepoint;
+    struct passgen_substring pos;
     struct passgen_substring data;
+    size_t error;
+    int32_t codepoint;
 };
 
 typedef struct passgen_token passgen_token_t;
