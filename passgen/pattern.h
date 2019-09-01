@@ -25,8 +25,8 @@ struct pattern_segment;
 struct pattern_char;
 struct pattern_special;
 struct pattern_group;
+struct pattern_ranges;
 struct pattern_range;
-struct pattern_range_item;
 
 struct pattern_substring {
   size_t offset;
@@ -47,7 +47,7 @@ struct pattern_char {
 };
 
 /// Range of possible characters.
-struct pattern_range_item {
+struct pattern_range {
     struct pattern_substring pos;
 
     int32_t start;
@@ -57,7 +57,7 @@ struct pattern_range_item {
 };
 
 /// Range. Represents something like `[a-z012]{3}`.
-struct pattern_range {
+struct pattern_ranges {
     struct pattern_substring pos;
 
     // array of range_items
@@ -100,7 +100,7 @@ struct pattern_segment {
     enum pattern_kind kind;
 
     union {
-        struct pattern_range range;
+        struct pattern_ranges range;
         struct pattern_group group;
         struct pattern_char character;
         struct pattern_special special;
@@ -133,8 +133,8 @@ typedef struct pattern_segment pattern_segment_t;
 typedef struct pattern_char pattern_char_t;
 typedef struct pattern_special pattern_special_t;
 typedef struct pattern_group pattern_group_t;
+typedef struct pattern_ranges pattern_ranges_t;
 typedef struct pattern_range pattern_range_t;
-typedef struct pattern_range_item pattern_range_item_t;
 
 void pattern_free(pattern_t *pattern);
 
