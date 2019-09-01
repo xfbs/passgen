@@ -73,7 +73,7 @@ struct pattern_segments {
     // array of segment_items
     passgen_array_t items;
 
-    struct pattern_repeat repeat;
+    //struct pattern_repeat repeat;
 };
 
 /// Group. Represents something like `abc[d0]|[def]g|(h|i)j`.
