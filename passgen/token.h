@@ -3,8 +3,8 @@
 
 /// Represents a valid substring of a string.
 struct passgen_substring {
-  size_t offset;
-  size_t length;
+    size_t offset;
+    size_t length;
 };
 
 enum passgen_token_type {
@@ -43,5 +43,3 @@ bool passgen_token_is_escaped(passgen_token_t *token);
 bool passgen_token_is_unicode(passgen_token_t *token);
 bool passgen_token_is_eof(passgen_token_t *token);
 bool passgen_token_is_error(passgen_token_t *token);
-bool passgen_token_is_result(passgen_token_t *token);
-

@@ -267,6 +267,3 @@ bool passgen_token_is_regular(passgen_token_t *token) {
 bool passgen_token_is_escaped(passgen_token_t *token) {
     return token->type == PATTERN_TOKEN_ESCAPED;
 }
-
-bool passgen_token_is_result(passgen_token_t *token) {
-}
