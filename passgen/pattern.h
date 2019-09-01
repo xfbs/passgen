@@ -20,8 +20,8 @@ enum pattern_kind {
 };
 
 struct pattern;
+struct pattern_segments;
 struct pattern_segment;
-struct pattern_segment_item;
 struct pattern_char;
 struct pattern_special;
 struct pattern_group;
@@ -67,7 +67,7 @@ struct pattern_range {
 };
 
 /// Segment. Represents something like `abc[def](g|h)`
-struct pattern_segment {
+struct pattern_segments {
     struct pattern_substring pos;
 
     // array of segment_items
@@ -96,7 +96,7 @@ struct pattern_special {
 };
 
 /// Pattern segment: single segment (range, group or sequence).
-struct pattern_segment_item {
+struct pattern_segment {
     enum pattern_kind kind;
 
     union {
@@ -128,8 +128,8 @@ struct pattern_result {
 
 typedef struct pattern pattern_t;
 typedef struct pattern_result pattern_result_t;
+typedef struct pattern_segments pattern_segments_t;
 typedef struct pattern_segment pattern_segment_t;
-typedef struct pattern_segment_item pattern_segment_item_t;
 typedef struct pattern_char pattern_char_t;
 typedef struct pattern_special pattern_special_t;
 typedef struct pattern_group pattern_group_t;

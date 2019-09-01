@@ -9,7 +9,7 @@ bool pattern_group_is_end(passgen_token_t token);
 bool pattern_range_is_start(passgen_token_t token);
 bool pattern_range_is_end(passgen_token_t token);
 
-bool pattern_segment_is_end(passgen_token_t token);
+bool pattern_segments_is_end(passgen_token_t token);
 
 pattern_result_t pattern_group_parse_inner(pattern_group_t *group, unicode_iter_t *iter, passgen_mem_t *mem);
 pattern_result_t pattern_group_parse(pattern_group_t *group, unicode_iter_t *iter, passgen_mem_t *mem);
@@ -18,8 +18,8 @@ pattern_result_t pattern_range_parse_inner(pattern_range_t *range, unicode_iter_
 pattern_result_t pattern_range_parse(pattern_range_t *range, unicode_iter_t *iter, passgen_mem_t *mem);
 pattern_result_t pattern_range_item_parse(pattern_range_item_t *item, unicode_iter_t *iter, passgen_mem_t *mem);
 
-pattern_result_t pattern_segment_parse(pattern_segment_t *segment, unicode_iter_t *iter, passgen_mem_t *mem);
-pattern_result_t pattern_segment_item_parse(pattern_segment_item_t *item, unicode_iter_t *iter, passgen_mem_t *mem);
+pattern_result_t pattern_segments_parse(pattern_segments_t *segment, unicode_iter_t *iter, passgen_mem_t *mem);
+pattern_result_t pattern_segment_parse(pattern_segment_t *item, unicode_iter_t *iter, passgen_mem_t *mem);
 
 pattern_result_t pattern_char_parse(
         pattern_char_t *character,
@@ -51,8 +51,8 @@ pattern_result_t pattern_error_alloc(unicode_iter_t *iter) {
 void pattern_free(pattern_t *pattern) {
 }
 
-pattern_result_t pattern_segment_parse(
-        pattern_segment_t *segment,
+pattern_result_t pattern_segments_parse(
+        pattern_segments_t *segment,
         unicode_iter_t *iter,
         passgen_mem_t *mem)
 {
@@ -63,16 +63,16 @@ pattern_result_t pattern_segment_parse(
     segment->items = passgen_array_init();
     bool first = true;
 
-    while(!pattern_segment_is_end(passgen_token_peek(iter))) {
-        pattern_segment_item_t *item = passgen_array_push(
+    while(!pattern_segments_is_end(passgen_token_peek(iter))) {
+        pattern_segment_t *item = passgen_array_push(
                 &segment->items,
-                sizeof(pattern_segment_item_t),
+                sizeof(pattern_segment_t),
                 mem);
         if(!item) {
             return pattern_error_alloc(iter);
         }
 
-        pattern_result_t result = pattern_segment_item_parse(item, iter, mem);
+        pattern_result_t result = pattern_segment_parse(item, iter, mem);
         if(!result.ok) {
             return result;
         }
@@ -93,8 +93,8 @@ pattern_result_t pattern_group_parse(
     return result_ok;
 }
 
-pattern_result_t pattern_segment_item_parse(
-        pattern_segment_item_t *item,
+pattern_result_t pattern_segment_parse(
+        pattern_segment_t *item,
         unicode_iter_t *iter,
         passgen_mem_t *mem)
 {
@@ -164,15 +164,15 @@ pattern_result_t pattern_group_parse_inner(
             passgen_token_next(iter);
         }
 
-        pattern_segment_t *segment = passgen_array_push(
+        pattern_segments_t *segment = passgen_array_push(
                 &group->segments,
-                sizeof(pattern_segment_t),
+                sizeof(pattern_segments_t),
                 mem);
         if(!segment) {
             return pattern_error_alloc(iter);
         }
 
-        pattern_result_t result = pattern_segment_parse(segment, iter, mem);
+        pattern_result_t result = pattern_segments_parse(segment, iter, mem);
         if(!result.ok) {
             return result;
         }
@@ -261,7 +261,7 @@ bool pattern_range_is_end(passgen_token_t token) {
     return false;
 }
 
-bool pattern_segment_is_end(passgen_token_t token) {
+bool pattern_segments_is_end(passgen_token_t token) {
     if(token.type == PATTERN_TOKEN_REGULAR) {
         switch(token.codepoint) {
             case ']':
@@ -439,11 +439,11 @@ char pattern_range_random(pattern_range_t *range, random_t *rand) {
   return '\0';
 }
 
-pattern_segment_t *pattern_segment_parse(const char **string) {
+pattern_segments_t *pattern_segments_parse(const char **string) {
   if(is_end(**string) || is_sep(**string) || is_illegal(**string)) {
     // TODO: empty segment.
     pattern_reps_t reps = { .min = 0, .max = 0 };
-    return pattern_segment_new(PATTERN_CHAR, (void *)*string, reps, NULL);
+    return pattern_segments_new(PATTERN_CHAR, (void *)*string, reps, NULL);
   }
 
   // parse the kind and data.
@@ -477,17 +477,17 @@ pattern_segment_t *pattern_segment_parse(const char **string) {
   pattern_reps_t reps = { .min = 1, .max = 1 };
   if(**string == '{') {
     *string += 1;
-    reps = pattern_segment_parse_reps(string);
+    reps = pattern_segments_parse_reps(string);
     if(**string != '}') goto fail;
     *string += 1;
   }
 
   // don't recurse if we're at the end.
   if(is_end(**string) || is_sep(**string) || is_illegal(**string)) {
-    return pattern_segment_new(kind, data, reps, NULL);
+    return pattern_segments_new(kind, data, reps, NULL);
   }
 
-  return pattern_segment_new(kind, data, reps, pattern_segment_parse(string));
+  return pattern_segments_new(kind, data, reps, pattern_segments_parse(string));
 fail:
   if(data) {
     switch(kind) {
@@ -505,12 +505,12 @@ fail:
   return NULL;
 }
 
-pattern_segment_t *pattern_segment_new(
+pattern_segments_t *pattern_segments_new(
     pattern_kind kind,
     void *data,
     pattern_reps_t reps,
-    pattern_segment_t *next) {
-  pattern_segment_t *pattern = malloc(sizeof(pattern_segment_t));
+    pattern_segments_t *next) {
+  pattern_segments_t *pattern = malloc(sizeof(pattern_segments_t));
   assert(pattern);
 
   pattern->kind = kind;
@@ -521,7 +521,7 @@ pattern_segment_t *pattern_segment_new(
   return pattern;
 }
 
-void pattern_segment_free(pattern_segment_t *pattern) {
+void pattern_segments_free(pattern_segments_t *pattern) {
   if(!pattern) return;
 
   switch(pattern->kind) {
@@ -535,7 +535,7 @@ void pattern_segment_free(pattern_segment_t *pattern) {
   }
 
   if(pattern->next) {
-    pattern_segment_free(pattern->next);
+    pattern_segments_free(pattern->next);
   }
 
   free(pattern);
@@ -553,7 +553,7 @@ size_t parse_size(const char **string) {
   return out;
 }
 
-pattern_reps_t pattern_segment_parse_reps(const char **string) {
+pattern_reps_t pattern_segments_parse_reps(const char **string) {
   pattern_reps_t reps = { .min = 0, .max = 0 };
 
   reps.min = parse_size(string);
@@ -569,7 +569,7 @@ pattern_reps_t pattern_segment_parse_reps(const char **string) {
   return reps;
 }
 
-size_t pattern_segment_maxlen(pattern_segment_t *pattern) {
+size_t pattern_segments_maxlen(pattern_segments_t *pattern) {
   size_t len = 0;
 
   switch(pattern->kind) {
@@ -585,12 +585,12 @@ size_t pattern_segment_maxlen(pattern_segment_t *pattern) {
   if(!pattern->next) {
     return len;
   } else {
-    return len + pattern_segment_maxlen(pattern->next);
+    return len + pattern_segments_maxlen(pattern->next);
   }
 }
 
-size_t pattern_segment_random_fill(
-    pattern_segment_t *segment,
+size_t pattern_segments_random_fill(
+    pattern_segments_t *segment,
     random_t *rand,
     char *str,
     size_t len) {
@@ -627,14 +627,14 @@ size_t pattern_segment_random_fill(
   return written;
 }
 
-char *pattern_segment_random(pattern_segment_t *pattern, random_t *rand) {
+char *pattern_segments_random(pattern_segments_t *pattern, random_t *rand) {
   // create buffer that is big enough.
-  size_t len = pattern_segment_maxlen(pattern);
+  size_t len = pattern_segments_maxlen(pattern);
   char *buffer = malloc(len + 1);
   assert(buffer);
 
   // write.
-  size_t written = pattern_segment_random_fill(pattern, rand, buffer, len);
+  size_t written = pattern_segments_random_fill(pattern, rand, buffer, len);
 
   // null-terminate.
   buffer[written] = '\0';
@@ -642,7 +642,7 @@ char *pattern_segment_random(pattern_segment_t *pattern, random_t *rand) {
   return buffer;
 }
 
-pattern_t *pattern_new(pattern_segment_t *segment, pattern_t *next) {
+pattern_t *pattern_new(pattern_segments_t *segment, pattern_t *next) {
   pattern_t *pattern = malloc(sizeof(pattern_t));
   assert(pattern);
   pattern->item = segment;
@@ -656,7 +656,7 @@ void pattern_free(pattern_t *pattern) {
   pattern_t *next;
 
   while(pattern) {
-    pattern_segment_free(pattern->item);
+    pattern_segments_free(pattern->item);
     next = pattern->next;
     free(pattern);
     pattern = next;
@@ -664,12 +664,12 @@ void pattern_free(pattern_t *pattern) {
 }
 
 pattern_t *pattern_parse(const char **string) {
-  pattern_t *pattern = pattern_new(pattern_segment_parse(string), NULL);
+  pattern_t *pattern = pattern_new(pattern_segments_parse(string), NULL);
 
   pattern_t *rest = pattern;
   while(!is_illegal(**string) && !is_end(**string)) {
     *string += 1;
-    rest->next = pattern_new(pattern_segment_parse(string), NULL);
+    rest->next = pattern_new(pattern_segments_parse(string), NULL);
     rest = rest->next;
   }
 
@@ -681,14 +681,14 @@ size_t pattern_maxlen(pattern_t *pattern) {
 
   // return the largest segment's maxlen.
   while(pattern) {
-    size_t maxlen_cur = pattern_segment_maxlen(pattern->item);
+    size_t maxlen_cur = pattern_segments_maxlen(pattern->item);
     if(maxlen_cur > maxlen) maxlen = maxlen_cur;
   }
 
   return maxlen;
 }
 
-size_t pattern_segment_count(pattern_t *pattern) {
+size_t pattern_segments_count(pattern_t *pattern) {
   size_t count = 0;
 
   while(pattern) {
@@ -705,7 +705,7 @@ size_t pattern_random_fill(
     char *buffer,
     size_t len) {
   // choose a segment
-  size_t segments = pattern_segment_count(pattern);
+  size_t segments = pattern_segments_count(pattern);
   size_t choice = random_uint64_max(rand, segments);
 
   // find segment
@@ -714,12 +714,12 @@ size_t pattern_random_fill(
     choice -= 1;
   }
 
-  return pattern_segment_random_fill(pattern->item, rand, buffer, len);
+  return pattern_segments_random_fill(pattern->item, rand, buffer, len);
 }
 
 char *pattern_random(pattern_t *pattern, random_t *rand) {
   // choose a segment
-  size_t segments = pattern_segment_count(pattern);
+  size_t segments = pattern_segments_count(pattern);
   size_t choice = random_uint64_max(rand, segments);
 
   // find segment
@@ -728,14 +728,14 @@ char *pattern_random(pattern_t *pattern, random_t *rand) {
     choice -= 1;
   }
 
-  return pattern_segment_random(pattern->item, rand);
+  return pattern_segments_random(pattern->item, rand);
 }
 
 size_t pattern_choices(pattern_t *pattern) {
   size_t choices = 0;
 
   while(pattern) {
-    choices += pattern_segment_choices(pattern->item);
+    choices += pattern_segments_choices(pattern->item);
     pattern = pattern->next;
   }
 
@@ -753,7 +753,7 @@ size_t pattern_range_choices(pattern_range_t *range) {
   return choices;
 }
 
-size_t pattern_segment_choices(pattern_segment_t *segment) {
+size_t pattern_segments_choices(pattern_segments_t *segment) {
   size_t choices = 0;
 
   while(segment) {
