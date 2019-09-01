@@ -13,6 +13,7 @@ enum passgen_token_type {
     PATTERN_TOKEN_SPECIAL,
     PATTERN_TOKEN_UNICODE,
     PATTERN_TOKEN_ESCAPED,
+    PASSGEN_TOKEN_ERROR,
     PASSGEN_TOKEN_ERROR_ESCAPE,
     PASSGEN_TOKEN_ERROR_LBRACE,
     PASSGEN_TOKEN_ERROR_RBRACE,
@@ -22,7 +23,6 @@ enum passgen_token_type {
 };
 
 struct passgen_token {
-    bool ok;
     enum passgen_token_type type;
     struct passgen_substring pos;
     struct passgen_substring data;
