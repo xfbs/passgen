@@ -12,7 +12,7 @@ test_result test_pattern_parse() {
     pattern_segment_t *segment;
 
     str = "abc";
-    result = pattern_parse(&pattern, str, NULL);
+    result = pattern_parse(&pattern, str, 0, NULL);
     assert(result.ok);
     assert(pattern.mem == NULL);
     assert(pattern.pattern == str);
@@ -44,7 +44,7 @@ test_result test_pattern_parse() {
     assert(segment->data.character.codepoint == 'c');
 
     str = "abc|def";
-    result = pattern_parse(&pattern, str, NULL);
+    result = pattern_parse(&pattern, str, 0, NULL);
     assert(result.ok);
     assert(pattern.pattern == str);
     assert(pattern.mem == NULL);
@@ -125,6 +125,72 @@ test_result test_pattern_parse() {
   */
 
   return test_ok;
+}
+
+test_result test_pattern_escapable() {
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
+
+    str = "\\[\\]\\(\\)\\{\\}\\|";
+    result = pattern_parse(&pattern, str, 0, NULL);
+    assert(result.ok);
+    assert(pattern.mem == NULL);
+    assert(pattern.pattern == str);
+    assert(pattern.group.pos.offset == 0);
+    assert(pattern.group.pos.length == 14);
+    assert(pattern.group.segments.len == 1);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->pos.offset == 0);
+    assert(segments->pos.length == 14);
+    assert(segments->items.len == 7);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 0);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == '[');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 1);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 2);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == ']');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 2);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 4);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == '(');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 3);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 6);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == ')');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 4);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 8);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == '{');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 5);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 10);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == '}');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 6);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 12);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == '|');
+
+    return test_ok;
 }
 
 test_result test_pattern_segment_random() {

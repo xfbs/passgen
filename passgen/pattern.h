@@ -117,11 +117,12 @@ struct pattern {
 enum pattern_error {
     PATTERN_ERROR_ALLOC,
     PATTERN_ERROR_ILLEGAL,
+    PATTERN_ERROR_DEPTH,
 };
 
 struct pattern_result {
     bool ok;
-    bool consistent;
+    bool remove;
     struct pattern_substring pos;
     enum pattern_error kind;
 };
@@ -136,9 +137,16 @@ typedef struct pattern_group pattern_group_t;
 typedef struct pattern_ranges pattern_ranges_t;
 typedef struct pattern_range pattern_range_t;
 
+typedef struct pattern_repeat pattern_repeat_t;
+
 void pattern_free(pattern_t *pattern);
 
-pattern_result_t pattern_parse(pattern_t *out, const char *data, passgen_mem_t *mem);
+pattern_result_t
+pattern_parse(
+        pattern_t *out,
+        const char *data,
+        size_t depth,
+        passgen_mem_t *mem);
 
 size_t pattern_maxlen(pattern_t *pattern);
 size_t pattern_minlen(pattern_t *pattern);

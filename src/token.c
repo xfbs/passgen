@@ -102,6 +102,19 @@ passgen_token_regular(size_t start, size_t end, int32_t codepoint) {
 }
 
 static inline passgen_token_t
+passgen_token_escaped(
+        size_t start,
+        size_t end,
+        int32_t codepoint) {
+  return (passgen_token_t) {
+    .type = PATTERN_TOKEN_ESCAPED,
+    .codepoint = codepoint,
+    .pos.offset = start,
+    .pos.length = end - start,
+  };
+}
+
+static inline passgen_token_t
 passgen_token_simple(
         size_t start,
         size_t end,
@@ -225,6 +238,9 @@ const static struct special_chars special_chars[] = {
 
 static const size_t special_chars_size = sizeof(special_chars);
 
+static const char escapable_chars[] = {'(', ')', '[', ']', '{', '}', '|'};
+static const size_t escapable_chars_len = sizeof(escapable_chars);
+
 passgen_token_t passgen_token_next_complex(size_t start, unicode_iter_t *iter) {
     size_t pos = iter->pos;
     unicode_iter_result_t result;
@@ -233,6 +249,13 @@ passgen_token_t passgen_token_next_complex(size_t start, unicode_iter_t *iter) {
     result = unicode_iter_next(iter);
     if(!result.ok) {
         return passgen_token_error_utf8(start, pos, iter->pos, result.error);
+    }
+
+    // check for regular escaped chars.
+    for(size_t i = 0; i < escapable_chars_len; i++) {
+        if(result.codepoint == escapable_chars[i]) {
+            return passgen_token_escaped(start, iter->pos, escapable_chars[i]);
+        }
     }
 
     for(size_t i = 0; i < special_chars_size; ++i) {

@@ -166,6 +166,17 @@ test_result test_passgen_token_types(void) {
     assert(token.data.offset == 22);
     assert(token.data.length == 1);
 
+    unichars = "\\(\\)\\[\\]\\{\\}\\|";
+    for(iter = unicode_iter(unichars); iter.pos < 14;) {
+        token = passgen_token_next(&iter);
+        assert(!passgen_token_is_error(&token));
+        assert(passgen_token_is_escaped(&token));
+        assert(!passgen_token_is_eof(&token));
+        assert(token.codepoint == unichars[iter.pos - 1]);
+        assert(token.pos.offset == (iter.pos - 2));
+        assert(token.pos.length == 2);
+    }
+
     return test_ok;
 }
 
