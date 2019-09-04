@@ -102,9 +102,13 @@ passgen_token_regular(size_t start, size_t end, int32_t codepoint) {
 }
 
 static inline passgen_token_t
-passgen_token_escaped(size_t start, size_t end, int32_t codepoint) {
+passgen_token_simple(
+        size_t start,
+        size_t end,
+        int32_t codepoint,
+        enum passgen_token_type type) {
   return (passgen_token_t) {
-    .type = PATTERN_TOKEN_ESCAPED,
+    .type = type,
     .codepoint = codepoint,
     .pos.offset = start,
     .pos.length = end - start,
@@ -199,23 +203,24 @@ passgen_token_t passgen_token_wordlist(size_t start, unicode_iter_t *iter) {
 typedef passgen_token_t passgen_token_special(size_t start, unicode_iter_t *iter);
 
 struct special_chars {
-  int32_t chr;
-  int32_t dest;
-  passgen_token_special *parser;
+    int32_t chr;
+    int32_t codepoint;
+    enum passgen_token_type type;
+    passgen_token_special *parser;
 };
 
-static struct special_chars special_chars[] = {
-  {'a', '\a', NULL}, /// alert
-  {'b', '\b', NULL}, /// no idea
-  {'e', '\033', NULL}, /// escape
-  {'f', '\f', NULL}, /// no idea
-  {'n', '\n', NULL}, /// newline
-  {'r', '\r', NULL}, /// carriage return
-  {'t', '\t', NULL}, /// tab
-  {'v', '\v', NULL}, /// vertical tab
-  {'\\', '\\', NULL}, /// backspace
-  {'u', 0, passgen_token_parse_unicode},
-  {'w', 0, passgen_token_wordlist},
+const static struct special_chars special_chars[] = {
+    {'a', '\a', PATTERN_TOKEN_ESCAPED, NULL},
+    {'b', '\b', PATTERN_TOKEN_ESCAPED, NULL},
+    {'e', '\033', PATTERN_TOKEN_ESCAPED, NULL},
+    {'f', '\f', PATTERN_TOKEN_ESCAPED, NULL},
+    {'n', '\n', PATTERN_TOKEN_ESCAPED, NULL},
+    {'r', '\r', PATTERN_TOKEN_ESCAPED, NULL},
+    {'t', '\t', PATTERN_TOKEN_ESCAPED, NULL},
+    {'v', '\v', PATTERN_TOKEN_ESCAPED, NULL},
+    {'\\', '\\', PATTERN_TOKEN_ESCAPED, NULL},
+    {'w', 'w', PATTERN_TOKEN_SPECIAL, NULL},
+    {'u', 0, 0, passgen_token_parse_unicode},
 };
 
 static const size_t special_chars_size = sizeof(special_chars);
@@ -235,7 +240,11 @@ passgen_token_t passgen_token_next_complex(size_t start, unicode_iter_t *iter) {
             if(special_chars[i].parser) {
                 return special_chars[i].parser(start, iter);
             } else {
-                return passgen_token_escaped(start, iter->pos, special_chars[i].dest);
+                return passgen_token_simple(
+                        start,
+                        iter->pos,
+                        special_chars[i].codepoint,
+                        special_chars[i].type);
             }
         }
     }
