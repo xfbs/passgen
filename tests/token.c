@@ -111,7 +111,7 @@ test_result test_passgen_token_types(void) {
     assert(!passgen_token_is_error(&token));
     assert(passgen_token_is_eof(&token));
 
-    const char *unichars = "\\u{FC}\\u{B5}\\u{3f4}";
+    const char *unichars = "\\u{FC}\\u{B5}\\u{3f4}\\u{0}";
     iter = unicode_iter(unichars);
 
     token = passgen_token_next(&iter);
@@ -124,6 +124,8 @@ test_result test_passgen_token_types(void) {
     assert(token.codepoint == 0xFC);
     assert(token.pos.offset == 0);
     assert(token.pos.length == 6);
+    assert(token.data.offset == 3);
+    assert(token.data.length == 2);
 
     token = passgen_token_next(&iter);
     assert(!passgen_token_is_error(&token));
@@ -135,6 +137,8 @@ test_result test_passgen_token_types(void) {
     assert(token.codepoint == 0xB5);
     assert(token.pos.offset == 6);
     assert(token.pos.length == 6);
+    assert(token.data.offset == 9);
+    assert(token.data.length == 2);
 
     token = passgen_token_next(&iter);
     assert(!passgen_token_is_error(&token));
@@ -146,6 +150,21 @@ test_result test_passgen_token_types(void) {
     assert(token.codepoint == 0x3F4);
     assert(token.pos.offset == 12);
     assert(token.pos.length == 7);
+    assert(token.data.offset == 15);
+    assert(token.data.length == 3);
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_error(&token));
+    assert(passgen_token_is_normal(&token));
+    assert(passgen_token_is_unicode(&token));
+    assert(!passgen_token_is_regular(&token));
+    assert(!passgen_token_is_eof(&token));
+    assert(token.type == PATTERN_TOKEN_UNICODE);
+    assert(token.codepoint == 0);
+    assert(token.pos.offset == 19);
+    assert(token.pos.length == 5);
+    assert(token.data.offset == 22);
+    assert(token.data.length == 1);
 
     return test_ok;
 }
@@ -296,6 +315,24 @@ test_result test_passgen_token_errors(void) {
     assert(token.pos.offset == 1);
     assert(token.pos.length == 1);
     assert(token.error == 2);
+
+    // no data
+    iter = unicode_iter(" \\u{}");
+
+    token = passgen_token_next(&iter);
+    assert(passgen_token_is_regular(&token));
+    assert(token.codepoint == ' ');
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_normal(&token));
+    assert(passgen_token_is_error(&token));
+    assert(!passgen_token_is_eof(&token));
+    assert(token.type == PASSGEN_TOKEN_ERROR_UNICODE_EMPTY);
+    assert(token.pos.offset == 1);
+    assert(token.pos.length == 4);
+    assert(token.data.offset == 4);
+    assert(token.data.length == 0);
+    assert(token.error == 4);
 
     return test_ok;
 }

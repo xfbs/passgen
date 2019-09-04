@@ -1,7 +1,9 @@
 #include "passgen/token.h"
 #include <stdlib.h>
+#include <utf8proc.h>
 
-passgen_token_t passgen_token_error_utf8(size_t start, size_t pos, size_t end, ssize_t error) {
+static inline passgen_token_t
+passgen_token_error_utf8(size_t start, size_t pos, size_t end, ssize_t error) {
   return (passgen_token_t) {
     .type = PASSGEN_TOKEN_ERROR_UTF8 + llabs(error),
     .pos.offset = start,
@@ -10,7 +12,8 @@ passgen_token_t passgen_token_error_utf8(size_t start, size_t pos, size_t end, s
   };
 }
 
-passgen_token_t passgen_token_error_escape(size_t start, size_t pos, size_t end) {
+static inline passgen_token_t
+passgen_token_error_escape(size_t start, size_t pos, size_t end) {
   return (passgen_token_t) {
     .type = PASSGEN_TOKEN_ERROR_ESCAPE,
     .pos.offset = start,
@@ -19,7 +22,8 @@ passgen_token_t passgen_token_error_escape(size_t start, size_t pos, size_t end)
   };
 }
 
-passgen_token_t passgen_token_error_lbrace(size_t start, size_t pos, size_t end) {
+static inline passgen_token_t
+passgen_token_error_lbrace(size_t start, size_t pos, size_t end) {
   return (passgen_token_t) {
     .type = PASSGEN_TOKEN_ERROR_LBRACE,
     .pos.offset = start,
@@ -28,7 +32,8 @@ passgen_token_t passgen_token_error_lbrace(size_t start, size_t pos, size_t end)
   };
 }
 
-passgen_token_t passgen_token_error_unicode_hex(
+static inline passgen_token_t
+passgen_token_error_unicode_hex(
         size_t start,
         size_t data_start,
         size_t error,
@@ -44,7 +49,24 @@ passgen_token_t passgen_token_error_unicode_hex(
   };
 }
 
-passgen_token_t passgen_token_error_unicode_char(
+static inline passgen_token_t
+passgen_token_error_unicode_empty(
+        size_t start,
+        size_t end,
+        size_t data_start)
+{
+  return (passgen_token_t) {
+    .type = PASSGEN_TOKEN_ERROR_UNICODE_EMPTY,
+    .pos.offset = start,
+    .pos.length = end - start,
+    .data.offset = data_start,
+    .data.length = 0,
+    .error = data_start,
+  };
+}
+
+static inline passgen_token_t
+passgen_token_error_unicode_char(
         size_t start,
         size_t end,
         size_t data_start,
@@ -60,7 +82,8 @@ passgen_token_t passgen_token_error_unicode_char(
   };
 }
 
-passgen_token_t passgen_token_eof(size_t start) {
+static inline passgen_token_t
+passgen_token_eof(size_t start) {
   return (passgen_token_t) {
     .type = PATTERN_TOKEN_EOF,
     .pos.offset = start,
@@ -68,7 +91,8 @@ passgen_token_t passgen_token_eof(size_t start) {
   };
 }
 
-passgen_token_t passgen_token_regular(size_t start, size_t end, int32_t codepoint) {
+static inline passgen_token_t
+passgen_token_regular(size_t start, size_t end, int32_t codepoint) {
   return (passgen_token_t) {
     .type = PATTERN_TOKEN_REGULAR,
     .codepoint = codepoint,
@@ -77,7 +101,8 @@ passgen_token_t passgen_token_regular(size_t start, size_t end, int32_t codepoin
   };
 }
 
-passgen_token_t passgen_token_escaped(size_t start, size_t end, int32_t codepoint) {
+static inline passgen_token_t
+passgen_token_escaped(size_t start, size_t end, int32_t codepoint) {
   return (passgen_token_t) {
     .type = PATTERN_TOKEN_ESCAPED,
     .codepoint = codepoint,
@@ -86,7 +111,8 @@ passgen_token_t passgen_token_escaped(size_t start, size_t end, int32_t codepoin
   };
 }
 
-passgen_token_t passgen_token_unicode(
+static inline passgen_token_t
+passgen_token_unicode(
         size_t start,
         size_t end,
         size_t data_start,
@@ -125,7 +151,6 @@ passgen_token_t passgen_token_parse_unicode(size_t start, unicode_iter_t *iter) 
 
     size_t data_start = iter->pos;
     size_t data_len_codepoints = 0;
-    size_t data_end = 0;
     pos = iter->pos;
     result = unicode_iter_next(iter);
     while(result.ok && result.codepoint != '}') {
@@ -134,7 +159,7 @@ passgen_token_t passgen_token_parse_unicode(size_t start, unicode_iter_t *iter) 
 
         if(6 < data_len_codepoints) {
             // hex is too long. unicode is valid from 0 to 10FFFF, afaik.
-            return passgen_token_error_unicode_char(start, iter->pos, data_start, data_end);
+            return passgen_token_error_unicode_char(start, iter->pos, data_start, pos);
         }
 
         if('0' <= result.codepoint && result.codepoint <= '9') {
@@ -147,7 +172,6 @@ passgen_token_t passgen_token_parse_unicode(size_t start, unicode_iter_t *iter) 
             return passgen_token_error_unicode_hex(start, data_start, pos, iter->pos);
         }
 
-        data_end = pos;
         pos = iter->pos;
         result = unicode_iter_next(iter);
     }
@@ -157,11 +181,15 @@ passgen_token_t passgen_token_parse_unicode(size_t start, unicode_iter_t *iter) 
         return passgen_token_error_utf8(start, pos, iter->pos, result.error);
     }
 
-    if(utf8proc_codepoint_valid(codepoint) != 1) {
-        return passgen_token_error_unicode_char(start, iter->pos, data_start, data_end);
+    if(data_len_codepoints == 0) {
+        return passgen_token_error_unicode_empty(start, iter->pos, data_start);
     }
 
-    return passgen_token_unicode(start, iter->pos, data_start, data_end, codepoint);
+    if(utf8proc_codepoint_valid(codepoint) != 1) {
+        return passgen_token_error_unicode_char(start, iter->pos, data_start, pos);
+    }
+
+    return passgen_token_unicode(start, iter->pos, data_start, pos, codepoint);
 }
 
 passgen_token_t passgen_token_wordlist(size_t start, unicode_iter_t *iter) {
