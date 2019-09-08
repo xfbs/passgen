@@ -2,6 +2,12 @@
 #include <assert.h>
 #include <stdbool.h>
 
+#define accept_regular(chr, error_kind, start) \
+    token = pattern_token_peek(iter); \
+    if(!passgen_token_regular(&token)) { \
+        return pattern_token_error(start, iter->pos, error_kind); \
+    }
+
 bool pattern_group_is_separator(passgen_token_t token);
 bool pattern_group_is_start(passgen_token_t token);
 bool pattern_group_is_end(passgen_token_t token);
@@ -66,6 +72,11 @@ pattern_char_parse(
         pattern_char_t *character,
         unicode_iter_t *iter,
         passgen_mem_t *mem);
+
+static inline pattern_result_t
+passgen_parse_number(
+        size_t *number,
+        unicode_iter_t *iter);
 
 static const pattern_result_t result_ok = {
     .ok = true,
@@ -375,24 +386,92 @@ pattern_parse_repeat(
         pattern_repeat_t *repeat,
         unicode_iter_t *iter)
 {
+    unicode_iter_t prev = *iter;
     pattern_result_t result = result_ok;
 
-    passgen_token_t token = passgen_token_peek(iter);
+    passgen_token_t token = passgen_token_next(iter);
 
     // don't do anything if this isn't a start token.
-    if(!passgen_repeat_is_start(token)) {
+    if(!pattern_repeat_is_start(token)) {
+        *iter = prev;
         repeat->min = 1;
         repeat->max = 1;
         return result;
     }
 
-    // skip this opening token
-    passgen_token_next(iter);
+    // parse min
+    result = passgen_parse_number(&repeat->min, iter);
+    if(!result.ok) {
+        return result;
+    }
 
-    // parse number
+    token = passgen_token_next(iter);
 
+    if(pattern_repeat_is_sep(token)) {
+        // parse max
+        result = passgen_parse_number(&repeat->max, iter);
+        if(!result.ok) {
+            return result;
+        }
+    } else {
+        repeat->max = repeat->min;
+    }
+
+    // check if comma or end brace is next
+    token = passgen_token_next(iter);
+
+    if(!pattern_repeat_is_end(token)) {
+        // error
+    }
+
+    if(repeat->min > repeat->max) {
+        // error
+    }
 
     return result;
+}
+
+static inline pattern_result_t
+passgen_parse_number(
+        size_t *number,
+        unicode_iter_t *iter)
+{
+    unicode_iter_t prev = *iter;
+    passgen_token_t token;
+    size_t num = 0;
+    size_t len = 0;
+
+    token = passgen_token_next(iter);
+    while(true) {
+        if(!passgen_token_is_regular(&token)) {
+            break;
+        }
+
+        if('0' <= token.codepoint && token.codepoint <= '9') {
+            num *= 10;
+            num += token.codepoint - '0';
+        } else {
+            break;
+        }
+
+        len += 1;
+        token = passgen_token_next(iter);
+    }
+
+    if(len == 0) {
+        // error
+    }
+
+    if(passgen_token_is_error(&token)) {
+        // error
+    }
+
+    // that last thing we aren't interested in.
+    *iter = prev;
+
+    // store result
+    *number = num;
+    return result_ok;
 }
 
 /*

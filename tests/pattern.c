@@ -98,33 +98,7 @@ test_result test_pattern_parse() {
     assert(segment->data.character.pos.length == 1);
     assert(segment->data.character.codepoint == 'f');
 
-  /*
-  s = "a";
-  pattern = pattern_parse(&s);
-  assert(pattern);
-  assert(!pattern->next);
-  assert(pattern->item);
-  assert(pattern->item->kind == PATTERN_CHAR);
-  assert(pattern->item->data.chr[0] == 'a');
-  assert(!pattern->item->next);
-  pattern_free(pattern);
-
-  s = "";
-  pattern = pattern_parse(&s);
-  assert(pattern);
-  assert(!pattern->next);
-  assert(pattern->item);
-  pattern_free(pattern);
-
-  s = ")";
-  pattern = pattern_parse(&s);
-  assert(pattern);
-  assert(!pattern->next);
-  assert(pattern->item);
-  pattern_free(pattern);
-  */
-
-  return test_ok;
+    return test_ok;
 }
 
 test_result test_pattern_escapable() {
@@ -193,7 +167,7 @@ test_result test_pattern_escapable() {
     return test_ok;
 }
 
-test_result test_pattern_segment_random() {
+test_result xxx_pattern_segment_random() {
   /*
   const char *s = "a\\({2}[ab]{10,12}";
   pattern_segment_t *pattern = pattern_segment_parse(&s);
@@ -224,7 +198,7 @@ test_result test_pattern_segment_random() {
   return test_ok;
 }
 
-test_result test_pattern_segment_maxlen() {
+test_result xxx_pattern_segment_maxlen() {
   /*
   const char *s = "a\\({2}b{11,12}";
   pattern_segment_t *pattern = pattern_segment_parse(&s);
@@ -240,7 +214,7 @@ test_result test_pattern_segment_maxlen() {
   return test_ok;
 }
 
-test_result test_pattern_segment_parse_chars() {
+test_result xxx_pattern_segment_parse_chars() {
   /*
   const char *s;
   const char *p;
@@ -353,7 +327,7 @@ test_result test_pattern_segment_parse_chars() {
   return test_ok;
 }
 
-test_result test_pattern_segment_parse_range() {
+test_result xxx_pattern_segment_parse_range() {
   /*
   const char *s;
   const char *p;
@@ -377,7 +351,7 @@ test_result test_pattern_segment_parse_range() {
   return test_ok;
 }
 
-test_result test_pattern_segment_parse_err() {
+test_result xxx_pattern_segment_parse_err() {
   /*
   const char *s;
   const char *p;
@@ -395,7 +369,7 @@ test_result test_pattern_segment_parse_err() {
   return test_ok;
 }
 
-test_result test_pattern_segment_parse_group() {
+test_result xxx_pattern_segment_parse_group() {
   /*
   const char *s;
   const char *p;
@@ -435,7 +409,7 @@ test_result test_pattern_segment_parse_group() {
   return test_ok;
 }
 
-test_result test_pattern_segment_parse_reps() {
+test_result xxx_pattern_segment_parse_reps() {
   /*
   const char *s = "{123,234}";
   const char *p = &s[1];
@@ -455,7 +429,7 @@ test_result test_pattern_segment_parse_reps() {
   return test_ok;
 }
 
-test_result test_pattern_range_random() {
+test_result xxx_pattern_range_random() {
   /*
   random_t *rand = random_new();
   const char *s;
@@ -475,7 +449,7 @@ test_result test_pattern_range_random() {
   return test_ok;
 }
 
-test_result test_pattern_range_range() {
+test_result xxx_pattern_range_range() {
   /*
   const char *s = "[a-z]";
   const char *p = &s[1];
@@ -491,7 +465,7 @@ test_result test_pattern_range_range() {
   return test_ok;
 }
 
-test_result test_pattern_range_char() {
+test_result xxx_pattern_range_char() {
   /*
   const char *s = "[a]";
   const char *p = &s[1];
@@ -507,7 +481,7 @@ test_result test_pattern_range_char() {
   return test_ok;
 }
 
-test_result test_pattern_range_escaped() {
+test_result xxx_pattern_range_escaped() {
   /*
   const char *s = "\\t\\n";
   const char *p = s;
@@ -580,7 +554,7 @@ test_result test_pattern_range_escaped() {
   return test_ok;
 }
 
-test_result test_pattern_range_combined() {
+test_result xxx_pattern_range_combined() {
   /*
   const char *s = "[a-z0-9%#]";
   const char *p = &s[1];
@@ -605,7 +579,7 @@ test_result test_pattern_range_combined() {
   return test_ok;
 }
 
-test_result test_pattern_range_err() {
+test_result xxx_pattern_range_err() {
   /*
   const char *s = "]";
   const char *p = s;
@@ -628,7 +602,7 @@ test_result test_pattern_range_err() {
   return test_ok;
 }
 
-test_result test_pattern_range_choices() {
+test_result xxx_pattern_range_choices() {
   /*
   // single char.
   pattern_range_t *range = pattern_range_new('a', 'a', NULL);
@@ -666,7 +640,7 @@ test_result test_pattern_range_choices() {
   return test_ok;
 }
 
-test_result test_pattern_segment_choices() {
+test_result xxx_pattern_segment_choices() {
   /*
   pattern_segment_t *segment;
   pattern_range_t *range;
@@ -718,7 +692,7 @@ test_result test_pattern_segment_choices() {
   return test_ok;
 }
 
-test_result test_pattern_error() {
+test_result xxx_pattern_error() {
   /*
   pattern_error_t error;
 
