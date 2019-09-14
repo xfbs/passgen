@@ -66,7 +66,7 @@ debug-memory: build/debug-memory
 	ninja -C $<
 
 build/release:
-	meson --prefix=$(PREFIX) $@
+	meson --prefix=$(PREFIX) $@ -Db_ndebug=true
 
 build/debug:
 	meson $@ --buildtype=debug
