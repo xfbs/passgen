@@ -317,3 +317,16 @@ Add positions to token.
 ### Limit recursion depth
 
 This might be useful to prevent stack overflows.
+
+### CLI Testing
+
+Write some bash scripts in the shape of
+
+    passgen "[a-c]{3}" | grep -E "[a-c]{3}"
+
+Etc. To make sure everything works.
+Also maybe think of using passgen itself to generate regex patterns to test for?
+
+### Callback-based generating
+
+Have a facility to generate passes via callbacks (w/ some `void *data` and a single unicode char).

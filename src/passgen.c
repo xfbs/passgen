@@ -168,6 +168,12 @@ void passgen_usage(const char *executable) {
 
 void passgen_show_version(void) {
   fprintf(stderr, "passgen, version %s\n", passgen_version_str());
+
+  if(passgen_is_debug()) {
+      fprintf(stderr, "debug build\n");
+  } else {
+      fprintf(stderr, "release build\n");
+  }
 }
 
 void passgen_bail(passgen_error error, void *data) {

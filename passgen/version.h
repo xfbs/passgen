@@ -16,3 +16,6 @@ const char *passgen_version_str();
 
 /// Test if the version of passgen is at least as big as the one passed.
 bool passgen_version_min(passgen_version_t version);
+
+/// Checks if this is a debug build.
+bool passgen_is_debug(void);

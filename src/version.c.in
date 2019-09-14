@@ -15,3 +15,11 @@ const char *passgen_version_str() {
 bool passgen_version_min(passgen_version_t version) {
   return false;
 }
+
+bool passgen_is_debug(void) {
+#ifdef NDEBUG
+    return false;
+#else
+    return true;
+#endif
+}
