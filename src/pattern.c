@@ -128,7 +128,7 @@ pattern_result_t pattern_segments_parse(
     segment->pos.offset = iter->pos;
     segment->pos.length = 0;
 
-    segment->items = passgen_array_init();
+    segment->items = passgen_array_init(sizeof(pattern_segment_t), mem);
     bool first = true;
 
     while(!pattern_segments_is_end(passgen_token_peek(iter))) {
@@ -230,7 +230,7 @@ pattern_result_t pattern_group_parse_inner(
     group->pos.offset = iter->pos;
     group->pos.length = 0;
 
-    group->segments = passgen_array_init();
+    group->segments = passgen_array_init(sizeof(pattern_segments_t), mem);
     bool first = true;
 
     while(first || pattern_group_is_separator(passgen_token_peek(iter))) {

@@ -142,6 +142,11 @@ There is a Makefile target for creating a debian package, but it is currently br
 
 It doesn't seem to parse `(a|b)[dfg912]` right?
 
+There are assertions sprinkled over the code. These will not be included in
+release builds. Usually no need to test for NULL pointers, these types of
+errors are evident from crashes in tests. Use these to test for wrong runtime
+calls.
+
 ## Todo
 
 ### Unicode Support
@@ -330,3 +335,21 @@ Also maybe think of using passgen itself to generate regex patterns to test for?
 ### Callback-based generating
 
 Have a facility to generate passes via callbacks (w/ some `void *data` and a single unicode char).
+
+### Randomness distribution testing
+
+Check that the distribution is uniform, and take this out of the regular tests
+
+### Randomness by callback
+
+Allow randomness to be derived from a callback?
+
+### Memory Alloc testing
+
+Use a custom memory allocator that failes at a predetermined or random time
+and make sure error states are returned properly and memory is correctly
+released.
+
+### Memory release testing
+
+Make sure there is no memory leaks or anything.
