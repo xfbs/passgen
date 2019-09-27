@@ -56,6 +56,7 @@ libpassgen = library(
   'src/token.c',
   'src/memory.c',
   'src/array.c',
+  'src/assert.c',
   version_src,
   install: true,
   dependencies: deps)
