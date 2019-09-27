@@ -6,6 +6,7 @@ NINJA        = ninja
 DOXYGEN      = doxygen
 DESTDIR		 = /
 PREFIX		 = /usr
+LATEX		 = lualatex
 
 default: release
 
@@ -31,8 +32,14 @@ deb: release
 	cd build/release && dpkg-deb --build $(DEBNAME)
 
 # generate documentations using doxygen.
-docs:
+docs: docs/html docs/passgen.pdf
+
+docs/html:
 	$(DOXYGEN) Doxyfile
+
+docs/passgen.pdf: docs/passgen.tex
+	$(LATEX) -output-directory docs $<
+	$(LATEX) -output-directory docs $<
 
 # build and run tests.
 test: debug
