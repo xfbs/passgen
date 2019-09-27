@@ -78,6 +78,6 @@ build/debug-memory:
 	meson $@ --buildtype=debug -Db_sanitize=memory
 
 clean:
-	$(RM) -r build docs
+	$(RM) -r build docs/html
 
 .PHONY: format release debug install clean docs
