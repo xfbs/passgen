@@ -4,6 +4,7 @@
 /// than 1024 bytes. All elements must have the same size.
 
 #pragma once
+#include "passgen/debug.h"
 #include <stddef.h>
 
 // forward declaration, to remove dependency.
