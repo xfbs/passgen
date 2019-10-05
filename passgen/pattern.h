@@ -127,6 +127,9 @@ struct pattern_result {
     enum pattern_error kind;
 };
 
+struct pattern_env {
+};
+
 typedef struct pattern pattern_t;
 typedef struct pattern_result pattern_result_t;
 typedef struct pattern_segments pattern_segments_t;
@@ -136,8 +139,11 @@ typedef struct pattern_special pattern_special_t;
 typedef struct pattern_group pattern_group_t;
 typedef struct pattern_ranges pattern_ranges_t;
 typedef struct pattern_range pattern_range_t;
+typedef struct pattern_env pattern_env_t;
 
 typedef struct pattern_repeat pattern_repeat_t;
+
+typedef int pattern_random_cb(void *data, int32_t codepoint);
 
 void pattern_free(pattern_t *pattern);
 
@@ -154,7 +160,15 @@ size_t pattern_minlen(pattern_t *pattern);
 size_t pattern_random_fill(
     pattern_t *pattern,
     random_t *rand,
+    pattern_env_t *env,
     char *buffer,
     size_t len);
+
+int pattern_random(
+    pattern_t *pattern,
+    random_t *rand,
+    pattern_env_t *env,
+    void *data,
+    pattern_random_cb *func);
 
 size_t pattern_choices(pattern_t *pattern);

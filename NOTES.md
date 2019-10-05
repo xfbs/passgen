@@ -353,3 +353,10 @@ released.
 ### Memory release testing
 
 Make sure there is no memory leaks or anything.
+
+### Generate pronounceable words
+
+Use something like `\p` as a special character to generate pronounceable words,
+using the algorithm found at [wolfram](https://www.wolfram.com/language/gallery/generate-random-pronounceable-words/).
+
+Maybe add `\P` for uppercase or mixed-case or something?

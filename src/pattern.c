@@ -413,15 +413,6 @@ size_t pattern_minlen(pattern_t *pattern) {
     return 0;
 }
 
-size_t pattern_random_fill(
-        pattern_t *pattern,
-        random_t *rand,
-        char *buffer,
-        size_t len)
-{
-    return 0;
-}
-
 size_t pattern_choices(pattern_t *pattern) {
     return 0;
 }

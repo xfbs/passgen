@@ -50,6 +50,7 @@ libpassgen = library(
   'passgen',
   'src/passgen.c',
   'src/pattern.c',
+  'src/pattern_random.c',
   'src/random.c',
   'src/reader.c',
   'src/unicode.c',
