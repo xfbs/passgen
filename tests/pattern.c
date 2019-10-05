@@ -127,6 +127,62 @@ test_result test_pattern_parse_orstr() {
     return test_ok;
 }
 
+test_result test_pattern_parse_range() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
+
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
+    pattern_ranges_t *ranges;
+    pattern_range_t *range;
+
+    str = "[abc-d]";
+    result = pattern_parse(&pattern, str, 0, &mem);
+    assert(result.ok);
+    assert(pattern.pattern == str);
+    assert(pattern.mem == &mem);
+    assert(pattern.group.pos.offset == 0);
+    assert(pattern.group.pos.length == 7);
+    assert(pattern.group.segments.len == 1);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->pos.offset == 0);
+    assert(segments->pos.length == 7);
+    assert(segments->items.len == 1);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_RANGE);
+    ranges = &segment->data.range;
+    assert(ranges->pos.offset == 0);
+    assert(ranges->pos.length == 7);
+    assert(ranges->items.len == 3);
+    range = passgen_array_get(&ranges->items, sizeof(pattern_range_t), 0);
+    assert(range->start == 'a');
+    assert(range->end == 'a');
+    assert(range->pos.offset == 1);
+    assert(range->pos.length == 1);
+    range = passgen_array_get(&ranges->items, sizeof(pattern_range_t), 1);
+    assert(range->start == 'b');
+    assert(range->end == 'b');
+    assert(range->pos.offset == 2);
+    assert(range->pos.length == 1);
+    range = passgen_array_get(&ranges->items, sizeof(pattern_range_t), 2);
+    assert(range->start == 'c');
+    assert(range->end == 'd');
+    assert(range->pos.offset == 3);
+    assert(range->pos.length == 3);
+
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
+
+    return test_ok;
+}
+
 test_result test_pattern_escapable() {
     passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
     passgen_mem_t mem = passgen_mem_accounting(&acc);
