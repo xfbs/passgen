@@ -54,6 +54,46 @@ test_result test_pattern_parse_str() {
     return test_ok;
 }
 
+test_result test_pattern_parse_group() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
+
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
+
+    str = "(abc)";
+    result = pattern_parse(&pattern, str, 1, &mem);
+    assert(result.ok);
+    assert(pattern.mem == &mem);
+    assert(pattern.pattern == str);
+    assert(pattern.group.pos.offset == 0);
+    assert(pattern.group.pos.length == 5);
+    assert(pattern.group.segments.len == 1);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->pos.offset == 0);
+    assert(segments->pos.length == 5);
+    assert(segments->items.len == 1);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_GROUP);
+    assert(segment->data.group.pos.offset == 1);
+    assert(segment->data.group.pos.length == 3);
+    segments = passgen_array_get(&segment->data.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->items.len == 3);
+
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
+
+    return test_ok;
+}
+
 test_result test_pattern_parse_strrep() {
     passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
     passgen_mem_t mem = passgen_mem_accounting(&acc);

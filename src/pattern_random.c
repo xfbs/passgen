@@ -163,7 +163,6 @@ pattern_random_group(
         void *data,
         pattern_random_cb *func);
 
-
 static inline int
 pattern_random_segment(
         pattern_segment_t *segment,
@@ -239,9 +238,19 @@ pattern_random_group(
         void *data,
         pattern_random_cb *func)
 {
-    for(size_t i = 0; i < group->segments.len; i++) {
+    // choose random number of repetitions
+    size_t reps = pattern_random_repeat(rand, &group->repeat);
+
+    for(size_t r = 0; r < reps; r++) {
+        // choose random segment from segments
+        size_t segment = random_uint64_max(rand, group->segments.len);
+
+        // get segment from array
         pattern_segments_t *segments;
-        segments = passgen_array_get(&group->segments, sizeof(pattern_segments_t), i);
+        segments = passgen_array_get(
+                &group->segments,
+                sizeof(pattern_segments_t),
+                segment);
 
         int ret = pattern_random_segments(
                 segments,

@@ -210,6 +210,39 @@ pattern_result_t pattern_group_parse(
         size_t depth,
         passgen_mem_t *mem)
 {
+    passgen_token_t token;
+    pattern_result_t result;
+
+    token = passgen_token_next(iter);
+
+    if(!pattern_group_is_start(token)) {
+        // error
+    }
+
+    result = pattern_group_parse_inner(
+            group,
+            iter,
+            depth,
+            mem);
+
+    if(!result.ok) {
+        return result;
+    }
+
+    token = passgen_token_next(iter);
+
+    if(!pattern_group_is_end(token)) {
+        // error
+    }
+
+    result = pattern_parse_repeat(
+            &group->repeat,
+            iter);
+
+    if(!result.ok) {
+        return result;
+    }
+
     return result_ok;
 }
 
@@ -445,6 +478,14 @@ bool pattern_group_is_separator(passgen_token_t token) {
 
 bool pattern_group_is_start(passgen_token_t token) {
     if(token.type == PATTERN_TOKEN_REGULAR && token.codepoint == '(') {
+        return true;
+    }
+
+    return false;
+}
+
+bool pattern_group_is_end(passgen_token_t token) {
+    if(token.type == PATTERN_TOKEN_REGULAR && token.codepoint == ')') {
         return true;
     }
 
