@@ -148,7 +148,6 @@ passgen_mem_accounting_error(
         printf("%s\n", strs[i]);
     }
     free(strs);
-#endif
 
     if(node) {
         // print allocation backtrace
@@ -166,6 +165,7 @@ passgen_mem_accounting_error(
         }
         free(symbols);
     }
+#endif
 
     exit(EXIT_FAILURE);
 }
@@ -379,7 +379,26 @@ passgen_mem_accounting_cleanup(passgen_mem_accounting_t *acc) {
 
     // iterate through the nodes and free them
     for(node = acc->list; node; node = next) {
+        // free memory if it hasn't already been
+        if(!node->freed) {
+            fprintf(stderr, "Cleanup: freeing %p\n", node->pointer);
+
+#ifdef PASSGEN_DEBUG
+            // print allocation backtrace
+            fprintf(stderr, "\nBacktrace (allocation):\n");
+            char** symbols = backtrace_symbols(node->alloc_bt, node->alloc_frames);
+            for (int i = 0; i < node->alloc_frames; i++) {
+                printf("%s\n", symbols[i]);
+            }
+            free(symbols);
+#endif
+
+            passgen_free(acc->mem, node->pointer);
+        }
+
         next = node->next;
+
+        // free node itself
         passgen_free(acc->mem, node);
     }
 

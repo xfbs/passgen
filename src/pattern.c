@@ -115,7 +115,60 @@ pattern_parse_repeat(
         pattern_repeat_t *repeat,
         unicode_iter_t *iter);
 
+void pattern_group_free(pattern_group_t *group, passgen_mem_t *mem);
+
+void pattern_range_free(pattern_ranges_t *range, passgen_mem_t *mem) {
+}
+
+void pattern_special_free(pattern_special_t *special, passgen_mem_t *mem) {
+}
+
+void pattern_segment_free(pattern_segment_t *segment, passgen_mem_t *mem) {
+    switch(segment->kind) {
+        case PATTERN_RANGE:
+            pattern_range_free(&segment->data.range, mem);
+            break;
+        case PATTERN_SPECIAL:
+            pattern_special_free(&segment->data.special, mem);
+            break;
+        case PATTERN_GROUP:
+            pattern_group_free(&segment->data.group, mem);
+            break;
+        case PATTERN_CHAR:
+            break;
+    }
+}
+
+void pattern_segments_free(pattern_segments_t *segments, passgen_mem_t *mem) {
+    for(size_t i = 0; i < segments->items.len; i++) {
+        pattern_segment_t *segment = passgen_array_get(
+                &segments->items,
+                sizeof(pattern_segment_t),
+                i);
+
+        pattern_segment_free(segment, mem);
+    }
+
+    passgen_array_free(&segments->items, sizeof(pattern_segment_t), mem);
+}
+
+void pattern_group_free(pattern_group_t *group, passgen_mem_t *mem) {
+    // go through segments, free individually
+    for(size_t i = 0; i < group->segments.len; i++) {
+        pattern_segments_t *segments = passgen_array_get(
+                &group->segments,
+                sizeof(pattern_segments_t),
+                i);
+
+        pattern_segments_free(segments, mem);
+    }
+
+    // free array holding them
+    passgen_array_free(&group->segments, sizeof(pattern_segments_t), mem);
+}
+
 void pattern_free(pattern_t *pattern) {
+    pattern_group_free(&pattern->group, pattern->mem);
 }
 
 pattern_result_t pattern_segments_parse(
