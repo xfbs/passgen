@@ -1,4 +1,5 @@
 #include "passgen/memory.h"
+#include "passgen/memory_private.h"
 #include "tests/tests.h"
 #include <string.h>
 
@@ -88,6 +89,91 @@ test_result test_memory_limited_malloc(void) {
     passgen_free(&mem, data1);
     passgen_free(&mem, data2);
     passgen_free(&mem, data3);
+
+    return test_ok;
+}
+
+test_result test_memory_accounting(void) {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
+    struct passgen_mem_accounting_list *list;
+
+    void *data, *data1, *data2, *data3;
+
+    data = passgen_malloc(&mem, 1024);
+    assert(data);
+
+    list = acc.list;
+    assert(list->pointer == data);
+    assert(list->freed == false);
+    assert(list->count == 1);
+    assert(list->size == 1024);
+    assert(list->next == NULL);
+
+    data1 = passgen_calloc(&mem, 24, 15);
+    assert(data1);
+
+    list = acc.list;
+    assert(list->pointer == data1);
+    assert(list->freed == false);
+    assert(list->count == 24);
+    assert(list->size == 15);
+    assert(list->next != NULL);
+
+    passgen_free(&mem, data);
+
+    list = acc.list->next;
+    assert(list->pointer == data);
+    assert(list->freed == true);
+    assert(list->count == 1);
+    assert(list->size == 1024);
+    assert(list->next == NULL);
+
+    data2 = passgen_realloc(&mem, data1, 7000);
+    assert(data2);
+
+    // this assertion might not hold true.
+    assert(data2 != data1);
+
+    list = acc.list;
+    assert(list->pointer == data2);
+    assert(list->freed == false);
+    assert(list->count == 1);
+    assert(list->size == 7000);
+    assert(list->next != NULL);
+
+    list = acc.list->next;
+    assert(list->pointer == data1);
+    assert(list->freed == true);
+    assert(list->count == 24);
+    assert(list->size == 15);
+    assert(list->next != NULL);
+
+    passgen_free(&mem, data2);
+
+    list = acc.list;
+    assert(list->pointer == data2);
+    assert(list->freed == true);
+    assert(list->count == 1);
+    assert(list->size == 7000);
+    assert(list->next != NULL);
+
+    assert(passgen_mem_accounting_check(&acc));
+
+    data3 = passgen_realloc(&mem, NULL, 4000);
+    list = acc.list;
+    assert(list->pointer == data3);
+    assert(list->freed == false);
+    assert(list->count == 1);
+    assert(list->size == 4000);
+    assert(list->next != NULL);
+
+    assert(!passgen_mem_accounting_check(&acc));
+
+    passgen_free(&mem, data3);
+    assert(passgen_mem_accounting_check(&acc));
+
+    passgen_mem_accounting_cleanup(&acc);
 
     return test_ok;
 }
