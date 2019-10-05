@@ -442,3 +442,8 @@ test_result test_pattern_uniescape() {
 
     return test_ok;
 }
+
+/* TODO
+ *
+ * test "[abc\x{f6}]{100}" - weird behaviour
+ */

@@ -64,18 +64,10 @@ pattern_random_repeat(
     }
 
     // get random number to choose from the range
-    size_t choice = random_uint64_max(rand, difference);
+    size_t choice = random_uint64_max(rand, difference + 1);
 
     return repeat->min + choice;
 }
-
-static inline int
-pattern_random_group(
-        pattern_group_t *group,
-        random_t *rand,
-        pattern_env_t *env,
-        void *data,
-        pattern_random_cb *func);
 
 static inline int
 pattern_random_ranges(
@@ -85,6 +77,49 @@ pattern_random_ranges(
         void *data,
         pattern_random_cb *func)
 {
+    size_t reps = pattern_random_repeat(rand, &ranges->repeat);
+
+    // compute number of possible codepoints
+    size_t possible = 0;
+    for(size_t i = 0; i < ranges->items.len; i++) {
+        pattern_range_t *range = passgen_array_get(
+                &ranges->items,
+                sizeof(pattern_range_t),
+                i);
+
+        possible += range->end - range->start + 1;
+    }
+
+    assert(possible != 0);
+
+    // repeat chose rep size times
+    for(size_t i = 0; i < reps; i++) {
+        size_t choice = random_uint64_max(rand, possible);
+
+        // find choice
+        for(size_t i = 0; i < ranges->items.len; i++) {
+            pattern_range_t *range = passgen_array_get(
+                    &ranges->items,
+                    sizeof(pattern_range_t),
+                    i);
+
+            size_t cur = range->end - range->start + 1;
+            if(cur < choice) {
+                // this is not it
+                choice -= cur;
+            } else {
+                // this is it
+                int ret = func(data, range->start + choice);
+
+                if(0 != ret) {
+                    return ret;
+                }
+
+                break;
+            }
+        }
+    }
+
     return 0;
 }
 
@@ -119,6 +154,15 @@ pattern_random_special(
 {
     return 0;
 }
+
+static inline int
+pattern_random_group(
+        pattern_group_t *group,
+        random_t *rand,
+        pattern_env_t *env,
+        void *data,
+        pattern_random_cb *func);
+
 
 static inline int
 pattern_random_segment(
