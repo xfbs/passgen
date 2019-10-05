@@ -5,8 +5,10 @@
 
 #define BINS_INITIAL 4
 #define BINS_MULTIPLIER 2
-#define BIN_SIZE 1024
+#define BIN_SIZE 4096
 #define ITEMS_PER_BIN(size) (BIN_SIZE / size)
+
+#undef passgen_array_get
 
 passgen_array_t passgen_array_init(size_t size, passgen_mem_t *mem) {
     // these might not be used if this isn't a debug build.
