@@ -51,6 +51,24 @@ size_t pattern_random_fill(
     return fillpos.cur;
 }
 
+static size_t
+pattern_random_repeat(
+        random_t *rand,
+        pattern_repeat_t *repeat)
+{
+    size_t difference = repeat->max - repeat->min;
+
+    // if there is no difference to pick, just return here
+    if(0 == difference) {
+        return repeat->min;
+    }
+
+    // get random number to choose from the range
+    size_t choice = random_uint64_max(rand, difference);
+
+    return repeat->min + choice;
+}
+
 static inline int
 pattern_random_group(
         pattern_group_t *group,
@@ -78,7 +96,17 @@ pattern_random_character(
         void *data,
         pattern_random_cb *func)
 {
-    return func(data, character->codepoint);
+    size_t reps = pattern_random_repeat(rand, &character->repeat);
+
+    for(size_t i = 0; i < reps; i++) {
+        int ret = func(data, character->codepoint);
+
+        if(0 != ret) {
+            return ret;
+        }
+    }
+
+    return 0;
 }
 
 static inline int
