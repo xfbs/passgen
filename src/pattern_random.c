@@ -186,7 +186,8 @@ pattern_random_group(
     return 0;
 }
 
-int pattern_random(
+inline int
+pattern_random(
         pattern_t *pattern,
         random_t *rand,
         pattern_env_t *env,
