@@ -201,6 +201,9 @@ pattern_random_segment(
                     data,
                     func);
     }
+
+    // unreachable
+    return 0;
 }
 
 static inline int
