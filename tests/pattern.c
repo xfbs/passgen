@@ -76,7 +76,7 @@ test_result test_pattern_parse_strrep() {
     assert(segments);
     assert(segments->pos.offset == 0);
     assert(segments->pos.length == 14);
-    //assert(segments->items.len == 3);
+    assert(segments->items.len == 3);
     segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
     assert(segment->kind == PATTERN_CHAR);
     assert(segment->data.character.pos.offset == 0);
@@ -98,6 +98,56 @@ test_result test_pattern_parse_strrep() {
     assert(segment->data.character.codepoint == 'c');
     assert(segment->data.character.repeat.min == 14);
     assert(segment->data.character.repeat.max == 19);
+
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
+
+    return test_ok;
+}
+
+test_result test_pattern_parse_rangerep() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
+
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
+
+    str = "[n][a]{5}[b-d]{8,127}";
+    result = pattern_parse(&pattern, str, 0, &mem);
+    assert(result.ok);
+    assert(pattern.mem == &mem);
+    assert(pattern.pattern == str);
+    assert(pattern.group.pos.offset == 0);
+    assert(pattern.group.pos.length == 21);
+    assert(pattern.group.segments.len == 1);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->pos.offset == 0);
+    assert(segments->pos.length == 21);
+    assert(segments->items.len == 3);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment->kind == PATTERN_RANGE);
+    assert(segment->data.range.pos.offset == 0);
+    assert(segment->data.range.pos.length == 3);
+    assert(segment->data.range.repeat.min == 1);
+    assert(segment->data.range.repeat.max == 1);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 1);
+    assert(segment->kind == PATTERN_RANGE);
+    assert(segment->data.range.pos.offset == 3);
+    assert(segment->data.range.pos.length == 6);
+    assert(segment->data.range.repeat.min == 5);
+    assert(segment->data.range.repeat.max == 5);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 2);
+    assert(segment->kind == PATTERN_RANGE);
+    assert(segment->data.range.pos.offset == 9);
+    assert(segment->data.range.pos.length == 12);
+    assert(segment->data.range.repeat.min == 8);
+    assert(segment->data.range.repeat.max == 127);
 
     // free, make sure no memory leaks
     pattern_free(&pattern);
@@ -345,6 +395,45 @@ test_result test_pattern_utf8() {
     assert(segment);
     assert(segment->kind == PATTERN_CHAR);
     assert(segment->data.character.codepoint == 0xE7);
+
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
+
+    return test_ok;
+}
+
+test_result test_pattern_uniescape() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
+
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
+    pattern_range_t *range;
+
+    str = "\\u{FC}[\\u{F6}\\u{fb}]";
+    result = pattern_parse(&pattern, str, 0, &mem);
+    assert(result.ok);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.codepoint == 0xFC);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 1);
+    assert(segment);
+    assert(segment->kind == PATTERN_RANGE);
+    assert(segment->data.range.items.len == 2);
+    range = passgen_array_get(&segment->data.range.items, sizeof(pattern_range_t), 0);
+    assert(range->start == 0xF6);
+    assert(range->end == 0xF6);
+    range = passgen_array_get(&segment->data.range.items, sizeof(pattern_range_t), 1);
+    assert(range->start == 0xFb);
+    assert(range->end == 0xFb);
 
     // free, make sure no memory leaks
     pattern_free(&pattern);

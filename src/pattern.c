@@ -298,6 +298,9 @@ pattern_result_t pattern_ranges_parse_inner(
     passgen_token_t token;
     pattern_result_t result;
 
+    range->repeat.min = 1;
+    range->repeat.max = 1;
+
     // initialise array of range items
     range->items = passgen_array_init(sizeof(pattern_range_t), mem);
 
@@ -335,6 +338,14 @@ pattern_result_t pattern_ranges_parse(
 
     token = passgen_token_next(iter);
     // assert this is ']'
+
+    result = pattern_parse_repeat(
+            &range->repeat,
+            iter);
+
+    if(!result.ok) {
+        return result;
+    }
 
     range->pos.length = iter->pos - range->pos.offset;
 
