@@ -1,0 +1,62 @@
+\documentclass[a4paper,twocolumn]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{microtype}
+\usepackage{syntax}
+\usepackage{amsmath}
+\usepackage[super]{nth}
+\usepackage{tikz}
+\usepackage{tikz-qtree}
+\usetikzlibrary{shapes,patterns,positioning}
+\usepackage[
+  colorlinks,
+  linkcolor={red!40!black},
+  citecolor={blue!60!black},
+  urlcolor={blue!60!black}
+]{hyperref}
+
+\title{Passgen}
+\author{Patrick M. Elsen <pelsen@xfbs.net>}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\begin{abstract}
+  Passwords are difficult. In this paper, a method by which passwords can be securely generated using a regular-expression-like language is presented.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+
+
+\section{Grammar}
+
+The grammar that passgen patterns are defined in is a very limited and slightly modified subset of regular expressions. Notably, a lot of features are missing, and some (like \verb|\w|) have a changed meaning. The aim is that people familiar with regular expressions will be able to comprehend these patterns.
+
+\setlength{\grammarindent}{4em}
+\begin{grammar}
+
+<pattern> ::= <group-inner>
+
+<group> ::= ‘(’ <group-inner> ‘)’ \alt ‘(’ <group-inner> ‘)’ <repeat>
+
+<range> ::= ‘[’ <range-inner> ‘]’ \alt ‘[’ <range-inner> ‘]’ <repeat>
+
+<char> ::= ‘a’
+
+<group-inner> ::= <segment> \alt <segment> <group-inner>
+
+<segment> ::= <group> | <range> | <char>
+
+<repeat> ::= ‘\{’ <number> ‘\}’ \alt ‘\{’ <number> ‘,’ <number> ‘\}’
+
+\end{grammar}
+
+
+
+\end{document}
