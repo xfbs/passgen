@@ -246,10 +246,17 @@ pattern_result_t pattern_char_parse(
         unicode_iter_t *iter,
         passgen_mem_t *mem)
 {
+    pattern_result_t result;
     character->pos.offset = iter->pos;
+
     passgen_token_t token = passgen_token_next(iter);
-    character->pos.length = iter->pos - character->pos.offset;
     character->codepoint = token.codepoint;
+
+    result = pattern_parse_repeat(
+            &character->repeat,
+            iter);
+
+    character->pos.length = iter->pos - character->pos.offset;
 
     return result_ok;
 }
@@ -519,9 +526,10 @@ pattern_parse_repeat(
         return result;
     }
 
-    token = passgen_token_next(iter);
+    token = passgen_token_peek(iter);
 
     if(pattern_repeat_is_sep(token)) {
+        passgen_token_next(iter);
         // parse max
         result = passgen_parse_number(&repeat->max, iter);
         if(!result.ok) {
@@ -569,6 +577,7 @@ passgen_parse_number(
         }
 
         len += 1;
+        prev = *iter;
         token = passgen_token_next(iter);
     }
 
