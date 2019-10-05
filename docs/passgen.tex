@@ -1,4 +1,4 @@
-\documentclass[a4paper,twocolumn]{article}
+\documentclass[a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{booktabs}
 \usepackage{xcolor}
@@ -47,15 +47,25 @@ The grammar that passgen patterns are defined in is a very limited and slightly 
 
 <range> ::= ‘[’ <range-inner> ‘]’ \alt ‘[’ <range-inner> ‘]’ <repeat>
 
-<char> ::= ‘a’
+<char> ::= ‘a’ | ‘\u{F6}’ | ‘\textbackslash [’
 
 <group-inner> ::= <segment> \alt <segment> <group-inner>
 
-<segment> ::= <group> | <range> | <char>
+<segment> ::= <segment-item> | <segment-item> <segment>
+
+<segment-item> ::= <group> | <range> | <char> | <special>
 
 <repeat> ::= ‘\{’ <number> ‘\}’ \alt ‘\{’ <number> ‘,’ <number> ‘\}’
 
+<special> ::= ‘\textbackslash w[’ <identifier> ‘]’ <repeat>
+
+<range-inner> ::= <range-item> | <range-item> <range-inner>
+
+<range-item> ::= ‘a’ | ‘a-z’
+
 \end{grammar}
+
+\section{Usage}
 
 
 
