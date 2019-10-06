@@ -11,6 +11,7 @@
 #include "token.h"
 #include "memory.h"
 #include "array.h"
+#include "passgen/pronounceable.h"
 
 enum pattern_kind {
     PATTERN_RANGE,
@@ -137,6 +138,8 @@ struct pattern_result {
 };
 
 struct pattern_env {
+    size_t pronounceable_limit;
+    enum passgen_pronounceable_type pronounceable_type;
 };
 
 typedef struct pattern pattern_t;

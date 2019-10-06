@@ -9,6 +9,11 @@ struct fillpos {
     size_t len;
 };
 
+static pattern_env_t pattern_env_default = {
+    .pronounceable_limit = 1000,
+    .pronounceable_type = PASSGEN_PRONOUNCEABLE_ENGLISH,
+};
+
 static int
 pattern_random_write_buffer(void *data, int32_t codepoint)
 {
@@ -146,12 +151,12 @@ pattern_random_special_pronounceable(
 
     /* TODO: get tries and default from env! */
     size_t count = passgen_pronounceable_len(
-            PASSGEN_PRONOUNCEABLE_ENGLISH,
+            env->pronounceable_type,
             rand,
             buffer,
             special->length.min,
             max,
-            100);
+            env->pronounceable_limit);
 
     /* TODO error handling */
     if(!count) {
@@ -335,6 +340,11 @@ pattern_random(
         void *data,
         pattern_random_cb *func)
 {
+    /* use default env if none was supplied. this should be relatively sane. */
+    if(!env) {
+        env = &pattern_env_default;
+    }
+
     return pattern_random_group(
             &pattern->group,
             rand,
