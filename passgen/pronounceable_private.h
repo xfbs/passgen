@@ -11,23 +11,23 @@ struct markov0 {
 struct markov1 {
     int32_t codepoint;
     size_t frequency_sum;
-    struct markov0 *list;
+    const struct markov0 *list;
     size_t list_len;
 };
 
 struct markov2 {
     int32_t codepoint;
-    struct markov1 *list;
+    const struct markov1 *list;
     size_t list_len;
 };
 
 struct markov {
-    struct markov2 *list;
+    const struct markov2 *list;
     size_t list_len;
 };
 
 size_t passgen_pronounceable2(
-        struct markov2 *list,
+        const struct markov2 *list,
         random_t *rand,
         char *buf,
         size_t len);
@@ -35,28 +35,28 @@ size_t passgen_pronounceable2(
 /* given a markov chain and two codepoints, choose the next codepoint. */
 int32_t
 passgen_pronounceable_choose2(
-        struct markov2 *list,
+        const struct markov2 *list,
         int32_t a,
         int32_t b);
 
 /* use a binary search to find a codepoint in a markov2 chain. */
-struct markov1 *
+const struct markov1 *
 passgen_pronounceable_find1(
-        struct markov2 *list,
+        const struct markov2 *list,
         int32_t codepoint);
 
 /* use binary search to find a codepoint in a markov chain. returns NULL on
  * error. */
-struct markov2 *
+const struct markov2 *
 passgen_pronounceable_find2(
-        struct markov *list,
+        const struct markov *list,
         int32_t codepoint);
 
 /* given a final markov chain list, find the right codepoint. */
-struct markov0 *
+const struct markov0 *
 passgen_pronounceable_find(
-        struct markov1 *list,
+        const struct markov1 *list,
         size_t choice);
 
 /* list of symbols of all markov chains */
-extern struct markov passgen_pronounceable_english;
+extern const struct markov passgen_pronounceable_english;

@@ -21,19 +21,19 @@ end
 
 puts '#include "passgen/pronounceable_private.h"'
 puts
-puts 'struct markov english = {'
-puts '    .list = (struct markov2[]) {'
+puts 'const struct markov english = {'
+puts '    .list = (const struct markov2[]) {'
 
 table.sort_by{|k, v| k}.each do |first, tsecond|
 puts '        {'
 puts "            .codepoint = 0x#{first.bytes[0].to_s(16)},"
-puts "            .list = (struct markov1[]){"
+puts "            .list = (const struct markov1[]){"
 
 tsecond.sort_by{|k, v| k}.each do |second, tthird|
 
 puts '                {'
 puts "                    .codepoint = 0x#{second.bytes[0].to_s(16)},"
-puts "                    .list = (struct markov0[]){"
+puts "                    .list = (const struct markov0[]){"
 
 tthird.sort_by{|k, v| k}.each do |third, count|
 

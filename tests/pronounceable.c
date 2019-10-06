@@ -9,7 +9,7 @@ test_result test_pronounceable_lists(void) {
 }
 
 test_result test_pronounceable_find2(void) {
-    struct markov2 *list;
+    const struct markov2 *list;
 
     list = passgen_pronounceable_find2(&passgen_pronounceable_english, '+');
     assert(list == NULL);
@@ -26,8 +26,8 @@ test_result test_pronounceable_find2(void) {
 }
 
 test_result test_pronounceable_find1(void) {
-    struct markov1 *list;
-    struct markov2 *list2;
+    const struct markov1 *list;
+    const struct markov2 *list2;
 
     list2 = passgen_pronounceable_find2(&passgen_pronounceable_english, 0);
     assert(list2);
@@ -47,9 +47,9 @@ test_result test_pronounceable_find1(void) {
 }
 
 test_result test_pronounceable_find(void) {
-    struct markov0 *choice;
-    struct markov1 *list;
-    struct markov2 *list2;
+    const struct markov0 *choice;
+    const struct markov1 *list;
+    const struct markov2 *list2;
 
     list2 = passgen_pronounceable_find2(&passgen_pronounceable_english, 0);
     assert(list2);

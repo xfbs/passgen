@@ -1,13 +1,13 @@
 #include "passgen/pronounceable_private.h"
 
-struct markov passgen_pronounceable_english = {
-    .list = (struct markov2[]) {
+const struct markov passgen_pronounceable_english = {
+    .list = (const struct markov2[]) {
         {
             .codepoint = 0x0,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x0,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 25417,
@@ -118,7 +118,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -233,7 +233,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -344,7 +344,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -451,7 +451,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -562,7 +562,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -677,7 +677,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -780,7 +780,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -871,7 +871,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -970,7 +970,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -1085,7 +1085,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -1156,7 +1156,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -1247,7 +1247,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -1346,7 +1346,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -1453,7 +1453,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -1544,7 +1544,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -1659,7 +1659,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -1762,7 +1762,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -1837,7 +1837,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -1932,7 +1932,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -2043,7 +2043,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -2154,7 +2154,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -2253,7 +2253,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -2332,7 +2332,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -2423,7 +2423,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -2490,7 +2490,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -2585,7 +2585,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -2647,10 +2647,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x61,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 14,
@@ -2741,7 +2741,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 115,
@@ -2848,7 +2848,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 342,
@@ -2947,7 +2947,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 934,
@@ -3058,7 +3058,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3325,
@@ -3169,7 +3169,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 112,
@@ -3264,7 +3264,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 179,
@@ -3363,7 +3363,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 429,
@@ -3470,7 +3470,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 177,
@@ -3585,7 +3585,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 12,
@@ -3652,7 +3652,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 273,
@@ -3755,7 +3755,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 12459,
@@ -3870,7 +3870,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 665,
@@ -3977,7 +3977,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6927,
@@ -4092,7 +4092,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 87,
@@ -4195,7 +4195,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 277,
@@ -4294,7 +4294,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -4333,7 +4333,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2384,
@@ -4448,7 +4448,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2179,
@@ -4559,7 +4559,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 858,
@@ -4666,7 +4666,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 155,
@@ -4777,7 +4777,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 27,
@@ -4844,7 +4844,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 215,
@@ -4947,7 +4947,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 174,
@@ -5038,7 +5038,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 696,
@@ -5141,7 +5141,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 18,
@@ -5227,10 +5227,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x62,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 230,
@@ -5345,7 +5345,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 14,
@@ -5396,7 +5396,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -5451,7 +5451,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -5506,7 +5506,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 284,
@@ -5621,7 +5621,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -5660,7 +5660,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -5707,7 +5707,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -5758,7 +5758,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 76,
@@ -5873,7 +5873,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -5912,7 +5912,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -5971,7 +5971,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 12,
@@ -6030,7 +6030,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -6073,7 +6073,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -6112,7 +6112,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 94,
@@ -6227,7 +6227,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -6282,7 +6282,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x75,
                             .frequency = 10,
@@ -6293,7 +6293,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -6348,7 +6348,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 232,
@@ -6439,7 +6439,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 14,
@@ -6502,7 +6502,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 35,
@@ -6613,7 +6613,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -6644,7 +6644,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -6679,7 +6679,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -6698,7 +6698,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 195,
@@ -6797,7 +6797,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -6835,10 +6835,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x63,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 443,
@@ -6953,7 +6953,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -7000,7 +7000,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -7067,7 +7067,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 10,
@@ -7114,7 +7114,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2677,
@@ -7225,7 +7225,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6,
@@ -7272,7 +7272,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -7311,7 +7311,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1214,
@@ -7418,7 +7418,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 113,
@@ -7521,7 +7521,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1490,
@@ -7632,7 +7632,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 14,
@@ -7683,7 +7683,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -7730,7 +7730,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -7765,7 +7765,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 234,
@@ -7880,7 +7880,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -7943,7 +7943,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -7958,7 +7958,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -8029,7 +8029,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 970,
@@ -8096,7 +8096,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 597,
@@ -8191,7 +8191,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 27,
@@ -8290,7 +8290,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -8305,7 +8305,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -8348,7 +8348,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x6f,
                             .frequency = 1,
@@ -8359,7 +8359,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1235,
@@ -8454,7 +8454,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 27,
@@ -8476,10 +8476,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x64,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 555,
@@ -8594,7 +8594,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -8649,7 +8649,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -8696,7 +8696,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 27,
@@ -8771,7 +8771,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2038,
@@ -8886,7 +8886,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -8933,7 +8933,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 7,
@@ -8996,7 +8996,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 16,
@@ -9051,7 +9051,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 141,
@@ -9166,7 +9166,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -9205,7 +9205,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -9256,7 +9256,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 7,
@@ -9311,7 +9311,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -9350,7 +9350,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 16,
@@ -9397,7 +9397,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 340,
@@ -9512,7 +9512,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -9559,7 +9559,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -9578,7 +9578,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 9,
@@ -9625,7 +9625,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1933,
@@ -9712,7 +9712,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 11,
@@ -9767,7 +9767,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 33,
@@ -9878,7 +9878,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -9909,7 +9909,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 166,
@@ -9956,7 +9956,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -9971,7 +9971,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 490,
@@ -10070,7 +10070,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6,
@@ -10108,10 +10108,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x65,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 828,
@@ -10222,7 +10222,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 44,
@@ -10309,7 +10309,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 79,
@@ -10408,7 +10408,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 22396,
@@ -10511,7 +10511,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1025,
@@ -10626,7 +10626,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 96,
@@ -10721,7 +10721,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 93,
@@ -10816,7 +10816,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 73,
@@ -10891,7 +10891,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 129,
@@ -10998,7 +10998,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -11033,7 +11033,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 96,
@@ -11124,7 +11124,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1235,
@@ -11235,7 +11235,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 202,
@@ -11338,7 +11338,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2762,
@@ -11449,7 +11449,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 48,
@@ -11556,7 +11556,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 156,
@@ -11655,7 +11655,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 7,
@@ -11698,7 +11698,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 15055,
@@ -11813,7 +11813,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 17423,
@@ -11920,7 +11920,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1888,
@@ -12027,7 +12027,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 38,
@@ -12126,7 +12126,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 19,
@@ -12201,7 +12201,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 204,
@@ -12296,7 +12296,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 200,
@@ -12391,7 +12391,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 571,
@@ -12498,7 +12498,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 39,
@@ -12592,10 +12592,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x66,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 36,
@@ -12710,7 +12710,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -12749,7 +12749,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -12796,7 +12796,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 11,
@@ -12835,7 +12835,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 142,
@@ -12942,7 +12942,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 286,
@@ -13033,7 +13033,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -13072,7 +13072,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -13103,7 +13103,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 14,
@@ -13210,7 +13210,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 1,
@@ -13229,7 +13229,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 2,
@@ -13256,7 +13256,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -13319,7 +13319,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -13350,7 +13350,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -13381,7 +13381,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 24,
@@ -13488,7 +13488,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -13535,7 +13535,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -13586,7 +13586,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 246,
@@ -13645,7 +13645,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 312,
@@ -13736,7 +13736,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 12,
@@ -13823,7 +13823,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -13838,7 +13838,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -13869,7 +13869,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -13880,7 +13880,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 596,
@@ -13943,7 +13943,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -13965,10 +13965,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x67,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 292,
@@ -14075,7 +14075,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 43,
@@ -14114,7 +14114,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 6,
@@ -14153,7 +14153,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 7,
@@ -14196,7 +14196,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1804,
@@ -14299,7 +14299,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -14338,7 +14338,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 22,
@@ -14421,7 +14421,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 202,
@@ -14528,7 +14528,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 99,
@@ -14627,7 +14627,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 8,
@@ -14646,7 +14646,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -14689,7 +14689,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -14740,7 +14740,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 22,
@@ -14791,7 +14791,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 93,
@@ -14878,7 +14878,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 233,
@@ -14989,7 +14989,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -15048,7 +15048,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x74,
                             .frequency = 1,
@@ -15059,7 +15059,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 10,
@@ -15122,7 +15122,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1378,
@@ -15209,7 +15209,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 14,
@@ -15272,7 +15272,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 24,
@@ -15371,7 +15371,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -15390,7 +15390,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 50,
@@ -15429,7 +15429,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1300,
@@ -15512,7 +15512,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 11,
@@ -15530,10 +15530,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x68,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 368,
@@ -15648,7 +15648,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -15695,7 +15695,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 17,
@@ -15738,7 +15738,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 7,
@@ -15793,7 +15793,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 440,
@@ -15908,7 +15908,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -15951,7 +15951,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -16002,7 +16002,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -16041,7 +16041,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 227,
@@ -16156,7 +16156,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 5,
@@ -16183,7 +16183,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -16230,7 +16230,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 10,
@@ -16301,7 +16301,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 45,
@@ -16360,7 +16360,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 14,
@@ -16431,7 +16431,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 121,
@@ -16546,7 +16546,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -16597,7 +16597,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -16612,7 +16612,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 18,
@@ -16679,7 +16679,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 599,
@@ -16758,7 +16758,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 553,
@@ -16861,7 +16861,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 32,
@@ -16968,7 +16968,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -17003,7 +17003,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -17050,7 +17050,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1289,
@@ -17157,7 +17157,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -17187,10 +17187,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x69,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5761,
@@ -17301,7 +17301,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 72,
@@ -17388,7 +17388,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 13057,
@@ -17491,7 +17491,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3227,
@@ -17598,7 +17598,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1066,
@@ -17709,7 +17709,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 62,
@@ -17776,7 +17776,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 122,
@@ -17867,7 +17867,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 14,
@@ -17934,7 +17934,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 134,
@@ -18013,7 +18013,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -18088,7 +18088,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 149,
@@ -18167,7 +18167,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 845,
@@ -18278,7 +18278,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 283,
@@ -18385,7 +18385,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3507,
@@ -18500,7 +18500,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 266,
@@ -18615,7 +18615,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1273,
@@ -18718,7 +18718,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -18749,7 +18749,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 292,
@@ -18860,7 +18860,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4665,
@@ -18971,7 +18971,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 870,
@@ -19078,7 +19078,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 11,
@@ -19161,7 +19161,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 29,
@@ -19232,7 +19232,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -19283,7 +19283,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 263,
@@ -19366,7 +19366,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -19401,7 +19401,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 25,
@@ -19499,10 +19499,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x6a,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 61,
@@ -19613,7 +19613,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 1,
@@ -19628,7 +19628,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -19647,7 +19647,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -19670,7 +19670,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 22,
@@ -19781,7 +19781,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -19796,7 +19796,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 2,
@@ -19823,7 +19823,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 30,
@@ -19918,7 +19918,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -19941,7 +19941,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -19960,7 +19960,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -19979,7 +19979,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 3,
@@ -19994,7 +19994,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 9,
@@ -20025,7 +20025,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 23,
@@ -20132,7 +20132,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x6f,
                             .frequency = 1,
@@ -20147,7 +20147,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -20170,7 +20170,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -20185,7 +20185,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -20200,7 +20200,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 7,
@@ -20303,7 +20303,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x65,
                             .frequency = 1,
@@ -20314,7 +20314,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 1,
@@ -20329,7 +20329,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -20355,10 +20355,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x6b,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 250,
@@ -20469,7 +20469,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -20516,7 +20516,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -20559,7 +20559,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 17,
@@ -20586,7 +20586,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2061,
@@ -20693,7 +20693,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -20732,7 +20732,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -20779,7 +20779,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 16,
@@ -20858,7 +20858,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 120,
@@ -20961,7 +20961,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 13,
@@ -20984,7 +20984,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -21031,7 +21031,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -21078,7 +21078,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -21113,7 +21113,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -21152,7 +21152,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 69,
@@ -21263,7 +21263,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 17,
@@ -21310,7 +21310,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x75,
                             .frequency = 1,
@@ -21321,7 +21321,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -21376,7 +21376,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1175,
@@ -21471,7 +21471,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 18,
@@ -21534,7 +21534,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 38,
@@ -21633,7 +21633,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -21664,7 +21664,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -21707,7 +21707,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x69,
                             .frequency = 1,
@@ -21718,7 +21718,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 350,
@@ -21809,7 +21809,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 3,
@@ -21823,10 +21823,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x6c,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1372,
@@ -21941,7 +21941,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 12,
@@ -21996,7 +21996,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 11,
@@ -22071,7 +22071,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 459,
@@ -22174,7 +22174,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 9381,
@@ -22289,7 +22289,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 64,
@@ -22384,7 +22384,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6,
@@ -22439,7 +22439,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -22482,7 +22482,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 441,
@@ -22597,7 +22597,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 7,
@@ -22624,7 +22624,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 149,
@@ -22727,7 +22727,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1045,
@@ -22834,7 +22834,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 73,
@@ -22917,7 +22917,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 16,
@@ -22984,7 +22984,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 280,
@@ -23099,7 +23099,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 50,
@@ -23174,7 +23174,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x67,
                             .frequency = 1,
@@ -23193,7 +23193,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 8,
@@ -23228,7 +23228,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2002,
@@ -23323,7 +23323,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 346,
@@ -23426,7 +23426,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 38,
@@ -23537,7 +23537,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -23584,7 +23584,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -23635,7 +23635,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 7,
@@ -23658,7 +23658,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 16689,
@@ -23761,7 +23761,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -23807,10 +23807,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x6d,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1201,
@@ -23925,7 +23925,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 109,
@@ -24016,7 +24016,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -24091,7 +24091,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6,
@@ -24150,7 +24150,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1445,
@@ -24265,7 +24265,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -24320,7 +24320,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -24371,7 +24371,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -24422,7 +24422,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 137,
@@ -24537,7 +24537,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 9,
@@ -24564,7 +24564,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -24615,7 +24615,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6,
@@ -24654,7 +24654,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 15,
@@ -24733,7 +24733,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 43,
@@ -24804,7 +24804,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 122,
@@ -24919,7 +24919,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 192,
@@ -25022,7 +25022,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x75,
                             .frequency = 6,
@@ -25033,7 +25033,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -25088,7 +25088,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1380,
@@ -25179,7 +25179,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 12,
@@ -25250,7 +25250,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 21,
@@ -25361,7 +25361,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -25388,7 +25388,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -25419,7 +25419,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x64,
                             .frequency = 1,
@@ -25430,7 +25430,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1058,
@@ -25521,7 +25521,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 4,
@@ -25555,10 +25555,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x6e,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1099,
@@ -25673,7 +25673,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -25728,7 +25728,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 29,
@@ -25807,7 +25807,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1296,
@@ -25918,7 +25918,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5697,
@@ -26033,7 +26033,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -26084,7 +26084,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 18673,
@@ -26183,7 +26183,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6,
@@ -26230,7 +26230,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 291,
@@ -26345,7 +26345,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -26384,7 +26384,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 305,
@@ -26479,7 +26479,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 8,
@@ -26518,7 +26518,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -26561,7 +26561,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 48,
@@ -26632,7 +26632,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 314,
@@ -26747,7 +26747,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -26814,7 +26814,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x69,
                             .frequency = 1,
@@ -26829,7 +26829,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -26880,7 +26880,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4465,
@@ -26987,7 +26987,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5742,
@@ -27094,7 +27094,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 34,
@@ -27197,7 +27197,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 8,
@@ -27240,7 +27240,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 263,
@@ -27279,7 +27279,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 49,
@@ -27322,7 +27322,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 768,
@@ -27425,7 +27425,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 7,
@@ -27491,10 +27491,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x6f,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 135,
@@ -27601,7 +27601,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 91,
@@ -27708,7 +27708,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 67,
@@ -27795,7 +27795,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 987,
@@ -27898,7 +27898,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 118,
@@ -28009,7 +28009,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 445,
@@ -28092,7 +28092,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 184,
@@ -28191,7 +28191,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 21,
@@ -28266,7 +28266,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 124,
@@ -28365,7 +28365,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 23,
@@ -28404,7 +28404,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 254,
@@ -28503,7 +28503,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 785,
@@ -28618,7 +28618,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 752,
@@ -28725,7 +28725,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 11090,
@@ -28840,7 +28840,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 187,
@@ -28951,7 +28951,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 358,
@@ -29054,7 +29054,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -29069,7 +29069,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2271,
@@ -29180,7 +29180,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1413,
@@ -29279,7 +29279,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 866,
@@ -29390,7 +29390,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 97,
@@ -29505,7 +29505,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 17,
@@ -29576,7 +29576,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 503,
@@ -29687,7 +29687,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 151,
@@ -29786,7 +29786,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 211,
@@ -29873,7 +29873,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 16,
@@ -29935,10 +29935,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x70,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 161,
@@ -30053,7 +30053,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -30108,7 +30108,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -30171,7 +30171,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 9,
@@ -30218,7 +30218,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 935,
@@ -30333,7 +30333,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 7,
@@ -30396,7 +30396,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -30439,7 +30439,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 644,
@@ -30522,7 +30522,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 77,
@@ -30633,7 +30633,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 12,
@@ -30652,7 +30652,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -30695,7 +30695,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 14,
@@ -30746,7 +30746,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 11,
@@ -30789,7 +30789,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -30832,7 +30832,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 56,
@@ -30947,7 +30947,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 17,
@@ -31022,7 +31022,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -31037,7 +31037,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 10,
@@ -31092,7 +31092,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 861,
@@ -31183,7 +31183,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 269,
@@ -31278,7 +31278,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 17,
@@ -31381,7 +31381,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -31412,7 +31412,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -31459,7 +31459,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -31470,7 +31470,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 605,
@@ -31573,7 +31573,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x69,
                             .frequency = 1,
@@ -31587,10 +31587,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x71,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -31633,7 +31633,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -31644,7 +31644,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -31667,7 +31667,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x63,
                             .frequency = 1,
@@ -31678,7 +31678,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x79,
                             .frequency = 1,
@@ -31689,7 +31689,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -31700,7 +31700,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -31747,7 +31747,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -31762,7 +31762,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -31773,7 +31773,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -31784,7 +31784,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x68,
                             .frequency = 1,
@@ -31803,7 +31803,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -31818,7 +31818,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -31837,7 +31837,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -31864,7 +31864,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -31879,7 +31879,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -31918,7 +31918,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6,
@@ -31989,7 +31989,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -32000,7 +32000,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x65,
                             .frequency = 1,
@@ -32015,7 +32015,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -32029,10 +32029,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x72,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1357,
@@ -32147,7 +32147,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 74,
@@ -32226,7 +32226,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 25,
@@ -32317,7 +32317,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1300,
@@ -32416,7 +32416,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2805,
@@ -32531,7 +32531,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 48,
@@ -32626,7 +32626,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 68,
@@ -32705,7 +32705,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 9,
@@ -32760,7 +32760,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 414,
@@ -32875,7 +32875,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -32906,7 +32906,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 537,
@@ -33001,7 +33001,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 124,
@@ -33088,7 +33088,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1198,
@@ -33179,7 +33179,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 527,
@@ -33278,7 +33278,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 327,
@@ -33393,7 +33393,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 107,
@@ -33468,7 +33468,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x75,
                             .frequency = 147,
@@ -33479,7 +33479,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 63,
@@ -33562,7 +33562,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6434,
@@ -33657,7 +33657,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 884,
@@ -33764,7 +33764,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 59,
@@ -33879,7 +33879,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 9,
@@ -33926,7 +33926,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -33981,7 +33981,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -34000,7 +34000,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4862,
@@ -34103,7 +34103,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 9,
@@ -34153,10 +34153,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x73,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 275,
@@ -34271,7 +34271,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -34318,7 +34318,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 29,
@@ -34389,7 +34389,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -34440,7 +34440,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3802,
@@ -34555,7 +34555,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -34610,7 +34610,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -34669,7 +34669,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2305,
@@ -34776,7 +34776,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 137,
@@ -34891,7 +34891,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 6,
@@ -34918,7 +34918,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 124,
@@ -35005,7 +35005,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6,
@@ -35060,7 +35060,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4113,
@@ -35127,7 +35127,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 12,
@@ -35170,7 +35170,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 130,
@@ -35285,7 +35285,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 55,
@@ -35364,7 +35364,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -35391,7 +35391,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -35434,7 +35434,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 12538,
@@ -35541,7 +35541,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6816,
@@ -35652,7 +35652,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 43,
@@ -35767,7 +35767,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -35814,7 +35814,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -35857,7 +35857,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 394,
@@ -35956,7 +35956,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -36002,10 +36002,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x74,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1263,
@@ -36120,7 +36120,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -36175,7 +36175,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -36230,7 +36230,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 16,
@@ -36277,7 +36277,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 10588,
@@ -36392,7 +36392,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -36439,7 +36439,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 10,
@@ -36486,7 +36486,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1085,
@@ -36589,7 +36589,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 315,
@@ -36704,7 +36704,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 22,
@@ -36735,7 +36735,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -36778,7 +36778,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 30,
@@ -36833,7 +36833,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -36880,7 +36880,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 12,
@@ -36935,7 +36935,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 456,
@@ -37050,7 +37050,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -37121,7 +37121,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x75,
                             .frequency = 20,
@@ -37132,7 +37132,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 18,
@@ -37203,7 +37203,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4406,
@@ -37298,7 +37298,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 94,
@@ -37389,7 +37389,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 56,
@@ -37500,7 +37500,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -37531,7 +37531,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -37582,7 +37582,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -37605,7 +37605,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5017,
@@ -37704,7 +37704,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 68,
@@ -37786,10 +37786,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x75,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 133,
@@ -37904,7 +37904,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 83,
@@ -38015,7 +38015,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 17,
@@ -38098,7 +38098,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 132,
@@ -38193,7 +38193,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 751,
@@ -38300,7 +38300,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 17,
@@ -38367,7 +38367,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 94,
@@ -38462,7 +38462,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 13,
@@ -38521,7 +38521,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 54,
@@ -38628,7 +38628,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -38675,7 +38675,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 87,
@@ -38750,7 +38750,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1174,
@@ -38861,7 +38861,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2930,
@@ -38972,7 +38972,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 205,
@@ -39087,7 +39087,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 10,
@@ -39186,7 +39186,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 211,
@@ -39293,7 +39293,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -39312,7 +39312,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 565,
@@ -39423,7 +39423,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 10270,
@@ -39534,7 +39534,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 530,
@@ -39645,7 +39645,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -39696,7 +39696,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -39743,7 +39743,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 7,
@@ -39782,7 +39782,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 115,
@@ -39853,7 +39853,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 53,
@@ -39924,7 +39924,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 13,
@@ -39998,10 +39998,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x76,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 155,
@@ -40116,7 +40116,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -40127,7 +40127,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -40150,7 +40150,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -40177,7 +40177,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3571,
@@ -40292,7 +40292,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -40315,7 +40315,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -40326,7 +40326,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 44,
@@ -40437,7 +40437,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x68,
                             .frequency = 5,
@@ -40452,7 +40452,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -40499,7 +40499,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 1,
@@ -40518,7 +40518,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -40537,7 +40537,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 39,
@@ -40644,7 +40644,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -40659,7 +40659,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -40694,7 +40694,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 15,
@@ -40721,7 +40721,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6,
@@ -40740,7 +40740,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -40799,7 +40799,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -40830,7 +40830,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -40845,7 +40845,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 78,
@@ -40908,7 +40908,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x6f,
                             .frequency = 3,
@@ -40926,10 +40926,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x77,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 70,
@@ -41036,7 +41036,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -41083,7 +41083,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -41126,7 +41126,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 28,
@@ -41181,7 +41181,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 40,
@@ -41284,7 +41284,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -41331,7 +41331,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -41374,7 +41374,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -41421,7 +41421,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 23,
@@ -41516,7 +41516,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x63,
                             .frequency = 1,
@@ -41535,7 +41535,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 47,
@@ -41594,7 +41594,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 94,
@@ -41681,7 +41681,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 9,
@@ -41724,7 +41724,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 284,
@@ -41815,7 +41815,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6,
@@ -41914,7 +41914,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 8,
@@ -41969,7 +41969,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x75,
                             .frequency = 2,
@@ -41980,7 +41980,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -42023,7 +42023,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 348,
@@ -42122,7 +42122,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 22,
@@ -42177,7 +42177,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -42236,7 +42236,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x65,
                             .frequency = 1,
@@ -42251,7 +42251,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 8,
@@ -42282,7 +42282,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 66,
@@ -42357,7 +42357,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x65,
                             .frequency = 5,
@@ -42383,10 +42383,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x78,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 19,
@@ -42477,7 +42477,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 5,
@@ -42516,7 +42516,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -42567,7 +42567,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -42594,7 +42594,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 32,
@@ -42669,7 +42669,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 1,
@@ -42700,7 +42700,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 5,
@@ -42731,7 +42731,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 75,
@@ -42770,7 +42770,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 11,
@@ -42865,7 +42865,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x65,
                             .frequency = 1,
@@ -42880,7 +42880,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -42915,7 +42915,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 21,
@@ -42938,7 +42938,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x65,
                             .frequency = 13,
@@ -42949,7 +42949,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6,
@@ -43044,7 +43044,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -43103,7 +43103,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x75,
                             .frequency = 13,
@@ -43114,7 +43114,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -43149,7 +43149,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 4,
@@ -43204,7 +43204,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 40,
@@ -43275,7 +43275,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -43334,7 +43334,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -43349,7 +43349,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -43376,7 +43376,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -43403,7 +43403,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 156,
@@ -43502,7 +43502,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x6f,
                             .frequency = 1,
@@ -43516,10 +43516,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x79,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 176,
@@ -43634,7 +43634,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 96,
@@ -43681,7 +43681,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 6,
@@ -43740,7 +43740,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 21,
@@ -43795,7 +43795,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 131,
@@ -43898,7 +43898,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -43953,7 +43953,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -44016,7 +44016,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -44067,7 +44067,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 8,
@@ -44150,7 +44150,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 10,
@@ -44161,7 +44161,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -44216,7 +44216,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 437,
@@ -44315,7 +44315,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 56,
@@ -44394,7 +44394,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 63,
@@ -44493,7 +44493,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 34,
@@ -44608,7 +44608,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 10,
@@ -44675,7 +44675,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x75,
                             .frequency = 5,
@@ -44686,7 +44686,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 28,
@@ -44773,7 +44773,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 722,
@@ -44868,7 +44868,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 12,
@@ -44931,7 +44931,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 12,
@@ -45026,7 +45026,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 8,
@@ -45053,7 +45053,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 83,
@@ -45096,7 +45096,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x78,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 49,
@@ -45127,7 +45127,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -45158,7 +45158,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -45204,10 +45204,10 @@ struct markov passgen_pronounceable_english = {
         },
         {
             .codepoint = 0x7a,
-            .list = (struct markov1[]){
+            .list = (const struct markov1[]){
                 {
                     .codepoint = 0x61,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 116,
@@ -45314,7 +45314,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x62,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 9,
@@ -45345,7 +45345,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x63,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 9,
@@ -45372,7 +45372,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x64,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -45407,7 +45407,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x65,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2777,
@@ -45510,7 +45510,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x66,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x65,
                             .frequency = 2,
@@ -45525,7 +45525,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x67,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 1,
@@ -45552,7 +45552,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x68,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -45595,7 +45595,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x69,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 34,
@@ -45702,7 +45702,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x69,
                             .frequency = 2,
@@ -45713,7 +45713,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6b,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 3,
@@ -45748,7 +45748,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6c,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -45783,7 +45783,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6d,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -45814,7 +45814,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6e,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 3,
@@ -45845,7 +45845,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x6f,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 70,
@@ -45956,7 +45956,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x70,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 13,
@@ -45979,7 +45979,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x71,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x75,
                             .frequency = 4,
@@ -45990,7 +45990,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x72,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 5,
@@ -46013,7 +46013,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x73,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 2,
@@ -46040,7 +46040,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x74,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 1,
@@ -46079,7 +46079,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x75,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 5,
@@ -46166,7 +46166,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x76,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 3,
@@ -46181,7 +46181,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x77,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x61,
                             .frequency = 3,
@@ -46200,7 +46200,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x79,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 90,
@@ -46275,7 +46275,7 @@ struct markov passgen_pronounceable_english = {
                 },
                 {
                     .codepoint = 0x7a,
-                    .list = (struct markov0[]){
+                    .list = (const struct markov0[]){
                         {
                             .codepoint = 0x0,
                             .frequency = 31,

@@ -4,13 +4,13 @@
 #include "passgen/pronounceable_private.h"
 #include <stdlib.h>
 
-struct markov *markov_pronounceable_all[] = {
+const struct markov *markov_pronounceable_all[] = {
     &passgen_pronounceable_english,
     NULL
 };
 
 size_t passgen_pronounceable2(
-        struct markov2 *list,
+        const struct markov2 *list,
         random_t *rand,
         char *buf,
         size_t len)
@@ -28,7 +28,7 @@ passgen_pronounceable(
     assert(type < PASSGEN_PRONOUNCEABLE_LAST);
 
     /* get list */
-    struct markov *list = markov_pronounceable_all[type];
+    const struct markov *list = markov_pronounceable_all[type];
     assert(list);
 
     return passgen_pronounceable2(list->list, rand, buf, len);
@@ -45,12 +45,10 @@ passgen_pronounceable_len(
     return 0;
 }
 
-int32_t passgen_pronounceable_choose2(struct markov2 *list, int32_t a, int32_t b) {
-    return 0;
-}
-
 static int
-markov1_find(const void *key_p, const void *item_p)
+markov1_find(
+        const void *key_p,
+        const void *item_p)
 {
     const int32_t *key = key_p;
     const struct markov1 *item = item_p;
@@ -64,12 +62,12 @@ markov1_find(const void *key_p, const void *item_p)
     }
 }
 
-struct markov1 *
+const struct markov1 *
 passgen_pronounceable_find1(
-        struct markov2 *list,
+        const struct markov2 *list,
         int32_t codepoint)
 {
-    struct markov1 *result;
+    const struct markov1 *result;
 
     result = bsearch(
             &codepoint,
@@ -96,12 +94,12 @@ markov_find(const void *key_p, const void *item_p)
     }
 }
 
-struct markov2 *
+const struct markov2 *
 passgen_pronounceable_find2(
-        struct markov *list,
+        const struct markov *list,
         int32_t codepoint)
 {
-    struct markov2 *result;
+    const struct markov2 *result;
 
     result = bsearch(
             &codepoint,
@@ -113,9 +111,9 @@ passgen_pronounceable_find2(
     return result;
 }
 
-struct markov0 *
+const struct markov0 *
 passgen_pronounceable_find(
-        struct markov1 *list,
+        const struct markov1 *list,
         size_t choice)
 {
     for(size_t i = 0; i < list->list_len; i++) {
