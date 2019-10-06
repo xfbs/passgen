@@ -170,6 +170,8 @@ test_result test_pronounceable_minascii(void) {
 }
 
 test_result test_pronounceable_lendist(void) {
+    /* make sure that when specifying lengths [8, 11], you really can get all
+     * possible lengths. */
     random_t *rand = random_new();
     assert(rand);
 
@@ -192,10 +194,10 @@ test_result test_pronounceable_lendist(void) {
         lens[ret - 8] += 1;
     }
 
-    assert(10 < lens[0]);
-    assert(10 < lens[1]);
-    assert(10 < lens[2]);
-    assert(10 < lens[3]);
+    assert(80 < lens[0]);
+    assert(80 < lens[1]);
+    assert(80 < lens[2]);
+    assert(80 < lens[3]);
 
     return test_ok;
 }

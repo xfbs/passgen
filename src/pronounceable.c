@@ -103,15 +103,19 @@ passgen_pronounceable_len(
             choice = passgen_pronounceable_choose(list, rand, p1, p2);
             assert(choice);
 
-            /* save codepoint in buffer */
-            if(choice->codepoint) {
-                buf[pos++] = choice->codepoint;
-            }
-
             /* advante to next pair of previour */
             p1 = p2;
             p2 = choice->codepoint;
-        } while(p2 && pos < max);
+
+            /* make sure we don't write too much. */
+            if(pos == max) {
+                pos++;
+                break;
+            }
+
+            /* save codepoint in buffer */
+            buf[pos++] = choice->codepoint;
+        } while(p2);
 
         /* if this isn't finished, or is too short, skip */
         if(p2 || pos <= min) {
