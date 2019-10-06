@@ -46,14 +46,17 @@ passgen_pronounceable2(
         const struct markov0 *choice = passgen_pronounceable_choose(list, rand, p1, p2);
         assert(choice);
 
-        buf[pos] = choice->codepoint;
+        /* save codepoint */
+        if(choice->codepoint) {
+            buf[pos] = choice->codepoint;
+        }
         pos += 1;
 
         p1 = p2;
         p2 = choice->codepoint;
     } while(p2 && pos < len);
 
-    return pos;
+    return pos - 1;
 }
 
 size_t
@@ -101,7 +104,9 @@ passgen_pronounceable_len(
             assert(choice);
 
             /* save codepoint in buffer */
-            buf[pos++] = choice->codepoint;
+            if(choice->codepoint) {
+                buf[pos++] = choice->codepoint;
+            }
 
             /* advante to next pair of previour */
             p1 = p2;
@@ -109,11 +114,11 @@ passgen_pronounceable_len(
         } while(p2 && pos < max);
 
         /* if this isn't finished, or is too short, skip */
-        if(p2 || pos < min) {
+        if(p2 || pos <= min) {
             continue;
         }
 
-        return pos;
+        return pos - 1;
     }
 
     return 0;

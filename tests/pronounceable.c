@@ -124,3 +124,50 @@ test_result test_pronounceable_len(void) {
 
     return test_ok;
 }
+
+test_result test_pronounceable_engascii(void) {
+    random_t *rand = random_new();
+    assert(rand);
+
+    for(size_t i = 0; i < 1000; i++) {
+        int32_t buffer[64];
+        size_t ret = passgen_pronounceable(
+                PASSGEN_PRONOUNCEABLE_ENGLISH,
+                rand,
+                buffer,
+                sizeof buffer);
+
+        for(size_t i = 0; i < ret; i++) {
+            assert('a' <= buffer[i]);
+            assert(buffer[i] <= 'z');
+        }
+    }
+
+    return test_ok;
+}
+
+test_result test_pronounceable_minascii(void) {
+    random_t *rand = random_new();
+    assert(rand);
+
+    for(size_t i = 0; i < 1000; i++) {
+        int32_t buffer[64];
+        size_t ret = passgen_pronounceable_len(
+                PASSGEN_PRONOUNCEABLE_ENGLISH,
+                rand,
+                buffer,
+                7,
+                10,
+                0);
+
+        printf("%zu\n", ret);
+        for(size_t i = 0; i < ret; i++) {
+            printf("%i\n", buffer[i]);
+            assert('a' <= buffer[i]);
+            assert(buffer[i] <= 'z');
+        }
+        printf("\n");
+    }
+
+    return test_ok;
+}
