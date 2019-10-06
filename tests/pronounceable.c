@@ -168,3 +168,34 @@ test_result test_pronounceable_minascii(void) {
 
     return test_ok;
 }
+
+test_result test_pronounceable_lendist(void) {
+    random_t *rand = random_new();
+    assert(rand);
+
+    size_t repeat = 1000;
+    size_t lens[4] = {0, 0, 0, 0};
+
+    for(size_t i = 0; i < repeat; i++) {
+        int32_t buffer[11];
+        size_t ret = passgen_pronounceable_len(
+                PASSGEN_PRONOUNCEABLE_ENGLISH,
+                rand,
+                buffer,
+                8,
+                11,
+                0);
+
+        assert(8 <= ret);
+        assert(ret <= 11);
+
+        lens[ret - 8] += 1;
+    }
+
+    assert(10 < lens[0]);
+    assert(10 < lens[1]);
+    assert(10 < lens[2]);
+    assert(10 < lens[3]);
+
+    return test_ok;
+}
