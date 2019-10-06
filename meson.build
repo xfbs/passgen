@@ -25,17 +25,17 @@ version_src = configure_file(
 cc = meson.get_compiler('c')
 
 # library used to decode and encode utf8.
-libutf8proc = dependency('libutf8proc', required: false)
+libutf8proc = dependency('libutf8proc', required: false, static: get_option('static'))
 
 if not libutf8proc.found()
-  libutf8proc = cc.find_library('utf8proc')
+  libutf8proc = cc.find_library('utf8proc', static: get_option('static'))
 endif
 
 # library used for cryptographic routines.
-libsodium = dependency('libsodium')
+libsodium = dependency('libsodium', static: get_option('static'))
 
 # library used for generating JSON.
-libjansson = dependency('jansson')
+libjansson = dependency('jansson', static: get_option('static'))
 
 # math lib
 libm = cc.find_library('m')
@@ -46,8 +46,7 @@ threads = dependency('threads')
 deps = [libutf8proc]
 
 # main library
-libpassgen = library(
-  'passgen',
+libpassgen_src = [
   'src/passgen.c',
   'src/pattern.c',
   'src/pattern_random.c',
@@ -60,9 +59,23 @@ libpassgen = library(
   'src/pronounceable.c',
   'data/pronounceable_english.c',
   'src/assert.c',
+]
+
+if not get_option('static')
+libpassgen = library(
+  'passgen',
+  libpassgen_src,
   version_src,
   install: true,
   dependencies: deps)
+else
+libpassgen = static_library(
+  'passgen',
+  libpassgen_src,
+  version_src,
+  install: true,
+  dependencies: deps)
+endif
 
 # main executable
 passgen = executable(
