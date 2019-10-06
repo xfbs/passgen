@@ -4,6 +4,7 @@
 
 test_result test_pronounceable_lists(void) {
     // TODO: test list properties (sorted, sums, etc).
+
     return test_ok;
 }
 
@@ -41,6 +42,32 @@ test_result test_pronounceable_find1(void) {
     list = passgen_pronounceable_find1(list2, 'a');
     assert(list != NULL);
     assert(list->codepoint == 'a');
+
+    return test_ok;
+}
+
+test_result test_pronounceable_find(void) {
+    struct markov0 *choice;
+    struct markov1 *list;
+    struct markov2 *list2;
+
+    list2 = passgen_pronounceable_find2(&passgen_pronounceable_english, 0);
+    assert(list2);
+
+    list = passgen_pronounceable_find1(list2, 0);
+    assert(list != NULL);
+    assert(list->codepoint == 0);
+
+    choice = passgen_pronounceable_find(list, list->frequency_sum);
+    assert(choice == NULL);
+
+    choice = passgen_pronounceable_find(list, 0);
+    assert(choice != NULL);
+    assert(choice->codepoint == 'a');
+
+    choice = passgen_pronounceable_find(list, list->frequency_sum - 1);
+    assert(choice != NULL);
+    assert(choice->codepoint == 'z');
 
     return test_ok;
 }

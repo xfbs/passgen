@@ -97,3 +97,19 @@ passgen_pronounceable_find2(
 
     return result;
 }
+
+struct markov0 *
+passgen_pronounceable_find(
+        struct markov1 *list,
+        size_t choice)
+{
+    for(size_t i = 0; i < list->list_len; i++) {
+        if(choice < list->list[i].frequency) {
+            return &list->list[i];
+        }
+
+        choice -= list->list[i].frequency;
+    }
+
+    return NULL;
+}

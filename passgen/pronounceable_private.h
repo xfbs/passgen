@@ -41,5 +41,11 @@ passgen_pronounceable_find2(
         struct markov *list,
         int32_t codepoint);
 
+/* given a final markov chain list, find the right codepoint. */
+struct markov0 *
+passgen_pronounceable_find(
+        struct markov1 *list,
+        size_t choice);
+
 /* list of symbols of all markov chains */
 extern struct markov passgen_pronounceable_english;
