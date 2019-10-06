@@ -42,4 +42,4 @@ passgen_pronounceable_find2(
         int32_t codepoint);
 
 /* list of symbols of all markov chains */
-struct markov passgen_pronounceable_english;
+extern struct markov passgen_pronounceable_english;
