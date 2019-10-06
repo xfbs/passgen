@@ -220,6 +220,10 @@ Source for German words: [wortliste](https://github.com/davidak/wortliste).
 
 Should the word lists be configurable?
 
+How should the word list be stored in memory? Ideally segmented by length.
+Store as unicode? Needs more space. Keep in memory, store offsets? Might be
+doable.
+
 ### Pronounceable character strings
 
 Supporting some kind of mechanism to generated pronounceable passwords should
