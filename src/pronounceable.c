@@ -9,6 +9,15 @@ struct markov *markov_pronounceable_all[] = {
     NULL
 };
 
+size_t passgen_pronounceable2(
+        struct markov2 *list,
+        random_t *rand,
+        char *buf,
+        size_t len)
+{
+    return 0;
+}
+
 size_t
 passgen_pronounceable(
         enum passgen_pronounceable_type type,
@@ -16,7 +25,13 @@ passgen_pronounceable(
         char *buf,
         size_t len)
 {
-    return 0;
+    assert(type < PASSGEN_PRONOUNCEABLE_LAST);
+
+    /* get list */
+    struct markov *list = markov_pronounceable_all[type];
+    assert(list);
+
+    return passgen_pronounceable2(list->list, rand, buf, len);
 }
 
 int

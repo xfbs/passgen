@@ -1,4 +1,5 @@
 #pragma once
+#include "passgen/random.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -25,8 +26,18 @@ struct markov {
     size_t list_len;
 };
 
+size_t passgen_pronounceable2(
+        struct markov2 *list,
+        random_t *rand,
+        char *buf,
+        size_t len);
+
 /* given a markov chain and two codepoints, choose the next codepoint. */
-int32_t passgen_pronounceable_choose2(struct markov2 *list, int32_t a, int32_t b);
+int32_t
+passgen_pronounceable_choose2(
+        struct markov2 *list,
+        int32_t a,
+        int32_t b);
 
 /* use a binary search to find a codepoint in a markov2 chain. */
 struct markov1 *

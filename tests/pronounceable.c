@@ -71,3 +71,19 @@ test_result test_pronounceable_find(void) {
 
     return test_ok;
 }
+
+test_result test_pronounceable(void) {
+    random_t *rand = random_new();
+    assert(rand);
+
+    char buffer[10];
+    size_t ret = passgen_pronounceable(
+            PASSGEN_PRONOUNCEABLE_ENGLISH,
+            rand,
+            buffer,
+            sizeof buffer);
+
+    assert(ret > 0);
+
+    return test_ok;
+}
