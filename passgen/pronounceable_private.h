@@ -26,10 +26,11 @@ struct markov {
     size_t list_len;
 };
 
-size_t passgen_pronounceable2(
+size_t
+passgen_pronounceable2(
         const struct markov *list,
         random_t *rand,
-        char *buf,
+        int32_t *buf,
         size_t len);
 
 /* given a markov chain and two codepoints, choose the next codepoint. */
