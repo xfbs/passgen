@@ -1,6 +1,7 @@
 #include "passgen/pattern.h"
 #include "passgen/debug.h"
 #include "passgen/assert.h"
+#include "passgen/pronounceable.h"
 
 struct fillpos {
     char *buffer;
@@ -130,6 +131,56 @@ pattern_random_character(
 }
 
 static inline int
+pattern_random_special_pronounceable(
+        pattern_special_t *special,
+        random_t *rand,
+        pattern_env_t *env,
+        void *data,
+        pattern_random_cb *func)
+{
+    /* limit length to 64, that should be plenty. */
+    size_t max = special->length.max;
+    if(64 < max) max = 64;
+
+    int32_t buffer[max];
+
+    /* TODO: get tries and default from env! */
+    size_t count = passgen_pronounceable_len(
+            PASSGEN_PRONOUNCEABLE_ENGLISH,
+            rand,
+            buffer,
+            special->length.min,
+            max,
+            100);
+
+    /* TODO error handling */
+    if(!count) {
+        return -2;
+    }
+
+    for(size_t i = 0; i < count; i++) {
+        int ret = func(data, buffer[i]);
+
+        if(0 != ret) {
+            return ret;
+        }
+    }
+
+    return 0;
+}
+
+static inline int
+pattern_random_special_wordlist(
+        pattern_special_t *special,
+        random_t *rand,
+        pattern_env_t *env,
+        void *data,
+        pattern_random_cb *func)
+{
+    return 0;
+}
+
+static inline int
 pattern_random_special(
         pattern_special_t *special,
         random_t *rand,
@@ -137,6 +188,27 @@ pattern_random_special(
         void *data,
         pattern_random_cb *func)
 {
+    switch(special->kind) {
+        case PATTERN_SPECIAL_PRONOUNCABLE:
+            return pattern_random_special_pronounceable(
+                    special,
+                    rand,
+                    env,
+                    data,
+                    func);
+            break;
+        case PATTERN_SPECIAL_WORDLIST:
+            return pattern_random_special_wordlist(
+                    special,
+                    rand,
+                    env,
+                    data,
+                    func);
+            break;
+        default:
+            assert(false);
+            break;
+    }
     return 0;
 }
 
