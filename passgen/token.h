@@ -42,5 +42,6 @@ bool passgen_token_is_normal(passgen_token_t *token);
 bool passgen_token_is_regular(passgen_token_t *token);
 bool passgen_token_is_escaped(passgen_token_t *token);
 bool passgen_token_is_unicode(passgen_token_t *token);
+bool passgen_token_is_special(passgen_token_t *token);
 bool passgen_token_is_eof(passgen_token_t *token);
 bool passgen_token_is_error(passgen_token_t *token);

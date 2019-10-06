@@ -233,11 +233,12 @@ const static struct special_chars special_chars[] = {
     {'v', '\v', PATTERN_TOKEN_ESCAPED, NULL},
     {'\\', '\\', PATTERN_TOKEN_ESCAPED, NULL},
     {'w', 'w', PATTERN_TOKEN_SPECIAL, NULL},
+    {'p', 'p', PATTERN_TOKEN_SPECIAL, NULL},
     {'u', 0, 0, passgen_token_parse_unicode},
     {0, 0, 0, NULL},
 };
 
-static const size_t special_chars_size = 11;
+static const size_t special_chars_size = 12;
 
 static const char escapable_chars[] = {'(', ')', '[', ']', '{', '}', '|'};
 static const size_t escapable_chars_len = sizeof(escapable_chars);
@@ -323,6 +324,10 @@ bool passgen_token_is_unicode(passgen_token_t *token) {
 
 bool passgen_token_is_regular(passgen_token_t *token) {
     return token->type == PATTERN_TOKEN_REGULAR;
+}
+
+bool passgen_token_is_special(passgen_token_t *token) {
+    return token->type == PATTERN_TOKEN_SPECIAL;
 }
 
 bool passgen_token_is_escaped(passgen_token_t *token) {

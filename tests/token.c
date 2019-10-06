@@ -345,5 +345,22 @@ test_result test_passgen_token_errors(void) {
     assert(token.data.length == 0);
     assert(token.error == 4);
 
+    // special
+    iter = unicode_iter(" \\p");
+
+    token = passgen_token_next(&iter);
+    assert(passgen_token_is_regular(&token));
+    assert(token.codepoint == ' ');
+
+    token = passgen_token_next(&iter);
+    assert(!passgen_token_is_normal(&token));
+    assert(!passgen_token_is_regular(&token));
+    assert(!passgen_token_is_error(&token));
+    assert(passgen_token_is_special(&token));
+    assert(token.type == PATTERN_TOKEN_SPECIAL);
+    assert(token.pos.offset == 1);
+    assert(token.pos.length == 2);
+    assert(token.codepoint == 'p');
+
     return test_ok;
 }

@@ -483,6 +483,35 @@ test_result test_pattern_uniescape() {
     return test_ok;
 }
 
+test_result test_pattern_pronouncable() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
+
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
+    pattern_range_t *range;
+
+    str = "\\p";
+    result = pattern_parse(&pattern, str, 0, &mem);
+    assert(result.ok);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    printf("%i\n", segment->kind);
+    assert(segment->kind == PATTERN_SPECIAL);
+
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
+
+    return test_ok;
+}
+
 /* TODO
  *
  * test "[abc\x{f6}]{100}" - weird behaviour

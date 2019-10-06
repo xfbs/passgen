@@ -74,6 +74,12 @@ pattern_char_parse(
         unicode_iter_t *iter,
         passgen_mem_t *mem);
 
+pattern_result_t
+pattern_special_parse(
+        pattern_special_t *special,
+        unicode_iter_t *iter,
+        passgen_mem_t *mem);
+
 static inline pattern_result_t
 passgen_parse_number(
         size_t *number,
@@ -267,6 +273,9 @@ pattern_result_t pattern_segment_parse(
     } else if(pattern_ranges_is_start(token)) {
         item->kind = PATTERN_RANGE;
         result = pattern_ranges_parse(&item->data.range, iter, mem);
+    } else if(passgen_token_is_special(&token)) {
+        item->kind = PATTERN_SPECIAL;
+        result = pattern_special_parse(&token, iter, mem);
     } else {
         item->kind = PATTERN_CHAR;
         result = pattern_char_parse(&item->data.character, iter, mem);
@@ -463,6 +472,16 @@ pattern_parse(
         return pattern_error_illegal(&token);
     }
 
+    return result_ok;
+}
+
+pattern_result_t
+pattern_special_parse(
+        pattern_special_t *special,
+        unicode_iter_t *iter,
+        passgen_mem_t *mem)
+{
+    passgen_token_next(iter);
     return result_ok;
 }
 
