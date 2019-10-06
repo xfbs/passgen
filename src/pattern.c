@@ -1,89 +1,6 @@
 #include "passgen/pattern.h"
+#include "passgen/pattern_private.h"
 #include <assert.h>
-#include <stdbool.h>
-
-#define accept_regular(chr, error_kind, start) \
-    token = pattern_token_peek(iter); \
-    if(!passgen_token_regular(&token)) { \
-        return pattern_token_error(start, iter->pos, error_kind); \
-    }
-
-bool pattern_group_is_separator(passgen_token_t token);
-bool pattern_group_is_start(passgen_token_t token);
-bool pattern_group_is_end(passgen_token_t token);
-
-bool pattern_ranges_is_start(passgen_token_t token);
-bool pattern_ranges_is_end(passgen_token_t token);
-bool pattern_range_is_sep(passgen_token_t token);
-
-bool pattern_segments_is_end(passgen_token_t token);
-
-bool pattern_repeat_is_start(passgen_token_t token);
-bool pattern_repeat_is_sep(passgen_token_t token);
-bool pattern_repeat_is_end(passgen_token_t token);
-
-pattern_result_t
-pattern_group_parse_inner(
-        pattern_group_t *group,
-        unicode_iter_t *iter,
-        size_t depth,
-        passgen_mem_t *mem);
-
-pattern_result_t
-pattern_group_parse(
-        pattern_group_t *group,
-        unicode_iter_t *iter,
-        size_t depth,
-        passgen_mem_t *mem);
-
-pattern_result_t
-pattern_ranges_parse_inner(
-        pattern_ranges_t *range,
-        unicode_iter_t *iter,
-        passgen_mem_t *mem);
-
-pattern_result_t
-pattern_ranges_parse(
-        pattern_ranges_t *range,
-        unicode_iter_t *iter,
-        passgen_mem_t *mem);
-
-pattern_result_t
-pattern_range_parse(
-        pattern_range_t *item,
-        unicode_iter_t *iter,
-        passgen_mem_t *mem);
-
-pattern_result_t
-pattern_segments_parse(
-        pattern_segments_t *segment,
-        unicode_iter_t *iter,
-        size_t depth,
-        passgen_mem_t *mem);
-
-pattern_result_t
-pattern_segment_parse(
-        pattern_segment_t *item,
-        unicode_iter_t *iter,
-        size_t depth,
-        passgen_mem_t *mem);
-
-pattern_result_t
-pattern_char_parse(
-        pattern_char_t *character,
-        unicode_iter_t *iter,
-        passgen_mem_t *mem);
-
-pattern_result_t
-pattern_special_parse(
-        pattern_special_t *special,
-        unicode_iter_t *iter,
-        passgen_mem_t *mem);
-
-static inline pattern_result_t
-passgen_parse_number(
-        size_t *number,
-        unicode_iter_t *iter);
 
 static const pattern_result_t result_ok = {
     .ok = true,
@@ -275,7 +192,7 @@ pattern_result_t pattern_segment_parse(
         result = pattern_ranges_parse(&item->data.range, iter, mem);
     } else if(passgen_token_is_special(&token)) {
         item->kind = PATTERN_SPECIAL;
-        result = pattern_special_parse(&token, iter, mem);
+        result = pattern_special_parse(&item->data.special, iter, mem);
     } else {
         item->kind = PATTERN_CHAR;
         result = pattern_char_parse(&item->data.character, iter, mem);
@@ -481,7 +398,44 @@ pattern_special_parse(
         unicode_iter_t *iter,
         passgen_mem_t *mem)
 {
-    passgen_token_next(iter);
+    pattern_result_t result;
+
+    special->pos.offset = iter->pos;
+
+    /* skip first token — we know this is a special token. */
+    passgen_token_t token = passgen_token_next(iter);
+
+    /* parse length. */
+    result = pattern_parse_repeat(
+            &special->length,
+            iter);
+
+    if(!result.ok) {
+        return result;
+    }
+
+    /* parse repetitions. */
+    result = pattern_parse_repeat(
+            &special->repeat,
+            iter);
+
+    if(!result.ok) {
+        return result;
+    }
+
+    switch(token.codepoint) {
+        case 'p':
+            special->kind = PATTERN_SPECIAL_PRONOUNCABLE;
+            break;
+        case 'w':
+            special->kind = PATTERN_SPECIAL_WORDLIST;
+            break;
+        default:
+            break;
+    }
+
+    special->pos.length = iter->pos - special->pos.offset;
+
     return result_ok;
 }
 

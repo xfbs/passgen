@@ -492,7 +492,7 @@ test_result test_pattern_pronouncable() {
     const char *str;
     pattern_segments_t *segments;
     pattern_segment_t *segment;
-    pattern_range_t *range;
+    pattern_special_t *special;
 
     str = "\\p";
     result = pattern_parse(&pattern, str, 0, &mem);
@@ -501,8 +501,12 @@ test_result test_pattern_pronouncable() {
     assert(segments);
     segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
     assert(segment);
-    printf("%i\n", segment->kind);
     assert(segment->kind == PATTERN_SPECIAL);
+    special = &segment->data.special;
+    assert(special->pos.offset == 0);
+    assert(special->pos.length == 2);
+    assert(special->pos.length == 2);
+    assert(special->kind == PATTERN_SPECIAL_PRONOUNCABLE);
 
     // free, make sure no memory leaks
     pattern_free(&pattern);

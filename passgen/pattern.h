@@ -19,6 +19,11 @@ enum pattern_kind {
     PATTERN_GROUP,
 };
 
+enum pattern_special_kind {
+    PATTERN_SPECIAL_PRONOUNCABLE,
+    PATTERN_SPECIAL_WORDLIST,
+};
+
 struct pattern;
 struct pattern_segments;
 struct pattern_segment;
@@ -94,7 +99,7 @@ struct pattern_group {
 struct pattern_special {
     struct pattern_substring pos;
     struct pattern_substring arg;
-
+    enum pattern_special_kind kind;
     struct pattern_repeat length;
     struct pattern_repeat repeat;
 };
