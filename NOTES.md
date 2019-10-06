@@ -384,3 +384,8 @@ like `\wordlist[english]` and `\pronouncable[english]` were allowed?
 
 Have a mechanism to count entropy as passwords are generated (using a *double*
 that is multiplied by the amount of possible choices every time).
+
+### Make portable build with musl
+
+Halfway there. `static` build target in Makefile supports building statically,
+but as of right now, building with `musl-gcc` doesn't work.
