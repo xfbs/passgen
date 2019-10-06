@@ -5,7 +5,7 @@
 
 #define BINS_INITIAL 4
 #define BINS_MULTIPLIER 2
-#define BIN_SIZE 4096
+#define BIN_SIZE 1024
 #define ITEMS_PER_BIN(size) (BIN_SIZE / size)
 
 #undef passgen_array_get

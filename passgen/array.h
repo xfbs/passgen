@@ -29,7 +29,8 @@ void *passgen_array_get(passgen_array_t *array, size_t size, size_t pos);
 void passgen_array_free(passgen_array_t *array, size_t size, passgen_mem_t *mem);
 void passgen_array_pop(passgen_array_t *array, size_t size, passgen_mem_t *mem);
 
-#ifndef PASSGEN_DEBUG
+/* enable this for more optimised lookups. */
+#if 0
 #define passgen_array_get(array, size, pos) \
-    ((array)->data[pos / (4096 / size)] + (pos % (4096 / size)) * size)
+    ((array)->data[pos / (1024 / size)] + (pos % (1024 / size)) * size)
 #endif
