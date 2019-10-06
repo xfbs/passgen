@@ -96,8 +96,19 @@ pattern_random_ranges(
 
         // locate choice in list of choices.
         // TODO: binary search.
-        size_t num = 0;
-        for(num = 0; ranges->choices_list[num] <= choice; num++);
+        size_t num ;
+        for(num = 0; num < ranges->items.len; num++) {
+            if(choice < ranges->choices_list[num]) {
+                break;
+            }
+        }
+
+        assert(num != ranges->items.len);
+
+        /* adjust choice to be relative offset */
+        if(num) {
+            choice -= ranges->choices_list[num - 1];
+        }
 
         pattern_range_t *range = passgen_array_get(
                 &ranges->items,
