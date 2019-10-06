@@ -360,3 +360,8 @@ Use something like `\p` as a special character to generate pronounceable words,
 using the algorithm found at [wolfram](https://www.wolfram.com/language/gallery/generate-random-pronounceable-words/).
 
 Maybe add `\P` for uppercase or mixed-case or something?
+
+### Special Identifiers
+
+What if instead of allowing a syntax like `\w` and `\p`, LaTeX-style identifiers
+like `\wordlist[english]` and `\pronouncable[english]` were allowed?
