@@ -1,6 +1,6 @@
 #include "passgen/pronounceable_private.h"
 
-struct markov english = {
+struct markov passgen_pronounceable_english = {
     .list = (struct markov2[]) {
         {
             .codepoint = 0x0,

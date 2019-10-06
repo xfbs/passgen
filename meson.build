@@ -105,6 +105,7 @@ test_files = [
   'tests/pattern.c',
   'tests/unicode.c',
   'tests/array.c',
+  'tests/pronounceable.c',
   'tests/token.c',
 ]
 all_tests = custom_target(
