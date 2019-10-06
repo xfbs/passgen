@@ -19,12 +19,13 @@ size_t passgen_pronounceable(
         size_t len);
 
 /* generates a pronounceable word using the given type that has *exactly*
- * length len. this function will *not* null-terminate the output. works by
- * trying repeatedly. gives up after *tries* (unless tries is 0). returns 0
- * on success, nonzero on failure. */
+ * between min and max codepoints. will not write more than *len* characters
+ * into the buffer, and exits non-zero if it would. */
 int passgen_pronounceable_len(
         enum passgen_pronounceable_type type,
         random_t *rand,
         char *buf,
         size_t len,
+        size_t min,
+        size_t max,
         size_t tries);

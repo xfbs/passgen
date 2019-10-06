@@ -76,14 +76,56 @@ test_result test_pronounceable(void) {
     random_t *rand = random_new();
     assert(rand);
 
-    char buffer[10];
-    size_t ret = passgen_pronounceable(
-            PASSGEN_PRONOUNCEABLE_ENGLISH,
-            rand,
-            buffer,
-            sizeof buffer);
+    for(size_t i = 0; i < 1000; i++) {
+        char buffer[64];
+        size_t ret = passgen_pronounceable(
+                PASSGEN_PRONOUNCEABLE_ENGLISH,
+                rand,
+                buffer,
+                sizeof buffer);
 
-    assert(ret > 0);
+        assert(ret > 0);
+        assert(ret <= sizeof(buffer));
+
+        /* make sure it's null terminated */
+        if(ret < sizeof(buffer)) {
+            assert(buffer[ret] == 0);
+        }
+    }
+
+    return test_ok;
+}
+
+test_result test_pronounceable_len(void) {
+    random_t *rand = random_new();
+    assert(rand);
+
+    /*
+    for(size_t i = 0; i < 1000; i++) {
+        char buffer[11];
+        int ret = passgen_pronounceable_len(
+                PASSGEN_PRONOUNCEABLE_ENGLISH,
+                rand,
+                buffer,
+                sizeof buffer,
+                0);
+
+        assert(ret == 0);
+        assert(buffer[10] == 0);
+    }
+
+    for(size_t i = 0; i < 1000; i++) {
+        char buffer[128];
+        int ret = passgen_pronounceable_len(
+                PASSGEN_PRONOUNCEABLE_ENGLISH,
+                rand,
+                buffer,
+                sizeof buffer,
+                10);
+
+        assert(0 != ret);
+    }
+    */
 
     return test_ok;
 }

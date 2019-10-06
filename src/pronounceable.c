@@ -9,13 +9,67 @@ const struct markov *markov_pronounceable_all[] = {
     NULL
 };
 
+const struct markov0 *
+passgen_pronounceable_choose(
+        const struct markov *list,
+        random_t *rand,
+        int32_t p1,
+        int32_t p2)
+{
+    const struct markov2 *list2 = passgen_pronounceable_find2(list, p1);
+
+    if(!list2) {
+        return NULL;
+    }
+
+    const struct markov1 *list1 = passgen_pronounceable_find1(list2, p2);
+
+    if(!list1) {
+        return NULL;
+    }
+
+    size_t choices = list1->frequency_sum;
+    size_t nchoice = random_uint64_max(rand, choices);
+
+    return passgen_pronounceable_find(list1, nchoice);
+}
+
 size_t passgen_pronounceable2(
-        const struct markov2 *list,
+        const struct markov *list,
         random_t *rand,
         char *buf,
         size_t len)
 {
-    return 0;
+    int32_t p1 = 0, p2 = 0;
+    size_t pos = 0;
+
+    do {
+        const struct markov2 *list2 = passgen_pronounceable_find2(list, p1);
+        assert(list2);
+
+        const struct markov1 *list1 = passgen_pronounceable_find1(list2, p2);
+        assert(list1);
+
+        size_t choices = list1->frequency_sum;
+        size_t nchoice = random_uint64_max(rand, choices);
+
+        const struct markov0 *choice = passgen_pronounceable_find(list1, nchoice);
+        assert(choice);
+
+        /* TODO: emit utf8 from the codepoint? */
+        buf[pos] = choice->codepoint;
+        pos += 1;
+
+        p1 = p2;
+        p2 = choice->codepoint;
+    } while(p2 && pos < len);
+
+    /* null-terminate string if there is space. */
+    if(pos < len) {
+        buf[pos] = 0;
+    }
+
+    return pos;
 }
 
 size_t
@@ -31,7 +85,7 @@ passgen_pronounceable(
     const struct markov *list = markov_pronounceable_all[type];
     assert(list);
 
-    return passgen_pronounceable2(list->list, rand, buf, len);
+    return passgen_pronounceable2(list, rand, buf, len);
 }
 
 int
@@ -40,9 +94,27 @@ passgen_pronounceable_len(
         random_t *rand,
         char *buf,
         size_t len,
+        size_t min,
+        size_t max,
         size_t tries)
 {
-    return 0;
+    assert(type < PASSGEN_PRONOUNCEABLE_LAST);
+
+    /* get list */
+    const struct markov *list = markov_pronounceable_all[type];
+    assert(list);
+
+    /* try tries times (or infinite times if tries is 0) to fill buffer up with
+     * a word. return 0 on success. */
+    for(size_t i = 0; !tries || i < tries; i++) {
+        size_t ret = passgen_pronounceable2(list, rand, buf, len);
+
+        if(ret == (len - 1)) {
+            return 0;
+        }
+    }
+
+    return -1;
 }
 
 static int
