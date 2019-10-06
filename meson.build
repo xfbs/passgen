@@ -116,6 +116,7 @@ test_files = [
   'tests/memory.c',
   'tests/reader.c',
   'tests/pattern.c',
+  'tests/pattern_random.c',
   'tests/unicode.c',
   'tests/array.c',
   'tests/pronounceable.c',
