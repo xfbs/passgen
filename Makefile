@@ -66,6 +66,9 @@ release: build/release
 debug: build/debug
 	ninja -C $<
 
+static: build/static
+	ninja -C $<
+
 debug-address: build/debug-address
 	ninja -C $<
 
@@ -74,6 +77,9 @@ debug-memory: build/debug-memory
 
 build/release:
 	meson --prefix=$(PREFIX) $@ -Db_ndebug=true
+
+build/static:
+	meson --prefix=$(PREFIX) $@ -Db_ndebug=true -Dstatic=true
 
 build/debug:
 	meson $@ --buildtype=debug
