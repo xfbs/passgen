@@ -82,7 +82,7 @@ test_result test_pronounceable(void) {
                 PASSGEN_PRONOUNCEABLE_ENGLISH,
                 rand,
                 buffer,
-                sizeof buffer);
+                64);
 
         assert(ret > 0);
         assert(ret <= sizeof(buffer));
@@ -135,7 +135,7 @@ test_result test_pronounceable_engascii(void) {
                 PASSGEN_PRONOUNCEABLE_ENGLISH,
                 rand,
                 buffer,
-                sizeof buffer);
+                64);
 
         for(size_t i = 0; i < ret; i++) {
             assert('a' <= buffer[i]);
@@ -160,13 +160,10 @@ test_result test_pronounceable_minascii(void) {
                 10,
                 0);
 
-        printf("%zu\n", ret);
         for(size_t i = 0; i < ret; i++) {
-            printf("%i\n", buffer[i]);
             assert('a' <= buffer[i]);
             assert(buffer[i] <= 'z');
         }
-        printf("\n");
     }
 
     return test_ok;
