@@ -120,6 +120,7 @@ void pattern_group_free(pattern_group_t *group, passgen_mem_t *mem);
 
 void pattern_range_free(pattern_ranges_t *ranges, passgen_mem_t *mem) {
     passgen_array_free(&ranges->items, sizeof(pattern_range_t), mem);
+    passgen_free(mem, ranges->choices_list);
 }
 
 void pattern_segment_free(pattern_segment_t *segment, passgen_mem_t *mem) {
@@ -358,29 +359,38 @@ pattern_result_t pattern_ranges_parse_inner(
 }
 
 pattern_result_t pattern_ranges_parse(
-        pattern_ranges_t *range,
+        pattern_ranges_t *ranges,
         unicode_iter_t *iter,
         passgen_mem_t *mem)
 {
-    range->pos.offset = iter->pos;
+    ranges->pos.offset = iter->pos;
     passgen_token_t token = passgen_token_next(iter);
     // TODO assert this?
 
     pattern_result_t result;
-    result = pattern_ranges_parse_inner(range, iter, mem);
+    result = pattern_ranges_parse_inner(ranges, iter, mem);
 
     token = passgen_token_next(iter);
     // assert this is ']'
 
     result = pattern_parse_repeat(
-            &range->repeat,
+            &ranges->repeat,
             iter);
 
     if(!result.ok) {
         return result;
     }
 
-    range->pos.length = iter->pos - range->pos.offset;
+    ranges->pos.length = iter->pos - ranges->pos.offset;
+
+    // compute sum of choices and choices list for binary search.
+    size_t choices = 0;
+    ranges->choices_list = passgen_malloc(mem, sizeof(size_t) * ranges->items.len);
+    for(size_t i = 0; i < ranges->items.len; i++) {
+        pattern_range_t *range = passgen_array_get(&ranges->items, sizeof(pattern_range_t), i);
+        choices += 1 + range->end - range->start;
+        ranges->choices_list[i] = choices;
+    }
 
     return result_ok;
 }

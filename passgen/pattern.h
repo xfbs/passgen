@@ -63,6 +63,10 @@ struct pattern_ranges {
     // array of range_items
     passgen_array_t items;
 
+    // how many choices to choose from. for efficient generation. improved
+    // locality.
+    size_t *choices_list;
+
     struct pattern_repeat repeat;
 };
 
