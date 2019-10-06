@@ -57,6 +57,8 @@ libpassgen = library(
   'src/token.c',
   'src/memory.c',
   'src/array.c',
+  'src/pronounceable.c',
+  'data/pronounceable_english.c',
   'src/assert.c',
   version_src,
   install: true,
