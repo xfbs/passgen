@@ -147,6 +147,18 @@ release builds. Usually no need to test for NULL pointers, these types of
 errors are evident from crashes in tests. Use these to test for wrong runtime
 calls.
 
+## Research
+
+Proquints, see <https://arxiv.org/html/0901.4016>
+
+Pronounceable: <http://www.antimoon.com/how/pronunc-soundsipa.htm>
+
+## Data
+
+### Word lists
+
+Latin: <https://github.com/bbloomf/verbalatina>
+
 ## Todo
 
 ### Unicode Support
