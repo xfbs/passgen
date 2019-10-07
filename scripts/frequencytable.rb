@@ -4,7 +4,7 @@
 
 dictionary_file = File.read(ARGV[0])
 
-words = dictionary_file.split("\r\n")
+words = dictionary_file.split("\n")
 
 table = Hash.new{|h, v| h[v] = Hash.new{|h, v| h[v] = Hash.new{|h, v| h[v] = 0}}}
 
