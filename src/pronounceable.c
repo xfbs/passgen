@@ -6,6 +6,7 @@
 
 const struct markov *markov_pronounceable_all[] = {
     &passgen_pronounceable_english,
+    &passgen_pronounceable_latin,
     NULL
 };
 
