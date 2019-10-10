@@ -33,6 +33,7 @@ void passgen_run(passgen_opts opts) {
 
     if(!result.ok) {
         random_close(&random);
+        pattern_error_show(result, opts.format);
         bail(PATTERN_PARSE, opts.format);
     }
 
@@ -193,7 +194,7 @@ void passgen_bail(passgen_error error, void *data) {
             printf("Error: couldn't open random object.\n");
             exit(-3);
         case PASSGEN_ERROR_PATTERN_PARSE:
-            printf("Error: couldn't parse pattern '%s'.\n", (const char *)data);
+            //printf("Error: couldn't parse pattern '%s'.\n", (const char *)data);
             exit(-4);
         case PASSGEN_ERROR_ILLEGAL_AMOUNT:
             printf("Error: illegal amount entered (%i).\n", *((int *)data));

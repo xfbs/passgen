@@ -128,6 +128,8 @@ enum pattern_error {
     PATTERN_ERROR_ALLOC,
     PATTERN_ERROR_ILLEGAL,
     PATTERN_ERROR_DEPTH,
+    PATTERN_ERROR_GROUP_CLOSE,
+    PATTERN_ERROR_LAST,
 };
 
 struct pattern_result {
@@ -184,3 +186,6 @@ int pattern_random(
     pattern_random_cb *func);
 
 size_t pattern_choices(pattern_t *pattern);
+
+const char *pattern_error_to_str(enum pattern_error kind);
+void pattern_error_show(pattern_result_t result, const char *format);

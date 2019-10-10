@@ -1,6 +1,8 @@
 #include "passgen/pattern.h"
 #include <stdbool.h>
 
+const char *passgen_error_str[PATTERN_ERROR_LAST];
+
 #define accept_regular(chr, error_kind, start) \
     token = pattern_token_peek(iter); \
     if(!passgen_token_regular(&token)) { \

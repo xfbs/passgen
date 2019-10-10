@@ -2,6 +2,13 @@
 #include "passgen/pattern_private.h"
 #include <assert.h>
 
+const char *passgen_error_str[PATTERN_ERROR_LAST] = {
+    "cannot allocate memory.",
+    "illegal.",
+    "depth limit exceeded.",
+    "group close token expected here.",
+};
+
 static const pattern_result_t result_ok = {
     .ok = true,
 };
@@ -20,6 +27,16 @@ pattern_result_t pattern_error_depth(passgen_token_t *token) {
         .ok = false,
         .remove = true,
         .kind = PATTERN_ERROR_DEPTH,
+        .pos.offset = token->pos.offset,
+        .pos.length = token->pos.length,
+    };
+}
+
+pattern_result_t pattern_error_token(passgen_token_t *token, enum pattern_error kind) {
+    return (pattern_result_t) {
+        .ok = false,
+        .remove = true,
+        .kind = kind,
         .pos.offset = token->pos.offset,
         .pos.length = token->pos.length,
     };
@@ -156,7 +173,7 @@ pattern_result_t pattern_group_parse(
     token = passgen_token_next(iter);
 
     if(!pattern_group_is_end(token)) {
-        // error
+        return pattern_error_token(&token, PATTERN_ERROR_GROUP_CLOSE);
     }
 
     result = pattern_parse_repeat(
@@ -630,4 +647,26 @@ passgen_parse_number(
     // store result
     *number = num;
     return result_ok;
+}
+
+const char *pattern_error_to_str(enum pattern_error kind) {
+    return passgen_error_str[kind];
+}
+
+void pattern_error_show(pattern_result_t result, const char *format) {
+    printf("\e[31mError at position %zu while parsing pattern: %s\n\e[0m", 
+            result.pos.offset,
+            pattern_error_to_str(result.kind));
+
+    printf("\n%s\n", format);
+
+    for(size_t i = 0; i < result.pos.offset; i++) {
+        printf(" ");
+    }
+
+    for(size_t i = 0; i < (1 || result.pos.length); i++) {
+        printf(i ? "~" : "^");
+    }
+
+    printf("\n");
 }
