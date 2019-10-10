@@ -12,12 +12,6 @@
 #include "passgen/debug.h"
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *)data)
 
-pattern_preset pattern_presets[] = {
-    { "apple1", "[a-zA-Z0-9]{3}(-[a-zA-Z0-9]{3}){3}" },
-    { "apple2", "[a-zA-Z0-9]{6}(-[a-zA-Z0-9]{6}){2}" },
-    { NULL, NULL },
-};
-
 void passgen_run(passgen_opts opts) {
     passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
     passgen_mem_t mem = passgen_mem_accounting(&acc);
@@ -177,16 +171,16 @@ void passgen_usage(const char *executable) {
             "(repeat).\n"
             "\n"
             "OPTIONS\n"
-            "    -a, --amount         The amount of passwords\n"
-            "    -z, --null           Use NUL instead of newline to separate passes.\n"
-            "    -h, --help           Show this help information\n"
-            "    -p, --preset name    Use the given preset.\n"
-            "    -v, --version        Show the version of this build.\n"
-            "    -d, --depth          Limit the parsing depth.\n"
+            "    -a, --amount      The amount of passwords\n"
+            "    -z, --null        Use NUL instead of newline to separate passes.\n"
+            "    -h, --help        Show this help information\n"
+            "    -p, --preset      Use the given preset.\n"
+            "    -v, --version     Show the version of this build.\n"
+            "    -d, --depth       Limit the parsing depth.\n"
             "\n"
             "PRESETS\n"
-            "    apple1          Generate passwords like 'oKC-T37-Dew-Qyn'.\n"
-            "    apple2          Generate passwords like 'mHXr4X-CiK4w6-hbjF7T'.\n",
+            "    apple1            Generate passwords like 'oKC-T37-Dew-Qyn'.\n"
+            "    apple2            Generate passwords like 'mHXr4X-CiK4w6-hbjF7T'.\n",
             passgen_version_str(),
             executable);
 }

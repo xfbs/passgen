@@ -59,6 +59,7 @@ libpassgen_src = [
   'src/pronounceable.c',
   'data/pronounceable_english.c',
   'data/pronounceable_latin.c',
+  'data/pattern_presets.c',
   'src/assert.c',
 ]
 
