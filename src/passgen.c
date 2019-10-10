@@ -29,7 +29,7 @@ void passgen_run(passgen_opts opts) {
 
     // parse format
     pattern_t pattern;
-    result = pattern_parse(&pattern, opts.format, 100, &mem);
+    result = pattern_parse(&pattern, opts.format, opts.depth, &mem);
 
     if(!result.ok) {
         random_close(&random);
@@ -46,12 +46,21 @@ void passgen_run(passgen_opts opts) {
         bail(ALLOC, NULL);
     }
 
+    char sep = '\n';
+    if(opts.null) {
+        sep = '\0';
+    }
+
     for(size_t i = 0; i < opts.amount; ++i) {
         // get a NULL-terminated, random pass.
         size_t written = pattern_random_fill(&pattern, &random, NULL, pass, pass_len);
         pass[written] = '\0';
 
-        printf((i == 0) ? "%s" : "\t%s", pass);
+        if(i == 0) {
+            printf("%s", pass);
+        } else {
+            printf("%c%s", sep, pass);
+        }
     }
 
     printf("\n");
@@ -65,9 +74,11 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
     passgen_opts opts = {
         .format = NULL,
         .amount = 1,
+        .depth = 100,
+        .null = false,
     };
 
-    const char *short_opts = "a:p:hv";
+    const char *short_opts = "a:p:d:zhv";
     const char *preset = NULL;
 
     // clang-format off
@@ -75,7 +86,9 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
         {"amount", required_argument, NULL, 'a'},
         {"help", no_argument, NULL, 'h'},
         {"preset", required_argument, NULL, 'p'},
+        {"depth", required_argument, NULL, 'd'},
         {"version", no_argument, NULL, 'v'},
+        {"null", no_argument, NULL, 'z'},
         {NULL, no_argument, NULL, 0}
     };
     // clang-format on
@@ -100,6 +113,13 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
                 break;
             case 'p':
                 preset = optarg;
+                break;
+            case 'd':
+                opt = atoi(optarg);
+                opts.depth = opt;
+                break;
+            case 'z':
+                opts.null = true;
                 break;
             case 'v':
                 bail(VERSION, NULL);
@@ -158,9 +178,11 @@ void passgen_usage(const char *executable) {
             "\n"
             "OPTIONS\n"
             "    -a, --amount         The amount of passwords\n"
+            "    -z, --null           Use NUL instead of newline to separate passes.\n"
             "    -h, --help           Show this help information\n"
             "    -p, --preset name    Use the given preset.\n"
             "    -v, --version        Show the version of this build.\n"
+            "    -d, --depth          Limit the parsing depth.\n"
             "\n"
             "PRESETS\n"
             "    apple1          Generate passwords like 'oKC-T37-Dew-Qyn'.\n"
