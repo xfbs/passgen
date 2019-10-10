@@ -23,6 +23,9 @@ bool pattern_repeat_is_start(passgen_token_t token);
 bool pattern_repeat_is_sep(passgen_token_t token);
 bool pattern_repeat_is_end(passgen_token_t token);
 
+bool pattern_sqarg_is_start(passgen_token_t token);
+bool pattern_sqarg_is_end(passgen_token_t token);
+
 pattern_result_t
 pattern_group_parse_inner(
         pattern_group_t *group,
@@ -86,3 +89,7 @@ passgen_parse_number(
         size_t *number,
         unicode_iter_t *iter);
 
+static pattern_result_t
+pattern_parse_sqarg(
+        pattern_substring_t *arg,
+        unicode_iter_t *iter);

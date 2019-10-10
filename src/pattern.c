@@ -156,6 +156,7 @@ pattern_result_t pattern_group_parse(
 
     token = passgen_token_next(iter);
 
+    /* if this was called, this is true already. */
     if(!pattern_group_is_start(token)) {
         // error
     }
@@ -422,6 +423,28 @@ pattern_special_parse(
     /* skip first token — we know this is a special token. */
     passgen_token_t token = passgen_token_next(iter);
 
+    result = pattern_parse_sqarg(
+            &special->arg,
+            iter);
+
+    if(!result.ok) {
+        return result;
+    }
+
+    switch(token.codepoint) {
+        case 'p':
+            special->kind = PATTERN_SPECIAL_PRONOUNCABLE;
+            special->data.pronounceable = passgen_pronounceable_lookup(
+                    special->arg.length,
+                    iter->data + special->arg.offset);
+            break;
+        case 'w':
+            special->kind = PATTERN_SPECIAL_WORDLIST;
+            break;
+        default:
+            break;
+    }
+
     /* parse length. */
     result = pattern_parse_repeat(
             &special->length,
@@ -438,17 +461,6 @@ pattern_special_parse(
 
     if(!result.ok) {
         return result;
-    }
-
-    switch(token.codepoint) {
-        case 'p':
-            special->kind = PATTERN_SPECIAL_PRONOUNCABLE;
-            break;
-        case 'w':
-            special->kind = PATTERN_SPECIAL_WORDLIST;
-            break;
-        default:
-            break;
     }
 
     special->pos.length = iter->pos - special->pos.offset;
@@ -554,6 +566,14 @@ bool pattern_repeat_is_end(passgen_token_t token) {
     return passgen_token_is_regular(&token) && token.codepoint == '}';
 }
 
+bool pattern_sqarg_is_start(passgen_token_t token) {
+    return passgen_token_is_regular(&token) && token.codepoint == '[';
+}
+
+bool pattern_sqarg_is_end(passgen_token_t token) {
+    return passgen_token_is_regular(&token) && token.codepoint == ']';
+}
+
 static pattern_result_t
 pattern_parse_repeat(
         pattern_repeat_t *repeat,
@@ -603,6 +623,36 @@ pattern_parse_repeat(
     }
 
     return result;
+}
+
+static pattern_result_t
+pattern_parse_sqarg(
+        pattern_substring_t *arg,
+        unicode_iter_t *iter)
+{
+    unicode_iter_t prev = *iter;
+    passgen_token_t token = passgen_token_next(iter);
+
+    // don't do anything if this isn't a start token.
+    if(!pattern_sqarg_is_start(token)) {
+        arg->offset = 0;
+        arg->length = 0;
+        *iter = prev;
+        return result_ok;
+    }
+
+    arg->offset = iter->pos;
+
+    while(!passgen_token_is_error(&token) && !pattern_sqarg_is_end(token)) {
+        arg->length = iter->pos - arg->offset;
+        token = passgen_token_next(iter);
+    }
+
+    if(passgen_token_is_error(&token)) {
+        // error
+    }
+
+    return result_ok;
 }
 
 static inline pattern_result_t

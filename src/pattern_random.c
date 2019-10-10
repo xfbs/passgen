@@ -162,7 +162,7 @@ pattern_random_special_pronounceable(
 
     /* TODO: get tries and default from env! */
     size_t count = passgen_pronounceable_len(
-            env->pronounceable_type,
+            special->data.pronounceable,
             rand,
             buffer,
             special->length.min,

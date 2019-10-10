@@ -6,4 +6,3 @@ pattern_preset pattern_presets[] = {
     { "pxkcd", "(\\p{8}-){3}\\p{8}" },
     { NULL, NULL },
 };
-

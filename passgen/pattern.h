@@ -103,6 +103,9 @@ struct pattern_special {
     enum pattern_special_kind kind;
     struct pattern_repeat length;
     struct pattern_repeat repeat;
+    union {
+        enum passgen_pronounceable_type pronounceable;
+    } data;
 };
 
 /// Pattern segment: single segment (range, group or sequence).
@@ -145,6 +148,7 @@ struct pattern_env {
 };
 
 typedef struct pattern pattern_t;
+typedef struct pattern_substring pattern_substring_t;
 typedef struct pattern_result pattern_result_t;
 typedef struct pattern_segments pattern_segments_t;
 typedef struct pattern_segment pattern_segment_t;

@@ -3,12 +3,33 @@
 #include "passgen/pronounceable.h"
 #include "passgen/pronounceable_private.h"
 #include <stdlib.h>
+#include <string.h>
 
 const struct markov *markov_pronounceable_all[] = {
     &passgen_pronounceable_english,
     &passgen_pronounceable_latin,
     NULL
 };
+
+passgen_pronounceable_map_t passgen_pronounceable_map[] = {
+    {"english", PASSGEN_PRONOUNCEABLE_ENGLISH},
+    {"latin", PASSGEN_PRONOUNCEABLE_LATIN},
+    {NULL, 0},
+};
+
+enum passgen_pronounceable_type
+passgen_pronounceable_lookup(
+        size_t length,
+        const char *name)
+{
+    for(size_t i = 0; i < PASSGEN_PRONOUNCEABLE_LAST; i++) {
+        if(0 == strncmp(passgen_pronounceable_map[i].name, name, length)) {
+            return passgen_pronounceable_map[i].type;
+        }
+    }
+
+    return PASSGEN_PRONOUNCEABLE_LAST;
+}
 
 const struct markov0 *
 passgen_pronounceable_choose(
