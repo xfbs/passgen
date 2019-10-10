@@ -41,6 +41,7 @@ typedef struct {
   const char *format;
   bool null;
   size_t depth;
+  bool complexity;
 } passgen_opts;
 
 /// Print usage (help text) using @p executable as the name of the program.

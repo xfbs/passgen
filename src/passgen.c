@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <math.h>
 #include "passgen/pattern.h"
 #include "passgen/random.h"
 #include "passgen/version.h"
@@ -46,9 +47,19 @@ void passgen_run(passgen_opts opts) {
     }
 
     for(size_t i = 0; i < opts.amount; ++i) {
+        pattern_env_t env = {
+            .find_complexity = opts.complexity,
+            .pronounceable_limit = 1000,
+            .pronounceable_type = PASSGEN_PRONOUNCEABLE_ENGLISH,
+        };
+
         // get a NULL-terminated, random pass.
-        size_t written = pattern_random_fill(&pattern, &random, NULL, pass, pass_len);
+        size_t written = pattern_random_fill(&pattern, &random, &env, pass, pass_len);
         pass[written] = '\0';
+
+        if(opts.complexity) {
+            fprintf(stderr, "entropy: %lf bits\n", log(env.complexity) / log(2));
+        }
 
         if(i == 0) {
             printf("%s", pass);
@@ -70,9 +81,10 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
         .amount = 1,
         .depth = 100,
         .null = false,
+        .complexity = false,
     };
 
-    const char *short_opts = "a:p:d:zhv";
+    const char *short_opts = "a:p:d:czhv";
     const char *preset = NULL;
 
     // clang-format off
@@ -83,6 +95,7 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
         {"depth", required_argument, NULL, 'd'},
         {"version", no_argument, NULL, 'v'},
         {"null", no_argument, NULL, 'z'},
+        {"complexity", no_argument, NULL, 'c'},
         {NULL, no_argument, NULL, 0}
     };
     // clang-format on
@@ -114,6 +127,9 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
                 break;
             case 'z':
                 opts.null = true;
+                break;
+            case 'c':
+                opts.complexity = true;
                 break;
             case 'v':
                 bail(VERSION, NULL);
@@ -177,6 +193,7 @@ void passgen_usage(const char *executable) {
             "    -p, --preset      Use the given preset.\n"
             "    -v, --version     Show the version of this build.\n"
             "    -d, --depth       Limit the parsing depth.\n"
+            "    -c, --complexity  Output complexity for each password.\n"
             "\n"
             "PRESETS\n"
             "    apple1            Generate passwords like 'oKC-T37-Dew-Qyn'.\n"

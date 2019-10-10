@@ -10,6 +10,7 @@ struct fillpos {
 };
 
 static pattern_env_t pattern_env_default = {
+    .find_complexity = false,
     .pronounceable_limit = 1000,
     .pronounceable_type = PASSGEN_PRONOUNCEABLE_ENGLISH,
 };
@@ -60,6 +61,7 @@ size_t pattern_random_fill(
 static size_t
 pattern_random_repeat(
         random_t *rand,
+        pattern_env_t *env,
         pattern_repeat_t *repeat)
 {
     size_t difference = repeat->max - repeat->min;
@@ -72,6 +74,11 @@ pattern_random_repeat(
     // get random number to choose from the range
     size_t choice = random_uint64_max(rand, difference + 1);
 
+    // keep track of complexity
+    if(env->find_complexity) {
+        env->complexity *= difference + 1;
+    }
+
     return repeat->min + choice;
 }
 
@@ -83,7 +90,7 @@ pattern_random_ranges(
         void *data,
         pattern_random_cb *func)
 {
-    size_t reps = pattern_random_repeat(rand, &ranges->repeat);
+    size_t reps = pattern_random_repeat(rand, env, &ranges->repeat);
 
     // compute number of possible codepoints
     size_t possible = ranges->choices_list[ranges->items.len - 1];
@@ -93,6 +100,11 @@ pattern_random_ranges(
     // repeat chose rep size times
     for(size_t i = 0; i < reps; i++) {
         size_t choice = random_uint64_max(rand, possible);
+
+        // keep track of complexity
+        if(env->find_complexity) {
+            env->complexity *= possible;
+        }
 
         // locate choice in list of choices.
         // TODO: binary search.
@@ -133,7 +145,7 @@ pattern_random_character(
         void *data,
         pattern_random_cb *func)
 {
-    size_t reps = pattern_random_repeat(rand, &character->repeat);
+    size_t reps = pattern_random_repeat(rand, env, &character->repeat);
 
     for(size_t i = 0; i < reps; i++) {
         int ret = func(data, character->codepoint);
@@ -315,11 +327,16 @@ pattern_random_group(
         pattern_random_cb *func)
 {
     // choose random number of repetitions
-    size_t reps = pattern_random_repeat(rand, &group->repeat);
+    size_t reps = pattern_random_repeat(rand, env, &group->repeat);
 
     for(size_t r = 0; r < reps; r++) {
         // choose random segment from segments
         size_t segment = random_uint64_max(rand, group->segments.len);
+
+        // keep track of complexity
+        if(env->find_complexity) {
+            env->complexity *= group->segments.len;
+        }
 
         // get segment from array
         pattern_segments_t *segments;
@@ -354,6 +371,10 @@ pattern_random(
     /* use default env if none was supplied. this should be relatively sane. */
     if(!env) {
         env = &pattern_env_default;
+    }
+
+    if(env->find_complexity) {
+        env->complexity = 1;
     }
 
     return pattern_random_group(

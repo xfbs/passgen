@@ -143,6 +143,8 @@ struct pattern_result {
 };
 
 struct pattern_env {
+    bool find_complexity;
+    double complexity;
     size_t pronounceable_limit;
     enum passgen_pronounceable_type pronounceable_type;
 };
