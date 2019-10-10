@@ -91,6 +91,76 @@ test_result test_pronounceable(void) {
     return test_ok;
 }
 
+/* rough test to see that there is a reasonable length distribution when
+ * generating english words. */
+test_result test_pronounceable_englendist(void) {
+    random_t *rand = random_new();
+    assert(rand);
+    size_t lens[64] = {0};
+
+    for(size_t i = 0; i < 1000; i++) {
+        int32_t buffer[64];
+        size_t ret = passgen_pronounceable(
+                PASSGEN_PRONOUNCEABLE_ENGLISH,
+                rand,
+                buffer,
+                64);
+
+        assert(ret <= sizeof(buffer));
+        lens[ret]++;
+    }
+
+    assert(lens[0] == 0);
+    assert(lens[2] > 10);
+    assert(lens[3] > 10);
+    assert(lens[4] > 10);
+    assert(lens[5] > 10);
+    assert(lens[5] > 10);
+    assert(lens[6] > 10);
+    assert(lens[7] > 10);
+    assert(lens[8] > 10);
+    assert(lens[9] > 10);
+    assert(lens[10] > 10);
+
+    return test_ok;
+}
+
+/* rough test to see that there is a reasonable length distribution when
+ * generating english words. */
+test_result test_pronounceable_latlendist(void) {
+    random_t *rand = random_new();
+    assert(rand);
+    size_t lens[64] = {0};
+
+    for(size_t i = 0; i < 1000; i++) {
+        int32_t buffer[64];
+        size_t ret = passgen_pronounceable(
+                PASSGEN_PRONOUNCEABLE_LATIN,
+                rand,
+                buffer,
+                64);
+
+        assert(ret > 0);
+        assert(ret <= sizeof(buffer));
+
+        lens[ret]++;
+    }
+
+    assert(lens[0] == 0);
+    assert(lens[2] > 10);
+    assert(lens[3] > 10);
+    assert(lens[4] > 10);
+    assert(lens[5] > 10);
+    assert(lens[5] > 10);
+    assert(lens[6] > 10);
+    assert(lens[7] > 10);
+    assert(lens[8] > 10);
+    assert(lens[9] > 10);
+    assert(lens[10] > 10);
+
+    return test_ok;
+}
+
 test_result test_pronounceable_len(void) {
     random_t *rand = random_new();
     assert(rand);
