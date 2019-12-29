@@ -13,5 +13,5 @@ build:alpine:
   image: alpine:latest
   stage: build
   script:
-    - apk add musl-dbg musl-dev libc-dev pkgconfig make cmake
+    - apk add build-base
     - mkdir build && cd build && cmake .. && make
