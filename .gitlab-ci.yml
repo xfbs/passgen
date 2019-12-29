@@ -8,3 +8,10 @@ build:bionic:
   script:
     - apt update && apt install -y gcc clang make cmake
     - mkdir build && cd build && cmake .. && make
+
+build:alpine:
+  image: alpine:latest
+  stage: build
+  script:
+    - apk add musl-dbg musl-dev libc-dev pkgconfig make cmake
+    - mkdir build && cd build && cmake .. && make
