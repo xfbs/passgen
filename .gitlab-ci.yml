@@ -31,14 +31,14 @@ docker:bionic:
 
 # build stuff on ubuntu.
 build:bionic:
-  image: "${CI_REGISTRY_NAME}:bionic"
+  image: registry.gitlab.com/xfbs/passgen:bionic
   stage: build
   script:
     - mkdir build && cd build && cmake .. && make
 
 # build stuff on alpine.
 build:alpine:
-  image: "${CI_REGISTRY_NAME}:alpine"
+  image: registry.gitlab.com/xfbs/passgen:alpine
   stage: build
   script:
     - mkdir build && cd build && cmake .. && make
