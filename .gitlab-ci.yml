@@ -2,13 +2,13 @@ stages:
   - setup
   - build
 
-services:
-  - docker:dind
 
 # rebuild alpine docker container.
-setup:docker:alpine:
+docker:alpine:
   image: docker
   stage: setup
+  services:
+    - docker:dind
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker build . -f Dockerfile.alpine -t "$CI_REGISTRY_IMAGE:alpine"
@@ -17,9 +17,11 @@ setup:docker:alpine:
     - docker
 
 # rebuild bionic docker container
-setup:docker:bionic:
+docker:bionic:
   image: docker
   stage: setup
+  services:
+    - docker:dind
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker build . -f Dockerfile.bionic -t "$CI_REGISTRY_IMAGE:bionic"
@@ -29,14 +31,14 @@ setup:docker:bionic:
 
 # build stuff on ubuntu.
 build:bionic:
-  image: ${CI_REGISTRY_NAME}:bionic
+  image: "${CI_REGISTRY_NAME}:bionic"
   stage: build
   script:
     - mkdir build && cd build && cmake .. && make
 
 # build stuff on alpine.
 build:alpine:
-  image: ${CI_REGISTRY_NAME}:alpine
+  image: "${CI_REGISTRY_NAME}:alpine"
   stage: build
   script:
     - mkdir build && cd build && cmake .. && make
