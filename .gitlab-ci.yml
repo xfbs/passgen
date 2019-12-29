@@ -29,16 +29,14 @@ setup:docker:bionic:
 
 # build stuff on ubuntu.
 build:bionic:
-  image: ubuntu:bionic
+  image: ${CI_REGISTRY_NAME}:bionic
   stage: build
   script:
-    - apt update && apt install -y gcc clang make cmake
     - mkdir build && cd build && cmake .. && make
 
 # build stuff on alpine.
 build:alpine:
-  image: alpine:latest
+  image: ${CI_REGISTRY_NAME}:alpine
   stage: build
   script:
-    - apk add build-base cmake make
     - mkdir build && cd build && cmake .. && make
