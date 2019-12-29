@@ -1,11 +1,11 @@
 FROM alpine:latest
 
+# install dependencies
 RUN apk add build-base cmake make sudo
 
+# setup normal user and sudo
 RUN addgroup sudo
 RUN adduser -s /bin/ash -G sudo -D user
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 USER user
-
-RUN sudo whoami
