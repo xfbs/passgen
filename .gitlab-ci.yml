@@ -2,7 +2,6 @@ stages:
   - setup
   - build
 
-
 # rebuild alpine docker container.
 docker:alpine:
   image: docker
