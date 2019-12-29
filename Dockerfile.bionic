@@ -2,9 +2,9 @@ FROM ubuntu:bionic
 
 RUN apt update && apt install -y build-essential sudo
 
-RUN adduser --disabled-password --groups sudo --system --shell /bin/bash user
+# create nonprivileged user to build stuff under with access to sudo
+RUN adduser --disabled-password --ingroup sudo --shell /bin/bash --gecos '' user
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 USER user
 
-RUN useradd -m docker && adduser docker sudo
