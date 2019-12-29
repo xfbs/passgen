@@ -1,9 +1,10 @@
-image: ubuntu:bionic
 
 stages:
   - build
 
-build:
+build:bionic:
+  image: ubuntu:bionic
   stage: build
   script:
+    - sudo apt install build-essential cmake
     - mkdir build && cd build && cmake .. && make
