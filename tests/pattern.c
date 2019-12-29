@@ -4,613 +4,626 @@
 #include "passgen/random.h"
 #include "tests/tests.h"
 
-test_result test_pattern_parse() {
-  const char *s = "abc|def";
-  pattern_t *pattern = pattern_parse(&s);
-  assert(pattern);
-  assert(pattern->item->kind == PATTERN_CHAR);
-  assert(pattern->item->data.chr[0] == 'a');
-  assert(pattern->item->next->kind == PATTERN_CHAR);
-  assert(pattern->item->next->data.chr[0] == 'b');
-  assert(pattern->item->next->next->kind == PATTERN_CHAR);
-  assert(pattern->item->next->next->data.chr[0] == 'c');
-  assert(!pattern->item->next->next->next);
-  assert(pattern->next->item->kind == PATTERN_CHAR);
-  assert(pattern->next->item->data.chr[0] == 'd');
-  assert(pattern->next->item->next->kind == PATTERN_CHAR);
-  assert(pattern->next->item->next->data.chr[0] == 'e');
-  assert(pattern->next->item->next->next->kind == PATTERN_CHAR);
-  assert(pattern->next->item->next->next->data.chr[0] == 'f');
-  assert(!pattern->next->item->next->next->next);
-  assert(!pattern->next->next);
-  pattern_free(pattern);
+test_result test_pattern_parse_str() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
 
-  s = "a";
-  pattern = pattern_parse(&s);
-  assert(pattern);
-  assert(!pattern->next);
-  assert(pattern->item);
-  assert(pattern->item->kind == PATTERN_CHAR);
-  assert(pattern->item->data.chr[0] == 'a');
-  assert(!pattern->item->next);
-  pattern_free(pattern);
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
 
-  s = "";
-  pattern = pattern_parse(&s);
-  assert(pattern);
-  assert(!pattern->next);
-  assert(pattern->item);
-  pattern_free(pattern);
+    str = "abc";
+    result = pattern_parse(&pattern, str, 0, &mem);
+    assert(result.ok);
+    assert(pattern.mem == &mem);
+    assert(pattern.pattern == str);
+    assert(pattern.group.pos.offset == 0);
+    assert(pattern.group.pos.length == 3);
+    assert(pattern.group.segments.len == 1);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->pos.offset == 0);
+    assert(segments->pos.length == 3);
+    assert(segments->items.len == 3);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 0);
+    assert(segment->data.character.pos.length == 1);
+    assert(segment->data.character.codepoint == 'a');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 1);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 1);
+    assert(segment->data.character.pos.length == 1);
+    assert(segment->data.character.codepoint == 'b');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 2);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 2);
+    assert(segment->data.character.pos.length == 1);
+    assert(segment->data.character.codepoint == 'c');
 
-  s = ")";
-  pattern = pattern_parse(&s);
-  assert(pattern);
-  assert(!pattern->next);
-  assert(pattern->item);
-  pattern_free(pattern);
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
 
-  return test_ok;
+    return test_ok;
 }
 
-test_result test_pattern_segment_random() {
-  const char *s = "a\\({2}[ab]{10,12}";
-  pattern_segment_t *pattern = pattern_segment_parse(&s);
-  random_t *rand = random_new();
-  const char *out = pattern_segment_random(pattern, rand);
-  assert(out);
-  assert(out[0] == 'a');
-  assert(out[1] == '(');
-  assert(out[2] == '(');
-  assert(out[3] == 'a' || out[3] == 'b');
-  assert(out[4] == 'a' || out[4] == 'b');
-  assert(out[5] == 'a' || out[5] == 'b');
-  assert(out[6] == 'a' || out[6] == 'b');
-  assert(out[7] == 'a' || out[7] == 'b');
-  assert(out[8] == 'a' || out[8] == 'b');
-  assert(out[9] == 'a' || out[9] == 'b');
-  assert(out[10] == 'a' || out[10] == 'b');
-  assert(out[11] == 'a' || out[11] == 'b');
-  assert(out[12] == 'a' || out[12] == 'b');
-  assert(out[13] == 'a' || out[13] == 'b' || out[13] == '\0');
-  assert(out[14] == 'a' || out[14] == 'b' || out[14] == '\0');
-  free((void *)out);
+test_result test_pattern_parse_group() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
 
-  pattern_segment_free(pattern);
-  random_close(rand);
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
 
-  return test_ok;
+    str = "(abc)";
+    result = pattern_parse(&pattern, str, 1, &mem);
+    assert(result.ok);
+    assert(pattern.mem == &mem);
+    assert(pattern.pattern == str);
+    assert(pattern.group.pos.offset == 0);
+    assert(pattern.group.pos.length == 5);
+    assert(pattern.group.segments.len == 1);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->pos.offset == 0);
+    assert(segments->pos.length == 5);
+    assert(segments->items.len == 1);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_GROUP);
+    assert(segment->data.group.pos.offset == 1);
+    assert(segment->data.group.pos.length == 3);
+    segments = passgen_array_get(&segment->data.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->items.len == 3);
+
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
+
+    return test_ok;
 }
 
-test_result test_pattern_segment_maxlen() {
-  const char *s = "a\\({2}b{11,12}";
-  pattern_segment_t *pattern = pattern_segment_parse(&s);
-  assert(pattern_segment_maxlen(pattern) == 15);
-  pattern_segment_free(pattern);
+test_result test_pattern_parse_strrep() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
 
-  s = "a{2,3}[a-z]{5}\\]{2}";
-  pattern = pattern_segment_parse(&s);
-  assert(pattern_segment_maxlen(pattern) == 10);
-  pattern_segment_free(pattern);
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
 
-  return test_ok;
+    str = "ab{11}c{14,19}";
+    result = pattern_parse(&pattern, str, 0, &mem);
+    assert(result.ok);
+    assert(pattern.mem == &mem);
+    assert(pattern.pattern == str);
+    assert(pattern.group.pos.offset == 0);
+    assert(pattern.group.pos.length == 14);
+    assert(pattern.group.segments.len == 1);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->pos.offset == 0);
+    assert(segments->pos.length == 14);
+    assert(segments->items.len == 3);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 0);
+    assert(segment->data.character.pos.length == 1);
+    assert(segment->data.character.codepoint == 'a');
+    assert(segment->data.character.repeat.min == 1);
+    assert(segment->data.character.repeat.max == 1);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 1);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 1);
+    assert(segment->data.character.pos.length == 5);
+    assert(segment->data.character.codepoint == 'b');
+    assert(segment->data.character.repeat.min == 11);
+    assert(segment->data.character.repeat.max == 11);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 2);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 6);
+    assert(segment->data.character.pos.length == 8);
+    assert(segment->data.character.codepoint == 'c');
+    assert(segment->data.character.repeat.min == 14);
+    assert(segment->data.character.repeat.max == 19);
+
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
+
+    return test_ok;
 }
 
-test_result test_pattern_segment_parse_chars() {
-  const char *s;
-  const char *p;
-  pattern_segment_t *pattern;
+test_result test_pattern_parse_rangerep() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
 
-  p = s = "a";
-  pattern = pattern_segment_parse(&p);
-  assert(pattern);
-  assert(!pattern->next);
-  assert(pattern->kind == PATTERN_CHAR);
-  assert(pattern->data.chr[0] == 'a');
-  assert(*p == '\0');
-  pattern_segment_free(pattern);
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
 
-  // stop at sep
-  p = s = "a|";
-  pattern = pattern_segment_parse(&p);
-  assert(pattern);
-  assert(!pattern->next);
-  assert(pattern->kind == PATTERN_CHAR);
-  assert(pattern->data.chr[0] == 'a');
-  assert(pattern->reps.min == 1);
-  assert(pattern->reps.max == 1);
-  assert(*p == '|');
-  pattern_segment_free(pattern);
+    str = "[n][a]{5}[b-d]{8,127}";
+    result = pattern_parse(&pattern, str, 0, &mem);
+    assert(result.ok);
+    assert(pattern.mem == &mem);
+    assert(pattern.pattern == str);
+    assert(pattern.group.pos.offset == 0);
+    assert(pattern.group.pos.length == 21);
+    assert(pattern.group.segments.len == 1);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->pos.offset == 0);
+    assert(segments->pos.length == 21);
+    assert(segments->items.len == 3);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment->kind == PATTERN_RANGE);
+    assert(segment->data.range.pos.offset == 0);
+    assert(segment->data.range.pos.length == 3);
+    assert(segment->data.range.repeat.min == 1);
+    assert(segment->data.range.repeat.max == 1);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 1);
+    assert(segment->kind == PATTERN_RANGE);
+    assert(segment->data.range.pos.offset == 3);
+    assert(segment->data.range.pos.length == 6);
+    assert(segment->data.range.repeat.min == 5);
+    assert(segment->data.range.repeat.max == 5);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 2);
+    assert(segment->kind == PATTERN_RANGE);
+    assert(segment->data.range.pos.offset == 9);
+    assert(segment->data.range.pos.length == 12);
+    assert(segment->data.range.repeat.min == 8);
+    assert(segment->data.range.repeat.max == 127);
 
-  // stop at illegal
-  p = s = "a)";
-  pattern = pattern_segment_parse(&p);
-  assert(pattern);
-  assert(!pattern->next);
-  assert(pattern->kind == PATTERN_CHAR);
-  assert(pattern->data.chr[0] == 'a');
-  assert(pattern->reps.min == 1);
-  assert(pattern->reps.max == 1);
-  assert(*p == ')');
-  pattern_segment_free(pattern);
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
 
-  // stop at illegal
-  p = s = "a]";
-  pattern = pattern_segment_parse(&p);
-  assert(pattern);
-  assert(!pattern->next);
-  assert(pattern->kind == PATTERN_CHAR);
-  assert(pattern->data.chr[0] == 'a');
-  assert(pattern->reps.min == 1);
-  assert(pattern->reps.max == 1);
-  assert(*p == ']');
-  pattern_segment_free(pattern);
-
-  // parse escaped
-  p = s = "\\]";
-  pattern = pattern_segment_parse(&p);
-  assert(pattern);
-  assert(!pattern->next);
-  assert(pattern->kind == PATTERN_CHAR);
-  assert(pattern->data.chr[0] == ']');
-  assert(pattern->reps.min == 1);
-  assert(pattern->reps.max == 1);
-  assert(*p == '\0');
-  pattern_segment_free(pattern);
-
-  // parse repetitons.
-  p = s = "a{12}";
-  pattern = pattern_segment_parse(&p);
-  assert(pattern);
-  assert(!pattern->next);
-  assert(pattern->kind == PATTERN_CHAR);
-  assert(pattern->data.chr[0] == 'a');
-  assert(pattern->reps.min == 12);
-  assert(pattern->reps.max == 12);
-  assert(*p == '\0');
-  pattern_segment_free(pattern);
-
-  // parse repetitons.
-  p = s = "a{12,23}";
-  pattern = pattern_segment_parse(&p);
-  assert(pattern);
-  assert(!pattern->next);
-  assert(pattern->kind == PATTERN_CHAR);
-  assert(pattern->data.chr[0] == 'a');
-  assert(pattern->reps.min == 12);
-  assert(pattern->reps.max == 23);
-  assert(*p == '\0');
-  pattern_segment_free(pattern);
-
-  // parse complex.
-  p = s = "a\\({2}b{11,12}";
-  pattern = pattern_segment_parse(&p);
-  assert(pattern);
-  assert(pattern->kind == PATTERN_CHAR);
-  assert(pattern->data.chr == &s[0]);
-  assert(pattern->reps.min == 1);
-  assert(pattern->reps.max == 1);
-  assert(pattern->next);
-  assert(pattern->next->kind == PATTERN_CHAR);
-  assert(pattern->next->data.chr == &s[2]);
-  assert(pattern->next->reps.min == 2);
-  assert(pattern->next->reps.max == 2);
-  assert(pattern->next->next);
-  assert(pattern->next->next->kind == PATTERN_CHAR);
-  assert(pattern->next->next->data.chr == &s[6]);
-  assert(pattern->next->next->reps.min == 11);
-  assert(pattern->next->next->reps.max == 12);
-  assert(!pattern->next->next->next);
-  assert(p == &s[14]);
-  pattern_segment_free(pattern);
-
-  return test_ok;
+    return test_ok;
 }
 
-test_result test_pattern_segment_parse_range() {
-  const char *s;
-  const char *p;
-  pattern_segment_t *pattern;
+test_result test_pattern_parse_orstr() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
 
-  p = s = "[a-z]{12,13}";
-  pattern = pattern_segment_parse(&p);
-  assert(pattern);
-  assert(pattern->kind == PATTERN_RANGE);
-  assert(pattern->data.range);
-  assert(pattern->data.range->start == 'a');
-  assert(pattern->data.range->end == 'z');
-  assert(pattern->data.range->next == NULL);
-  assert(pattern->reps.min == 12);
-  assert(pattern->reps.max == 13);
-  assert(!pattern->next);
-  assert(p == &s[12]);
-  pattern_segment_free(pattern);
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
 
-  return test_ok;
+    str = "abc|def";
+    result = pattern_parse(&pattern, str, 0, &mem);
+    assert(result.ok);
+    assert(pattern.pattern == str);
+    assert(pattern.mem == &mem);
+    assert(pattern.group.pos.offset == 0);
+    assert(pattern.group.pos.length == 7);
+    assert(pattern.group.segments.len == 2);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->pos.offset == 0);
+    assert(segments->pos.length == 3);
+    assert(segments->items.len == 3);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 0);
+    assert(segment->data.character.pos.length == 1);
+    assert(segment->data.character.codepoint == 'a');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 1);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 1);
+    assert(segment->data.character.pos.length == 1);
+    assert(segment->data.character.codepoint == 'b');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 2);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 2);
+    assert(segment->data.character.pos.length == 1);
+    assert(segment->data.character.codepoint == 'c');
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 1);
+    assert(segments);
+    assert(segments->pos.offset == 4);
+    assert(segments->pos.length == 3);
+    assert(segments->items.len == 3);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 4);
+    assert(segment->data.character.pos.length == 1);
+    assert(segment->data.character.codepoint == 'd');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 1);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 5);
+    assert(segment->data.character.pos.length == 1);
+    assert(segment->data.character.codepoint == 'e');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 2);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 6);
+    assert(segment->data.character.pos.length == 1);
+    assert(segment->data.character.codepoint == 'f');
+
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
+
+    return test_ok;
 }
 
-test_result test_pattern_segment_parse_err() {
-  const char *s;
-  const char *p;
-  pattern_segment_t *pattern;
+test_result test_pattern_parse_range() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
 
-  p = s = "[a-z){12,13}";
-  pattern = pattern_segment_parse(&p);
-  assert(!pattern);
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
+    pattern_ranges_t *ranges;
+    pattern_range_t *range;
 
-  p = s = "(a-z]{12,13}";
-  pattern = pattern_segment_parse(&p);
-  assert(!pattern);
+    str = "[abc-d]";
+    result = pattern_parse(&pattern, str, 0, &mem);
+    assert(result.ok);
+    assert(pattern.pattern == str);
+    assert(pattern.mem == &mem);
+    assert(pattern.group.pos.offset == 0);
+    assert(pattern.group.pos.length == 7);
+    assert(pattern.group.segments.len == 1);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->pos.offset == 0);
+    assert(segments->pos.length == 7);
+    assert(segments->items.len == 1);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_RANGE);
+    ranges = &segment->data.range;
+    assert(ranges->pos.offset == 0);
+    assert(ranges->pos.length == 7);
+    assert(ranges->items.len == 3);
+    range = passgen_array_get(&ranges->items, sizeof(pattern_range_t), 0);
+    assert(range->start == 'a');
+    assert(range->end == 'a');
+    assert(range->pos.offset == 1);
+    assert(range->pos.length == 1);
+    range = passgen_array_get(&ranges->items, sizeof(pattern_range_t), 1);
+    assert(range->start == 'b');
+    assert(range->end == 'b');
+    assert(range->pos.offset == 2);
+    assert(range->pos.length == 1);
+    range = passgen_array_get(&ranges->items, sizeof(pattern_range_t), 2);
+    assert(range->start == 'c');
+    assert(range->end == 'd');
+    assert(range->pos.offset == 3);
+    assert(range->pos.length == 3);
 
-  return test_ok;
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
+
+    return test_ok;
 }
 
-test_result test_pattern_segment_parse_group() {
-  const char *s;
-  const char *p;
-  pattern_segment_t *pattern;
+test_result test_pattern_escapable() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
 
-  p = s = "()";
-  pattern = pattern_segment_parse(&p);
-  assert(pattern);
-  pattern_segment_free(pattern);
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
 
-  p = s = "(a)|";
-  pattern = pattern_segment_parse(&p);
-  assert(pattern);
-  assert(pattern->kind == PATTERN_GROUP);
-  assert(pattern->data.group);
-  assert(pattern->data.group->item);
-  assert(pattern->data.group->item->kind == PATTERN_CHAR);
-  assert(pattern->data.group->item->data.chr[0] == 'a');
-  assert(!pattern->data.group->item->next);
-  assert(pattern->reps.min == 1);
-  assert(pattern->reps.max == 1);
-  assert(!pattern->next);
-  assert(*p == '|');
-  pattern_segment_free(pattern);
+    str = "\\[\\]\\(\\)\\{\\}\\|";
+    result = pattern_parse(&pattern, str, 0, &mem);
+    assert(result.ok);
+    assert(pattern.mem == &mem);
+    assert(pattern.pattern == str);
+    assert(pattern.group.pos.offset == 0);
+    assert(pattern.group.pos.length == 14);
+    assert(pattern.group.segments.len == 1);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->pos.offset == 0);
+    assert(segments->pos.length == 14);
+    assert(segments->items.len == 7);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 0);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == '[');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 1);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 2);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == ']');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 2);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 4);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == '(');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 3);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 6);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == ')');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 4);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 8);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == '{');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 5);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 10);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == '}');
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 6);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 12);
+    assert(segment->data.character.pos.length == 2);
+    assert(segment->data.character.codepoint == '|');
 
-  p = s = "(abc){2,3}";
-  pattern = pattern_segment_parse(&p);
-  assert(pattern);
-  assert(pattern->kind == PATTERN_GROUP);
-  assert(pattern->reps.min == 2);
-  assert(pattern->reps.max == 3);
-  assert(!pattern->next);
-  assert(*p == '\0');
-  pattern_segment_free(pattern);
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
 
-  return test_ok;
+    return test_ok;
 }
 
-test_result test_pattern_segment_parse_reps() {
-  const char *s = "{123,234}";
-  const char *p = &s[1];
-  pattern_reps_t reps = pattern_segment_parse_reps(&p);
-  assert(*p == '}');
-  assert(reps.min == 123);
-  assert(reps.max == 234);
+test_result test_pattern_utf8() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
 
-  s = "{991}";
-  p = &s[1];
-  reps = pattern_segment_parse_reps(&p);
-  assert(*p == '}');
-  assert(reps.min == 991);
-  assert(reps.max == 991);
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
 
-  return test_ok;
+    str = "üöäßç";
+    result = pattern_parse(&pattern, str, 0, &mem);
+    assert(result.ok);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.codepoint == 0xFC);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 1);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.codepoint == 0xF6);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 2);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.codepoint == 0xE4);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 3);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.codepoint == 0xDF);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 4);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.codepoint == 0xE7);
+
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
+
+    return test_ok;
 }
 
-test_result test_pattern_range_random() {
-  random_t *rand = random_new();
-  const char *s;
-  pattern_range_t *range;
-  s = "ace0-1";
-  range = pattern_range_parse(&s);
+test_result test_pattern_uniescape() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
 
-  for(size_t i = 0; i < 256; i++) {
-    char c = pattern_range_random(range, rand);
-    assert(c == 'a' || c == 'c' || c == 'e' || c == '0' || c == '1');
-  }
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
+    pattern_range_t *range;
 
-  pattern_range_free(range);
-  random_close(rand);
+    str = "\\u{FC}[\\u{F6}\\u{fb}]";
+    result = pattern_parse(&pattern, str, 0, &mem);
+    assert(result.ok);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.codepoint == 0xFC);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 1);
+    assert(segment);
+    assert(segment->kind == PATTERN_RANGE);
+    assert(segment->data.range.items.len == 2);
+    range = passgen_array_get(&segment->data.range.items, sizeof(pattern_range_t), 0);
+    assert(range->start == 0xF6);
+    assert(range->end == 0xF6);
+    range = passgen_array_get(&segment->data.range.items, sizeof(pattern_range_t), 1);
+    assert(range->start == 0xFb);
+    assert(range->end == 0xFb);
 
-  return test_ok;
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
+
+    return test_ok;
 }
 
-test_result test_pattern_range_range() {
-  const char *s = "[a-z]";
-  const char *p = &s[1];
-  pattern_range_t *range = pattern_range_parse(&p);
-  assert(range);
-  assert(p == &s[4]);
-  assert(range->start == 'a');
-  assert(range->end == 'z');
-  assert(range->next == NULL);
-  pattern_range_free(range);
+test_result test_pattern_pronouncable() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
 
-  return test_ok;
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
+    pattern_special_t *special;
+
+    str = "\\p";
+    result = pattern_parse(&pattern, str, 0, &mem);
+    assert(result.ok);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_SPECIAL);
+    special = &segment->data.special;
+    assert(special->pos.offset == 0);
+    assert(special->pos.length == 2);
+    assert(special->pos.length == 2);
+    assert(special->kind == PATTERN_SPECIAL_PRONOUNCABLE);
+
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
+
+    return test_ok;
 }
 
-test_result test_pattern_range_char() {
-  const char *s = "[a]";
-  const char *p = &s[1];
-  pattern_range_t *range = pattern_range_parse(&p);
-  assert(range);
-  assert(p == &s[2]);
-  assert(range->start == 'a');
-  assert(range->end == 'a');
-  assert(range->next == NULL);
-  pattern_range_free(range);
+test_result test_pattern_somepatt() {
+    passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);
+    passgen_mem_t mem = passgen_mem_accounting(&acc);
 
-  return test_ok;
+    pattern_t pattern;
+    pattern_result_t result;
+    const char *str;
+    pattern_segments_t *segments;
+    pattern_segment_t *segment;
+    pattern_group_t *group;
+    pattern_range_t *range;
+
+    str = "(a|b)[dfg912]";
+    result = pattern_parse(&pattern, str, 1, &mem);
+    assert(result.ok);
+    assert(pattern.mem == &mem);
+    assert(pattern.pattern == str);
+    assert(pattern.group.pos.offset == 0);
+    assert(pattern.group.pos.length == 13);
+    assert(pattern.group.segments.len == 1);
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->pos.offset == 0);
+    assert(segments->pos.length == 13);
+    assert(segments->items.len == 2);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment);
+    assert(segment->kind == PATTERN_GROUP);
+    assert(segment->data.group.pos.offset == 1);
+    assert(segment->data.group.pos.length == 3);
+    assert(segment->data.group.segments.len == 2);
+    group = &segment->data.group;
+    segments = passgen_array_get(&group->segments, sizeof(pattern_segments_t), 0);
+    assert(segments);
+    assert(segments->pos.offset == 1);
+    assert(segments->pos.length == 1);
+    assert(segments->items.len == 1);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 1);
+    assert(segment->data.character.pos.length == 1);
+    assert(segment->data.character.codepoint == 'a');
+    segments = passgen_array_get(&group->segments, sizeof(pattern_segments_t), 1);
+    assert(segments);
+    assert(segments->pos.offset == 3);
+    assert(segments->pos.length == 1);
+    assert(segments->items.len == 1);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 0);
+    assert(segment->kind == PATTERN_CHAR);
+    assert(segment->data.character.pos.offset == 3);
+    assert(segment->data.character.pos.length == 1);
+    assert(segment->data.character.codepoint == 'b');
+    segments = passgen_array_get(&pattern.group.segments, sizeof(pattern_segments_t), 0);
+    segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), 1);
+    assert(segment);
+    assert(segment->kind == PATTERN_RANGE);
+    assert(segment->data.range.pos.offset == 5);
+    assert(segment->data.range.pos.length == 8);
+    assert(segment->data.range.items.len == 6);
+    range = passgen_array_get(&segment->data.range.items, sizeof(pattern_range_t), 0);
+    assert(range->pos.offset == 6);
+    assert(range->pos.length == 1);
+    assert(range->start == 'd');
+    assert(range->end == 'd');
+    range = passgen_array_get(&segment->data.range.items, sizeof(pattern_range_t), 1);
+    assert(range->pos.offset == 7);
+    assert(range->pos.length == 1);
+    assert(range->start == 'f');
+    assert(range->end == 'f');
+    range = passgen_array_get(&segment->data.range.items, sizeof(pattern_range_t), 2);
+    assert(range->pos.offset == 8);
+    assert(range->pos.length == 1);
+    assert(range->start == 'g');
+    assert(range->end == 'g');
+    range = passgen_array_get(&segment->data.range.items, sizeof(pattern_range_t), 3);
+    assert(range->pos.offset == 9);
+    assert(range->pos.length == 1);
+    assert(range->start == '9');
+    assert(range->end == '9');
+    range = passgen_array_get(&segment->data.range.items, sizeof(pattern_range_t), 4);
+    assert(range->pos.offset == 10);
+    assert(range->pos.length == 1);
+    assert(range->start == '1');
+    assert(range->end == '1');
+    range = passgen_array_get(&segment->data.range.items, sizeof(pattern_range_t), 5);
+    assert(range->pos.offset == 11);
+    assert(range->pos.length == 1);
+    assert(range->start == '2');
+    assert(range->end == '2');
+
+    /* make sure choices list has the right entries */
+    assert(segment->data.range.choices_list != NULL);
+    assert(segment->data.range.choices_list[0] == 1);
+    assert(segment->data.range.choices_list[1] == 2);
+    assert(segment->data.range.choices_list[2] == 3);
+    assert(segment->data.range.choices_list[3] == 4);
+    assert(segment->data.range.choices_list[4] == 5);
+    assert(segment->data.range.choices_list[5] == 6);
+
+    // free, make sure no memory leaks
+    pattern_free(&pattern);
+    assert(passgen_mem_accounting_check(&acc));
+    passgen_mem_accounting_cleanup(&acc);
+
+    return test_ok;
 }
 
-test_result test_pattern_range_escaped() {
-  const char *s = "\\t\\n";
-  const char *p = s;
-  pattern_range_t *range = pattern_range_parse(&p);
-  assert(range);
-  assert(p == &s[4]);
-  assert(range->start == '\t');
-  assert(range->end == '\t');
-  assert(range->next);
-  assert(range->next->start == '\n');
-  assert(range->next->end == '\n');
-  assert(range->next->next == NULL);
-  pattern_range_free(range);
-
-  p = s = "\\a";
-  range = pattern_range_parse(&p);
-  assert(range);
-  assert(range->start == '\a');
-  assert(range->next == NULL);
-  pattern_range_free(range);
-
-  p = s = "\\b";
-  range = pattern_range_parse(&p);
-  assert(range);
-  assert(range->start == '\b');
-  assert(range->next == NULL);
-  pattern_range_free(range);
-
-  p = s = "\\e";
-  range = pattern_range_parse(&p);
-  assert(range);
-  assert(range->start == '\033');
-  assert(range->next == NULL);
-  pattern_range_free(range);
-
-  p = s = "\\f";
-  range = pattern_range_parse(&p);
-  assert(range);
-  assert(range->start == '\f');
-  assert(range->next == NULL);
-  pattern_range_free(range);
-
-  p = s = "\\n";
-  range = pattern_range_parse(&p);
-  assert(range);
-  assert(range->start == '\n');
-  assert(range->next == NULL);
-  pattern_range_free(range);
-
-  p = s = "\\t";
-  range = pattern_range_parse(&p);
-  assert(range);
-  assert(range->start == '\t');
-  assert(range->next == NULL);
-  pattern_range_free(range);
-
-  p = s = "\\\\";
-  range = pattern_range_parse(&p);
-  assert(range);
-  assert(range->start == '\\');
-  assert(range->next == NULL);
-  pattern_range_free(range);
-
-  // error
-  p = s = "\\d";
-  range = pattern_range_parse(&p);
-  assert(!range);
-
-  return test_ok;
-}
-
-test_result test_pattern_range_combined() {
-  const char *s = "[a-z0-9%#]";
-  const char *p = &s[1];
-  pattern_range_t *range = pattern_range_parse(&p);
-  assert(range);
-  assert(p == &s[9]);
-  assert(range->start == 'a');
-  assert(range->end == 'z');
-  assert(range->next);
-  assert(range->next->start == '0');
-  assert(range->next->end == '9');
-  assert(range->next->next != NULL);
-  assert(range->next->next->start == '%');
-  assert(range->next->next->end == '%');
-  assert(range->next->next->next != NULL);
-  assert(range->next->next->next->start == '#');
-  assert(range->next->next->next->end == '#');
-  assert(range->next->next->next->next == NULL);
-  pattern_range_free(range);
-
-  return test_ok;
-}
-
-test_result test_pattern_range_err() {
-  const char *s = "]";
-  const char *p = s;
-  assert(!pattern_range_parse(&p));
-  assert(p == s);
-
-  p = s = ")";
-  assert(!pattern_range_parse(&p));
-  assert(p == s);
-
-  p = s = "a-";
-  pattern_range_t *range = pattern_range_parse(&p);
-  assert(!range);
-
-  p = s = "";
-  assert(!pattern_range_parse(&p));
-  assert(p == s);
-
-  return test_ok;
-}
-
-test_result test_pattern_range_choices() {
-  // single char.
-  pattern_range_t *range = pattern_range_new('a', 'a', NULL);
-  assert(range);
-  assert(pattern_range_choices(range) == 1);
-  pattern_range_free(range);
-
-  // char range.
-  range = pattern_range_new('a', 'c', NULL);
-  assert(range);
-  assert(pattern_range_choices(range) == 3);
-  pattern_range_free(range);
-
-  // multi chars.
-  range = pattern_range_new('a', 'a', NULL);
-  assert(range);
-  range = pattern_range_new('c', 'c', range);
-  assert(range);
-  range = pattern_range_new('e', 'e', range);
-  assert(range);
-  assert(pattern_range_choices(range) == 3);
-  pattern_range_free(range);
-
-  // multi char range.
-  range = pattern_range_new('a', 'c', NULL);
-  assert(range);
-  range = pattern_range_new('e', 'f', range);
-  assert(range);
-  range = pattern_range_new('h', 'k', range);
-  assert(range);
-  assert(pattern_range_choices(range) == (3 + 2 + 4));
-  pattern_range_free(range);
-
-  return test_ok;
-}
-
-test_result test_pattern_segment_choices() {
-  pattern_segment_t *segment;
-  pattern_range_t *range;
-
-  // single char.
-  segment = pattern_segment_new(
-      PATTERN_CHAR, NULL, (pattern_reps_t){ .min = 1, .max = 1 }, NULL);
-  assert(segment);
-  assert(pattern_segment_choices(segment) == 1);
-  pattern_segment_free(segment);
-
-  // single char, variable length.
-  segment = pattern_segment_new(
-      PATTERN_CHAR, NULL, (pattern_reps_t){ .min = 5, .max = 8 }, NULL);
-  assert(segment);
-  assert(pattern_segment_choices(segment) == 4);  // 5, 6, 7, or 8 repetitions.
-  pattern_segment_free(segment);
-
-  // range.
-  range = pattern_range_new('a', 'c', NULL);
-  assert(range);
-  segment = pattern_segment_new(
-      PATTERN_RANGE, range, (pattern_reps_t){ .min = 8, .max = 8 }, NULL);
-  assert(segment);
-  assert(pattern_range_choices(range) == 3);
-  assert(
-      pattern_segment_choices(segment) ==
-      (3 * 3 * 3 * 3 * 3 * 3 * 3 * 3));  // 5, 6, 7, or 8 repetitions.
-  // pattern_range_free(range);
-  pattern_segment_free(segment);
-
-  // range, variable repetitions.
-  range = pattern_range_new('a', 'c', NULL);
-  assert(range);
-  segment = pattern_segment_new(
-      PATTERN_RANGE, range, (pattern_reps_t){ .min = 5, .max = 8 }, NULL);
-  assert(segment);
-  assert(pattern_range_choices(range) == 3);
-  assert(
-      pattern_segment_choices(segment) ==
-      (3 * 3 * 3 * 3 * 3 + 3 * 3 * 3 * 3 * 3 * 3 + 3 * 3 * 3 * 3 * 3 * 3 * 3 +
-       3 * 3 * 3 * 3 * 3 * 3 * 3 * 3));  // 5, 6, 7, or 8 repetitions.
-  // pattern_range_free(range);
-  pattern_segment_free(segment);
-
-  // TODO: test group.
-
-  return test_ok;
-}
-
-test_result test_pattern_error() {
-  pattern_error_t error;
-
-  error = pattern_error(PATTERN_ERROR_UNKNOWN, 0, 0);
-  assert(error.kind == PATTERN_ERROR_UNKNOWN);
-  assert(error.prev == 0);
-  assert(error.pos == 0);
-
-  error = pattern_error(PATTERN_ERROR_ALLOC, 0, 0);
-  assert(error.kind == PATTERN_ERROR_ALLOC);
-  assert(error.prev == 0);
-  assert(error.pos == 0);
-
-  return test_ok;
-}
-
-test_result test_pattern_token_next(void) {
-  struct unicode_iter iter;
-  struct pattern_token token;
-
-  iter = unicode_iter("a");
-
-  token = pattern_token_next(&iter);
-  assert(token.type == PATTERN_TOKEN_REGULAR);
-  assert(token.codepoint == 'a');
-
-  token = pattern_token_next(&iter);
-  assert(token.type == PATTERN_TOKEN_EOF);
-
-  iter = unicode_iter("ä");
-
-  token = pattern_token_next(&iter);
-  assert(token.type == PATTERN_TOKEN_REGULAR);
-  assert(token.codepoint == 0xE4);
-
-  token = pattern_token_next(&iter);
-  assert(token.type == PATTERN_TOKEN_EOF);
-
-  return test_ok;
-}
-
-test_result test_pattern_token_peek(void) {
-  struct unicode_iter iter;
-  struct pattern_token token;
-
-  iter = unicode_iter("a");
-
-  token = pattern_token_peek(&iter);
-  assert(token.type == PATTERN_TOKEN_REGULAR);
-  assert(token.codepoint == 'a');
-
-  token = pattern_token_peek(&iter);
-  assert(token.type == PATTERN_TOKEN_REGULAR);
-  assert(token.codepoint == 'a');
-
-  iter = unicode_iter("ä");
-
-  token = pattern_token_peek(&iter);
-  assert(token.type == PATTERN_TOKEN_REGULAR);
-  assert(token.codepoint == 0xE4);
-
-  token = pattern_token_peek(&iter);
-  assert(token.type == PATTERN_TOKEN_REGULAR);
-  assert(token.codepoint == 0xE4);
-
-  return test_ok;
-}
+/* TODO
+ *
+ * test "[abc\x{f6}]{100}" - weird behaviour
+ */

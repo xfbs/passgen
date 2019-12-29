@@ -25,17 +25,17 @@ version_src = configure_file(
 cc = meson.get_compiler('c')
 
 # library used to decode and encode utf8.
-libutf8proc = dependency('libutf8proc', required: false)
+libutf8proc = dependency('libutf8proc', required: false, static: get_option('static'))
 
 if not libutf8proc.found()
-  libutf8proc = cc.find_library('utf8proc')
+  libutf8proc = cc.find_library('utf8proc', static: get_option('static'))
 endif
 
 # library used for cryptographic routines.
-libsodium = dependency('libsodium')
+libsodium = dependency('libsodium', static: get_option('static'))
 
 # library used for generating JSON.
-libjansson = dependency('jansson')
+libjansson = dependency('jansson', static: get_option('static'))
 
 # math lib
 libm = cc.find_library('m')
@@ -46,16 +46,38 @@ threads = dependency('threads')
 deps = [libutf8proc]
 
 # main library
-libpassgen = library(
-  'passgen',
+libpassgen_src = [
   'src/passgen.c',
   'src/pattern.c',
+  'src/pattern_random.c',
   'src/random.c',
   'src/reader.c',
   'src/unicode.c',
+  'src/token.c',
+  'src/memory.c',
+  'src/array.c',
+  'src/pronounceable.c',
+  'data/pronounceable_english.c',
+  'data/pronounceable_latin.c',
+  'data/pattern_presets.c',
+  'src/assert.c',
+]
+
+if not get_option('static')
+libpassgen = library(
+  'passgen',
+  libpassgen_src,
   version_src,
   install: true,
   dependencies: deps)
+else
+libpassgen = static_library(
+  'passgen',
+  libpassgen_src,
+  version_src,
+  install: true,
+  dependencies: deps)
+endif
 
 # main executable
 passgen = executable(
@@ -65,14 +87,14 @@ passgen = executable(
   install: true)
 
 # tools
-pattern_dump = executable(
-  'pattern-dump',
-  'src/bin/pattern-dump.c',
-  link_with: libpassgen)
-pattern_choices = executable(
-  'pattern-choices',
-  'src/bin/pattern-choices.c',
-  link_with: libpassgen)
+#pattern_dump = executable(
+#  'pattern-dump',
+#  'src/bin/pattern-dump.c',
+#  link_with: libpassgen)
+#pattern_choices = executable(
+#  'pattern-choices',
+#  'src/bin/pattern-choices.c',
+#  link_with: libpassgen)
 
 # benchmarks
 bench_random = executable(
@@ -93,9 +115,15 @@ benchmark('parse', bench_parse)
 generate_all = find_program('tests/generate.rb')
 test_files = [
   'tests/random.c',
+  'tests/memory.c',
   'tests/reader.c',
   'tests/pattern.c',
-  'tests/unicode.c']
+  'tests/pattern_random.c',
+  'tests/unicode.c',
+  'tests/array.c',
+  'tests/pronounceable.c',
+  'tests/token.c',
+]
 all_tests = custom_target(
   'all.c',
   input: test_files,
@@ -116,6 +144,7 @@ install_headers(
   'passgen/pattern.h',
   'passgen/version.h',
   'passgen/unicode.h',
+  'passgen/token.h',
   subdir : 'passgen')
 
 # pkgconfig file

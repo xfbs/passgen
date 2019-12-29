@@ -7,6 +7,7 @@
 
 #pragma once
 #include <stdlib.h>
+#include <stdbool.h>
 
 /// The kinds of errors that cause the binary to exit early and with a nonzero
 /// return code.
@@ -38,6 +39,9 @@ typedef struct {
   size_t amount;
   /// The format to use when generating passwords.
   const char *format;
+  bool null;
+  size_t depth;
+  bool complexity;
 } passgen_opts;
 
 /// Print usage (help text) using @p executable as the name of the program.

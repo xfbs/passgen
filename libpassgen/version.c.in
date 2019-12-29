@@ -1,3 +1,4 @@
+#include "passgen/debug.h"
 #include "passgen/version.h"
 
 passgen_version_t passgen_version() {
@@ -17,9 +18,9 @@ bool passgen_version_min(passgen_version_t version) {
 }
 
 bool passgen_is_debug(void) {
-#ifdef NDEBUG
-    return false;
-#else
+#ifdef PASSGEN_DEBUG
     return true;
+#else
+    return false;
 #endif
 }

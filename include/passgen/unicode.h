@@ -32,6 +32,9 @@ struct unicode_iter_result {
   ssize_t error;
 };
 
+typedef struct unicode_iter unicode_iter_t;
+typedef struct unicode_iter_result unicode_iter_result_t;
+
 /// Creates a new unicode iterator.
 struct unicode_iter unicode_iter(const char *data);
 

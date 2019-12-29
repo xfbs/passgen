@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 201910
 #include "passgen/reader.h"
 #include <stdbool.h>
 #include <stdio.h>

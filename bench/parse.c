@@ -13,11 +13,13 @@ void *bench_pattern_parse_setup(const char *data) {
 }
 
 void bench_pattern_parse_func(void *data) {
+  /*
   const char *str = data;
 
   pattern_t *pattern = pattern_parse(&str);
   assert(pattern);
   pattern_free(pattern);
+  */
 }
 
 void bench_pattern_parse_free(void *state) {

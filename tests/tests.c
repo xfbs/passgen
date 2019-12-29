@@ -1,6 +1,7 @@
 #include "tests/tests.h"
 #include <string.h>
 #include <time.h>
+#include <stdlib.h>
 
 test_result test_ok = { .ok = true };
 
@@ -41,9 +42,9 @@ int main(int argc, char *argv[]) {
       success + failures);
 
   if(failures) {
-    return -1;
+    return EXIT_FAILURE;
   } else {
-    return 0;
+    return EXIT_SUCCESS;
   }
 }
 

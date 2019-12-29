@@ -1,0 +1,34 @@
+
+stages:
+  - setup
+  - build
+
+services:
+  - docker:dind
+
+
+# rebuild docker containers if they changed.
+setup:docker:
+  image: docker
+  stage: setup
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build . -f Dockerfile.bionic -t passgen:bionic
+  only:
+    - master
+
+# build stuff on ubuntu.
+build:bionic:
+  image: ubuntu:bionic
+  stage: build
+  script:
+    - apt update && apt install -y gcc clang make cmake
+    - mkdir build && cd build && cmake .. && make
+
+# build stuff on alpine.
+build:alpine:
+  image: alpine:latest
+  stage: build
+  script:
+    - apk add build-base cmake make
+    - mkdir build && cd build && cmake .. && make

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-TEST_REGEX = /(test_result ([^ ]+)\(.*\))/
+TEST_REGEX = /(test_result test_([^ ]+)\(.*\))/
 
 outfile = File.open(ARGV.shift, "w")
 inputs = ARGV
@@ -21,7 +21,7 @@ outfile.puts
 outfile.puts "test_entry tests[] = {"
 
 outfile.puts tests
-  .map{|test| "    test(" + test.last[5..-1] + "),"}
+  .map{|test| "    test(" + test.last + "),"}
   .join("\n")
 
 outfile.puts "    {NULL, NULL},"
