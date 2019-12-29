@@ -1,7 +1,16 @@
 
 stages:
+  - setup
   - build
 
+# rebuild docker containers if they changed.
+setup:docker:
+  image: docker
+  stage: setup
+  script:
+    - docker build . -f Dockerfile.bionic -t passgen:bionic
+
+# build stuff on ubuntu.
 build:bionic:
   image: ubuntu:bionic
   stage: build
@@ -9,6 +18,7 @@ build:bionic:
     - apt update && apt install -y gcc clang make cmake
     - mkdir build && cd build && cmake .. && make
 
+# build stuff on alpine.
 build:alpine:
   image: alpine:latest
   stage: build
