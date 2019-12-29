@@ -9,7 +9,18 @@ set(HEADER_LIST
     "../include/passgen/pattern_private.h")
 
 set(SOURCE_LIST
-    "array.c")
+    "array.c"
+    "assert.c"
+    "memory.c"
+    "passgen.c"
+    "pattern.c"
+    "pattern_random.c"
+    "pronounceable.c"
+    "random.c"
+    "reader.c"
+#    "token.c"
+#    "unicode.c"
+)
 
 add_library(passgen ${SOURCE_LIST} ${HEADER_LIST})
 
