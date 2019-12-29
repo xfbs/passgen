@@ -11,10 +11,20 @@ setup:docker:
   stage: setup
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f Dockerfile.bionic -t "$CI_REGISTRY_IMAGE:bionic"
-    - docker push "$CI_REGISTRY_IMAGE:bionic"
-    - docker build . -f Dockerfile.alpine -t "$CI_REGISTRY_IMAGE:alpine"
-    - docker push "$CI_REGISTRY_IMAGE:alpine"
+    - >
+      if ! git diff --exit-code Dockerfile.bionic; then
+        docker build . -f Dockerfile.bionic -t "$CI_REGISTRY_IMAGE:bionic"
+        docker push "$CI_REGISTRY_IMAGE:bionic"
+      else
+        echo "Skipping rebuilding bionic, Dockerfile hasn't changed."
+      fi
+    - >
+      if ! git diff --exit-code Dockerfile.alpine; then
+        docker build . -f Dockerfile.alpine -t "$CI_REGISTRY_IMAGE:alpine"
+        docker push "$CI_REGISTRY_IMAGE:alpine"
+      else
+        echo "Skipping rebuilding bionic, Dockerfile hasn't changed."
+      fi
   only:
     - master
 
