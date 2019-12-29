@@ -13,5 +13,5 @@ build:alpine:
   image: alpine:latest
   stage: build
   script:
-    - apk add build-base
+    - apk add build-base cmake make
     - mkdir build && cd build && cmake .. && make
