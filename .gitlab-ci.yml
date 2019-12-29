@@ -1,11 +1,9 @@
-
 stages:
   - setup
   - build
 
 services:
   - docker:dind
-
 
 # rebuild docker containers if they changed.
 setup:docker:
@@ -14,6 +12,7 @@ setup:docker:
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker build . -f Dockerfile.bionic -t passgen:bionic
+    - docker push "$CI_REGISTRY_IMAGE:bionic"
   only:
     - master
 
