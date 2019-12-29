@@ -2,5 +2,6 @@ stages:
   - build
 
 build:
+  stage: build
   script:
     - mkdir build && cd build && cmake .. && make
