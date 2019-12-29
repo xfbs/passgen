@@ -11,8 +11,10 @@ setup:docker:
   stage: setup
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f Dockerfile.bionic -t passgen:bionic
+    - docker build . -f Dockerfile.bionic -t "$CI_REGISTRY_IMAGE:bionic"
     - docker push "$CI_REGISTRY_IMAGE:bionic"
+    - docker build . -f Dockerfile.alpine -t "$CI_REGISTRY_IMAGE:alpine"
+    - docker push "$CI_REGISTRY_IMAGE:alpine"
   only:
     - master
 
