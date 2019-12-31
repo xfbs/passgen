@@ -1,3 +1,7 @@
+# makes git submodules work
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 stages:
   - setup
   - build
