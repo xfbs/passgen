@@ -2,7 +2,7 @@
 #include "passgen/reader.h"
 #include <stdbool.h>
 #include <stdio.h>
-#include "tests/tests.h"
+#include "tests.h"
 
 test_result test_reader_string() {
   reader_t reader = reader_from_string("abcde");

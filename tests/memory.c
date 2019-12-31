@@ -1,6 +1,6 @@
 #include "passgen/memory.h"
 #include "passgen/memory_private.h"
-#include "tests/tests.h"
+#include "tests.h"
 #include <string.h>
 
 test_result test_memory_stdlib(void) {

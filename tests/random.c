@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "passgen/pattern.h"
-#include "tests/tests.h"
+#include "tests.h"
 
 test_result test_random_uint8(void) {
   random_t *rand = random_new();

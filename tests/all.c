@@ -1,4 +1,4 @@
-#include "tests/tests.h"
+#include "tests.h"
 
 test_result test_array_init(void);
 test_result test_array_push(void);

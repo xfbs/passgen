@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "passgen/random.h"
-#include "tests/tests.h"
+#include "tests.h"
 
 test_result test_pattern_parse_str() {
     passgen_mem_accounting_t acc = passgen_mem_accounting_new(NULL);

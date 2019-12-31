@@ -1,5 +1,5 @@
 #include "passgen/array.h"
-#include "tests/tests.h"
+#include "tests.h"
 #include <string.h>
 
 test_result test_array_init(void) {

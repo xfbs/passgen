@@ -1,6 +1,6 @@
 #include "passgen/pronounceable.h"
 #include "passgen/pronounceable_private.h"
-#include "tests/tests.h"
+#include "tests.h"
 
 test_result test_pronounceable_lists(void) {
     // TODO: test list properties (sorted, sums, etc).

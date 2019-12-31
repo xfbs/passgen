@@ -1,5 +1,5 @@
 #include "passgen/token.h"
-#include "tests/tests.h"
+#include "tests.h"
 
 test_result test_passgen_token_next(void) {
     struct unicode_iter iter;

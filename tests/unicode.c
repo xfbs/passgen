@@ -1,5 +1,5 @@
 #include "passgen/unicode.h"
-#include "tests/tests.h"
+#include "tests.h"
 
 test_result test_unicode_iter_sized(void) {
   struct unicode_iter iter;

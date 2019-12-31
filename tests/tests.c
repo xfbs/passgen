@@ -1,4 +1,4 @@
-#include "tests/tests.h"
+#include "tests.h"
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
