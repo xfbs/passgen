@@ -19,8 +19,10 @@ set(SOURCE_LIST
     "pronounceable.c"
     "random.c"
     "reader.c"
-#    "token.c"
-#    "unicode.c"
+    "pronounceable_english.c"
+    "pronounceable_latin.c"
+    "token.c"
+    "unicode.c"
 )
 
 configure_file(version.c.in version.c)
@@ -29,3 +31,4 @@ add_library(passgen ${SOURCE_LIST} ${HEADER_LIST})
 
 target_include_directories(passgen PUBLIC ../include)
 target_compile_features(passgen PUBLIC c_std_99)
+target_link_libraries(passgen utf8proc)
