@@ -34,5 +34,5 @@ target_compile_features(passgen PUBLIC c_std_99)
 target_link_libraries(passgen utf8proc)
 
 if(USE_LIBEXECINFO)
-target_link_libraries(passgen libexecinfo)
+target_link_libraries(passgen execinfo)
 endif(USE_LIBEXECINFO)
