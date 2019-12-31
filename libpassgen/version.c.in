@@ -3,19 +3,21 @@
 
 passgen_version_t passgen_version() {
   return (passgen_version_t) {
-    .maj = @VERSION_MAJ@,
-    .min = @VERSION_MIN@,
-    .rev = @VERSION_REV@,
+    .maj = @PROJECT_VERSION_MAJOR@,
+    .min = @PROJECT_VERSION_MINOR@,
+    .rev = @PROJECT_VERSION_PATCH@,
   };
 }
 
 const char *passgen_version_str() {
-  return "@VERSION@";
+  return "@PROJECT_VERSION@";
 }
 
 bool passgen_version_min(passgen_version_t version) {
   return false;
 }
+
+const char *passgen_git_commit = "@PROJECT_GIT_COMMIT@";
 
 bool passgen_is_debug(void) {
 #ifdef PASSGEN_DEBUG
