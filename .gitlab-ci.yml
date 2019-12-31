@@ -44,4 +44,4 @@ build:alpine:
   image: registry.gitlab.com/xfbs/passgen:alpine
   stage: build
   script:
-    - mkdir build && cd build && cmake .. && make
+    - mkdir build && cd build && cmake .. -DUSE_LIBEXECINFO=y && make

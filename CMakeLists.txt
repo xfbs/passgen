@@ -14,6 +14,8 @@ option(BUILD_UTILS "Build utility executables." OFF)
 option(BUILD_FUZZER "Build fuzzer using afl (requires setting compiler to afl-gcc)." OFF)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
 
+option(USE_LIBEXECINFO "Use libexecinfo. For systems that don't have backtrace in libc." OFF)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
 include(ExternalProject)
@@ -24,11 +26,17 @@ if(BUILD_GIT_INFO)
     git_info()
 endif()
 
+# dependency: utf8proc
 if(BUILD_UTF8PROC)
 add_subdirectory(extern/utf8proc)
 else()
 find_package(utf8proc)
 endif()
+
+# dependency (only on alpine): libexecinfo-dev
+if(USE_LIBEXECINFO)
+find_library(libexecinfo execinfo)
+endif(USE_LIBEXECINFO)
 
 if(BUILD_LIBPASSGEN)
 add_subdirectory(libpassgen)

@@ -32,3 +32,7 @@ add_library(passgen ${SOURCE_LIST} ${HEADER_LIST})
 target_include_directories(passgen PUBLIC ../include)
 target_compile_features(passgen PUBLIC c_std_99)
 target_link_libraries(passgen utf8proc)
+
+if(USE_LIBEXECINFO)
+target_link_libraries(passgen libexecinfo)
+endif(USE_LIBEXECINFO)
