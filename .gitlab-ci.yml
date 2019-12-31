@@ -39,7 +39,7 @@ build:bionic:
   script:
     - mkdir build && cd build && cmake ..
     - make
-    - ./build/tests/passgen-test
+    - ./tests/passgen-test
 
 # build stuff on alpine.
 build:alpine:
@@ -48,4 +48,4 @@ build:alpine:
   script:
     - mkdir build && cd build && cmake .. -DUSE_LIBEXECINFO=y
     - make
-    - ./build/tests/passgen-test
+    - ./tests/passgen-test
