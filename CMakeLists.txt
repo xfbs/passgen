@@ -6,6 +6,7 @@ project(passgen
     LANGUAGES C)
 
 # project build options.
+option(BUILD_UTF8PROC "Build utf8proc, a dependency." YES)
 option(BUILD_LIBPASSGEN "Build libpassgen. Enabled by default, if disabled uses system-wide libpassgen." ON)
 option(BUILD_PASSGEN "Build passgen main binary." ON)
 option(BUILD_TESTS "Build unit tests." ON)
@@ -15,10 +16,18 @@ option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
+include(ExternalProject)
+
 # get commit info, if git is available.
 if(BUILD_GIT_INFO)
     include(GitInfo)
     git_info()
+endif()
+
+if(BUILD_UTF8PROC)
+add_subdirectory(extern/utf8proc)
+else()
+find_package(utf8proc)
 endif()
 
 if(BUILD_LIBPASSGEN)
