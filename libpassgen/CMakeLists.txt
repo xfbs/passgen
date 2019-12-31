@@ -9,6 +9,7 @@ set(HEADER_LIST
     "../include/passgen/pattern_private.h")
 
 set(SOURCE_LIST
+    "${CMAKE_CURRENT_BINARY_DIR}/version.c"
     "array.c"
     "assert.c"
     "memory.c"
@@ -21,6 +22,8 @@ set(SOURCE_LIST
 #    "token.c"
 #    "unicode.c"
 )
+
+configure_file(version.c.in version.c)
 
 add_library(passgen ${SOURCE_LIST} ${HEADER_LIST})
 
