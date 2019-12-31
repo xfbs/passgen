@@ -24,3 +24,7 @@ endif()
 if(BUILD_LIBPASSGEN)
 add_subdirectory(libpassgen)
 endif()
+
+if(BUILD_TESTS)
+add_subdirectory(tests)
+endif()
