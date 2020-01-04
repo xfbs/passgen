@@ -38,8 +38,8 @@ build:bionic:debug:
   stage: build
   script:
     - mkdir build && cd build
-    - cmake -DCMAKE_BUILD_TYPE=Release ..
-    - make
+    - cmake -GNinja -DCMAKE_BUILD_TYPE=Release ..
+    - ninja
     - ./tests/passgen-test
 
 build:bionic:release:
@@ -47,8 +47,8 @@ build:bionic:release:
   stage: build
   script:
     - mkdir build && cd build
-    - cmake -DCMAKE_BUILD_TYPE=Debug ..
-    - make
+    - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug ..
+    - ninja
     - ./tests/passgen-test
 
 # build stuff on alpine.
