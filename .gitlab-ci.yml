@@ -42,10 +42,18 @@ build:bionic:
     - ./tests/passgen-test
 
 # build stuff on alpine.
-build:alpine:
+build:alpine:release:
   image: registry.gitlab.com/xfbs/passgen:alpine
   stage: build
   script:
-    - mkdir build && cd build && cmake .. -DUSE_LIBEXECINFO=y
+    - mkdir build && cd build && cmake -DUSE_LIBEXECINFO=y -DCMAKE_BUILD_TYPE=Release ..
+    - make
+    - ./tests/passgen-test
+
+build:alpine:debug:
+  image: registry.gitlab.com/xfbs/passgen:alpine
+  stage: build
+  script:
+    - mkdir build && cd build && cmake -DUSE_LIBEXECINFO=y -DCMAKE_BUILD_TYPE=Debug ..
     - make
     - ./tests/passgen-test
