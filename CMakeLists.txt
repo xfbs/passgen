@@ -13,6 +13,7 @@ option(BUILD_TESTS "Build unit tests." ON)
 option(BUILD_UTILS "Build utility executables." OFF)
 option(BUILD_FUZZER "Build fuzzer using afl (requires setting compiler to afl-gcc)." OFF)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
+option(BUILD_STATIC "Built targets statically." OFF)
 
 option(USE_LIBEXECINFO "Use libexecinfo. For systems that don't have backtrace in libc." OFF)
 
