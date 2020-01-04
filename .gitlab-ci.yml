@@ -90,14 +90,31 @@ build:alpine:debug:
     expire_in: 1 week
 
 release:alpine:
-    image: registry.gitlab.com/xfbs/passgen:bionic
-    stage: release
-    dependencies:
-      - build:alpine:debug
-    script:
-      - mkdir release
-      - cp build-alpine-debug/libpassgen/libpassgen.a build-alpine-debug/tests/passgen-test release
-      - tar c -f release.tar.gz -z release
-    artifacts:
-      paths:
-        - release.tar.xz
+  # no need to fetch submodules for this stage
+  variables: {}
+  image: registry.gitlab.com/xfbs/passgen:alpine
+  stage: release
+  dependencies:
+    - build:alpine:release
+  script:
+    - mkdir release
+    - cp build-alpine-release/libpassgen/libpassgen.a build-alpine-release/tests/passgen-test release
+    - tar c -f release.tar.gz -z release
+  artifacts:
+    paths:
+      - release.tar.gz
+
+release:bionic:
+  # no need to fetch submodules for this stage
+  variables: {}
+  image: registry.gitlab.com/xfbs/passgen:alpine
+  stage: release
+  dependencies:
+    - build:bionic:release
+  script:
+    - mkdir release
+    - cp build-bionic-release/libpassgen/libpassgen.a build-bionic-release/tests/passgen-test release
+    - tar c -f release.tar.gz -z release
+  artifacts:
+    paths:
+      - release.tar.gz
