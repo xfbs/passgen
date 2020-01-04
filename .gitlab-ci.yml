@@ -38,19 +38,27 @@ build:bionic:debug:
   image: registry.gitlab.com/xfbs/passgen:bionic
   stage: build
   script:
-    - mkdir build && cd build
+    - mkdir build-bionic-debug && cd build-bionic-debug
     - cmake -GNinja -DCMAKE_BUILD_TYPE=Release ..
     - ninja
     - ./tests/passgen-test
+  artifacts:
+    paths:
+      - build-bionic-debug
+    expire_in: 1 week
 
 build:bionic:release:
   image: registry.gitlab.com/xfbs/passgen:bionic
   stage: build
   script:
-    - mkdir build && cd build
+    - mkdir build-bionic-release && cd build-bionic-release
     - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug ..
     - ninja
     - ./tests/passgen-test
+  artifacts:
+    paths:
+      - build-bionic-release
+    expire_in: 1 week
 
 # build stuff on alpine.
 build:alpine:release:
