@@ -82,14 +82,14 @@ build:alpine:debug:
     expire_in: 1 week
 
 release:alpine:
-    image: registry.gitlab.com/xfbs/passgen:alpine
+    image: registry.gitlab.com/xfbs/passgen:bionic
     stage: release
     dependencies:
       - build:alpine:debug
     script:
       - mkdir release
       - cp build-alpine-debug/libpassgen/libpassgen.a build-alpine-debug/tests/passgen-test release
-      - tar --create --file release.tar.xz --xz release
+      - tar c -f release.tar.xz -J release
     artifacts:
       paths:
         - release.tar.xz
