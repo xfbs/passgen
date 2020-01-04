@@ -97,7 +97,7 @@ release:alpine:
     script:
       - mkdir release
       - cp build-alpine-debug/libpassgen/libpassgen.a build-alpine-debug/tests/passgen-test release
-      - tar c -f release.tar.xz -J release
+      - tar c -f release.tar.gz -z release
     artifacts:
       paths:
         - release.tar.xz
