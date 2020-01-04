@@ -92,4 +92,4 @@ release:alpine:
       - tar --create --file release.tar.xz --xz release
     artifacts:
       paths:
-        release.tar.xz
+        - release.tar.xz
