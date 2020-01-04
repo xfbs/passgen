@@ -5,6 +5,7 @@ variables:
 stages:
   - setup
   - build
+  - release
 
 # rebuild alpine docker container.
 docker:alpine:
@@ -56,10 +57,14 @@ build:alpine:release:
   image: registry.gitlab.com/xfbs/passgen:alpine
   stage: build
   script:
-    - mkdir build && cd build
+    - mkdir -p build-alpine-release && cd build-alpine-release
     - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC=y ..
     - ninja
     - ./tests/passgen-test
+  artifacts:
+    paths:
+      - build-alpine-release
+    expire_in: 1 week
 
 # alpine uses musl libc by default which does not have a backtrace() function
 # built-in. therefore, the debug build needs USE_LIBEXECINFO to build.
@@ -67,7 +72,12 @@ build:alpine:debug:
   image: registry.gitlab.com/xfbs/passgen:alpine
   stage: build
   script:
-    - mkdir build && cd build
+    - mkdir build-alpine-debug && cd build-alpine-debug
     - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DUSE_LIBEXECINFO=y ..
     - ninja
     - ./tests/passgen-test
+  artifacts:
+    paths:
+      - build-alpine-debug
+    expire_in: 1 week
+
