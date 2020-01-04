@@ -57,7 +57,7 @@ build:alpine:release:
   stage: build
   script:
     - mkdir build && cd build
-    - cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC=y ..
+    - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC=y ..
     - make
     - ./tests/passgen-test
 
@@ -68,6 +68,6 @@ build:alpine:debug:
   stage: build
   script:
     - mkdir build && cd build
-    - cmake -DCMAKE_BUILD_TYPE=Debug -DUSE_LIBEXECINFO=y ..
+    - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DUSE_LIBEXECINFO=y ..
     - make
     - ./tests/passgen-test
