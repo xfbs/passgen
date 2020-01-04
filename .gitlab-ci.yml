@@ -58,7 +58,7 @@ build:alpine:release:
   script:
     - mkdir build && cd build
     - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC=y ..
-    - make
+    - ninja
     - ./tests/passgen-test
 
 # alpine uses musl libc by default which does not have a backtrace() function
@@ -69,5 +69,5 @@ build:alpine:debug:
   script:
     - mkdir build && cd build
     - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DUSE_LIBEXECINFO=y ..
-    - make
+    - ninja
     - ./tests/passgen-test
