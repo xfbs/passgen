@@ -33,11 +33,21 @@ docker:bionic:
     - docker
 
 # build stuff on ubuntu.
-build:bionic:
+build:bionic:debug:
   image: registry.gitlab.com/xfbs/passgen:bionic
   stage: build
   script:
-    - mkdir build && cd build && cmake ..
+    - mkdir build && cd build
+    - cmake -DCMAKE_BUILD_TYPE=Release ..
+    - make
+    - ./tests/passgen-test
+
+build:bionic:release:
+  image: registry.gitlab.com/xfbs/passgen:bionic
+  stage: build
+  script:
+    - mkdir build && cd build
+    - cmake -DCMAKE_BUILD_TYPE=Debug ..
     - make
     - ./tests/passgen-test
 
@@ -46,14 +56,18 @@ build:alpine:release:
   image: registry.gitlab.com/xfbs/passgen:alpine
   stage: build
   script:
-    - mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC=y ..
+    - mkdir build && cd build
+    - cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC=y ..
     - make
     - ./tests/passgen-test
 
+# alpine uses musl libc by default which does not have a backtrace() function
+# built-in. therefore, the debug build needs USE_LIBEXECINFO to build.
 build:alpine:debug:
   image: registry.gitlab.com/xfbs/passgen:alpine
   stage: build
   script:
-    - mkdir build && cd build && cmake -DUSE_LIBEXECINFO=y -DCMAKE_BUILD_TYPE=Debug ..
+    - mkdir build && cd build
+    - cmake -DCMAKE_BUILD_TYPE=Debug -DUSE_LIBEXECINFO=y ..
     - make
     - ./tests/passgen-test
