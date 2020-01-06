@@ -98,7 +98,7 @@ release:alpine:
     - build:alpine:release
   script:
     - mkdir release
-    - cp build-alpine-release/libpassgen/libpassgen.a build-alpine-release/tests/passgen-test release
+    - cp build-bionic-release/{libpassgen/libpassgen.a,tests/passgen-test,bin/passgen} release
     - tar c -f release.tar.gz -z release
   artifacts:
     paths:
@@ -113,7 +113,7 @@ release:bionic:
     - build:bionic:release
   script:
     - mkdir release
-    - cp build-bionic-release/libpassgen/libpassgen.a build-bionic-release/tests/passgen-test release
+    - cp build-bionic-release/{libpassgen/libpassgen.a,tests/passgen-test,bin/passgen} release
     - tar c -f release.tar.gz -z release
   artifacts:
     paths:
