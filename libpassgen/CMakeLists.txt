@@ -16,6 +16,7 @@ set(SOURCE_LIST
     "passgen.c"
     "pattern.c"
     "pattern_random.c"
+    "pattern_presets.c"
     "pronounceable.c"
     "random.c"
     "reader.c"
@@ -31,7 +32,7 @@ add_library(passgen ${SOURCE_LIST} ${HEADER_LIST})
 
 target_include_directories(passgen PUBLIC ../include)
 target_compile_features(passgen PUBLIC c_std_99)
-target_link_libraries(passgen utf8proc)
+target_link_libraries(passgen utf8proc m)
 
 if(USE_LIBEXECINFO)
 target_link_libraries(passgen execinfo)
