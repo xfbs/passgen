@@ -12,6 +12,7 @@ option(BUILD_PASSGEN "Build passgen main binary." ON)
 option(BUILD_CMOCKA "Build cmocka library for unit tests." YES)
 option(BUILD_TESTS "Build unit tests." ON)
 option(BUILD_UTILS "Build utility binaries." OFF)
+option(BUILD_BINARY "Build passgen binary." ON)
 option(BUILD_UTILS "Build utility executables." OFF)
 option(BUILD_FUZZER "Build fuzzer using afl (requires setting compiler to afl-gcc)." OFF)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
@@ -41,20 +42,22 @@ if(USE_LIBEXECINFO)
 find_library(libexecinfo execinfo)
 endif(USE_LIBEXECINFO)
 
+# build libpassgen
 if(BUILD_LIBPASSGEN)
 add_subdirectory(libpassgen)
 endif()
 
+# build passgen binary and perhaps utils
+add_subdirectory(bin)
+
+# cmocka framework for unit tests
 if(BUILD_CMOCKA)
 add_subdirectory(extern/cmocka)
 else()
 find_package(cmocka)
 endif()
 
+# unit tests
 if(BUILD_TESTS)
 add_subdirectory(tests)
-endif()
-
-if(BUILD_UTILS)
-add_subdirectory(utils)
 endif()
