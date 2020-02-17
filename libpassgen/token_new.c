@@ -14,29 +14,42 @@ static inline int token_parse_init(struct token_parser *parser, struct token *to
     return parser->state;
 }
 
-const static int simple_escaped[][2] = {
-    {'a', '\a'},
-    {'b', '\b'},
-    {'e', '\033'},
-    {'f', '\f'},
-    {'n', '\n'},
-    {'r', '\r'},
-    {'t', '\t'},
-    {'v', '\v'},
-    {'\\', '\\'},
-    {0, 0}
+// Simple ASCII escape map. Don't use this for large (unicode) codepoints.
+// Provides efficient O(1) lookup.
+const static char simple_escaped[] = {
+    0,
+    ['a'] = '\a',
+    ['b'] = '\b',
+    ['e'] = '\033',
+    ['f'] = '\f',
+    ['n'] = '\n',
+    ['r'] = '\r',
+    ['t'] = '\t',
+    ['v'] = '\v',
+    ['\\'] = '\\'
 };
 
 static inline int token_parse_escaped(struct token_parser *parser, struct token *token, uint32_t codepoint) {
-    for(size_t i = 0; simple_escaped[i][0]; i++) {
-        if(codepoint == simple_escaped[i][0]) {
-            token->escaped = true;
-            token->type = TOKEN_NORMAL;
-            token->codepoint = simple_escaped[i][1];
-            parser->state = TOKEN_INIT;
+    // simple_escaped only covers ASCII, whereas codepoint could be much larger.
+    if(codepoint < sizeof(simple_escaped) && simple_escaped[codepoint]) {
+        token->escaped = true;
+        token->normal_escaped = false;
+        token->type = TOKEN_NORMAL;
+        token->codepoint = simple_escaped[codepoint];
+        parser->state = TOKEN_INIT;
 
-            return parser->state;
-        }
+        return parser->state;
+    }
+
+    switch(codepoint) {
+        case 'u':
+            parser->state = TOKEN_UNICODE;
+            break;
+        default:
+            token->escaped = true;
+            token->normal_escaped = true;
+            token->codepoint = codepoint;
+            parser->state = TOKEN_INIT;
     }
 
     return parser->state;
