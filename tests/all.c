@@ -48,6 +48,8 @@ test_result test_passgen_token_next(void);
 test_result test_passgen_token_peek(void);
 test_result test_passgen_token_types(void);
 test_result test_passgen_token_errors(void);
+test_result test_token_normal(void);
+test_result test_token_escaped(void);
 test_result test_unicode_iter_sized(void);
 test_result test_unicode_iter_peek(void);
 test_result test_unicode_iter_error(void);
@@ -102,6 +104,8 @@ test_entry tests[] = {
     test(passgen_token_peek),
     test(passgen_token_types),
     test(passgen_token_errors),
+    test(token_normal),
+    test(token_escaped),
     test(unicode_iter_sized),
     test(unicode_iter_peek),
     test(unicode_iter_error),

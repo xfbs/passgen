@@ -23,6 +23,7 @@ set(SOURCE_LIST
     "pronounceable_english.c"
     "pronounceable_latin.c"
     "token.c"
+    "token_new.c"
     "unicode.c"
 )
 
