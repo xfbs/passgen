@@ -1,7 +1,7 @@
 #include "passgen/token_new.h"
 #include "passgen/util.h"
 
-static inline int token_parse_init(struct token_parser *parser, struct token *token, uint32_t codepoint) {
+static inline void token_parse_init(struct token_parser *parser, struct token *token, uint32_t codepoint) {
     if(codepoint == '\\') {
         parser->state = TOKEN_ESCAPED;
     } else {
@@ -10,8 +10,6 @@ static inline int token_parse_init(struct token_parser *parser, struct token *to
         token->escaped = false;
         parser->state = TOKEN_INIT;
     }
-
-    return parser->state;
 }
 
 // Simple ASCII escape map. Don't use this for large (unicode) codepoints.
@@ -29,7 +27,7 @@ const static char simple_escaped[] = {
     ['\\'] = '\\'
 };
 
-static inline int token_parse_escaped(struct token_parser *parser, struct token *token, uint32_t codepoint) {
+static inline void token_parse_escaped(struct token_parser *parser, struct token *token, uint32_t codepoint) {
     // simple_escaped only covers ASCII, whereas codepoint could be much larger.
     if(codepoint < sizeof(simple_escaped) && simple_escaped[codepoint]) {
         token->escaped = true;
@@ -38,7 +36,7 @@ static inline int token_parse_escaped(struct token_parser *parser, struct token 
         token->codepoint = simple_escaped[codepoint];
         parser->state = TOKEN_INIT;
 
-        return parser->state;
+        return;
     }
 
     switch(codepoint) {
@@ -51,18 +49,16 @@ static inline int token_parse_escaped(struct token_parser *parser, struct token 
             token->codepoint = codepoint;
             parser->state = TOKEN_INIT;
     }
-
-    return parser->state;
 }
 
-static inline int token_parse_unicode(struct token_parser *parser, uint32_t codepoint) {
+static inline void token_parse_unicode(struct token_parser *parser, uint32_t codepoint) {
     if(codepoint == '{') {
         parser->state = TOKEN_UNICODE_PAYLOAD;
         parser->data.unicode_payload.length = 0;
         parser->data.unicode_payload.codepoint = 0;
+    } else {
+        parser->state = TOKEN_ERROR_UNICODE_START;
     }
-
-    return parser->state;
 }
 
 static inline void token_parse_unicode_payload(struct token_parser *parser, struct token *token, uint32_t codepoint) {
@@ -78,12 +74,17 @@ static inline void token_parse_unicode_payload(struct token_parser *parser, stru
     // keep track of length, make sure it's not too long.
     parser->data.unicode_payload.length++;
     if(parser->data.unicode_payload.length > 6) {
-        // error: too long
+        parser->state = TOKEN_ERROR_UNICODE_PAYLOAD_LEN;
+
+        return;
     }
 
+    // try to decode the hex value.
     uint32_t decoded = hex_decode(codepoint);
     if(decoded < 0) {
-        // error: illegal value
+        parser->state = TOKEN_ERROR_UNICODE_PAYLOAD;
+
+        return;
     }
 
     parser->data.unicode_payload.codepoint *= 16;

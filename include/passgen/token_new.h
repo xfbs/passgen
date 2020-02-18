@@ -9,10 +9,15 @@
 #include <stdbool.h>
 
 enum token_state {
-    TOKEN_INIT,
+    TOKEN_INIT = 0,
     TOKEN_ESCAPED,
     TOKEN_UNICODE,
-    TOKEN_UNICODE_PAYLOAD
+    TOKEN_UNICODE_PAYLOAD,
+
+    // errors
+    TOKEN_ERROR_UNICODE_START = -1,
+    TOKEN_ERROR_UNICODE_PAYLOAD = -2,
+    TOKEN_ERROR_UNICODE_PAYLOAD_LEN = -3
 };
 
 enum token_type {
@@ -45,4 +50,12 @@ struct token {
     bool normal_escaped;
 };
 
+/* parse a single codepoint. The return value signals what happened. If it
+ * returns zero (TOKEN_INIT), it means that a token has been parsed into `token`.
+ * If it returns a positive integer, it means that it was successful but the
+ * token hasn't finished parsing yet, it is awaiting more input. If it returns
+ * negatively, it means that there has been an error.
+ */
 int token_parse(struct token_parser *parser, struct token *token, uint32_t codepoint);
+
+const char *token_parse_error_str(int ret);

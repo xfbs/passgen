@@ -117,3 +117,31 @@ test_result test_token_unicode(void) {
 
     return test_ok;
 }
+
+test_result test_token_unicode_error_start(void) {
+    struct token_parser parser = {0};
+    struct token token = {0};
+
+    // test that passing any character that is not an opening brace after \u
+    // causes an error state (so \u{FC} is fine, but \u[ is not).
+
+#define TEST_UNICODE_ERROR(a, b) \
+    assert(token_parse(&parser, &token, '\\') == TOKEN_ESCAPED); \
+    assert(parser.state == TOKEN_ESCAPED); \
+    assert(token_parse(&parser, &token, 'u') == TOKEN_UNICODE); \
+    assert(parser.state == TOKEN_UNICODE); \
+    assert(token_parse(&parser, &token, a) == TOKEN_ERROR_UNICODE_START); \
+    assert(parser.state == TOKEN_ERROR_UNICODE_START); \
+    assert(token_parse(&parser, &token, b) == TOKEN_ERROR_UNICODE_START); \
+    assert(parser.state == TOKEN_ERROR_UNICODE_START); \
+    parser.state = TOKEN_INIT
+
+    TEST_UNICODE_ERROR('x', 'y');
+    TEST_UNICODE_ERROR('c', '{');
+    TEST_UNICODE_ERROR('}', '{');
+    TEST_UNICODE_ERROR('[', ']');
+
+#undef TEST_UNICODE_ERROR
+
+    return test_ok;
+}
