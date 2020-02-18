@@ -5,13 +5,14 @@
  */
 
 #include <stdint.h>
-#include <stdint.h>
+#include <stddef.h>
 #include <stdbool.h>
 
 enum token_state {
     TOKEN_INIT,
     TOKEN_ESCAPED,
-    TOKEN_UNICODE
+    TOKEN_UNICODE,
+    TOKEN_UNICODE_PAYLOAD
 };
 
 enum token_type {
@@ -27,6 +28,14 @@ enum token_escaped {
 
 struct token_parser {
     enum token_state state;
+    union {
+        // when parsing a \u{FA} unicode literal, this is where we keep the
+        // state.
+        struct {
+            size_t length;
+            uint32_t codepoint;
+        } unicode_payload;
+    } data;
 };
 
 struct token {
