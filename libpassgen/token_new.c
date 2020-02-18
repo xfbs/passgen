@@ -80,7 +80,7 @@ static inline void token_parse_unicode_payload(struct token_parser *parser, stru
     }
 
     // try to decode the hex value.
-    uint32_t decoded = hex_decode(codepoint);
+    int8_t decoded = hex_decode(codepoint);
     if(decoded < 0) {
         parser->state = TOKEN_ERROR_UNICODE_PAYLOAD;
 

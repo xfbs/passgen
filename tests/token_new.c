@@ -72,10 +72,14 @@ test_result test_token_unicode(void) {
     assert(parser.state == TOKEN_UNICODE); \
     assert(token_parse(&parser, &token, '{') == TOKEN_UNICODE_PAYLOAD); \
     assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 0); \
+    assert(parser.data.unicode_payload.codepoint == 0); \
     assert(token_parse(&parser, &token, a) == TOKEN_UNICODE_PAYLOAD); \
     assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 1); \
     assert(token_parse(&parser, &token, b) == TOKEN_UNICODE_PAYLOAD); \
     assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 2); \
     assert(token_parse(&parser, &token, '}') == TOKEN_INIT); \
     assert(parser.state == TOKEN_INIT); \
     assert(token.codepoint == out)
@@ -88,30 +92,40 @@ test_result test_token_unicode(void) {
 
 #undef TEST_UNICODE
 
-#define TEST_UNICODE(a, b, c, d, e, out) \
+#define TEST_UNICODE(a, b, c, d, e, f, out) \
     assert(token_parse(&parser, &token, '\\') == TOKEN_ESCAPED); \
     assert(parser.state == TOKEN_ESCAPED); \
     assert(token_parse(&parser, &token, 'u') == TOKEN_UNICODE); \
     assert(parser.state == TOKEN_UNICODE); \
     assert(token_parse(&parser, &token, '{') == TOKEN_UNICODE_PAYLOAD); \
     assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 0); \
+    assert(parser.data.unicode_payload.codepoint == 0); \
     assert(token_parse(&parser, &token, a) == TOKEN_UNICODE_PAYLOAD); \
     assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 1); \
     assert(token_parse(&parser, &token, b) == TOKEN_UNICODE_PAYLOAD); \
     assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 2); \
     assert(token_parse(&parser, &token, c) == TOKEN_UNICODE_PAYLOAD); \
     assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 3); \
     assert(token_parse(&parser, &token, d) == TOKEN_UNICODE_PAYLOAD); \
     assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 4); \
     assert(token_parse(&parser, &token, e) == TOKEN_UNICODE_PAYLOAD); \
     assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 5); \
+    assert(token_parse(&parser, &token, f) == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 6); \
     assert(token_parse(&parser, &token, '}') == TOKEN_INIT); \
     assert(parser.state == TOKEN_INIT); \
     assert(token.codepoint == out)
 
-    TEST_UNICODE('1', 'F', '6', '4', '2', 0x1F642);
-    TEST_UNICODE('1', 'f', '6', '0', 'b', 0x1F60B);
-    TEST_UNICODE('0', '0', '0', 'f', 'c', 0xFC);
+    TEST_UNICODE('0', '1', 'F', '6', '4', '2', 0x1F642);
+    TEST_UNICODE('0', '1', 'f', '6', '0', 'b', 0x1F60B);
+    TEST_UNICODE('0', '0', '0', '0', 'f', 'c', 0xFC);
 
 #undef TEST_UNICODE
 
@@ -140,6 +154,81 @@ test_result test_token_unicode_error_start(void) {
     TEST_UNICODE_ERROR('c', '{');
     TEST_UNICODE_ERROR('}', '{');
     TEST_UNICODE_ERROR('[', ']');
+
+#undef TEST_UNICODE_ERROR
+
+    return test_ok;
+}
+
+test_result test_token_unicode_error_payload(void) {
+    struct token_parser parser = {0};
+    struct token token = {0};
+
+    // test that passing any character that is not an opening brace after \u
+    // causes an error state (so \u{FC} is fine, but \u[ is not).
+
+#define TEST_UNICODE_ERROR(a) \
+    assert(token_parse(&parser, &token, '\\') == TOKEN_ESCAPED); \
+    assert(parser.state == TOKEN_ESCAPED); \
+    assert(token_parse(&parser, &token, 'u') == TOKEN_UNICODE); \
+    assert(parser.state == TOKEN_UNICODE); \
+    assert(token_parse(&parser, &token, '{') == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(token_parse(&parser, &token, a) == TOKEN_ERROR_UNICODE_PAYLOAD); \
+    assert(parser.state == TOKEN_ERROR_UNICODE_PAYLOAD); \
+    parser.state = TOKEN_INIT
+
+    TEST_UNICODE_ERROR('x');
+    TEST_UNICODE_ERROR(' ');
+    TEST_UNICODE_ERROR('-');
+    TEST_UNICODE_ERROR('!');
+
+#undef TEST_UNICODE_ERROR
+
+    return test_ok;
+}
+
+test_result test_token_unicode_error_len(void) {
+    struct token_parser parser = {0};
+    struct token token = {0};
+
+    // test that passing any character that is not an opening brace after \u
+    // causes an error state (so \u{FC} is fine, but \u[ is not).
+
+#define TEST_UNICODE_ERROR(a, b, c, d, e, f, g) \
+    assert(token_parse(&parser, &token, '\\') == TOKEN_ESCAPED); \
+    assert(parser.state == TOKEN_ESCAPED); \
+    assert(token_parse(&parser, &token, 'u') == TOKEN_UNICODE); \
+    assert(parser.state == TOKEN_UNICODE); \
+    assert(token_parse(&parser, &token, '{') == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 0); \
+    assert(parser.data.unicode_payload.codepoint == 0); \
+    assert(token_parse(&parser, &token, a) == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 1); \
+    assert(token_parse(&parser, &token, b) == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 2); \
+    assert(token_parse(&parser, &token, c) == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 3); \
+    assert(token_parse(&parser, &token, d) == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 4); \
+    assert(token_parse(&parser, &token, e) == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 5); \
+    assert(token_parse(&parser, &token, f) == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.state == TOKEN_UNICODE_PAYLOAD); \
+    assert(parser.data.unicode_payload.length == 6); \
+    assert(token_parse(&parser, &token, f) == TOKEN_ERROR_UNICODE_PAYLOAD_LEN); \
+    assert(parser.state == TOKEN_ERROR_UNICODE_PAYLOAD_LEN); \
+    assert(parser.data.unicode_payload.length == 7); \
+    parser.state = TOKEN_INIT
+
+    TEST_UNICODE_ERROR('0', '0', '0', '0', '0', '0', '0');
+    TEST_UNICODE_ERROR('1', '0', 'f', 'f', 'f', 'f', '0');
 
 #undef TEST_UNICODE_ERROR
 

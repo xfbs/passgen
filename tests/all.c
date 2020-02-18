@@ -52,6 +52,8 @@ test_result test_token_normal(void);
 test_result test_token_escaped(void);
 test_result test_token_unicode(void);
 test_result test_token_unicode_error_start(void);
+test_result test_token_unicode_error_payload(void);
+test_result test_token_unicode_error_len(void);
 test_result test_unicode_iter_sized(void);
 test_result test_unicode_iter_peek(void);
 test_result test_unicode_iter_error(void);
@@ -110,6 +112,8 @@ test_entry tests[] = {
     test(token_escaped),
     test(token_unicode),
     test(token_unicode_error_start),
+    test(token_unicode_error_payload),
+    test(token_unicode_error_len),
     test(unicode_iter_sized),
     test(unicode_iter_peek),
     test(unicode_iter_error),
