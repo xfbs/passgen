@@ -10,7 +10,7 @@ tests = inputs
   .map{|data| data.scan(TEST_REGEX)}
   .flatten(1)
 
-outfile.puts '#include "tests/tests.h"'
+outfile.puts '#include "tests.h"'
 outfile.puts
 
 outfile.puts tests
