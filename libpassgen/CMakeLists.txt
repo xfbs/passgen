@@ -24,6 +24,7 @@ set(SOURCE_LIST
     "pronounceable_latin.c"
     "token.c"
     "token_new.c"
+    "token_new_json.c"
     "unicode.c"
 )
 
@@ -31,9 +32,9 @@ configure_file(version.c.in version.c)
 
 add_library(passgen ${SOURCE_LIST} ${HEADER_LIST})
 
-target_include_directories(passgen PUBLIC ../include)
+target_include_directories(passgen PUBLIC ../include /usr/local/include)
 target_compile_features(passgen PUBLIC c_std_99)
-target_link_libraries(passgen utf8proc m)
+target_link_libraries(passgen utf8proc m ${libjansson})
 
 if(USE_LIBEXECINFO)
 target_link_libraries(passgen execinfo)

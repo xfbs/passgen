@@ -1,6 +1,30 @@
 #include "passgen/token_new.h"
 #include "passgen/util.h"
 
+const struct enum_mapping token_state_mapping[] = {
+    {TOKEN_INIT, "TOKEN_INIT"},
+    {TOKEN_ESCAPED, "TOKEN_ESCAPED"},
+    {TOKEN_UNICODE, "TOKEN_UNICODE"},
+    {TOKEN_UNICODE_PAYLOAD, "TOKEN_UNICODE_PAYLOAD"},
+    {TOKEN_ERROR_UNICODE_START, "TOKEN_ERROR_UNICODE_START"},
+    {TOKEN_ERROR_UNICODE_PAYLOAD, "TOKEN_ERROR_UNICODE_PAYLOAD"},
+    {TOKEN_ERROR_UNICODE_PAYLOAD_LEN, "TOKEN_ERROR_UNICODE_PAYLOAD_LEN"},
+    {0, NULL},
+};
+
+const struct enum_mapping token_type_mapping[] = {
+    {TOKEN_NORMAL, "TOKEN_NORMAL"},
+    {TOKEN_SPECIAL, "TOKEN_SPECIAL"},
+    {0, NULL}
+};
+
+const struct enum_mapping token_escaped_mapping[] = {
+    {TOKEN_ESCAPED_NOT, "TOKEN_ESCAPED_NOT"},
+    {TOKEN_ESCAPED_SIMPLE, "TOKEN_ESCAPED_SIMPLE"},
+    {TOKEN_ESCPAED_NORMAL, "TOKEN_ESCAPED_NORMAL"},
+    {0, NULL}
+};
+
 static inline void token_parse_init(struct token_parser *parser, struct token *token, uint32_t codepoint) {
     if(codepoint == '\\') {
         parser->state = TOKEN_ESCAPED;
@@ -110,4 +134,8 @@ int token_parse(struct token_parser *parser, struct token *token, uint32_t codep
     }
 
     return parser->state;
+}
+
+const char *token_parse_error_str(int ret) {
+    return "err";
 }

@@ -4,10 +4,12 @@
  * escaped symbols, or special tokens.
  */
 
+#pragma once
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
 
+// when updating any of the enums, make sure to also update the mappings.
 enum token_state {
     TOKEN_INIT = 0,
     TOKEN_ESCAPED,
@@ -22,7 +24,11 @@ enum token_state {
 
 enum token_type {
     TOKEN_NORMAL,
-    TOKEN_SPECIAL
+    TOKEN_SPECIAL,
+    TOKEN_ESCAPED_TYPE,
+    TOKEN_ESCAPED_SIMPLE_TYPE,
+    TOKEN_ESCAPED_PASSTHRU,
+    TOKEN_ESCAPED_UNICODE
 };
 
 enum token_escaped {
@@ -50,6 +56,15 @@ struct token {
     bool normal_escaped;
 };
 
+struct enum_mapping {
+    int value;
+    const char *name;
+};
+
+extern const struct enum_mapping token_state_mapping[];
+extern const struct enum_mapping token_type_mapping[];
+extern const struct enum_mapping token_escaped_mapping[];
+
 /* parse a single codepoint. The return value signals what happened. If it
  * returns zero (TOKEN_INIT), it means that a token has been parsed into `token`.
  * If it returns a positive integer, it means that it was successful but the
@@ -59,3 +74,4 @@ struct token {
 int token_parse(struct token_parser *parser, struct token *token, uint32_t codepoint);
 
 const char *token_parse_error_str(int ret);
+

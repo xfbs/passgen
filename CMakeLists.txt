@@ -42,6 +42,8 @@ if(USE_LIBEXECINFO)
 find_library(libexecinfo execinfo)
 endif(USE_LIBEXECINFO)
 
+find_library(libjansson jansson)
+
 # build libpassgen
 if(BUILD_LIBPASSGEN)
 add_subdirectory(libpassgen)
@@ -49,12 +51,13 @@ endif()
 
 # build passgen binary and perhaps utils
 add_subdirectory(bin)
+add_subdirectory(tools)
 
 # cmocka framework for unit tests
 if(BUILD_CMOCKA)
-add_subdirectory(extern/cmocka)
+    #add_subdirectory(extern/cmocka)
 else()
-find_package(cmocka)
+    #find_package(cmocka)
 endif()
 
 # unit tests
