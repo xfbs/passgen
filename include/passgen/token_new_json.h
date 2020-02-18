@@ -1,3 +1,7 @@
+/* Convert token parser data structures into JSON. Used for inspecing and
+ * serializing the state.
+ */
+
 #pragma once
 
 #include "token_new.h"
