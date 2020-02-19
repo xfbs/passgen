@@ -31,12 +31,39 @@ set(SOURCE_LIST
 
 configure_file(version.c.in version.c)
 
-add_library(passgen ${SOURCE_LIST} ${HEADER_LIST})
 
-target_include_directories(passgen PUBLIC ../include /usr/local/include)
-target_compile_features(passgen PUBLIC c_std_99)
-target_link_libraries(passgen utf8proc m ${libjansson})
+add_library(passgen-objects OBJECT ${SOURCE_LIST} ${HEADER_LIST})
+set_property(TARGET passgen-objects PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+target_include_directories(passgen-objects PUBLIC ../include /usr/local/include)
+target_compile_features(passgen-objects PUBLIC c_std_99)
+
+add_library(passgen-static STATIC $<TARGET_OBJECTS:passgen-objects>)
+target_link_libraries(passgen-static utf8proc m ${libjansson})
+set_target_properties(passgen-static PROPERTIES OUTPUT_NAME passgen)
+
+add_library(passgen-shared SHARED $<TARGET_OBJECTS:passgen-objects>)
+target_link_libraries(passgen-shared utf8proc m ${libjansson})
+set_target_properties(passgen-shared PROPERTIES OUTPUT_NAME passgen)
+
+target_include_directories(passgen-static PUBLIC ../include /usr/local/include)
+target_include_directories(passgen-shared PUBLIC ../include /usr/local/include)
+
+#add_library(passgen ${SOURCE_LIST} ${HEADER_LIST})
+
+#target_include_directories(passgen PUBLIC ../include /usr/local/include)
+#target_compile_features(passgen PUBLIC c_std_99)
+#target_link_libraries(passgen utf8proc m ${libjansson})
+
+install(TARGETS passgen-static passgen-shared
+    DESTINATION lib
+    COMPONENT Libraries)
+
+install(FILES ${HEADER_LIST}
+    DESTINATION include/passgen
+    COMPONENT Headers)
 
 if(USE_LIBEXECINFO)
-target_link_libraries(passgen execinfo)
+target_link_libraries(passgen-static execinfo)
+target_link_libraries(passgen-shared execinfo)
 endif(USE_LIBEXECINFO)

@@ -10,7 +10,7 @@ endif()
 
 if(BUILD_BINARY)
 add_executable(passgen-bin passgen.c)
-target_link_libraries(passgen-bin passgen)
+target_link_libraries(passgen-bin passgen-static)
 set_target_properties(passgen-bin
             PROPERTIES OUTPUT_NAME passgen)
 endif()

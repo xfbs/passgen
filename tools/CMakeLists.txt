@@ -9,7 +9,7 @@ if(BUILD_UTILS)
 endif()
 
 add_executable(passgen-tokens passgen-tokens.c)
-target_link_libraries(passgen-tokens passgen ${libjansson})
+target_link_libraries(passgen-tokens passgen-static ${libjansson})
 
 if(USE_LIBEXECINFO)
 #target_link_libraries(passgen execinfo)
