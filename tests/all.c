@@ -58,6 +58,8 @@ test_result test_unicode_iter_sized(void);
 test_result test_unicode_iter_peek(void);
 test_result test_unicode_iter_error(void);
 test_result test_unicode_iter_next(void);
+test_result test_utf8_decode_simple(void);
+test_result test_utf8_decode_short_output(void);
 
 test_entry tests[] = {
     test(array_init),
@@ -118,5 +120,7 @@ test_entry tests[] = {
     test(unicode_iter_peek),
     test(unicode_iter_error),
     test(unicode_iter_next),
+    test(utf8_decode_simple),
+    test(utf8_decode_short_output),
     {NULL, NULL},
 };

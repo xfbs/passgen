@@ -26,6 +26,7 @@ set(SOURCE_LIST
     "token_new.c"
     "token_new_json.c"
     "unicode.c"
+    "utf8.c"
 )
 
 configure_file(version.c.in version.c)
