@@ -83,7 +83,7 @@ int token_parse(struct token_parser *parser, struct token *token, uint32_t codep
  * If the return value is zero or positive, it was a success, and `size` is filled
  * with the amount of tokens in the tokens array.
  */
-int token_parse(struct token_parser *parser, size_t *size, struct token token[], uint32_t codepoints[]);
+int token_parse_str(struct token_parser *parser, size_t *size, struct token token[], uint32_t codepoints[]);
 
 const char *token_parse_error_str(int ret);
 
