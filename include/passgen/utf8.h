@@ -14,3 +14,7 @@
  * encountered or there input is incomplete).
  */
 int utf8_decode(uint32_t *out, size_t out_len, size_t *out_pos, const uint8_t *in, size_t in_len, size_t *in_pos);
+
+/* encodes unicode characters into a UTF-8 character sequence.
+ */
+int utf8_encode(uint8_t *out, size_t out_len, size_t *out_pos, const uint32_t *in, size_t in_len, size_t *in_pos);

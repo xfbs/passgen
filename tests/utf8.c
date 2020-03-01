@@ -71,3 +71,34 @@ test_result test_utf8_decode_short_output(void) {
 
     return test_ok;
 }
+
+test_result test_utf8_encode_simple(void) {
+    // test that we can decode a simple UTF-8 string.
+
+    // ü😂µ
+    const uint8_t expected[] = {
+        0xc3, 0xbc, 0xf0, 0x9f, 0x98, 0x82, 0xc2, 0xb5, 0x0a
+    };
+
+    const uint32_t input[] = {
+        0xFC, 0x1F602, 0xB5, 0x0A
+    };
+
+    uint8_t output[9];
+
+    size_t in_pos = 0;
+    size_t out_pos = 0;
+
+    int ret = utf8_encode(
+            output, sizeof(output) / sizeof(output[0]), &out_pos,
+            input, sizeof(input) / sizeof(input[0]), &in_pos);
+
+    assert(ret != 0);
+    assert(in_pos == (sizeof(input)/sizeof(input[0])));
+    assert(out_pos == (sizeof(expected)/sizeof(expected[0])));
+    for(size_t i = 0; i < out_pos; i++) {
+        assert(output[i] == expected[i]);
+    }
+
+    return test_ok;
+}
