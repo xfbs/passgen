@@ -1,6 +1,3 @@
 [submodule "external/utf8proc"]
 	path = extern/utf8proc
 	url = https://github.com/JuliaStrings/utf8proc
-[submodule "extern/cmocka"]
-	path = extern/cmocka
-	url = https://gitlab.com/cmocka/cmocka
