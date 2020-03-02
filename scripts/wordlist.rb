@@ -1,12 +1,11 @@
 #!/usr/bin/env ruby
-require "minitest/autorun"
-
+require 'minitest'
 
 # how many characters match
 def matching_prefix(a, b)
   a
     .chars
-    .zip(b.chars)
+    .zip(b)
     .map{|a, b| a == b}
     .take_while{|x| x}
     .count
@@ -22,9 +21,10 @@ class WordNode
   end
 
   def add(word)
+    word_chars = word.chars
     longest_matching_prefix, index = @children
       .each_with_index
-      .map{|child, index| [matching_prefix(child.word, word), index]}
+      .map{|child, index| [matching_prefix(child.word, word_chars), index]}
       .max_by{|child, index| index}
 
     if (longest_matching_prefix || 0) == 0
@@ -44,6 +44,51 @@ class WordNode
     else
       # word is longer than child: recurse
       @children[index].add(word.chars[longest_matching_prefix..-1].join)
+    end
+  end
+
+  def dump
+    @children.each do |child|
+      header = 0
+      header += 64 if child.leaf
+      if child.children.empty?
+        print header.chr
+        print child.word.length
+      else
+        header += 128
+        header += 16
+        header += 4
+        print header.chr
+        print child.word.length
+        print (child.children.count / 256).chr
+        print (child.children.count % 256).chr
+        print 0.chr
+        print 200.chr
+      end
+      print child.word
+    end
+    @children.each do |child|
+      child.dump
+    end
+  end
+
+  def print(prefix = "")
+    current = prefix + (@word || "")
+    if @leaf
+      puts current
+    end
+
+    @children.each do |child|
+      child.print(current)
+    end
+  end
+
+  def inspect(depth: 0, prev: [])
+    cur = prev
+    cur = cur + [@word] if @word
+    puts "#{' ' * depth}word = #{cur.join(' ')}\n"
+    @children.each do |child|
+      child.inspect(depth: depth + 2, prev: cur)
     end
   end
 end
@@ -140,5 +185,24 @@ class WordNodeTest < Minitest::Test
     assert_equal root.children[0].children[1].leaf, true
     assert_equal root.children[0].children[1].word, 'on'
     assert_equal root.children[0].children[1].children.count, 1
+  end
+end
+
+if ARGV[0] == 'test'
+  require 'minitest/autorun'
+elsif ARGV[0] == 'dump'
+  words = File.read(ARGV[1]).split
+  root = WordNode.new
+  words.each do |word|
+    root.add(word)
+  end
+  root.dump
+elsif ARGV[0] == 'print'
+  words = File.read(ARGV[1]).split
+  root = WordNode.new
+  words.each do |word|
+    root.add(word)
+    root.inspect
+    puts
   end
 end
