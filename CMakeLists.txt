@@ -53,13 +53,6 @@ endif()
 add_subdirectory(bin)
 add_subdirectory(tools)
 
-# cmocka framework for unit tests
-if(BUILD_CMOCKA)
-    #add_subdirectory(extern/cmocka)
-else()
-    #find_package(cmocka)
-endif()
-
 # unit tests
 if(BUILD_TESTS)
 add_subdirectory(tests)
