@@ -200,6 +200,19 @@ test_result test_array_pop(void) {
     assert(array.bins == 4);
     assert(array.data[1] == NULL);
 
+    passgen_array_get(&array, 256, 0);
+
+    passgen_array_pop(&array, 256, NULL);
+    assert(array.len == 3);
+
+    passgen_array_pop(&array, 256, NULL);
+    assert(array.len == 2);
+
+
+    passgen_array_pop(&array, 256, NULL);
+    assert(array.len == 1);
+
+
     passgen_array_free(&array, 256, NULL);
 
     return test_ok;

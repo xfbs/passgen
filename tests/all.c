@@ -8,6 +8,8 @@ test_result test_memory_stdlib(void);
 test_result test_memory_limited(void);
 test_result test_memory_limited_malloc(void);
 test_result test_memory_accounting(void);
+test_result test_parser_simple(void);
+test_result test_parser_multi_groups(void);
 test_result test_pattern_parse_str();
 test_result test_pattern_parse_group();
 test_result test_pattern_parse_strrep();
@@ -71,6 +73,8 @@ test_entry tests[] = {
     test(memory_limited),
     test(memory_limited_malloc),
     test(memory_accounting),
+    test(parser_simple),
+    test(parser_multi_groups),
     test(pattern_parse_str),
     test(pattern_parse_group),
     test(pattern_parse_strrep),

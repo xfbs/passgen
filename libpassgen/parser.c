@@ -16,7 +16,9 @@ int parser_init(
     // set initial segment
     state = passgen_array_push(&parser->state, sizeof(struct parser_state), NULL);
     state->type = PARSER_SEGMENT;
-    state->data = passgen_array_push(&parser->parsed.group.segments, sizeof(pattern_segments_t), NULL);
+    struct pattern_segments *segments = passgen_array_push(&parser->parsed.group.segments, sizeof(pattern_segments_t), NULL);
+    state->data = segments;
+    segments->items = passgen_array_init(sizeof(struct pattern_segment), NULL);
 
     return 0;
 }
@@ -39,10 +41,13 @@ int parse_token(
 
     do {
         // get current state
+        printf("size %zu\n", parser->state.len);
         struct parser_state *state = passgen_array_get(
                 &parser->state,
                 sizeof(struct parser_state),
                 parser->state.len - 1);
+
+        printf("state: %p len %zu\n", state, parser->state.len);
 
         switch(state->type) {
             case PARSER_OUTER:
@@ -70,10 +75,14 @@ int parse_token_outer(
 
         state->type = PARSER_SEGMENT;
 
-        state->data = passgen_array_push(
+        struct pattern_segments *segments = passgen_array_push(
                 &parser->parsed.group.segments,
                 sizeof(pattern_segments_t),
                 NULL);
+
+        state->data = segments;
+
+        segments->items = passgen_array_init(sizeof(struct pattern_segment), NULL);
 
         return 0;
     } else {
