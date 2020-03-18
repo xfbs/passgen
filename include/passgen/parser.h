@@ -1,5 +1,5 @@
-#include "pattern.h"
 #include "token_new.h"
+#include "pattern/pattern.h"
 
 enum parser_state_type {
     PARSER_OUTER,
@@ -15,7 +15,7 @@ struct parser_state {
 
 struct parser {
     passgen_array_t state;
-    pattern_t parsed;
+    passgen_pattern_t parsed;
 };
 
 // parses a single token.

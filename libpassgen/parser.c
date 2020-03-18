@@ -1,4 +1,7 @@
 #include "passgen/parser.h"
+#include "passgen/pattern/segments.h"
+#include "passgen/pattern/segment.h"
+#include "passgen/pattern/kind.h"
 
 int parser_init(
         struct parser *parser) {
@@ -6,7 +9,7 @@ int parser_init(
     passgen_array_init(&parser->state, sizeof(struct parser_state), NULL);
 
     // initialise group
-    passgen_array_init(&parser->parsed.group.segments, sizeof(pattern_segments_t), NULL);
+    passgen_array_init(&parser->parsed.group.segments, sizeof(passgen_pattern_segments_t), NULL);
 
     // set initial group
     struct parser_state *state = passgen_array_push(&parser->state, sizeof(struct parser_state), NULL);
@@ -16,9 +19,9 @@ int parser_init(
     // set initial segment
     state = passgen_array_push(&parser->state, sizeof(struct parser_state), NULL);
     state->type = PARSER_SEGMENT;
-    struct pattern_segments *segments = passgen_array_push(&parser->parsed.group.segments, sizeof(pattern_segments_t), NULL);
+    struct passgen_pattern_segments *segments = passgen_array_push(&parser->parsed.group.segments, sizeof(passgen_pattern_segments_t), NULL);
     state->data = segments;
-    passgen_array_init(&segments->items, sizeof(struct pattern_segment), NULL);
+    passgen_array_init(&segments->items, sizeof(struct passgen_pattern_segment), NULL);
 
     return 0;
 }
@@ -26,12 +29,12 @@ int parser_init(
 int parse_token_outer(
         struct parser *parser,
         struct token *token,
-        struct pattern_group *group);
+        struct passgen_pattern_group *group);
 
 int parse_token_segment(
         struct parser *parser,
         struct token *token,
-        struct pattern_segments *segments);
+        struct passgen_pattern_segments *segments);
 
 int parse_token(
         struct parser *parser,
@@ -65,7 +68,7 @@ int parse_token(
 int parse_token_outer(
         struct parser *parser,
         struct token *token,
-        struct pattern_group *group) {
+        struct passgen_pattern_group *group) {
     if(token->codepoint == '|') {
         // create new segment and parser state
         struct parser_state *state = passgen_array_push(
@@ -75,14 +78,14 @@ int parse_token_outer(
 
         state->type = PARSER_SEGMENT;
 
-        struct pattern_segments *segments = passgen_array_push(
+        struct passgen_pattern_segments *segments = passgen_array_push(
                 &parser->parsed.group.segments,
-                sizeof(pattern_segments_t),
+                sizeof(passgen_pattern_segments_t),
                 NULL);
 
         state->data = segments;
 
-        passgen_array_init(&segments->items, sizeof(struct pattern_segment), NULL);
+        passgen_array_init(&segments->items, sizeof(struct passgen_pattern_segment), NULL);
 
         return 0;
     } else {
@@ -93,7 +96,7 @@ int parse_token_outer(
 int parse_token_segment(
         struct parser *parser,
         struct token *token,
-        struct pattern_segments *segments) {
+        struct passgen_pattern_segments *segments) {
 
     // check if this is a delimiter, and in that case, bubble up
     if(token->codepoint == '|') {
@@ -101,7 +104,7 @@ int parse_token_segment(
         return 1;
     }
 
-    struct pattern_segment *item = passgen_array_push(&segments->items, sizeof(struct pattern_segment), NULL);
+    struct passgen_pattern_segment *item = passgen_array_push(&segments->items, sizeof(struct passgen_pattern_segment), NULL);
 
     // we're supposed to read something in.
     if(token->codepoint == '(') {
@@ -112,7 +115,7 @@ int parse_token_segment(
         // start new ranges
     }
 
-    item->kind = PATTERN_CHAR;
+    item->kind = PASSGEN_PATTERN_CHAR;
     item->data.character.codepoint = token->codepoint;
 
     return 0;
