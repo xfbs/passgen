@@ -26,8 +26,8 @@ test_result test_parser_multi_groups(void) {
     assert(0 == parse_token(&parser, &token));
     assert(token_parse(&token_parser, &token, '|') == TOKEN_INIT);
     assert(0 == parse_token(&parser, &token));
-    //assert(token_parse(&token_parser, &token, 'b') == TOKEN_INIT);
-    //assert(0 == parse_token(&parser, &token));
+    assert(token_parse(&token_parser, &token, 'b') == TOKEN_INIT);
+    assert(0 == parse_token(&parser, &token));
 
     return test_ok;
 }
