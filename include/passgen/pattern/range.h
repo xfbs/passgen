@@ -1,5 +1,7 @@
 #pragma once
 #include "substring.h"
+#include <stddef.h>
+#include <stdint.h>
 
 struct passgen_pattern_range {
     struct passgen_pattern_substring pos;

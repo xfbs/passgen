@@ -3,16 +3,21 @@
 #include "passgen/pattern/segment.h"
 #include "passgen/pattern/kind.h"
 
+static inline struct parser_state *parser_state_push(struct parser *parser) {
+    return passgen_array_push(&parser->state, sizeof(struct parser_state), NULL);
+}
+
 int parser_init(
         struct parser *parser) {
     // initialise parsing stack
     passgen_array_init(&parser->state, sizeof(struct parser_state), NULL);
 
     // initialise group
-    passgen_array_init(&parser->parsed.group.segments, sizeof(passgen_pattern_segments_t), NULL);
+    passgen_pattern_init(&parser->parsed);
+    //passgen_array_init(&parser->parsed.group.segments, sizeof(passgen_pattern_segments_t), NULL);
 
     // set initial group
-    struct parser_state *state = passgen_array_push(&parser->state, sizeof(struct parser_state), NULL);
+    struct parser_state *state = parser_state_push(parser);
     state->type = PARSER_OUTER;
     state->data = &parser->parsed.group;
 
@@ -44,13 +49,10 @@ int parse_token(
 
     do {
         // get current state
-        printf("size %zu\n", parser->state.len);
         struct parser_state *state = passgen_array_get(
                 &parser->state,
                 sizeof(struct parser_state),
                 parser->state.len - 1);
-
-        printf("state: %p len %zu\n", state, parser->state.len);
 
         switch(state->type) {
             case PARSER_OUTER:

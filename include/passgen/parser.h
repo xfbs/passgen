@@ -1,5 +1,6 @@
 #include "token_new.h"
 #include "pattern/pattern.h"
+#include "array.h"
 
 enum parser_state_type {
     PARSER_OUTER,
