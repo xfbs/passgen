@@ -10,22 +10,19 @@
 
 #undef passgen_array_get
 
-passgen_array_t passgen_array_init(size_t size, passgen_mem_t *mem) {
-    // these might not be used if this isn't a debug build.
-    (void) size;
-    (void) mem;
-
+void passgen_array_init(passgen_array_t *array, size_t size, passgen_mem_t *mem) {
     assert(ITEMS_PER_BIN(size));
 
-    return (passgen_array_t) {
-        .data = NULL,
-        .len = 0,
-        .bins = 0,
+    array->data = NULL;
+    array->len = 0;
+    array->bins = 0;
 #ifdef PASSGEN_DEBUG
-        .size = size,
-        .mem = mem,
+    array->size = size;
+    array->mem = mem;
+#else
+    (void) size;
+    (void) mem;
 #endif
-    };
 }
 
 void *passgen_array_push(passgen_array_t *array, size_t size, passgen_mem_t *mem) {

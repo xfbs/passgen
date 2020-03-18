@@ -3,7 +3,8 @@
 #include <string.h>
 
 test_result test_array_init(void) {
-    passgen_array_t array = passgen_array_init(256, NULL);
+    passgen_array_t array;
+    passgen_array_init(&array, 256, NULL);
 
     assert(array.data == NULL);
     assert(array.len == 0);
@@ -15,7 +16,8 @@ test_result test_array_init(void) {
 }
 
 test_result test_array_push(void) {
-    passgen_array_t array = passgen_array_init(256, NULL);
+    passgen_array_t array;
+    passgen_array_init(&array, 256, NULL);
 
     void *data;
 
@@ -75,7 +77,8 @@ test_result test_array_push(void) {
 }
 
 test_result test_array_get(void) {
-    passgen_array_t array = passgen_array_init(256, NULL);
+    passgen_array_t array;
+    passgen_array_init(&array, 256, NULL);
 
     void *data;
 
@@ -132,7 +135,8 @@ test_result test_array_get(void) {
 }
 
 test_result test_array_pop(void) {
-    passgen_array_t array = passgen_array_init(256, NULL);
+    passgen_array_t array;
+    passgen_array_init(&array, 256, NULL);
 
     void *data;
 

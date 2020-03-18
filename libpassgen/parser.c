@@ -3,10 +3,10 @@
 int parser_init(
         struct parser *parser) {
     // initialise parsing stack
-    parser->state = passgen_array_init(sizeof(struct parser_state), NULL);
+    passgen_array_init(&parser->state, sizeof(struct parser_state), NULL);
 
     // initialise group
-    parser->parsed.group.segments = passgen_array_init(sizeof(pattern_segments_t), NULL);
+    passgen_array_init(&parser->parsed.group.segments, sizeof(pattern_segments_t), NULL);
 
     // set initial group
     struct parser_state *state = passgen_array_push(&parser->state, sizeof(struct parser_state), NULL);
@@ -18,7 +18,7 @@ int parser_init(
     state->type = PARSER_SEGMENT;
     struct pattern_segments *segments = passgen_array_push(&parser->parsed.group.segments, sizeof(pattern_segments_t), NULL);
     state->data = segments;
-    segments->items = passgen_array_init(sizeof(struct pattern_segment), NULL);
+    passgen_array_init(&segments->items, sizeof(struct pattern_segment), NULL);
 
     return 0;
 }
@@ -82,7 +82,7 @@ int parse_token_outer(
 
         state->data = segments;
 
-        segments->items = passgen_array_init(sizeof(struct pattern_segment), NULL);
+        passgen_array_init(&segments->items, sizeof(struct pattern_segment), NULL);
 
         return 0;
     } else {
