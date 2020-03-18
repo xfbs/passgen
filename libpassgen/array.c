@@ -103,13 +103,13 @@ void passgen_array_pop(passgen_array_t *array, size_t size, passgen_mem_t *mem) 
     if(offset == 1) {
         passgen_free(mem, array->data[bin]);
         array->data[bin] = NULL;
-    }
 
-    // if this was the last bin, free the whole array.
-    if(bin == 0) {
-        passgen_free(mem, array->data);
-        array->data = NULL;
-        array->bins = 0;
+        // if this was the last bin, free the whole array.
+        if(bin == 0) {
+            passgen_free(mem, array->data);
+            array->data = NULL;
+            array->bins = 0;
+        }
     }
 
     array->len -= 1;
