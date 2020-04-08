@@ -6,6 +6,8 @@ enum parser_state_type {
     PARSER_OUTER,
     PARSER_SEGMENT,
     PARSER_CHAR,
+    PARSER_GROUP,
+    PARSER_RANGE,
     PARSER_DONE,
 };
 

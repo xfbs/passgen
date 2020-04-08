@@ -7,6 +7,10 @@ static inline struct parser_state *parser_state_push(struct parser *parser) {
     return passgen_array_push(&parser->state, sizeof(struct parser_state), NULL);
 }
 
+static inline void parser_state_pop(struct parser *parser) {
+    passgen_array_pop(&parser->state, sizeof(struct parser_state), NULL);
+}
+
 int parser_init(
         struct parser *parser) {
     // initialise parsing stack
@@ -102,7 +106,7 @@ int parse_token_segment(
 
     // check if this is a delimiter, and in that case, bubble up
     if(token->codepoint == '|') {
-        passgen_array_pop(&parser->state, sizeof(struct parser_state), NULL);
+        parser_state_pop(parser);
         return 1;
     }
 
@@ -110,11 +114,17 @@ int parse_token_segment(
 
     // we're supposed to read something in.
     if(token->codepoint == '(') {
-        // start new group
+        item = PASSGEN_PATTERN_GROUP;
+        struct parser_state *state = parser_state_push(parser);
+        state->type = PARSER_GROUP;
+        state->data = &item->data.group;
     }
 
     if(token->codepoint == '[') {
-        // start new ranges
+        item = PASSGEN_PATTERN_RANGE;
+        struct parser_state *state = parser_state_push(parser);
+        state->type = PARSER_RANGE;
+        state->data = &item->data.range;
     }
 
     item->kind = PASSGEN_PATTERN_CHAR;

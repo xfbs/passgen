@@ -2,16 +2,19 @@
 #include <jansson.h>
 #include "passgen/token_new.h"
 #include "passgen/token_new_json.h"
-
-void usage();
-void dump(const unsigned char *str);
+#include "passgen/utf8.h"
 
 int main(int argc, char *argv[]) {
-    if(argc < 2) {
-        usage(argv[0]);
-        exit(EXIT_FAILURE);
-    } else {
-        dump((unsigned char *) argv[1]);
+    unsigned char stdin_buffer[128];
+    uint32_t codepoint_buffer[128];
+    size_t stdin_buffer_len;
+
+    while((stdin_buffer_len = fread(stdin_buffer, 1, sizeof(stdin_buffer), stdin)) > 0) {
+        if(ferror(stdin)) {
+            break;
+        }
+
+        printf("%zu\n", stdin_buffer_len);
     }
 
     return EXIT_SUCCESS;
