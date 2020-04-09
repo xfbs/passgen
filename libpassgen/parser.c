@@ -1,7 +1,7 @@
 #include "passgen/parser.h"
 #include "passgen/pattern/kind.h"
+#include "passgen/pattern/item.h"
 #include "passgen/pattern/segment.h"
-#include "passgen/pattern/segments.h"
 
 static inline struct parser_state *parser_state_push(struct parser *parser) {
   return passgen_array_push(&parser->state, sizeof(struct parser_state), NULL);
@@ -26,7 +26,7 @@ int parser_init(struct parser *parser) {
   struct parser_state *state = parser_state_push(parser);
   state->type = PARSER_GROUP;
   state->data.group.group = &parser->parsed.group;
-  state->data.group.segments = passgen_pattern_group_add(&parser->parsed.group);
+  state->data.group.segment = passgen_pattern_group_new_segment(&parser->parsed.group);
 
   return 0;
 }
@@ -61,22 +61,14 @@ int parse_token_group(
     struct parser_state *state) {
   if(token->codepoint == '|') {
     // create new segment and parser state
-    struct passgen_pattern_segments *segments = passgen_array_push(
-        &parser->parsed.group.segments,
-        sizeof(passgen_pattern_segments_t),
-        NULL);
-    state->data.group.segments = segments;
-    passgen_array_init(
-        &segments->items,
-        sizeof(struct passgen_pattern_segment),
-        NULL);
+    state->data.group.segment = passgen_pattern_group_new_segment(&parser->parsed.group);
 
     return 0;
   }
 
-  struct passgen_pattern_segment *item = passgen_array_push(
-      &state->data.group.segments->items,
-      sizeof(struct passgen_pattern_segment),
+  struct passgen_pattern_item *item = passgen_array_push(
+      &state->data.group.segment->items,
+      sizeof(struct passgen_pattern_item),
       NULL);
 
   // we're supposed to read something in.

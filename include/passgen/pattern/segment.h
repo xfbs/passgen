@@ -1,18 +1,19 @@
 #pragma once
+#include "passgen/array.h"
+#include "substring.h"
 
-#include "passgen/pattern/char.h"
-#include "passgen/pattern/group.h"
-#include "passgen/pattern/kind.h"
-#include "passgen/pattern/set.h"
-#include "passgen/pattern/special.h"
+struct passgen_pattern_item;
 
 typedef struct passgen_pattern_segment {
-  enum passgen_pattern_kind kind;
+  struct passgen_pattern_substring pos;
 
-  union {
-    struct passgen_pattern_set set;
-    struct passgen_pattern_group group;
-    struct passgen_pattern_char character;
-    struct passgen_pattern_special special;
-  } data;
+  // array of segment_items
+  passgen_array_t items;
+
+  // struct pattern_repeat repeat;
 } passgen_pattern_segment_t;
+
+void passgen_pattern_segment_init(struct passgen_pattern_segment *segment);
+void passgen_pattern_segment_free(struct passgen_pattern_segment *segment);
+
+struct passgen_pattern_item *passgen_pattern_segment_new_item(struct passgen_pattern_segment *segment);

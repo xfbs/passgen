@@ -14,10 +14,10 @@ struct parser_state {
   union {
     struct {
       struct passgen_pattern_group *group;
-      struct passgen_pattern_segments *segments;
+      struct passgen_pattern_segment *segment;
     } group;
     struct {
-      struct passgen_pattern_segment *segment;
+      struct passgen_pattern_item *item;
     } repeat;
     struct {
       struct passgen_pattern_set *set;
