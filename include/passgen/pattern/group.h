@@ -1,6 +1,7 @@
 #pragma once
 #include "substring.h"
 #include "passgen/array.h"
+#include "passgen/pattern/segments.h"
 #include "repeat.h"
 
 typedef struct passgen_pattern_group {
@@ -13,3 +14,5 @@ typedef struct passgen_pattern_group {
 } passgen_pattern_group_t;
 
 void passgen_pattern_group_init(passgen_pattern_group_t *group);
+
+struct passgen_pattern_segments *passgen_pattern_group_add(passgen_pattern_group_t *group);

@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 #include "substring.h"
 #include "repeat.h"
 
