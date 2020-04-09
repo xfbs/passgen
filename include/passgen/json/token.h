@@ -7,12 +7,12 @@
 #include <jansson.h>
 #include "passgen/token.h"
 
-json_t *token_parser_to_json(struct token_parser *parser);
+json_t *passgen_token_parser_to_json(struct passgen_token_parser *parser);
 
-json_t *token_state_to_json(enum token_state state);
+json_t *passgen_token_state_to_json(enum passgen_token_state state);
 
-json_t *token_type_to_json(enum token_type type);
+json_t *passgen_token_type_to_json(enum passgen_token_type type);
 
-json_t *token_escaped_to_json(enum token_escaped escaped);
+json_t *passgen_token_escaped_to_json(enum passgen_token_escaped escaped);
 
-json_t *token_to_json(struct token *token);
+json_t *passgen_token_to_json(struct passgen_token *token);

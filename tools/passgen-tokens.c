@@ -26,8 +26,8 @@ void usage(const char *prog) {
 }
 
 void dump(const unsigned char *str) {
-    struct token_parser parser = {0};
-    struct token token = {0};
+    struct passgen_token_parser parser = {0};
+    struct passgen_token token = {0};
 
     json_t *output = json_array();
 
@@ -36,13 +36,13 @@ void dump(const unsigned char *str) {
 
         json_object_set_new(obj, "character", json_integer(str[i]));
 
-        int ret = token_parse(&parser, &token, str[i]);
+        int ret = passgen_token_parse(&parser, &token, str[i]);
 
-        json_t *parser_json = token_parser_to_json(&parser);
+        json_t *parser_json = passgen_token_parser_to_json(&parser);
         json_object_set_new(obj, "parser", parser_json);
 
         if(parser.state == TOKEN_INIT) {
-            json_t *token_json = token_to_json(&token);
+            json_t *token_json = passgen_token_to_json(&token);
             json_object_set_new(obj, "token", token_json);
         }
 

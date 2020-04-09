@@ -1,7 +1,7 @@
 #include "passgen/token.h"
 #include "passgen/util.h"
 
-const struct enum_mapping token_state_mapping[] = {
+const struct passgen_enum_mapping passgen_token_state_mapping[] = {
     {TOKEN_INIT, "TOKEN_INIT"},
     {TOKEN_ESCAPED, "TOKEN_ESCAPED"},
     {TOKEN_UNICODE, "TOKEN_UNICODE"},
@@ -12,20 +12,20 @@ const struct enum_mapping token_state_mapping[] = {
     {0, NULL},
 };
 
-const struct enum_mapping token_type_mapping[] = {
+const struct passgen_enum_mapping passgen_token_type_mapping[] = {
     {TOKEN_NORMAL, "TOKEN_NORMAL"},
     {TOKEN_SPECIAL, "TOKEN_SPECIAL"},
     {0, NULL}};
 
-const struct enum_mapping token_escaped_mapping[] = {
+const struct passgen_enum_mapping passgen_token_escaped_mapping[] = {
     {TOKEN_ESCAPED_NOT, "TOKEN_ESCAPED_NOT"},
     {TOKEN_ESCAPED_SIMPLE, "TOKEN_ESCAPED_SIMPLE"},
     {TOKEN_ESCPAED_NORMAL, "TOKEN_ESCAPED_NORMAL"},
     {0, NULL}};
 
 static inline void token_parse_init(
-    struct token_parser *parser,
-    struct token *token,
+    struct passgen_token_parser *parser,
+    struct passgen_token *token,
     uint32_t codepoint) {
   if(codepoint == '\\') {
     parser->state = TOKEN_ESCAPED;
@@ -52,8 +52,8 @@ const static char simple_escaped[] = {
     ['\\'] = '\\'};
 
 static inline void token_parse_escaped(
-    struct token_parser *parser,
-    struct token *token,
+    struct passgen_token_parser *parser,
+    struct passgen_token *token,
     uint32_t codepoint) {
   // simple_escaped only covers ASCII, whereas codepoint could be much larger.
   if(codepoint < sizeof(simple_escaped) && simple_escaped[codepoint]) {
@@ -77,7 +77,7 @@ static inline void token_parse_escaped(
 }
 
 static inline void
-token_parse_unicode(struct token_parser *parser, uint32_t codepoint) {
+token_parse_unicode(struct passgen_token_parser *parser, uint32_t codepoint) {
   if(codepoint == '{') {
     parser->state = TOKEN_UNICODE_PAYLOAD;
     parser->data.unicode_payload.length = 0;
@@ -88,8 +88,8 @@ token_parse_unicode(struct token_parser *parser, uint32_t codepoint) {
 }
 
 static inline void token_parse_unicode_payload(
-    struct token_parser *parser,
-    struct token *token,
+    struct passgen_token_parser *parser,
+    struct passgen_token *token,
     uint32_t codepoint) {
   // once we read the closing brace, the payload is over and we can emit the
   // token.
@@ -121,9 +121,9 @@ static inline void token_parse_unicode_payload(
   parser->data.unicode_payload.codepoint += decoded;
 }
 
-int token_parse(
-    struct token_parser *parser,
-    struct token *token,
+int passgen_token_parse(
+    struct passgen_token_parser *parser,
+    struct passgen_token *token,
     uint32_t codepoint) {
   switch(parser->state) {
     case TOKEN_INIT: token_parse_init(parser, token, codepoint); break;
@@ -138,6 +138,6 @@ int token_parse(
   return parser->state;
 }
 
-const char *token_parse_error_str(int ret) {
+const char *passgen_token_parse_error_str(int ret) {
   return "err";
 }

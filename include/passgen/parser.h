@@ -35,6 +35,6 @@ struct parser {
 // parses a single token.
 int parser_init(struct parser *parser);
 
-int parse_token(struct parser *parser, struct token *token);
+int parse_token(struct parser *parser, struct passgen_token *token);
 
 int parse_finish(struct parser *parser);

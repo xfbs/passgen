@@ -1,9 +1,9 @@
 #include "passgen/json/token.h"
 
-json_t *token_parser_to_json(struct token_parser *parser) {
+json_t *passgen_token_parser_to_json(struct passgen_token_parser *parser) {
   json_t *obj = json_object();
 
-  json_object_set_new(obj, "state", token_state_to_json(parser->state));
+  json_object_set_new(obj, "state", passgen_token_state_to_json(parser->state));
 
   if(parser->state == TOKEN_UNICODE_PAYLOAD) {
     json_t *data = json_object();
@@ -23,40 +23,40 @@ json_t *token_parser_to_json(struct token_parser *parser) {
   return obj;
 }
 
-json_t *token_to_json(struct token *token) {
+json_t *passgen_token_to_json(struct passgen_token *token) {
   json_t *obj = json_object();
 
   json_object_set_new(obj, "codepoint", json_integer(token->codepoint));
   json_object_set_new(obj, "escaped", json_boolean(token->escaped));
-  json_object_set_new(obj, "type", token_type_to_json(token->type));
+  json_object_set_new(obj, "type", passgen_token_type_to_json(token->type));
 
   return obj;
 }
 
-json_t *token_state_to_json(enum token_state state) {
-  for(size_t i = 0; token_state_mapping[i].name; i++) {
-    if(state == token_state_mapping[i].value) {
-      return json_string(token_state_mapping[i].name);
+json_t *passgen_token_state_to_json(enum passgen_token_state state) {
+  for(size_t i = 0; passgen_token_state_mapping[i].name; i++) {
+    if(state == passgen_token_state_mapping[i].value) {
+      return json_string(passgen_token_state_mapping[i].name);
     }
   }
 
   return NULL;
 }
 
-json_t *token_type_to_json(enum token_type type) {
-  for(size_t i = 0; token_type_mapping[i].name; i++) {
-    if(type == token_type_mapping[i].value) {
-      return json_string(token_type_mapping[i].name);
+json_t *passgen_token_type_to_json(enum passgen_token_type type) {
+  for(size_t i = 0; passgen_token_type_mapping[i].name; i++) {
+    if(type == passgen_token_type_mapping[i].value) {
+      return json_string(passgen_token_type_mapping[i].name);
     }
   }
 
   return NULL;
 }
 
-json_t *token_escaped_to_json(enum token_escaped escaped) {
-  for(size_t i = 0; token_escaped_mapping[i].name; i++) {
-    if(escaped == token_escaped_mapping[i].value) {
-      return json_string(token_escaped_mapping[i].name);
+json_t *passgen_token_escaped_to_json(enum passgen_token_escaped escaped) {
+  for(size_t i = 0; passgen_token_escaped_mapping[i].name; i++) {
+    if(escaped == passgen_token_escaped_mapping[i].value) {
+      return json_string(passgen_token_escaped_mapping[i].name);
     }
   }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-struct enum_mapping {
+struct passgen_enum_mapping {
   int value;
   const char *name;
 };

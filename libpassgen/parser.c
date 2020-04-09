@@ -45,10 +45,10 @@ int parser_init(struct parser *parser) {
 
 int parse_token_group(
     struct parser *parser,
-    struct token *token,
+    struct passgen_token *token,
     struct parser_state *state);
 
-int parse_token(struct parser *parser, struct token *token) {
+int parse_token(struct parser *parser, struct passgen_token *token) {
   int ret;
 
   do {
@@ -69,7 +69,7 @@ int parse_token(struct parser *parser, struct token *token) {
 
 int parse_token_group(
     struct parser *parser,
-    struct token *token,
+    struct passgen_token *token,
     struct parser_state *state) {
   if(token->codepoint == '|') {
     // create new segment and parser state

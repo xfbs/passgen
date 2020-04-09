@@ -11,7 +11,7 @@
 #include "passgen/enum_mapping.h"
 
 // when updating any of the enums, make sure to also update the mappings.
-enum token_state {
+enum passgen_token_state {
   TOKEN_INIT = 0,
   TOKEN_ESCAPED,
   TOKEN_UNICODE,
@@ -23,7 +23,7 @@ enum token_state {
   TOKEN_ERROR_UNICODE_PAYLOAD_LEN = -3
 };
 
-enum token_type {
+enum passgen_token_type {
   TOKEN_NORMAL,
   TOKEN_SPECIAL,
   TOKEN_ESCAPED_TYPE,
@@ -32,14 +32,14 @@ enum token_type {
   TOKEN_ESCAPED_UNICODE
 };
 
-enum token_escaped {
+enum passgen_token_escaped {
   TOKEN_ESCAPED_NOT,
   TOKEN_ESCAPED_SIMPLE,
   TOKEN_ESCPAED_NORMAL
 };
 
-struct token_parser {
-  enum token_state state;
+struct passgen_token_parser {
+  enum passgen_token_state state;
   union {
     // when parsing a \u{FA} unicode literal, this is where we keep the
     // state.
@@ -50,16 +50,12 @@ struct token_parser {
   } data;
 };
 
-struct token {
+struct passgen_token {
   uint32_t codepoint;
-  enum token_type type;
+  enum passgen_token_type type;
   bool escaped;
   bool normal_escaped;
 };
-
-extern const struct enum_mapping token_state_mapping[];
-extern const struct enum_mapping token_type_mapping[];
-extern const struct enum_mapping token_escaped_mapping[];
 
 /* parse a single codepoint. The return value signals what happened. If it
  * returns zero (TOKEN_INIT), it means that a token has been parsed into
@@ -67,9 +63,9 @@ extern const struct enum_mapping token_escaped_mapping[];
  * but the token hasn't finished parsing yet, it is awaiting more input. If it
  * returns negatively, it means that there has been an error.
  */
-int token_parse(
-    struct token_parser *parser,
-    struct token *token,
+int passgen_token_parse(
+    struct passgen_token_parser *parser,
+    struct passgen_token *token,
     uint32_t codepoint);
 
 /* Parse a bunch of codepoints from an array. The variable size should contain
@@ -82,10 +78,14 @@ int token_parse(
  * If the return value is zero or positive, it was a success, and `size` is
  * filled with the amount of tokens in the tokens array.
  */
-int token_parse_str(
-    struct token_parser *parser,
+int passgen_token_parse_str(
+    struct passgen_token_parser *parser,
     size_t *size,
-    struct token token[],
+    struct passgen_token token[],
     uint32_t codepoints[]);
 
-const char *token_parse_error_str(int ret);
+const char *passgen_token_parse_error_str(int ret);
+
+extern const struct passgen_enum_mapping passgen_token_state_mapping[];
+extern const struct passgen_enum_mapping passgen_token_type_mapping[];
+extern const struct passgen_enum_mapping passgen_token_escaped_mapping[];
