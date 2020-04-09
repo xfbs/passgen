@@ -23,7 +23,7 @@ set(SOURCE_LIST
     "reader.c"
     "pronounceable_english.c"
     "pronounceable_latin.c"
-    "token.c"
+    "token_old.c"
     "token_new.c"
     "token_new_json.c"
     "unicode.c"

@@ -1,4 +1,4 @@
-#include "passgen/token.h"
+#include "passgen/token_old.h"
 #include "tests.h"
 
 test_result test_passgen_token_next(void) {

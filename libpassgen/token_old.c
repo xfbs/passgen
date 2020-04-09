@@ -1,4 +1,4 @@
-#include "passgen/token.h"
+#include "passgen/token_old.h"
 #include <stdlib.h>
 #include <utf8proc.h>
 

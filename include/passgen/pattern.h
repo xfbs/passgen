@@ -8,7 +8,7 @@
 #include "memory.h"
 #include "passgen/pronounceable.h"
 #include "random.h"
-#include "token.h"
+#include "token_old.h"
 #include "unicode.h"
 #include <stdbool.h>
 #include <stdlib.h>
