@@ -106,12 +106,11 @@ int parse_token_group(
   }
 
   if(token->codepoint == '[') {
-    /*
-    item->kind = PASSGEN_PATTERN_SET;
-    struct parser_state *state = parser_state_push(parser);
-    state->type = PARSER_SET;
-    state->data.set.set = &item->data.set;
-    */
+    struct passgen_pattern_set *set = passgen_pattern_segment_new_set(state->data.group.segment);
+    parser_state_push_set(
+        parser,
+        set,
+        NULL);
   }
 
   struct passgen_pattern_char *chr = passgen_pattern_segment_new_char(state->data.group.segment);
