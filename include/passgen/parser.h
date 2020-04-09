@@ -4,7 +4,7 @@
 
 enum parser_state_type {
   PARSER_GROUP,
-  PARSER_RANGE,
+  PARSER_SET,
   PARSER_REPEAT,
   PARSER_DONE,
 };
@@ -20,8 +20,8 @@ struct parser_state {
       struct passgen_pattern_segment *segment;
     } repeat;
     struct {
-      struct passgen_pattern_ranges *ranges;
-    } range;
+      struct passgen_pattern_set *set;
+    } set;
   } data;
 };
 

@@ -1,16 +1,16 @@
 #pragma once
 
-#include "char.h"
+#include "passgen/pattern/char.h"
 #include "passgen/pattern/group.h"
-#include "kind.h"
-#include "ranges.h"
-#include "special.h"
+#include "passgen/pattern/kind.h"
+#include "passgen/pattern/set.h"
+#include "passgen/pattern/special.h"
 
 typedef struct passgen_pattern_segment {
   enum passgen_pattern_kind kind;
 
   union {
-    struct passgen_pattern_ranges range;
+    struct passgen_pattern_set set;
     struct passgen_pattern_group group;
     struct passgen_pattern_char character;
     struct passgen_pattern_special special;

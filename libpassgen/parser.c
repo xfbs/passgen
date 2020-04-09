@@ -88,10 +88,10 @@ int parse_token_group(
   }
 
   if(token->codepoint == '[') {
-    item->kind = PASSGEN_PATTERN_RANGE;
+    item->kind = PASSGEN_PATTERN_SET;
     struct parser_state *state = parser_state_push(parser);
-    state->type = PARSER_RANGE;
-    state->data.range.ranges = &item->data.range;
+    state->type = PARSER_SET;
+    state->data.set.set = &item->data.set;
   }
 
   item->kind = PASSGEN_PATTERN_CHAR;

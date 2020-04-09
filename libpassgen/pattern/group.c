@@ -19,3 +19,6 @@ passgen_pattern_group_add(passgen_pattern_group_t *group) {
 
   return segments;
 }
+
+void passgen_pattern_group_free(passgen_pattern_group_t *group) {
+}

@@ -31,6 +31,7 @@ set(SOURCE_LIST
     "pattern/group.c"
     "pattern/segments.c"
     "pattern/pattern.c"
+    "pattern/set.c"
 )
 
 configure_file(version.c.in version.c)
