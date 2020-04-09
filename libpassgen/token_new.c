@@ -24,7 +24,9 @@ const struct enum_mapping token_escaped_mapping[] = {
     {0, NULL}};
 
 static inline void token_parse_init(
-    struct token_parser *parser, struct token *token, uint32_t codepoint) {
+    struct token_parser *parser,
+    struct token *token,
+    uint32_t codepoint) {
   if(codepoint == '\\') {
     parser->state = TOKEN_ESCAPED;
   } else {
@@ -50,7 +52,9 @@ const static char simple_escaped[] = {
     ['\\'] = '\\'};
 
 static inline void token_parse_escaped(
-    struct token_parser *parser, struct token *token, uint32_t codepoint) {
+    struct token_parser *parser,
+    struct token *token,
+    uint32_t codepoint) {
   // simple_escaped only covers ASCII, whereas codepoint could be much larger.
   if(codepoint < sizeof(simple_escaped) && simple_escaped[codepoint]) {
     token->escaped = true;
@@ -84,7 +88,9 @@ token_parse_unicode(struct token_parser *parser, uint32_t codepoint) {
 }
 
 static inline void token_parse_unicode_payload(
-    struct token_parser *parser, struct token *token, uint32_t codepoint) {
+    struct token_parser *parser,
+    struct token *token,
+    uint32_t codepoint) {
   // once we read the closing brace, the payload is over and we can emit the
   // token.
   if(codepoint == '}') {
@@ -116,7 +122,9 @@ static inline void token_parse_unicode_payload(
 }
 
 int token_parse(
-    struct token_parser *parser, struct token *token, uint32_t codepoint) {
+    struct token_parser *parser,
+    struct token *token,
+    uint32_t codepoint) {
   switch(parser->state) {
     case TOKEN_INIT: token_parse_init(parser, token, codepoint); break;
     case TOKEN_ESCAPED: token_parse_escaped(parser, token, codepoint); break;

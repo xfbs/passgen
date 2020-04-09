@@ -39,13 +39,19 @@ pattern_result_t pattern_group_parse(
     passgen_mem_t *mem);
 
 pattern_result_t pattern_ranges_parse_inner(
-    pattern_ranges_t *range, unicode_iter_t *iter, passgen_mem_t *mem);
+    pattern_ranges_t *range,
+    unicode_iter_t *iter,
+    passgen_mem_t *mem);
 
 pattern_result_t pattern_ranges_parse(
-    pattern_ranges_t *range, unicode_iter_t *iter, passgen_mem_t *mem);
+    pattern_ranges_t *range,
+    unicode_iter_t *iter,
+    passgen_mem_t *mem);
 
 pattern_result_t pattern_range_parse(
-    pattern_range_t *item, unicode_iter_t *iter, passgen_mem_t *mem);
+    pattern_range_t *item,
+    unicode_iter_t *iter,
+    passgen_mem_t *mem);
 
 pattern_result_t pattern_segments_parse(
     pattern_segments_t *segment,
@@ -60,10 +66,14 @@ pattern_result_t pattern_segment_parse(
     passgen_mem_t *mem);
 
 pattern_result_t pattern_char_parse(
-    pattern_char_t *character, unicode_iter_t *iter, passgen_mem_t *mem);
+    pattern_char_t *character,
+    unicode_iter_t *iter,
+    passgen_mem_t *mem);
 
 pattern_result_t pattern_special_parse(
-    pattern_special_t *special, unicode_iter_t *iter, passgen_mem_t *mem);
+    pattern_special_t *special,
+    unicode_iter_t *iter,
+    passgen_mem_t *mem);
 
 static inline pattern_result_t
 passgen_parse_number(size_t *number, unicode_iter_t *iter);

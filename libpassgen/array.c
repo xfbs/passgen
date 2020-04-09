@@ -11,7 +11,9 @@
 #undef passgen_array_get
 
 void passgen_array_init(
-    passgen_array_t *array, size_t size, passgen_mem_t *mem) {
+    passgen_array_t *array,
+    size_t size,
+    passgen_mem_t *mem) {
   assert(ITEMS_PER_BIN(size));
 
   array->data = NULL;
@@ -79,7 +81,9 @@ void *passgen_array_get(passgen_array_t *array, size_t size, size_t pos) {
 }
 
 void passgen_array_free(
-    passgen_array_t *array, size_t size, passgen_mem_t *mem) {
+    passgen_array_t *array,
+    size_t size,
+    passgen_mem_t *mem) {
   assert(array->size == size);
   assert(array->mem == mem);
 
@@ -97,7 +101,9 @@ void passgen_array_free(
 }
 
 void passgen_array_pop(
-    passgen_array_t *array, size_t size, passgen_mem_t *mem) {
+    passgen_array_t *array,
+    size_t size,
+    passgen_mem_t *mem) {
   size_t bin = array->len / ITEMS_PER_BIN(size);
   size_t offset = array->len % ITEMS_PER_BIN(size);
 

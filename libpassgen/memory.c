@@ -109,7 +109,8 @@ static void passgen_free_limited(void *state, void *ptr) {
 }
 
 void passgen_mem_accounting_error(
-    enum passgen_mem_accounting_error error, void *data) {
+    enum passgen_mem_accounting_error error,
+    void *data) {
   struct passgen_mem_accounting_list *node = NULL;
   const char *errstr;
   void *pointer = data;
@@ -258,7 +259,8 @@ static void *passgen_realloc_accounting(void *state, void *ptr, size_t size) {
 
     if(ptr_node->freed) {
       passgen_mem_accounting_error(
-          PASSGEN_MEM_ACCOUNTING_REALLOCFREED, ptr_node);
+          PASSGEN_MEM_ACCOUNTING_REALLOCFREED,
+          ptr_node);
     }
   }
 

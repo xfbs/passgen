@@ -52,7 +52,9 @@ size_t pattern_random_fill(
 }
 
 static size_t pattern_random_repeat(
-    random_t *rand, pattern_env_t *env, pattern_repeat_t *repeat) {
+    random_t *rand,
+    pattern_env_t *env,
+    pattern_repeat_t *repeat) {
   size_t difference = repeat->max - repeat->min;
 
   // if there is no difference to pick, just return here
@@ -196,7 +198,11 @@ static inline int pattern_random_special(
   switch(special->kind) {
     case PATTERN_SPECIAL_PRONOUNCABLE:
       return pattern_random_special_pronounceable(
-          special, rand, env, data, func);
+          special,
+          rand,
+          env,
+          data,
+          func);
       break;
     case PATTERN_SPECIAL_WORDLIST:
       return pattern_random_special_wordlist(special, rand, env, data, func);
@@ -224,10 +230,18 @@ static inline int pattern_random_segment(
       return pattern_random_ranges(&segment->data.range, rand, env, data, func);
     case PATTERN_CHAR:
       return pattern_random_character(
-          &segment->data.character, rand, env, data, func);
+          &segment->data.character,
+          rand,
+          env,
+          data,
+          func);
     case PATTERN_SPECIAL:
       return pattern_random_special(
-          &segment->data.special, rand, env, data, func);
+          &segment->data.special,
+          rand,
+          env,
+          data,
+          func);
     case PATTERN_GROUP:
       return pattern_random_group(&segment->data.group, rand, env, data, func);
   }
@@ -277,7 +291,9 @@ static inline int pattern_random_group(
     // get segment from array
     pattern_segments_t *segments;
     segments = passgen_array_get(
-        &group->segments, sizeof(pattern_segments_t), segment);
+        &group->segments,
+        sizeof(pattern_segments_t),
+        segment);
 
     int ret = pattern_random_segments(segments, rand, env, data, func);
 

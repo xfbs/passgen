@@ -72,7 +72,9 @@ extern const struct enum_mapping token_escaped_mapping[];
  * returns negatively, it means that there has been an error.
  */
 int token_parse(
-    struct token_parser *parser, struct token *token, uint32_t codepoint);
+    struct token_parser *parser,
+    struct token *token,
+    uint32_t codepoint);
 
 /* Parse a bunch of codepoints from an array. The variable size should contain
  * the number of codepoints and the number of slots in the token array (should

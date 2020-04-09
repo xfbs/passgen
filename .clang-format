@@ -5,8 +5,8 @@ AlignAfterOpenBracket: AlwaysBreak
 AlignConsecutiveMacros: 'true'
 AlignEscapedNewlines: Left
 AlignTrailingComments: 'true'
-AllowAllArgumentsOnNextLine: 'true'
-AllowAllParametersOfDeclarationOnNextLine: 'true'
+AllowAllArgumentsOnNextLine: 'false'
+AllowAllParametersOfDeclarationOnNextLine: 'false'
 AllowShortBlocksOnASingleLine: 'false'
 AllowShortCaseLabelsOnASingleLine: 'true'
 AllowShortFunctionsOnASingleLine: None

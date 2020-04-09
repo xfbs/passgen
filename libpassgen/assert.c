@@ -7,7 +7,10 @@
 #  define CALLSTACK_MAX 128
 
 void passgen_assert_fail(
-    const char *cond, const char *file, const char *func, size_t line) {
+    const char *cond,
+    const char *file,
+    const char *func,
+    size_t line) {
   // print warning
   fprintf(
       stderr,

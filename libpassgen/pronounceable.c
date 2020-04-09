@@ -6,7 +6,9 @@
 #include <string.h>
 
 const struct markov *markov_pronounceable_all[] = {
-    &passgen_pronounceable_english, &passgen_pronounceable_latin, NULL};
+    &passgen_pronounceable_english,
+    &passgen_pronounceable_latin,
+    NULL};
 
 passgen_pronounceable_map_t passgen_pronounceable_map[] = {
     {"english", PASSGEN_PRONOUNCEABLE_ENGLISH},
@@ -26,7 +28,10 @@ passgen_pronounceable_lookup(size_t length, const char *name) {
 }
 
 const struct markov0 *passgen_pronounceable_choose(
-    const struct markov *list, random_t *rand, int32_t p1, int32_t p2) {
+    const struct markov *list,
+    random_t *rand,
+    int32_t p1,
+    int32_t p2) {
   const struct markov2 *list2 = passgen_pronounceable_find2(list, p1);
   if(!list2) {
     return NULL;
@@ -44,7 +49,10 @@ const struct markov0 *passgen_pronounceable_choose(
 }
 
 size_t passgen_pronounceable2(
-    const struct markov *list, random_t *rand, int32_t *buf, size_t len) {
+    const struct markov *list,
+    random_t *rand,
+    int32_t *buf,
+    size_t len) {
   int32_t p1 = 0, p2 = 0;
   size_t pos = 0;
 

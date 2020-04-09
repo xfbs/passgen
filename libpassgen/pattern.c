@@ -198,7 +198,9 @@ pattern_result_t pattern_segment_parse(
 }
 
 pattern_result_t pattern_char_parse(
-    pattern_char_t *character, unicode_iter_t *iter, passgen_mem_t *mem) {
+    pattern_char_t *character,
+    unicode_iter_t *iter,
+    passgen_mem_t *mem) {
   pattern_result_t result;
   character->pos.offset = iter->pos;
 
@@ -213,7 +215,9 @@ pattern_result_t pattern_char_parse(
 }
 
 pattern_result_t pattern_range_parse(
-    pattern_range_t *range, unicode_iter_t *iter, passgen_mem_t *mem) {
+    pattern_range_t *range,
+    unicode_iter_t *iter,
+    passgen_mem_t *mem) {
   passgen_token_t token;
 
   range->pos.offset = iter->pos;
@@ -239,7 +243,9 @@ pattern_result_t pattern_range_parse(
 }
 
 pattern_result_t pattern_ranges_parse_inner(
-    pattern_ranges_t *range, unicode_iter_t *iter, passgen_mem_t *mem) {
+    pattern_ranges_t *range,
+    unicode_iter_t *iter,
+    passgen_mem_t *mem) {
   passgen_token_t token;
   pattern_result_t result;
 
@@ -268,7 +274,9 @@ pattern_result_t pattern_ranges_parse_inner(
 }
 
 pattern_result_t pattern_ranges_parse(
-    pattern_ranges_t *ranges, unicode_iter_t *iter, passgen_mem_t *mem) {
+    pattern_ranges_t *ranges,
+    unicode_iter_t *iter,
+    passgen_mem_t *mem) {
   ranges->pos.offset = iter->pos;
   passgen_token_t token = passgen_token_next(iter);
   // TODO assert this?
@@ -340,7 +348,10 @@ pattern_result_t pattern_group_parse_inner(
 }
 
 pattern_result_t pattern_parse(
-    pattern_t *pattern, const char *data, size_t depth, passgen_mem_t *mem) {
+    pattern_t *pattern,
+    const char *data,
+    size_t depth,
+    passgen_mem_t *mem) {
   pattern->mem = mem;
   pattern->pattern = data;
 
@@ -366,7 +377,9 @@ pattern_result_t pattern_parse(
 }
 
 pattern_result_t pattern_special_parse(
-    pattern_special_t *special, unicode_iter_t *iter, passgen_mem_t *mem) {
+    pattern_special_t *special,
+    unicode_iter_t *iter,
+    passgen_mem_t *mem) {
   pattern_result_t result;
 
   special->pos.offset = iter->pos;
@@ -384,7 +397,8 @@ pattern_result_t pattern_special_parse(
     case 'p':
       special->kind = PATTERN_SPECIAL_PRONOUNCABLE;
       special->data.pronounceable = passgen_pronounceable_lookup(
-          special->arg.length, iter->data + special->arg.offset);
+          special->arg.length,
+          iter->data + special->arg.offset);
       break;
     case 'w': special->kind = PATTERN_SPECIAL_WORDLIST; break;
     default: break;

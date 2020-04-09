@@ -33,7 +33,10 @@ passgen_token_error_lbrace(size_t start, size_t pos, size_t end) {
 }
 
 static inline passgen_token_t passgen_token_error_unicode_hex(
-    size_t start, size_t data_start, size_t error, size_t end) {
+    size_t start,
+    size_t data_start,
+    size_t error,
+    size_t end) {
   return (passgen_token_t){
       .type = PASSGEN_TOKEN_ERROR_UNICODE_HEX,
       .pos.offset = start,
@@ -57,7 +60,10 @@ passgen_token_error_unicode_empty(size_t start, size_t end, size_t data_start) {
 }
 
 static inline passgen_token_t passgen_token_error_unicode_char(
-    size_t start, size_t end, size_t data_start, size_t data_end) {
+    size_t start,
+    size_t end,
+    size_t data_start,
+    size_t data_end) {
   return (passgen_token_t){
       .type = PASSGEN_TOKEN_ERROR_UNICODE_CHAR,
       .pos.offset = start,
@@ -97,7 +103,10 @@ passgen_token_escaped(size_t start, size_t end, int32_t codepoint) {
 }
 
 static inline passgen_token_t passgen_token_simple(
-    size_t start, size_t end, int32_t codepoint, enum passgen_token_type type) {
+    size_t start,
+    size_t end,
+    int32_t codepoint,
+    enum passgen_token_type type) {
   return (passgen_token_t){
       .type = type,
       .codepoint = codepoint,
@@ -154,7 +163,10 @@ passgen_token_parse_unicode(size_t start, unicode_iter_t *iter) {
     if(6 < data_len_codepoints) {
       // hex is too long. unicode is valid from 0 to 10FFFF, afaik.
       return passgen_token_error_unicode_char(
-          start, iter->pos, data_start, pos);
+          start,
+          iter->pos,
+          data_start,
+          pos);
     }
 
     if('0' <= result.codepoint && result.codepoint <= '9') {

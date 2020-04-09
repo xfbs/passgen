@@ -13,4 +13,6 @@ typedef struct passgen_wordlist_t {
 void passgen_wordlist_init(passgen_wordlist_t *wordlist, FILE *file);
 
 size_t passgen_wordlist_get(
-    passgen_wordlist_t *wordlist, size_t length, size_t number);
+    passgen_wordlist_t *wordlist,
+    size_t length,
+    size_t number);

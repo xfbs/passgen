@@ -26,14 +26,15 @@ int parser_init(struct parser *parser) {
   struct parser_state *state = parser_state_push(parser);
   state->type = PARSER_GROUP;
   state->data.group.group = &parser->parsed.group;
-  state->data.group.segments =
-      passgen_pattern_group_add(&parser->parsed.group);
+  state->data.group.segments = passgen_pattern_group_add(&parser->parsed.group);
 
   return 0;
 }
 
 int parse_token_group(
-    struct parser *parser, struct token *token, struct parser_state *state);
+    struct parser *parser,
+    struct token *token,
+    struct parser_state *state);
 
 int parse_token(struct parser *parser, struct token *token) {
   int ret;
@@ -41,7 +42,9 @@ int parse_token(struct parser *parser, struct token *token) {
   do {
     // get current state
     struct parser_state *state = passgen_array_get(
-        &parser->state, sizeof(struct parser_state), parser->state.len - 1);
+        &parser->state,
+        sizeof(struct parser_state),
+        parser->state.len - 1);
 
     switch(state->type) {
       case PARSER_GROUP: ret = parse_token_group(parser, token, state); break;
@@ -52,7 +55,9 @@ int parse_token(struct parser *parser, struct token *token) {
 }
 
 int parse_token_group(
-    struct parser *parser, struct token *token, struct parser_state *state) {
+    struct parser *parser,
+    struct token *token,
+    struct parser_state *state) {
   if(token->codepoint == '|') {
     // create new segment and parser state
     struct passgen_pattern_segments *segments = passgen_array_push(
@@ -61,7 +66,9 @@ int parse_token_group(
         NULL);
     state->data.group.segments = segments;
     passgen_array_init(
-        &segments->items, sizeof(struct passgen_pattern_segment), NULL);
+        &segments->items,
+        sizeof(struct passgen_pattern_segment),
+        NULL);
 
     return 0;
   }

@@ -9,7 +9,9 @@ json_t *token_parser_to_json(struct token_parser *parser) {
     json_t *data = json_object();
 
     json_object_set_new(
-        data, "length", json_integer(parser->data.unicode_payload.length));
+        data,
+        "length",
+        json_integer(parser->data.unicode_payload.length));
     json_object_set_new(
         data,
         "codepoint",

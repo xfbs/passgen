@@ -168,7 +168,10 @@ typedef int pattern_random_cb(void *data, int32_t codepoint);
 void pattern_free(pattern_t *pattern);
 
 pattern_result_t pattern_parse(
-    pattern_t *out, const char *data, size_t depth, passgen_mem_t *mem);
+    pattern_t *out,
+    const char *data,
+    size_t depth,
+    passgen_mem_t *mem);
 
 size_t pattern_maxlen(pattern_t *pattern);
 size_t pattern_minlen(pattern_t *pattern);
