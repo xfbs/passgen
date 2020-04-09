@@ -20,9 +20,13 @@ option(BUILD_STATIC "Built targets statically." OFF)
 
 option(USE_LIBEXECINFO "Use libexecinfo. For systems that don't have backtrace in libc." OFF)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 include(ExternalProject)
+include(ClangFormat)
+
+clangformat_setup()
 
 # get commit info, if git is available.
 if(BUILD_GIT_INFO)
