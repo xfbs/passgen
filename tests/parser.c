@@ -10,7 +10,7 @@ test_result test_parser_simple(void) {
     struct passgen_token token = {0};
 
     assert(0 == parser_init(&parser));
-    assert(passgen_token_parse(&token_parser, &token, 'a') == TOKEN_INIT);
+    assert(passgen_token_parse(&token_parser, &token, 'a') == PASSGEN_TOKEN_INIT);
     assert(0 == parse_token(&parser, &token));
 
     return test_ok;
@@ -22,11 +22,11 @@ test_result test_parser_multi_groups(void) {
     struct passgen_token token = {0};
 
     assert(0 == parser_init(&parser));
-    assert(passgen_token_parse(&token_parser, &token, 'a') == TOKEN_INIT);
+    assert(passgen_token_parse(&token_parser, &token, 'a') == PASSGEN_TOKEN_INIT);
     assert(0 == parse_token(&parser, &token));
-    assert(passgen_token_parse(&token_parser, &token, '|') == TOKEN_INIT);
+    assert(passgen_token_parse(&token_parser, &token, '|') == PASSGEN_TOKEN_INIT);
     assert(0 == parse_token(&parser, &token));
-    assert(passgen_token_parse(&token_parser, &token, 'b') == TOKEN_INIT);
+    assert(passgen_token_parse(&token_parser, &token, 'b') == PASSGEN_TOKEN_INIT);
     assert(0 == parse_token(&parser, &token));
 
     return test_ok;

@@ -5,7 +5,7 @@ json_t *passgen_token_parser_to_json(struct passgen_token_parser *parser) {
 
   json_object_set_new(obj, "state", passgen_token_state_to_json(parser->state));
 
-  if(parser->state == TOKEN_UNICODE_PAYLOAD) {
+  if(parser->state == PASSGEN_TOKEN_UNICODE_PAYLOAD) {
     json_t *data = json_object();
 
     json_object_set_new(

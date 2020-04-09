@@ -12,30 +12,30 @@
 
 // when updating any of the enums, make sure to also update the mappings.
 enum passgen_token_state {
-  TOKEN_INIT = 0,
-  TOKEN_ESCAPED,
-  TOKEN_UNICODE,
-  TOKEN_UNICODE_PAYLOAD,
+  PASSGEN_TOKEN_INIT = 0,
+  PASSGEN_TOKEN_ESCAPED,
+  PASSGEN_TOKEN_UNICODE,
+  PASSGEN_TOKEN_UNICODE_PAYLOAD,
 
   // errors
-  TOKEN_ERROR_UNICODE_START = -1,
-  TOKEN_ERROR_UNICODE_PAYLOAD = -2,
-  TOKEN_ERROR_UNICODE_PAYLOAD_LEN = -3
+  PASSGEN_TOKEN_ERROR_UNICODE_START = -1,
+  PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD = -2,
+  PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN = -3
 };
 
 enum passgen_token_type {
-  TOKEN_NORMAL,
-  TOKEN_SPECIAL,
-  TOKEN_ESCAPED_TYPE,
-  TOKEN_ESCAPED_SIMPLE_TYPE,
-  TOKEN_ESCAPED_PASSTHRU,
-  TOKEN_ESCAPED_UNICODE
+  PASSGEN_TOKEN_NORMAL,
+  PASSGEN_TOKEN_SPECIAL,
+  PASSGEN_TOKEN_ESCAPED_TYPE,
+  PASSGEN_TOKEN_ESCAPED_SIMPLE_TYPE,
+  PASSGEN_TOKEN_ESCAPED_PASSTHRU,
+  PASSGEN_TOKEN_ESCAPED_UNICODE
 };
 
 enum passgen_token_escaped {
-  TOKEN_ESCAPED_NOT,
-  TOKEN_ESCAPED_SIMPLE,
-  TOKEN_ESCPAED_NORMAL
+  PASSGEN_TOKEN_ESCAPED_NOT,
+  PASSGEN_TOKEN_ESCAPED_SIMPLE,
+  PASSGEN_TOKEN_ESCPAED_NORMAL
 };
 
 struct passgen_token_parser {
@@ -58,7 +58,7 @@ struct passgen_token {
 };
 
 /* parse a single codepoint. The return value signals what happened. If it
- * returns zero (TOKEN_INIT), it means that a token has been parsed into
+ * returns zero (PASSGEN_TOKEN_INIT), it means that a token has been parsed into
  * `token`. If it returns a positive integer, it means that it was successful
  * but the token hasn't finished parsing yet, it is awaiting more input. If it
  * returns negatively, it means that there has been an error.

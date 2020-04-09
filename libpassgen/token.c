@@ -2,25 +2,25 @@
 #include "passgen/util.h"
 
 const struct passgen_enum_mapping passgen_token_state_mapping[] = {
-    {TOKEN_INIT, "TOKEN_INIT"},
-    {TOKEN_ESCAPED, "TOKEN_ESCAPED"},
-    {TOKEN_UNICODE, "TOKEN_UNICODE"},
-    {TOKEN_UNICODE_PAYLOAD, "TOKEN_UNICODE_PAYLOAD"},
-    {TOKEN_ERROR_UNICODE_START, "TOKEN_ERROR_UNICODE_START"},
-    {TOKEN_ERROR_UNICODE_PAYLOAD, "TOKEN_ERROR_UNICODE_PAYLOAD"},
-    {TOKEN_ERROR_UNICODE_PAYLOAD_LEN, "TOKEN_ERROR_UNICODE_PAYLOAD_LEN"},
+    {PASSGEN_TOKEN_INIT, "PASSGEN_TOKEN_INIT"},
+    {PASSGEN_TOKEN_ESCAPED, "PASSGEN_TOKEN_ESCAPED"},
+    {PASSGEN_TOKEN_UNICODE, "PASSGEN_TOKEN_UNICODE"},
+    {PASSGEN_TOKEN_UNICODE_PAYLOAD, "PASSGEN_TOKEN_UNICODE_PAYLOAD"},
+    {PASSGEN_TOKEN_ERROR_UNICODE_START, "PASSGEN_TOKEN_ERROR_UNICODE_START"},
+    {PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD, "PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD"},
+    {PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN, "PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN"},
     {0, NULL},
 };
 
 const struct passgen_enum_mapping passgen_token_type_mapping[] = {
-    {TOKEN_NORMAL, "TOKEN_NORMAL"},
-    {TOKEN_SPECIAL, "TOKEN_SPECIAL"},
+    {PASSGEN_TOKEN_NORMAL, "PASSGEN_TOKEN_NORMAL"},
+    {PASSGEN_TOKEN_SPECIAL, "PASSGEN_TOKEN_SPECIAL"},
     {0, NULL}};
 
 const struct passgen_enum_mapping passgen_token_escaped_mapping[] = {
-    {TOKEN_ESCAPED_NOT, "TOKEN_ESCAPED_NOT"},
-    {TOKEN_ESCAPED_SIMPLE, "TOKEN_ESCAPED_SIMPLE"},
-    {TOKEN_ESCPAED_NORMAL, "TOKEN_ESCAPED_NORMAL"},
+    {PASSGEN_TOKEN_ESCAPED_NOT, "PASSGEN_TOKEN_ESCAPED_NOT"},
+    {PASSGEN_TOKEN_ESCAPED_SIMPLE, "PASSGEN_TOKEN_ESCAPED_SIMPLE"},
+    {PASSGEN_TOKEN_ESCPAED_NORMAL, "PASSGEN_TOKEN_ESCAPED_NORMAL"},
     {0, NULL}};
 
 static inline void token_parse_init(
@@ -28,12 +28,12 @@ static inline void token_parse_init(
     struct passgen_token *token,
     uint32_t codepoint) {
   if(codepoint == '\\') {
-    parser->state = TOKEN_ESCAPED;
+    parser->state = PASSGEN_TOKEN_ESCAPED;
   } else {
     token->codepoint = codepoint;
-    token->type = TOKEN_NORMAL;
+    token->type = PASSGEN_TOKEN_NORMAL;
     token->escaped = false;
-    parser->state = TOKEN_INIT;
+    parser->state = PASSGEN_TOKEN_INIT;
   }
 }
 
@@ -59,31 +59,31 @@ static inline void token_parse_escaped(
   if(codepoint < sizeof(simple_escaped) && simple_escaped[codepoint]) {
     token->escaped = true;
     token->normal_escaped = false;
-    token->type = TOKEN_NORMAL;
+    token->type = PASSGEN_TOKEN_NORMAL;
     token->codepoint = simple_escaped[codepoint];
-    parser->state = TOKEN_INIT;
+    parser->state = PASSGEN_TOKEN_INIT;
 
     return;
   }
 
   switch(codepoint) {
-    case 'u': parser->state = TOKEN_UNICODE; break;
+    case 'u': parser->state = PASSGEN_TOKEN_UNICODE; break;
     default:
       token->escaped = true;
       token->normal_escaped = true;
       token->codepoint = codepoint;
-      parser->state = TOKEN_INIT;
+      parser->state = PASSGEN_TOKEN_INIT;
   }
 }
 
 static inline void
 token_parse_unicode(struct passgen_token_parser *parser, uint32_t codepoint) {
   if(codepoint == '{') {
-    parser->state = TOKEN_UNICODE_PAYLOAD;
+    parser->state = PASSGEN_TOKEN_UNICODE_PAYLOAD;
     parser->data.unicode_payload.length = 0;
     parser->data.unicode_payload.codepoint = 0;
   } else {
-    parser->state = TOKEN_ERROR_UNICODE_START;
+    parser->state = PASSGEN_TOKEN_ERROR_UNICODE_START;
   }
 }
 
@@ -96,7 +96,7 @@ static inline void token_parse_unicode_payload(
   if(codepoint == '}') {
     token->codepoint = parser->data.unicode_payload.codepoint;
     token->escaped = true;
-    parser->state = TOKEN_INIT;
+    parser->state = PASSGEN_TOKEN_INIT;
 
     return;
   }
@@ -104,7 +104,7 @@ static inline void token_parse_unicode_payload(
   // keep track of length, make sure it's not too long.
   parser->data.unicode_payload.length++;
   if(parser->data.unicode_payload.length > 6) {
-    parser->state = TOKEN_ERROR_UNICODE_PAYLOAD_LEN;
+    parser->state = PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN;
 
     return;
   }
@@ -112,7 +112,7 @@ static inline void token_parse_unicode_payload(
   // try to decode the hex value.
   int8_t decoded = hex_decode(codepoint);
   if(decoded < 0) {
-    parser->state = TOKEN_ERROR_UNICODE_PAYLOAD;
+    parser->state = PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD;
 
     return;
   }
@@ -126,10 +126,10 @@ int passgen_token_parse(
     struct passgen_token *token,
     uint32_t codepoint) {
   switch(parser->state) {
-    case TOKEN_INIT: token_parse_init(parser, token, codepoint); break;
-    case TOKEN_ESCAPED: token_parse_escaped(parser, token, codepoint); break;
-    case TOKEN_UNICODE: token_parse_unicode(parser, codepoint); break;
-    case TOKEN_UNICODE_PAYLOAD:
+    case PASSGEN_TOKEN_INIT: token_parse_init(parser, token, codepoint); break;
+    case PASSGEN_TOKEN_ESCAPED: token_parse_escaped(parser, token, codepoint); break;
+    case PASSGEN_TOKEN_UNICODE: token_parse_unicode(parser, codepoint); break;
+    case PASSGEN_TOKEN_UNICODE_PAYLOAD:
       token_parse_unicode_payload(parser, token, codepoint);
       break;
     default: break;

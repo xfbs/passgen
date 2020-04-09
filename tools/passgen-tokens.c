@@ -41,7 +41,7 @@ void dump(const unsigned char *str) {
         json_t *parser_json = passgen_token_parser_to_json(&parser);
         json_object_set_new(obj, "parser", parser_json);
 
-        if(parser.state == TOKEN_INIT) {
+        if(parser.state == PASSGEN_TOKEN_INIT) {
             json_t *token_json = passgen_token_to_json(&token);
             json_object_set_new(obj, "token", token_json);
         }
