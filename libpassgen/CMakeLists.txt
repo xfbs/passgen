@@ -25,7 +25,7 @@ set(SOURCE_LIST
     "pronounceable_latin.c"
     "token_old.c"
     "token.c"
-    "token_json.c"
+    "json/token.c"
     "unicode.c"
     "utf8.c"
     "pattern/group.c"

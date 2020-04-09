@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "token.h"
 #include <jansson.h>
+#include "passgen/token.h"
 
 json_t *token_parser_to_json(struct token_parser *parser);
 

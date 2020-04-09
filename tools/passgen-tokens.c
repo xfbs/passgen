@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <jansson.h>
 #include "passgen/token.h"
-#include "passgen/token_json.h"
+#include "passgen/json/token.h"
 #include "passgen/utf8.h"
 
 int main(int argc, char *argv[]) {
