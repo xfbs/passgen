@@ -1,16 +1,16 @@
 #include "passgen/random.h"
+#include "passgen/pattern.h"
+#include "tests.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
-#include "passgen/pattern.h"
-#include "tests.h"
 
 test_result test_random_uint8(void) {
   random_t *rand = random_new();
   assert(rand);
 
   // generate random nubers until we got almost all of them.
-  bool gotten[UINT8_MAX + 1] = { false };
+  bool gotten[UINT8_MAX + 1] = {false};
   for(size_t i = 0; i < (32 * UINT8_MAX); ++i) {
     gotten[random_uint8(rand)] = true;
   }
@@ -31,7 +31,7 @@ test_result test_random_uint8_max(void) {
 
   for(size_t max = 1; max < UINT8_MAX; ++max) {
     // generate random nubers until we got almost all of them.
-    bool gotten[UINT8_MAX] = { false };
+    bool gotten[UINT8_MAX] = {false};
     for(size_t i = 0; i < (16 * UINT8_MAX); ++i) {
       uint8_t r = random_uint8_max(rand, max);
       assert(r < max);
@@ -54,7 +54,7 @@ test_result test_random_uint16(void) {
   assert(rand);
 
   // generate random nubers until we got almost all of them.
-  bool gotten[UINT16_MAX + 1] = { false };
+  bool gotten[UINT16_MAX + 1] = {false};
   for(size_t i = 0; i < (32 * UINT16_MAX); ++i) {
     gotten[random_uint16(rand)] = true;
   }
@@ -73,12 +73,29 @@ test_result test_random_uint16_max(void) {
   random_t *rand = random_new();
   assert(rand);
 
-  size_t max[] = { 1,     2,     3,     4,     5,    100,   200,
-                   500,   1000,  1500,  2000,  5000, 10000, 15000,
-                   20000, 30000, 45000, 60000, 0 };
+  size_t max[] = {
+      1,
+      2,
+      3,
+      4,
+      5,
+      100,
+      200,
+      500,
+      1000,
+      1500,
+      2000,
+      5000,
+      10000,
+      15000,
+      20000,
+      30000,
+      45000,
+      60000,
+      0};
 
   for(size_t n = 1; max[n]; ++n) {
-    bool gotten[UINT16_MAX] = { false };
+    bool gotten[UINT16_MAX] = {false};
     for(size_t i = 0; i < (16 * max[n]); ++i) {
       uint16_t r = random_uint16_max(rand, max[n]);
       assert(r < max[n]);
@@ -178,7 +195,7 @@ test_result test_random_read(void) {
   random_t random;
   assert(random_open(&random));
 
-  uint8_t data[2000] = { 0 };
+  uint8_t data[2000] = {0};
 
   // fill small.
   random_read(&random, &data[0], 1);

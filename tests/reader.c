@@ -1,12 +1,12 @@
 #define _POSIX_C_SOURCE 201910
 #include "passgen/reader.h"
+#include "tests.h"
 #include <stdbool.h>
 #include <stdio.h>
-#include "tests.h"
 
 test_result test_reader_string() {
   reader_t reader = reader_from_string("abcde");
-  char data[100] = { 0 };
+  char data[100] = {0};
 
   assert(reader_pos(&reader) == 0);
 
@@ -59,7 +59,7 @@ test_result test_reader_string() {
 test_result test_reader_file() {
   FILE *file = fmemopen("abcde", 6, "r");
   reader_t reader = reader_from_file(file);
-  char data[100] = { 0 };
+  char data[100] = {0};
 
   assert(reader_pos(&reader) == 0);
 
@@ -92,7 +92,7 @@ test_result test_reader_file() {
 
   // reading past EOF should only read up to EOF.
   res = reader_read(&reader, &data[0], 10);
-  //assert(reader_pos(&reader) == 5);
+  // assert(reader_pos(&reader) == 5);
   assert(res.ok);
   assert(res.eof == true);
   assert(res.read == 2);
@@ -101,7 +101,7 @@ test_result test_reader_file() {
 
   // once EOF has been set, don't read any more data.
   res = reader_read(&reader, &data[0], 10);
-  //assert(reader_pos(&reader) == 5);
+  // assert(reader_pos(&reader) == 5);
   assert(res.ok);
   assert(res.eof == true);
   assert(res.read == 0);

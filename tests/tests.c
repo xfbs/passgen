@@ -1,9 +1,9 @@
 #include "tests.h"
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <stdlib.h>
 
-test_result test_ok = { .ok = true };
+test_result test_ok = {.ok = true};
 
 int main(int argc, char *argv[]) {
   size_t failures = 0;
