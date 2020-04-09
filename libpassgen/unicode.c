@@ -1,6 +1,6 @@
 #include "passgen/unicode.h"
-#include <utf8proc.h>
 #include <string.h>
+#include <utf8proc.h>
 
 #define MIN_BUFLEN 8
 
@@ -10,9 +10,9 @@ struct unicode_iter unicode_iter(const char *data) {
 
 struct unicode_iter unicode_iter_sized(const char *data, size_t length) {
   struct unicode_iter iter = {
-    .data = data,
-    .length = length,
-    .pos = 0,
+      .data = data,
+      .length = length,
+      .pos = 0,
   };
 
   return iter;

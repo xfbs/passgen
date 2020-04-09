@@ -6,8 +6,8 @@
 /// and run the tool.
 
 #pragma once
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 /// The kinds of errors that cause the binary to exit early and with a nonzero
 /// return code.

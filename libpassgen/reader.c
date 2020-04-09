@@ -1,8 +1,8 @@
 #include "passgen/reader.h"
 #include <string.h>
 
-#define STATUS_EOF 1
-#define is_status_eof(n) ((n)&STATUS_EOF)
+#define STATUS_EOF        1
+#define is_status_eof(n)  ((n)&STATUS_EOF)
 #define set_status_eof(n) (n) |= STATUS_EOF
 
 read_result reader_fread(reader_t *reader, void *dest, size_t size) {
@@ -11,10 +11,10 @@ read_result reader_fread(reader_t *reader, void *dest, size_t size) {
   reader->pos += read;
 
   read_result ret = {
-    .ok = !ferror(reader->data),
-    .eof = feof(reader->data),
-    .errno = 0,
-    .read = read,
+      .ok = !ferror(reader->data),
+      .eof = feof(reader->data),
+      .errno = 0,
+      .read = read,
   };
 
   return ret;
@@ -48,10 +48,10 @@ read_result reader_string_read(reader_t *reader, void *_dest, size_t size) {
   }
 
   read_result ret = {
-    .ok = true,
-    .eof = eof,
-    .errno = 0,
-    .read = read,
+      .ok = true,
+      .eof = eof,
+      .errno = 0,
+      .read = read,
   };
 
   return ret;
@@ -59,9 +59,9 @@ read_result reader_string_read(reader_t *reader, void *_dest, size_t size) {
 
 reader_t reader_from_file(FILE *file) {
   reader_t reader = {
-    .read = reader_fread,
-    .data = file,
-    .pos = 0,
+      .read = reader_fread,
+      .data = file,
+      .pos = 0,
   };
 
   return reader;
@@ -69,9 +69,9 @@ reader_t reader_from_file(FILE *file) {
 
 reader_t reader_from_string(const char *string) {
   reader_t reader = {
-    .read = reader_string_read,
-    .data = (void *)string,
-    .pos = 0,
+      .read = reader_string_read,
+      .data = (void *)string,
+      .pos = 0,
   };
 
   return reader;

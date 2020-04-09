@@ -3,9 +3,9 @@
 /// Methods for decoding unicode characters from a reader.
 
 #pragma once
+#include "passgen/reader.h"
 #include <stdint.h>
 #include <sys/types.h>
-#include "passgen/reader.h"
 
 /// Unicode iterator. Iterates through a string and returns unicode
 /// characters on-demand.

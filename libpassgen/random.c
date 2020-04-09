@@ -110,36 +110,31 @@ void random_free(random_t *random) {
   free(random);
 }
 
-inline uint8_t
-random_uint8(random_t *random) {
+inline uint8_t random_uint8(random_t *random) {
   uint8_t data;
   random_read(random, &data, sizeof(data));
   return data;
 }
 
-inline uint16_t
-random_uint16(random_t *random) {
+inline uint16_t random_uint16(random_t *random) {
   uint16_t data;
   random_read(random, &data, sizeof(data));
   return data;
 }
 
-inline uint32_t
-random_uint32(random_t *random) {
+inline uint32_t random_uint32(random_t *random) {
   uint32_t data;
   random_read(random, &data, sizeof(data));
   return data;
 }
 
-inline uint64_t
-random_uint64(random_t *random) {
+inline uint64_t random_uint64(random_t *random) {
   uint64_t data;
   random_read(random, &data, sizeof(data));
   return data;
 }
 
-inline uint8_t
-random_uint8_max(random_t *random, uint8_t max) {
+inline uint8_t random_uint8_max(random_t *random, uint8_t max) {
   uint8_t mask = max;
   mask |= mask >> 4;
   mask |= mask >> 2;
@@ -153,8 +148,7 @@ random_uint8_max(random_t *random, uint8_t max) {
   return num;
 }
 
-inline uint16_t
-random_uint16_max(random_t *random, uint16_t max) {
+inline uint16_t random_uint16_max(random_t *random, uint16_t max) {
   if(max <= UINT8_MAX) {
     return random_uint8_max(random, max);
   }
@@ -174,8 +168,7 @@ random_uint16_max(random_t *random, uint16_t max) {
   return num;
 }
 
-inline uint32_t
-random_uint32_max(random_t *random, uint32_t max) {
+inline uint32_t random_uint32_max(random_t *random, uint32_t max) {
   if(max < UINT16_MAX) {
     return random_uint16_max(random, max);
   }
@@ -196,8 +189,7 @@ random_uint32_max(random_t *random, uint32_t max) {
   return num;
 }
 
-inline uint64_t
-random_uint64_max(random_t *random, uint64_t max) {
+inline uint64_t random_uint64_max(random_t *random, uint64_t max) {
   if(max < UINT32_MAX) {
     return random_uint32_max(random, max);
   }
