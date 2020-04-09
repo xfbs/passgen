@@ -15,10 +15,7 @@ passgen_pattern_group_add(passgen_pattern_group_t *group) {
       &group->segments,
       sizeof(passgen_pattern_segments_t),
       NULL);
-  passgen_array_init(
-      &segments->items,
-      sizeof(struct passgen_pattern_segment),
-      NULL);
+  passgen_pattern_segments_init(segments);
 
   return segments;
 }

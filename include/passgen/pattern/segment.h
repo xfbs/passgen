@@ -1,7 +1,7 @@
 #pragma once
 
 #include "char.h"
-#include "group.h"
+#include "passgen/pattern/group.h"
 #include "kind.h"
 #include "ranges.h"
 #include "special.h"

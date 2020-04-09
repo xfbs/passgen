@@ -48,6 +48,7 @@ int parse_token(struct parser *parser, struct token *token) {
 
     switch(state->type) {
       case PARSER_GROUP: ret = parse_token_group(parser, token, state); break;
+      default: return -1;
     }
   } while(ret > 0);
 
@@ -80,14 +81,14 @@ int parse_token_group(
 
   // we're supposed to read something in.
   if(token->codepoint == '(') {
-    item = PASSGEN_PATTERN_GROUP;
+    item->kind = PASSGEN_PATTERN_GROUP;
     struct parser_state *state = parser_state_push(parser);
     state->type = PARSER_GROUP;
     state->data.group.group = &item->data.group;
   }
 
   if(token->codepoint == '[') {
-    item = PASSGEN_PATTERN_RANGE;
+    item->kind = PASSGEN_PATTERN_RANGE;
     struct parser_state *state = parser_state_push(parser);
     state->type = PARSER_RANGE;
     state->data.range.ranges = &item->data.range;

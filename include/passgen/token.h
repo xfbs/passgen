@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "passgen/enum_mapping.h"
 
 // when updating any of the enums, make sure to also update the mappings.
 enum token_state {
@@ -54,11 +55,6 @@ struct token {
   enum token_type type;
   bool escaped;
   bool normal_escaped;
-};
-
-struct enum_mapping {
-  int value;
-  const char *name;
 };
 
 extern const struct enum_mapping token_state_mapping[];

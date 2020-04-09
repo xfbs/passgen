@@ -29,6 +29,7 @@ set(SOURCE_LIST
     "unicode.c"
     "utf8.c"
     "pattern/group.c"
+    "pattern/segments.c"
     "pattern/pattern.c"
 )
 

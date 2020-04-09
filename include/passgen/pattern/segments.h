@@ -2,6 +2,8 @@
 #include "passgen/array.h"
 #include "substring.h"
 
+struct passgen_pattern_segment;
+
 typedef struct passgen_pattern_segments {
   struct passgen_pattern_substring pos;
 
@@ -10,3 +12,7 @@ typedef struct passgen_pattern_segments {
 
   // struct pattern_repeat repeat;
 } passgen_pattern_segments_t;
+
+void passgen_pattern_segments_init(struct passgen_pattern_segments *segments);
+
+struct passgen_pattern_segment *passgen_pattern_segments_new_segment(struct passgen_pattern_segments *segments);
