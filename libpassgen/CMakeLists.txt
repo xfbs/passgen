@@ -39,7 +39,7 @@ configure_file(version.c.in version.c)
 
 add_library(passgen-objects OBJECT ${SOURCE_LIST} ${HEADER_LIST})
 set_property(TARGET passgen-objects PROPERTY POSITION_INDEPENDENT_CODE 1)
-clangformat_add(passgen-objects)
+target_clangformat_setup(passgen-objects)
 
 target_include_directories(passgen-objects PUBLIC ../include /usr/local/include)
 target_compile_features(passgen-objects PUBLIC c_std_99)

@@ -1,6 +1,6 @@
 #include "passgen/parser.h"
-#include "passgen/pattern/kind.h"
 #include "passgen/pattern/item.h"
+#include "passgen/pattern/kind.h"
 #include "passgen/pattern/segment.h"
 
 static inline struct parser_state *parser_state_push(struct parser *parser) {
@@ -85,7 +85,8 @@ int parse_token_group(
     struct parser_state *state) {
   // create new segment and parser state
   if(token->codepoint == '|') {
-    state->data.group.segment = passgen_pattern_group_new_segment(state->data.group.group);
+    state->data.group.segment =
+        passgen_pattern_group_new_segment(state->data.group.group);
     return 0;
   }
 
@@ -97,7 +98,8 @@ int parse_token_group(
 
   // we're supposed to read something in.
   if(token->codepoint == '(') {
-    struct passgen_pattern_group *group = passgen_pattern_segment_new_group(state->data.group.segment);
+    struct passgen_pattern_group *group =
+        passgen_pattern_segment_new_group(state->data.group.segment);
     parser_state_push_group(
         parser,
         group,
@@ -106,14 +108,13 @@ int parse_token_group(
   }
 
   if(token->codepoint == '[') {
-    struct passgen_pattern_set *set = passgen_pattern_segment_new_set(state->data.group.segment);
-    parser_state_push_set(
-        parser,
-        set,
-        NULL);
+    struct passgen_pattern_set *set =
+        passgen_pattern_segment_new_set(state->data.group.segment);
+    parser_state_push_set(parser, set, NULL);
   }
 
-  struct passgen_pattern_char *chr = passgen_pattern_segment_new_char(state->data.group.segment);
+  struct passgen_pattern_char *chr =
+      passgen_pattern_segment_new_char(state->data.group.segment);
   chr->codepoint = token->codepoint;
 
   return 0;
@@ -124,10 +125,7 @@ int parse_finish(struct parser *parser) {
 }
 
 struct parser_state *passgen_parser_get_state(struct parser *parser, size_t n) {
-  return passgen_array_get(
-      &parser->state,
-      sizeof(struct parser_state),
-      n);
+  return passgen_array_get(&parser->state, sizeof(struct parser_state), n);
 }
 
 struct parser_state *passgen_parser_get_state_last(struct parser *parser) {

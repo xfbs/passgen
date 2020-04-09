@@ -33,9 +33,12 @@ bool run(test_entry test);
 #define test(id) \
   { .name = #id, .func = test_##id }
 
-#define assert(some)   \
-  if (!(some))         \
-    return (test_result){ \
-        .ok = false, .assertion = #some, .line = __LINE__, .func = __func__};
+#define assert(some)        \
+  if(!(some))               \
+    return (test_result){   \
+        .ok = false,        \
+        .assertion = #some, \
+        .line = __LINE__,   \
+        .func = __func__};
 
 extern test_entry tests[];

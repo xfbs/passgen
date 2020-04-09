@@ -3,10 +3,7 @@
 #include "passgen/pattern/segment.h"
 
 void passgen_pattern_group_init(passgen_pattern_group_t *group) {
-  passgen_array_init(
-      &group->segments,
-      sizeof(passgen_pattern_segment_t),
-      NULL);
+  passgen_array_init(&group->segments, sizeof(passgen_pattern_segment_t), NULL);
 }
 
 void passgen_pattern_group_free(passgen_pattern_group_t *group) {
@@ -19,10 +16,7 @@ void passgen_pattern_group_free(passgen_pattern_group_t *group) {
     passgen_pattern_segment_free(segment);
   }
 
-  passgen_array_free(
-      &group->segments,
-      sizeof(passgen_pattern_segment_t),
-      NULL);
+  passgen_array_free(&group->segments, sizeof(passgen_pattern_segment_t), NULL);
 }
 
 struct passgen_pattern_segment *
@@ -38,8 +32,8 @@ passgen_pattern_group_new_segment(passgen_pattern_group_t *group) {
 
 struct passgen_pattern_segment *
 passgen_pattern_group_get_segment(passgen_pattern_group_t *group, size_t n) {
-    return passgen_array_get(
-        &group->segments,
-        sizeof(passgen_pattern_segment_t),
-        n);
+  return passgen_array_get(
+      &group->segments,
+      sizeof(passgen_pattern_segment_t),
+      n);
 }

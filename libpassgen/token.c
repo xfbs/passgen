@@ -7,8 +7,10 @@ const struct passgen_enum_mapping passgen_token_state_mapping[] = {
     {PASSGEN_TOKEN_UNICODE, "PASSGEN_TOKEN_UNICODE"},
     {PASSGEN_TOKEN_UNICODE_PAYLOAD, "PASSGEN_TOKEN_UNICODE_PAYLOAD"},
     {PASSGEN_TOKEN_ERROR_UNICODE_START, "PASSGEN_TOKEN_ERROR_UNICODE_START"},
-    {PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD, "PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD"},
-    {PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN, "PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN"},
+    {PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD,
+     "PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD"},
+    {PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN,
+     "PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN"},
     {0, NULL},
 };
 
@@ -127,7 +129,9 @@ int passgen_token_parse(
     uint32_t codepoint) {
   switch(parser->state) {
     case PASSGEN_TOKEN_INIT: token_parse_init(parser, token, codepoint); break;
-    case PASSGEN_TOKEN_ESCAPED: token_parse_escaped(parser, token, codepoint); break;
+    case PASSGEN_TOKEN_ESCAPED:
+      token_parse_escaped(parser, token, codepoint);
+      break;
     case PASSGEN_TOKEN_UNICODE: token_parse_unicode(parser, codepoint); break;
     case PASSGEN_TOKEN_UNICODE_PAYLOAD:
       token_parse_unicode_payload(parser, token, codepoint);
