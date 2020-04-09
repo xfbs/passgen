@@ -1,4 +1,4 @@
-#include "passgen/token_new.h"
+#include "passgen/token.h"
 #include "passgen/util.h"
 
 const struct enum_mapping token_state_mapping[] = {

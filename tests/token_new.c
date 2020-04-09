@@ -1,4 +1,4 @@
-#include "passgen/token_new.h"
+#include "passgen/token.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>

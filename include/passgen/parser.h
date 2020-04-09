@@ -1,6 +1,6 @@
 #include "array.h"
 #include "pattern/pattern.h"
-#include "token_new.h"
+#include "token.h"
 
 enum parser_state_type {
   PARSER_GROUP,

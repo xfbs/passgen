@@ -1,4 +1,4 @@
-#include "passgen/token_new_json.h"
+#include "passgen/token_json.h"
 
 json_t *token_parser_to_json(struct token_parser *parser) {
   json_t *obj = json_object();

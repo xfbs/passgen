@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "token_new.h"
+#include "token.h"
 #include <jansson.h>
 
 json_t *token_parser_to_json(struct token_parser *parser);
