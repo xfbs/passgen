@@ -1,3 +1,5 @@
+#pragma once
+
 #include "array.h"
 #include "pattern/pattern.h"
 #include "token.h"
@@ -27,7 +29,7 @@ struct parser_state {
 
 struct parser {
   passgen_array_t state;
-  passgen_pattern_t parsed;
+  passgen_pattern_t pattern;
 };
 
 // parses a single token.
