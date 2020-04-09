@@ -19,6 +19,18 @@ static inline struct parser_state *parser_state_push_group(
   return state;
 }
 
+static inline struct parser_state *parser_state_push_set(
+    struct parser *parser,
+    struct passgen_pattern_set *set,
+    struct passgen_pattern_range *range) {
+  struct parser_state *state = parser_state_push(parser);
+  state->type = PARSER_SET;
+  state->data.set.set = set;
+  state->data.set.range = range;
+
+  return state;
+}
+
 static inline void parser_state_init(struct parser *parser) {
   passgen_array_init(&parser->state, sizeof(struct parser_state), NULL);
 }
@@ -71,17 +83,15 @@ int parse_token_group(
     struct parser *parser,
     struct passgen_token *token,
     struct parser_state *state) {
+  // create new segment and parser state
   if(token->codepoint == '|') {
-    // create new segment and parser state
     state->data.group.segment = passgen_pattern_group_new_segment(state->data.group.group);
-
     return 0;
   }
 
   // this group's over
   if(token->codepoint == ')') {
     parser_state_pop(parser);
-
     return 0;
   }
 

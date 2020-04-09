@@ -23,6 +23,7 @@ struct parser_state {
     } repeat;
     struct {
       struct passgen_pattern_set *set;
+      struct passgen_pattern_range *range;
     } set;
   } data;
 };

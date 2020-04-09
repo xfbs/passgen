@@ -5,13 +5,20 @@
 #include <time.h>
 #include "tests.h"
 
-test_result test_parser_empty(void) {
-    struct parser parser = {0};
-    struct passgen_token_parser token_parser = {0};
-    struct passgen_token token = {0};
-    struct passgen_pattern_segment *segment;
+#define PREAMBLE() \
+    struct parser parser = {0}; \
+    struct passgen_token_parser token_parser = {0}; \
+    struct passgen_token token = {0}; \
+    struct passgen_pattern_segment *segment; \
+    struct passgen_pattern_item *item; \
+    assert(0 == parser_init(&parser))
 
-    assert(0 == parser_init(&parser));
+#define PARSE_CODEPOINT(codepoint) \
+    assert(passgen_token_parse(&token_parser, &token, codepoint) == PASSGEN_TOKEN_INIT); \
+    assert(0 == parse_token(&parser, &token))
+
+test_result test_parser_empty(void) {
+  PREAMBLE();
 
     // single empty segment
     assert(1 == parser.pattern.group.segments.len);
@@ -22,16 +29,8 @@ test_result test_parser_empty(void) {
 }
 
 test_result test_parser_single_char(void) {
-    struct parser parser = {0};
-    struct passgen_token_parser token_parser = {0};
-    struct passgen_token token = {0};
-    struct parser_state *state;
-    struct passgen_pattern_segment *segment;
-    struct passgen_pattern_item *item;
-
-    assert(0 == parser_init(&parser));
-    assert(passgen_token_parse(&token_parser, &token, 'a') == PASSGEN_TOKEN_INIT);
-    assert(0 == parse_token(&parser, &token));
+  PREAMBLE();
+  PARSE_CODEPOINT('a');
 
     // single segment containing char 'a'
     assert(1 == parser.pattern.group.segments.len);
@@ -49,17 +48,9 @@ test_result test_parser_single_char(void) {
 }
 
 test_result test_parser_multi_char(void) {
-    struct parser parser = {0};
-    struct passgen_token_parser token_parser = {0};
-    struct passgen_token token = {0};
-    struct passgen_pattern_segment *segment;
-    struct passgen_pattern_item *item;
-
-    assert(0 == parser_init(&parser));
-    assert(passgen_token_parse(&token_parser, &token, 'a') == PASSGEN_TOKEN_INIT);
-    assert(0 == parse_token(&parser, &token));
-    assert(passgen_token_parse(&token_parser, &token, 'b') == PASSGEN_TOKEN_INIT);
-    assert(0 == parse_token(&parser, &token));
+  PREAMBLE();
+  PARSE_CODEPOINT('a');
+  PARSE_CODEPOINT('b');
 
     // single segment containing char 'a'
     assert(1 == parser.pattern.group.segments.len);
@@ -82,19 +73,10 @@ test_result test_parser_multi_char(void) {
 }
 
 test_result test_parser_multi_groups(void) {
-    struct parser parser = {0};
-    struct passgen_token_parser token_parser = {0};
-    struct passgen_token token = {0};
-    struct passgen_pattern_segment *segment;
-    struct passgen_pattern_item *item;
-
-    assert(0 == parser_init(&parser));
-    assert(passgen_token_parse(&token_parser, &token, 'a') == PASSGEN_TOKEN_INIT);
-    assert(0 == parse_token(&parser, &token));
-    assert(passgen_token_parse(&token_parser, &token, '|') == PASSGEN_TOKEN_INIT);
-    assert(0 == parse_token(&parser, &token));
-    assert(passgen_token_parse(&token_parser, &token, 'b') == PASSGEN_TOKEN_INIT);
-    assert(0 == parse_token(&parser, &token));
+  PREAMBLE();
+  PARSE_CODEPOINT('a');
+  PARSE_CODEPOINT('|');
+  PARSE_CODEPOINT('b');
 
     assert(2 == parser.pattern.group.segments.len);
 
@@ -117,3 +99,30 @@ test_result test_parser_multi_groups(void) {
     return test_ok;
 }
 
+test_result test_parser_nested_groups(void) {
+  PREAMBLE();
+  PARSE_CODEPOINT('(');
+  PARSE_CODEPOINT('a');
+  PARSE_CODEPOINT(')');
+
+    assert(1 == parser.pattern.group.segments.len);
+
+    segment = passgen_pattern_group_get_segment(&parser.pattern.group, 0);
+    assert(1 == segment->items.len);
+
+    item = passgen_pattern_segment_get_item(segment, 0);
+    assert(item);
+    assert(item->kind == PASSGEN_PATTERN_GROUP);
+
+    assert(1 == item->data.group.segments.len);
+
+    segment = passgen_pattern_group_get_segment(&item->data.group, 0);
+    assert(1 == segment->items.len);
+
+    item = passgen_pattern_segment_get_item(segment, 0);
+    assert(item);
+    assert(item->kind == PASSGEN_PATTERN_CHAR);
+    assert(item->data.character.codepoint == 'a');
+
+    return test_ok;
+}
