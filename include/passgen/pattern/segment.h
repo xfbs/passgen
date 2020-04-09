@@ -25,3 +25,5 @@ struct passgen_pattern_char *passgen_pattern_segment_new_char(struct passgen_pat
 struct passgen_pattern_set *passgen_pattern_segment_new_set(struct passgen_pattern_segment *segment);
 struct passgen_pattern_group *passgen_pattern_segment_new_group(struct passgen_pattern_segment *segment);
 struct passgen_pattern_special *passgen_pattern_segment_new_special(struct passgen_pattern_segment *segment);
+
+struct passgen_pattern_item *passgen_pattern_segment_get_item(struct passgen_pattern_segment *segment, size_t n);

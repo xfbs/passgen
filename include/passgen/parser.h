@@ -38,3 +38,6 @@ int parser_init(struct parser *parser);
 int parse_token(struct parser *parser, struct passgen_token *token);
 
 int parse_finish(struct parser *parser);
+
+struct parser_state *passgen_parser_get_state(struct parser *parser, size_t n);
+struct parser_state *passgen_parser_get_state_last(struct parser *parser);

@@ -36,3 +36,10 @@ passgen_pattern_group_new_segment(passgen_pattern_group_t *group) {
   return segment;
 }
 
+struct passgen_pattern_segment *
+passgen_pattern_group_get_segment(passgen_pattern_group_t *group, size_t n) {
+    return passgen_array_get(
+        &group->segments,
+        sizeof(passgen_pattern_segment_t),
+        n);
+}

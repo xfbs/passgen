@@ -78,32 +78,53 @@ int parse_token_group(
     return 0;
   }
 
-  struct passgen_pattern_item *item = passgen_array_push(
-      &state->data.group.segment->items,
-      sizeof(struct passgen_pattern_item),
-      NULL);
+  // this group's over
+  if(token->codepoint == ')') {
+    parser_state_pop(parser);
+
+    return 0;
+  }
 
   // we're supposed to read something in.
   if(token->codepoint == '(') {
-    item->kind = PASSGEN_PATTERN_GROUP;
-    struct parser_state *state = parser_state_push(parser);
-    state->type = PARSER_GROUP;
-    state->data.group.group = &item->data.group;
+    struct passgen_pattern_group *group = passgen_pattern_segment_new_group(state->data.group.segment);
+    parser_state_push_group(
+        parser,
+        group,
+        passgen_pattern_group_new_segment(group));
+    return 0;
   }
 
   if(token->codepoint == '[') {
+    /*
     item->kind = PASSGEN_PATTERN_SET;
     struct parser_state *state = parser_state_push(parser);
     state->type = PARSER_SET;
     state->data.set.set = &item->data.set;
+    */
   }
 
-  item->kind = PASSGEN_PATTERN_CHAR;
-  item->data.character.codepoint = token->codepoint;
+  struct passgen_pattern_char *chr = passgen_pattern_segment_new_char(state->data.group.segment);
+  chr->codepoint = token->codepoint;
 
   return 0;
 }
 
 int parse_finish(struct parser *parser) {
   return 0;
+}
+
+struct parser_state *passgen_parser_get_state(struct parser *parser, size_t n) {
+  return passgen_array_get(
+      &parser->state,
+      sizeof(struct parser_state),
+      n);
+}
+
+struct parser_state *passgen_parser_get_state_last(struct parser *parser) {
+  if(parser->state.len != 0) {
+    return passgen_parser_get_state(parser, parser->state.len - 1);
+  } else {
+    return NULL;
+  }
 }

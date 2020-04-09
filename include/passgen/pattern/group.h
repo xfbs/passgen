@@ -18,3 +18,6 @@ void passgen_pattern_group_free(passgen_pattern_group_t *group);
 
 struct passgen_pattern_segment *
 passgen_pattern_group_new_segment(passgen_pattern_group_t *group);
+
+struct passgen_pattern_segment *
+passgen_pattern_group_get_segment(passgen_pattern_group_t *group, size_t n);
