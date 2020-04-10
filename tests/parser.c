@@ -1,4 +1,4 @@
-#include "passgen/parse.h"
+#include "passgen/parser.h"
 #include "passgen/pattern/item.h"
 #include "tests.h"
 #include <stdbool.h>

@@ -1,5 +1,6 @@
 set(HEADER_LIST
-    "../include/passgen/array.h"
+    "../include/passgen/data/array.h"
+    "../include/passgen/data/parser.h"
     "../include/passgen/assert.h"
     "../include/passgen/debug.h"
     "../include/passgen/memory.h"
@@ -10,13 +11,13 @@ set(HEADER_LIST
 
 set(SOURCE_LIST
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
-    "array.c"
+    "data/array.c"
+    "data/parser.c"
     "assert.c"
     "memory.c"
     "passgen.c"
     "pattern.c"
     "parser.c"
-    "parse.c"
     "pattern_random.c"
     "pattern_presets.c"
     "pronounceable.c"

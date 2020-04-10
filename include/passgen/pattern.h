@@ -4,7 +4,7 @@
 /// Methods for parsing a regex-subset used to generate custom data.
 
 #pragma once
-#include "array.h"
+#include "passgen/data/array.h"
 #include "memory.h"
 #include "passgen/pronounceable.h"
 #include "random.h"
