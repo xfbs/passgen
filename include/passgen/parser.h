@@ -12,4 +12,3 @@ int passgen_parse_token_group(
     struct parser *parser,
     struct passgen_token *token,
     struct parser_state *state);
-
