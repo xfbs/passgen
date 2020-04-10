@@ -1,8 +1,8 @@
 #pragma once
 
-#include "array.h"
-#include "pattern/pattern.h"
-#include "token.h"
+#include "passgen/array.h"
+#include "passgen/pattern/pattern.h"
+#include "passgen/token.h"
 
 enum parser_state_type {
   PARSER_GROUP,
@@ -33,12 +33,22 @@ struct parser {
   passgen_pattern_t pattern;
 };
 
-// parses a single token.
-int parser_init(struct parser *parser);
-
-int parse_token(struct parser *parser, struct passgen_token *token);
-
-int parse_finish(struct parser *parser);
-
 struct parser_state *passgen_parser_get_state(struct parser *parser, size_t n);
 struct parser_state *passgen_parser_get_state_last(struct parser *parser);
+
+struct parser_state *parser_state_push(struct parser *parser);
+
+struct parser_state *parser_state_push_group(
+    struct parser *parser,
+    struct passgen_pattern_group *group,
+    struct passgen_pattern_segment *segment);
+
+struct parser_state *parser_state_push_set(
+    struct parser *parser,
+    struct passgen_pattern_set *set,
+    struct passgen_pattern_range *range);
+
+void passgen_parser_init(struct parser *parser);
+void passgen_parser_free(struct parser *parser);
+
+void parser_state_pop(struct parser *parser);

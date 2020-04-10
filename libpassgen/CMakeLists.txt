@@ -16,6 +16,7 @@ set(SOURCE_LIST
     "passgen.c"
     "pattern.c"
     "parser.c"
+    "parse.c"
     "pattern_random.c"
     "pattern_presets.c"
     "pronounceable.c"

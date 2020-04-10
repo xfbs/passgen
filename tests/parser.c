@@ -1,4 +1,4 @@
-#include "passgen/parser.h"
+#include "passgen/parse.h"
 #include "passgen/pattern/item.h"
 #include "tests.h"
 #include <stdbool.h>
@@ -11,13 +11,14 @@
   struct passgen_token token = {0};               \
   struct passgen_pattern_segment *segment;        \
   struct passgen_pattern_item *item;              \
-  assert(0 == parser_init(&parser))
+  passgen_parser_init(&parser);      \
+  assert(0 == passgen_parse_start(&parser))
 
 #define PARSE_CODEPOINT(codepoint)                             \
   assert(                                                      \
       passgen_token_parse(&token_parser, &token, codepoint) == \
       PASSGEN_TOKEN_INIT);                                     \
-  assert(0 == parse_token(&parser, &token))
+  assert(0 == passgen_parse_token(&parser, &token))
 
 test_result test_parser_empty(void) {
   PREAMBLE();
