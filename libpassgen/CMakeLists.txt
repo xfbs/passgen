@@ -11,6 +11,7 @@ set(HEADER_LIST
 
 set(SOURCE_LIST
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
+    "${CMAKE_CURRENT_BINARY_DIR}/enum_mapping.c"
     "data/array.c"
     "data/parser.c"
     "assert.c"
@@ -33,11 +34,19 @@ set(SOURCE_LIST
     "pattern/group.c"
     "pattern/segment.c"
     "pattern/pattern.c"
-    "pattern/set.c"
-)
+    "pattern/set.c")
 
 configure_file(version.c.in version.c)
 
+# this automatically generates enum mappings (mappings from enum integer to
+# string and back) from the header files.
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/enum_mapping.c
+  COMMAND ${PROJECT_SOURCE_DIR}/scripts/generate_enum_mapping.rb ${CMAKE_CURRENT_BINARY_DIR}/enum_mapping.c ${HEADER_LIST}
+  DEPENDS ${PROJECT_SOURCE_DIR}/scripts/generate_enum_mapping.rb ${HEADER_LIST}
+  COMMENT "Generating enum mapping"
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  VERBATIM)
 
 add_library(passgen-objects OBJECT ${SOURCE_LIST} ${HEADER_LIST})
 set_property(TARGET passgen-objects PROPERTY POSITION_INDEPENDENT_CODE 1)
