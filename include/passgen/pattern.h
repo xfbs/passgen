@@ -4,8 +4,8 @@
 /// Methods for parsing a regex-subset used to generate custom data.
 
 #pragma once
-#include "passgen/data/array.h"
 #include "memory.h"
+#include "passgen/data/array.h"
 #include "passgen/pronounceable.h"
 #include "random.h"
 #include "token_old.h"

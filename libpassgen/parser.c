@@ -24,7 +24,9 @@ int passgen_parse_token(struct parser *parser, struct passgen_token *token) {
         parser->state.len - 1);
 
     switch(state->type) {
-      case PARSER_GROUP: ret = passgen_parse_token_group(parser, token, state); break;
+      case PARSER_GROUP:
+        ret = passgen_parse_token_group(parser, token, state);
+        break;
       default: return -1;
     }
   } while(ret > 0);
