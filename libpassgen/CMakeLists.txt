@@ -83,6 +83,7 @@ add_custom_command(
   VERBATIM)
 
 add_library(passgen-objects OBJECT ${SOURCE_LIST} ${HEADER_LIST})
+target_link_libraries(passgen-objects utf8proc m ${libjansson})
 set_property(TARGET passgen-objects PROPERTY POSITION_INDEPENDENT_CODE 1)
 target_clangformat_setup(passgen-objects)
 
