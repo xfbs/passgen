@@ -1,7 +1,7 @@
 #pragma once
 
-#include "passgen/data/parser_state.h"
 #include "passgen/data/array.h"
+#include "passgen/data/parser_state.h"
 #include "passgen/token.h"
 
 struct parser {
@@ -9,8 +9,10 @@ struct parser {
   passgen_pattern_t pattern;
 };
 
-struct passgen_parser_state *passgen_parser_get_state(struct parser *parser, size_t n);
-struct passgen_parser_state *passgen_parser_get_state_last(struct parser *parser);
+struct passgen_parser_state *
+passgen_parser_get_state(struct parser *parser, size_t n);
+struct passgen_parser_state *
+passgen_parser_get_state_last(struct parser *parser);
 
 struct passgen_parser_state *parser_state_push(struct parser *parser);
 

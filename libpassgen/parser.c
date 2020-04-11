@@ -1,8 +1,8 @@
 #include "passgen/parser.h"
-#include "passgen/data/segment_item.h"
 #include "passgen/data/pattern_kind.h"
 #include "passgen/data/range.h"
 #include "passgen/data/segment.h"
+#include "passgen/data/segment_item.h"
 
 int passgen_parse_start(struct parser *parser) {
   // set initial group
@@ -20,8 +20,10 @@ int passgen_parse_token(struct parser *parser, struct passgen_token *token) {
   switch(state->type) {
     case PASSGEN_PARSER_GROUP: return passgen_parse_group(parser, token, state);
     case PASSGEN_PARSER_SET: return passgen_parse_set(parser, token, state);
-    case PASSGEN_PARSER_SET_RANGE: return passgen_parse_set_range(parser, token, state);
-    case PASSGEN_PARSER_REPEAT: return passgen_parse_repeat(parser, token, state);
+    case PASSGEN_PARSER_SET_RANGE:
+      return passgen_parse_set_range(parser, token, state);
+    case PASSGEN_PARSER_REPEAT:
+      return passgen_parse_repeat(parser, token, state);
     case PASSGEN_PARSER_REPEAT_RANGE:
       return passgen_parse_repeat_range(parser, token, state);
     default: return -1;

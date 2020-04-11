@@ -1,10 +1,13 @@
 #include "passgen/parser.h"
-#include "passgen/data/segment_item.h"
 #include "passgen/data/pattern_kind.h"
 #include "passgen/data/segment.h"
+#include "passgen/data/segment_item.h"
 
 struct passgen_parser_state *parser_state_push(struct parser *parser) {
-  return passgen_array_push(&parser->state, sizeof(struct passgen_parser_state), NULL);
+  return passgen_array_push(
+      &parser->state,
+      sizeof(struct passgen_parser_state),
+      NULL);
 }
 
 struct passgen_parser_state *parser_state_push_group(
@@ -53,11 +56,16 @@ void parser_state_pop(struct parser *parser) {
   passgen_array_pop(&parser->state, sizeof(struct passgen_parser_state), NULL);
 }
 
-struct passgen_parser_state *passgen_parser_get_state(struct parser *parser, size_t n) {
-  return passgen_array_get(&parser->state, sizeof(struct passgen_parser_state), n);
+struct passgen_parser_state *
+passgen_parser_get_state(struct parser *parser, size_t n) {
+  return passgen_array_get(
+      &parser->state,
+      sizeof(struct passgen_parser_state),
+      n);
 }
 
-struct passgen_parser_state *passgen_parser_get_state_last(struct parser *parser) {
+struct passgen_parser_state *
+passgen_parser_get_state_last(struct parser *parser) {
   if(parser->state.len != 0) {
     return passgen_parser_get_state(parser, parser->state.len - 1);
   } else {
