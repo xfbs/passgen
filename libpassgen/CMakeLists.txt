@@ -12,7 +12,7 @@ set(HEADER_LIST
     "../include/passgen/parser.h"
     "../include/passgen/passgen.h"
     "../include/passgen/pattern.h"
-    "../include/passgen/pattern/char.h"
+    "../include/passgen/data/char.h"
     "../include/passgen/pattern/group.h"
     "../include/passgen/pattern/item.h"
     "../include/passgen/pattern/kind.h"

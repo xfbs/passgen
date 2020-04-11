@@ -1,6 +1,6 @@
 #pragma once
-#include "repeat.h"
-#include "substring.h"
+#include "passgen/pattern/repeat.h"
+#include "passgen/pattern/substring.h"
 #include <stdint.h>
 
 struct passgen_pattern_char {

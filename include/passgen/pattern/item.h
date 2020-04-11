@@ -1,6 +1,6 @@
 #pragma once
 
-#include "passgen/pattern/char.h"
+#include "passgen/data/char.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/kind.h"
 #include "passgen/pattern/repeat.h"
