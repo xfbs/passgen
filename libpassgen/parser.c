@@ -15,7 +15,7 @@ int passgen_parse_start(struct parser *parser) {
 }
 
 int passgen_parse_token(struct parser *parser, struct passgen_token *token) {
-  struct parser_state *state = passgen_parser_get_state_last(parser);
+  struct passgen_parser_state *state = passgen_parser_get_state_last(parser);
 
   switch(state->type) {
     case PARSER_GROUP: return passgen_parse_group(parser, token, state);
@@ -31,7 +31,7 @@ int passgen_parse_token(struct parser *parser, struct passgen_token *token) {
 int passgen_parse_group(
     struct parser *parser,
     struct passgen_token *token,
-    struct parser_state *state) {
+    struct passgen_parser_state *state) {
   struct passgen_pattern_group *group;
   struct passgen_pattern_item *item;
   switch(token->codepoint) {
@@ -79,7 +79,7 @@ int passgen_parse_group(
 int passgen_parse_set(
     struct parser *parser,
     struct passgen_token *token,
-    struct parser_state *state) {
+    struct passgen_parser_state *state) {
   // this set's over
   if(token->codepoint == ']') {
     parser_state_pop(parser);
@@ -106,7 +106,7 @@ int passgen_parse_set(
 int passgen_parse_set_range(
     struct parser *parser,
     struct passgen_token *token,
-    struct parser_state *state) {
+    struct passgen_parser_state *state) {
   state->data.set.range->end = token->codepoint;
   state->type = PARSER_SET;
 
@@ -116,7 +116,7 @@ int passgen_parse_set_range(
 int passgen_parse_repeat(
     struct parser *parser,
     struct passgen_token *token,
-    struct parser_state *state) {
+    struct passgen_parser_state *state) {
   // this set's over
   if(token->codepoint == '}') {
     state->data.repeat.item->repeat.max = state->data.repeat.item->repeat.min;
@@ -145,7 +145,7 @@ int passgen_parse_repeat(
 int passgen_parse_repeat_range(
     struct parser *parser,
     struct passgen_token *token,
-    struct parser_state *state) {
+    struct passgen_parser_state *state) {
   if(token->codepoint == '}') {
     parser_state_pop(parser);
     return 0;

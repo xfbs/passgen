@@ -2,7 +2,7 @@
 #include "passgen/container/stack.h"
 #include "passgen/data/pattern.h"
 
-enum parser_state_type {
+enum passgen_parser_state_type {
   PARSER_GROUP,
   PARSER_SET,
   PARSER_SET_RANGE,
@@ -12,8 +12,8 @@ enum parser_state_type {
   PARSER_DONE,
 };
 
-struct parser_state {
-  enum parser_state_type type;
+struct passgen_parser_state {
+  enum passgen_parser_state_type type;
   union {
     struct {
       struct passgen_pattern_group *group;

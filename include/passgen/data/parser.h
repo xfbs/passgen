@@ -9,22 +9,22 @@ struct parser {
   passgen_pattern_t pattern;
 };
 
-struct parser_state *passgen_parser_get_state(struct parser *parser, size_t n);
-struct parser_state *passgen_parser_get_state_last(struct parser *parser);
+struct passgen_parser_state *passgen_parser_get_state(struct parser *parser, size_t n);
+struct passgen_parser_state *passgen_parser_get_state_last(struct parser *parser);
 
-struct parser_state *parser_state_push(struct parser *parser);
+struct passgen_parser_state *parser_state_push(struct parser *parser);
 
-struct parser_state *parser_state_push_group(
+struct passgen_parser_state *parser_state_push_group(
     struct parser *parser,
     struct passgen_pattern_group *group,
     struct passgen_pattern_segment *segment);
 
-struct parser_state *parser_state_push_set(
+struct passgen_parser_state *parser_state_push_set(
     struct parser *parser,
     struct passgen_pattern_set *set,
     struct passgen_pattern_range *range);
 
-struct parser_state *parser_state_push_repeat(
+struct passgen_parser_state *parser_state_push_repeat(
     struct parser *parser,
     struct passgen_pattern_item *item);
 

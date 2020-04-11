@@ -11,24 +11,24 @@ int passgen_parse_token(struct parser *parser, struct passgen_token *token);
 int passgen_parse_group(
     struct parser *parser,
     struct passgen_token *token,
-    struct parser_state *state);
+    struct passgen_parser_state *state);
 
 int passgen_parse_set(
     struct parser *parser,
     struct passgen_token *token,
-    struct parser_state *state);
+    struct passgen_parser_state *state);
 
 int passgen_parse_set_range(
     struct parser *parser,
     struct passgen_token *token,
-    struct parser_state *state);
+    struct passgen_parser_state *state);
 
 int passgen_parse_repeat(
     struct parser *parser,
     struct passgen_token *token,
-    struct parser_state *state);
+    struct passgen_parser_state *state);
 
 int passgen_parse_repeat_range(
     struct parser *parser,
     struct passgen_token *token,
-    struct parser_state *state);
+    struct passgen_parser_state *state);
