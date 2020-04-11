@@ -5,7 +5,7 @@
 #include "passgen/token.h"
 
 struct parser {
-  passgen_array_t state;
+  struct passgen_parser_state_stack state;
   passgen_pattern_t pattern;
 };
 
