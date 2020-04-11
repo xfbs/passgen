@@ -12,7 +12,7 @@ struct passgen_parser_state *parser_state_push_group(
     struct passgen_pattern_group *group,
     struct passgen_pattern_segment *segment) {
   struct passgen_parser_state *state = parser_state_push(parser);
-  state->type = PARSER_GROUP;
+  state->type = PASSGEN_PARSER_GROUP;
   state->data.group.group = group;
   state->data.group.segment = segment;
 
@@ -24,7 +24,7 @@ struct passgen_parser_state *parser_state_push_set(
     struct passgen_pattern_set *set,
     struct passgen_pattern_range *range) {
   struct passgen_parser_state *state = parser_state_push(parser);
-  state->type = PARSER_SET;
+  state->type = PASSGEN_PARSER_SET;
   state->data.set.set = set;
   state->data.set.range = range;
 
@@ -35,7 +35,7 @@ struct passgen_parser_state *parser_state_push_repeat(
     struct parser *parser,
     struct passgen_pattern_item *item) {
   struct passgen_parser_state *state = parser_state_push(parser);
-  state->type = PARSER_REPEAT;
+  state->type = PASSGEN_PARSER_REPEAT;
   state->data.repeat.item = item;
 
   return state;

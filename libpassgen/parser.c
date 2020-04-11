@@ -18,11 +18,11 @@ int passgen_parse_token(struct parser *parser, struct passgen_token *token) {
   struct passgen_parser_state *state = passgen_parser_get_state_last(parser);
 
   switch(state->type) {
-    case PARSER_GROUP: return passgen_parse_group(parser, token, state);
-    case PARSER_SET: return passgen_parse_set(parser, token, state);
-    case PARSER_SET_RANGE: return passgen_parse_set_range(parser, token, state);
-    case PARSER_REPEAT: return passgen_parse_repeat(parser, token, state);
-    case PARSER_REPEAT_RANGE:
+    case PASSGEN_PARSER_GROUP: return passgen_parse_group(parser, token, state);
+    case PASSGEN_PARSER_SET: return passgen_parse_set(parser, token, state);
+    case PASSGEN_PARSER_SET_RANGE: return passgen_parse_set_range(parser, token, state);
+    case PASSGEN_PARSER_REPEAT: return passgen_parse_repeat(parser, token, state);
+    case PASSGEN_PARSER_REPEAT_RANGE:
       return passgen_parse_repeat_range(parser, token, state);
     default: return -1;
   }
@@ -88,7 +88,7 @@ int passgen_parse_set(
 
   // part of a range expression
   if(token->codepoint == '-') {
-    state->type = PARSER_SET_RANGE;
+    state->type = PASSGEN_PARSER_SET_RANGE;
     return 0;
   }
 
@@ -108,7 +108,7 @@ int passgen_parse_set_range(
     struct passgen_token *token,
     struct passgen_parser_state *state) {
   state->data.set.range->end = token->codepoint;
-  state->type = PARSER_SET;
+  state->type = PASSGEN_PARSER_SET;
 
   return 0;
 }
@@ -126,7 +126,7 @@ int passgen_parse_repeat(
 
   if(token->codepoint == ',') {
     state->data.repeat.item->repeat.max = 0;
-    state->type = PARSER_REPEAT_RANGE;
+    state->type = PASSGEN_PARSER_REPEAT_RANGE;
     return 0;
   }
 
