@@ -1,5 +1,7 @@
 set(HEADER_LIST
     "../include/passgen/assert.h"
+    "../include/passgen/container/stack.h"
+    "../include/passgen/container/stack_impl.h"
     "../include/passgen/debug.h"
     "../include/passgen/data/array.h"
     "../include/passgen/data/parser.h"
@@ -61,6 +63,7 @@ set(SOURCE_LIST
     "utf8.c"
     "pattern/group.c"
     "pattern/segment.c"
+    "pattern/range.c"
     "pattern/pattern.c"
     "pattern/set.c")
 
