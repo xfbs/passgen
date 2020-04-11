@@ -1,6 +1,6 @@
 #pragma once
 #include "passgen/data/array.h"
-#include "substring.h"
+#include "passgen/data/substring.h"
 
 struct passgen_pattern_item;
 struct passgen_pattern_set;

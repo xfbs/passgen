@@ -1,6 +1,6 @@
 #pragma once
 #include "passgen/container/stack.h"
-#include "passgen/pattern/substring.h"
+#include "passgen/data/substring.h"
 #include <stddef.h>
 #include <stdint.h>
 

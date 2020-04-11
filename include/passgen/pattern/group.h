@@ -2,7 +2,7 @@
 #include "passgen/data/array.h"
 #include "passgen/pattern/segment.h"
 #include "passgen/data/repeat.h"
-#include "substring.h"
+#include "passgen/data/substring.h"
 
 typedef struct passgen_pattern_group {
   struct passgen_pattern_substring pos;

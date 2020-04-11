@@ -1,7 +1,7 @@
 #pragma once
 #include "passgen/data/repeat.h"
 #include "special_kind.h"
-#include "substring.h"
+#include "passgen/data/substring.h"
 
 struct passgen_pattern_special {
   struct passgen_pattern_substring pos;
