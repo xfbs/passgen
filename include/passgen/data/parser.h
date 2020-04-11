@@ -1,35 +1,8 @@
 #pragma once
 
+#include "passgen/data/parser_state.h"
 #include "passgen/data/array.h"
-#include "passgen/data/pattern.h"
 #include "passgen/token.h"
-
-enum parser_state_type {
-  PARSER_GROUP,
-  PARSER_SET,
-  PARSER_SET_RANGE,
-  PARSER_REPEAT,
-  PARSER_REPEAT_RANGE,
-  PARSER_SPECIAL,
-  PARSER_DONE,
-};
-
-struct parser_state {
-  enum parser_state_type type;
-  union {
-    struct {
-      struct passgen_pattern_group *group;
-      struct passgen_pattern_segment *segment;
-    } group;
-    struct {
-      struct passgen_pattern_item *item;
-    } repeat;
-    struct {
-      struct passgen_pattern_set *set;
-      struct passgen_pattern_range *range;
-    } set;
-  } data;
-};
 
 struct parser {
   passgen_array_t state;
