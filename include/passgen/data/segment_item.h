@@ -1,7 +1,7 @@
 #pragma once
 
 #include "passgen/data/char.h"
-#include "passgen/pattern/group.h"
+#include "passgen/data/group.h"
 #include "passgen/data/pattern_kind.h"
 #include "passgen/data/repeat.h"
 #include "passgen/data/set.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "group.h"
+#include "passgen/data/group.h"
 #include "passgen/memory.h"
 
 typedef struct passgen_pattern {
