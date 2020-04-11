@@ -61,11 +61,11 @@ set(SOURCE_LIST
     "json/token.c"
     "unicode.c"
     "utf8.c"
-    "pattern/group.c"
-    "pattern/segment.c"
-    "pattern/range.c"
-    "pattern/pattern.c"
-    "pattern/set.c")
+    "data/group.c"
+    "data/segment.c"
+    "data/range.c"
+    "data/pattern.c"
+    "data/set.c")
 
 configure_file(version.c.in version.c)
 
