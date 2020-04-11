@@ -22,7 +22,7 @@ set(HEADER_LIST
     "../include/passgen/pattern/segment.h"
     "../include/passgen/pattern/set.h"
     "../include/passgen/pattern/special.h"
-    "../include/passgen/pattern/special_kind.h"
+    "../include/passgen/data/special_kind.h"
     "../include/passgen/data/substring.h"
     "../include/passgen/pattern_private.h"
     "../include/passgen/pronounceable.h"
