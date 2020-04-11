@@ -61,9 +61,5 @@ passgen_parser_get_state(struct parser *parser, size_t n) {
 
 struct passgen_parser_state *
 passgen_parser_get_state_last(struct parser *parser) {
-  if(parser->state.len != 0) {
-    return passgen_parser_get_state(parser, parser->state.len - 1);
-  } else {
-    return NULL;
-  }
+  return passgen_parser_state_stack_top(&parser->state);
 }

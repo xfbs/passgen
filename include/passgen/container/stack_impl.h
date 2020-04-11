@@ -91,4 +91,12 @@
     }                                                                        \
                                                                              \
     stack->len -= 1;                                                         \
+  } \
+  \
+  data_type *name##_stack_top(struct name##_stack *stack) { \
+    if(stack->len) { \
+      return name##_stack_get(stack, stack->len - 1); \
+    } else { \
+      return NULL; \
+    } \
   }

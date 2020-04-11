@@ -20,4 +20,5 @@ typedef struct passgen_mem passgen_mem_t;
       passgen_mem_t *mem);                                                \
                                                                           \
   data_type *name##_stack_get(struct name##_stack *stack, size_t pos);    \
-  void name##_stack_pop(struct name##_stack *stack, passgen_mem_t *mem)
+  void name##_stack_pop(struct name##_stack *stack, passgen_mem_t *mem);  \
+  data_type *name##_stack_top(struct name##_stack *stack)
