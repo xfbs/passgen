@@ -10,8 +10,9 @@
 - [ ] enable memory sanitizer for tests
 - [ ] rewrite the parser, it should be a state machine
     - [x] implement group parsing
-    - [ ] implement set parsing
-    - [ ] implement set range parsing
+    - [x] implement set parsing
+    - [x] implement set range parsing
+    - [x] implement repeat parsing
     - [ ] implement escape handling
     - [ ] implement special character handling
 - [ ] adapt generation for new data structures
