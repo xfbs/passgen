@@ -5,7 +5,7 @@
 #include "passgen/pattern/kind.h"
 #include "passgen/data/repeat.h"
 #include "passgen/pattern/set.h"
-#include "passgen/pattern/special.h"
+#include "passgen/data/special.h"
 
 typedef struct passgen_pattern_item {
   enum passgen_pattern_kind kind;

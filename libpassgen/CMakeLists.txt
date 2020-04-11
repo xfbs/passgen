@@ -21,7 +21,7 @@ set(HEADER_LIST
     "../include/passgen/data/repeat.h"
     "../include/passgen/pattern/segment.h"
     "../include/passgen/pattern/set.h"
-    "../include/passgen/pattern/special.h"
+    "../include/passgen/data/special.h"
     "../include/passgen/data/special_kind.h"
     "../include/passgen/data/substring.h"
     "../include/passgen/pattern_private.h"
