@@ -1,5 +1,6 @@
 #pragma once
 #include "passgen/data/array.h"
+#include "passgen/pattern/range.h"
 #include "repeat.h"
 #include "substring.h"
 
@@ -10,6 +11,7 @@ struct passgen_pattern_set {
 
   // array of range_items
   passgen_array_t items;
+  struct passgen_pattern_range_stack _items;
 
   // how many choices to choose from. for efficient generation. improved
   // locality.
