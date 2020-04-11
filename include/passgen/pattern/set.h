@@ -23,3 +23,6 @@ void passgen_pattern_set_free(struct passgen_pattern_set *set);
 
 struct passgen_pattern_range *
 passgen_pattern_set_new_range(struct passgen_pattern_set *set);
+
+struct passgen_pattern_range *
+passgen_pattern_set_get_range(struct passgen_pattern_set *set, size_t n);
