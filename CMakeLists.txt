@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(passgen
     VERSION 1.0.0
-    DESCRIPTION "Very nice project"
+    DESCRIPTION "Regex-based password generator"
     LANGUAGES C)
 
 # project build options.
@@ -19,7 +19,6 @@ option(BUILD_STATIC "Built targets statically." OFF)
 
 option(USE_LIBEXECINFO "Use libexecinfo. For systems that don't have backtrace in libc." OFF)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 include(ExternalProject)
