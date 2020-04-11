@@ -1,7 +1,7 @@
 #pragma once
 
 #include "passgen/data/array.h"
-#include "passgen/pattern/pattern.h"
+#include "passgen/data/pattern.h"
 #include "passgen/token.h"
 
 enum parser_state_type {
