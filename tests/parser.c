@@ -1,6 +1,6 @@
 #include "passgen/parser.h"
 #include "passgen/pattern/item.h"
-#include "passgen/pattern/range.h"
+#include "passgen/data/range.h"
 #include "tests.h"
 #include <stdbool.h>
 #include <stdio.h>

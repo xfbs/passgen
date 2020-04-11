@@ -1,7 +1,7 @@
 #include "passgen/parser.h"
 #include "passgen/pattern/item.h"
 #include "passgen/pattern/kind.h"
-#include "passgen/pattern/range.h"
+#include "passgen/data/range.h"
 #include "passgen/pattern/segment.h"
 
 int passgen_parse_start(struct parser *parser) {

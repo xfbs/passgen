@@ -1,6 +1,6 @@
 #pragma once
 #include "passgen/data/array.h"
-#include "passgen/pattern/range.h"
+#include "passgen/data/range.h"
 #include "repeat.h"
 #include "substring.h"
 

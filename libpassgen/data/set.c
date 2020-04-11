@@ -1,5 +1,5 @@
 #include "passgen/pattern/set.h"
-#include "passgen/pattern/range.h"
+#include "passgen/data/range.h"
 
 void passgen_pattern_set_init(struct passgen_pattern_set *set) {
   passgen_array_init(&set->items, sizeof(struct passgen_pattern_range), NULL);
