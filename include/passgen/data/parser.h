@@ -10,6 +10,7 @@ enum parser_state_type {
   PARSER_SET_RANGE,
   PARSER_REPEAT,
   PARSER_REPEAT_RANGE,
+  PARSER_SPECIAL,
   PARSER_DONE,
 };
 

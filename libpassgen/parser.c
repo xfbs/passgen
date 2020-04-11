@@ -22,7 +22,8 @@ int passgen_parse_token(struct parser *parser, struct passgen_token *token) {
     case PARSER_SET: return passgen_parse_set(parser, token, state);
     case PARSER_SET_RANGE: return passgen_parse_set_range(parser, token, state);
     case PARSER_REPEAT: return passgen_parse_repeat(parser, token, state);
-    case PARSER_REPEAT_RANGE: return passgen_parse_repeat_range(parser, token, state);
+    case PARSER_REPEAT_RANGE:
+      return passgen_parse_repeat_range(parser, token, state);
     default: return -1;
   }
 }
@@ -61,9 +62,7 @@ int passgen_parse_group(
       // clear default repetition
       item->repeat.min = 0;
       item->repeat.max = 0;
-      parser_state_push_repeat(
-          parser,
-          item);
+      parser_state_push_repeat(parser, item);
       return 0;
     default: break;
   }
