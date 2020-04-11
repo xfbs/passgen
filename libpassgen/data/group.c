@@ -1,5 +1,5 @@
 #include "passgen/pattern/group.h"
-#include "passgen/pattern/item.h"
+#include "passgen/data/segment_item.h"
 #include "passgen/pattern/segment.h"
 
 void passgen_pattern_group_init(passgen_pattern_group_t *group) {

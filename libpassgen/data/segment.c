@@ -1,6 +1,6 @@
 #include "passgen/pattern/segment.h"
 #include "passgen/pattern/group.h"
-#include "passgen/pattern/item.h"
+#include "passgen/data/segment_item.h"
 #include "passgen/pattern/set.h"
 
 void passgen_pattern_segment_init(struct passgen_pattern_segment *segment) {
