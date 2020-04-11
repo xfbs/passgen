@@ -4,7 +4,7 @@
 #include "passgen/pattern/group.h"
 #include "passgen/data/pattern_kind.h"
 #include "passgen/data/repeat.h"
-#include "passgen/pattern/set.h"
+#include "passgen/data/set.h"
 #include "passgen/data/special.h"
 
 typedef struct passgen_pattern_item {
