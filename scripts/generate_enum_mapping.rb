@@ -167,7 +167,7 @@ class Parser
 
   def puts output
     output.puts '#include "passgen/enum_mapping.h"'
-    output.puts "size_t #{enum_name}_enum_length = #{values.size};"
+    output.puts "size_t #{enum_name}_enum_count = #{values.size};"
 
     output.puts "const struct passgen_enum_mapping #{enum_name}_enum_by_name[] = {"
     @values.sort_by{|name, _| name}.each do |name, value|

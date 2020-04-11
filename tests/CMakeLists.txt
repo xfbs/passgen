@@ -6,6 +6,7 @@ target_clangformat_setup(passgen-test-lib)
 # list of test sources.
 set(TEST_LIST
   "array.c"
+  "enum_mapping.c"
   "memory.c"
   "parser.c"
   "pattern.c"
@@ -32,3 +33,7 @@ add_custom_command(
 add_executable(passgen-test ${CMAKE_CURRENT_BINARY_DIR}/all.c ${TEST_LIST})
 target_link_libraries(passgen-test passgen-static passgen-test-lib)
 target_clangformat_setup(passgen-test)
+
+add_test(
+  NAME passgen-test
+  COMMAND passgen-test)

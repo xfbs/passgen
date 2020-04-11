@@ -1,8 +1,8 @@
 #pragma once
+#include "passgen/enum_mapping.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include "passgen/enum_mapping.h"
 
 // when updating any of the enums, make sure to also update the mappings.
 enum passgen_token_state {
@@ -50,6 +50,10 @@ struct passgen_token {
   bool escaped;
   bool normal_escaped;
 };
+
+PASSGEN_ENUM_MAPPING(passgen_token_state);
+PASSGEN_ENUM_MAPPING(passgen_token_type);
+PASSGEN_ENUM_MAPPING(passgen_token_escaped);
 
 extern const struct passgen_enum_mapping passgen_token_type_mapping[];
 extern const struct passgen_enum_mapping passgen_token_escaped_mapping[];

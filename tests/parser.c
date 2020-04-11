@@ -11,7 +11,7 @@
   struct passgen_token token = {0};               \
   struct passgen_pattern_segment *segment;        \
   struct passgen_pattern_item *item;              \
-  passgen_parser_init(&parser);      \
+  passgen_parser_init(&parser);                   \
   assert(0 == passgen_parse_start(&parser))
 
 #define PARSE_CODEPOINT(codepoint)                             \

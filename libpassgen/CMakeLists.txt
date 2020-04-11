@@ -3,6 +3,7 @@ set(HEADER_LIST
     "../include/passgen/debug.h"
     "../include/passgen/data/array.h"
     "../include/passgen/data/parser.h"
+    "../include/passgen/data/token.h"
     "../include/passgen/enum_mapping.h"
     "../include/passgen/memory.h"
     "../include/passgen/memory_private.h"
@@ -37,9 +38,10 @@ set(HEADER_LIST
 
 set(SOURCE_LIST
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
-    "${CMAKE_CURRENT_BINARY_DIR}/enum_mapping.c"
+    "${CMAKE_CURRENT_BINARY_DIR}/enum_mapping_autogen.c"
     "data/array.c"
     "data/parser.c"
+    "enum_mapping.c"
     "assert.c"
     "memory.c"
     "passgen.c"
@@ -67,8 +69,8 @@ configure_file(version.c.in version.c)
 # this automatically generates enum mappings (mappings from enum integer to
 # string and back) from the header files.
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/enum_mapping.c
-  COMMAND ${PROJECT_SOURCE_DIR}/scripts/generate_enum_mapping.rb ${CMAKE_CURRENT_BINARY_DIR}/enum_mapping.c ${HEADER_LIST}
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/enum_mapping_autogen.c
+  COMMAND ${PROJECT_SOURCE_DIR}/scripts/generate_enum_mapping.rb ${CMAKE_CURRENT_BINARY_DIR}/enum_mapping_autogen.c ${HEADER_LIST}
   DEPENDS ${PROJECT_SOURCE_DIR}/scripts/generate_enum_mapping.rb ${HEADER_LIST}
   COMMENT "Generating enum mapping"
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
