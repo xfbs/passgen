@@ -2,6 +2,7 @@
 #include "passgen/pattern/item.h"
 #include "passgen/pattern/kind.h"
 #include "passgen/pattern/segment.h"
+#include "passgen/pattern/range.h"
 
 int passgen_parse_start(struct parser *parser) {
   // set initial group
@@ -67,6 +68,8 @@ int passgen_parse_group(
   struct passgen_pattern_char *chr =
       passgen_pattern_segment_new_char(state->data.group.segment);
   chr->codepoint = token->codepoint;
+  chr->repeat.min = 1;
+  chr->repeat.max = 1;
 
   return 0;
 }
@@ -84,7 +87,15 @@ int passgen_parse_set(
   // part of a range expression
   if(token->codepoint == '-') {
     state->type = PARSER_SET_RANGE;
+    return 0;
   }
+
+  struct passgen_pattern_range *range = passgen_pattern_set_new_range(state->data.set.set);
+
+  range->start = token->codepoint;
+  range->end = token->codepoint;
+
+  state->data.set.range = range;
 
   return 0;
 }
@@ -93,6 +104,7 @@ int passgen_parse_set_range(
     struct parser *parser,
     struct passgen_token *token,
     struct parser_state *state) {
+  state->data.set.range->end = token->codepoint;
   state->type = PARSER_SET;
 
   return 0;

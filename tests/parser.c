@@ -1,5 +1,6 @@
 #include "passgen/parser.h"
 #include "passgen/pattern/item.h"
+#include "passgen/pattern/range.h"
 #include "tests.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -182,6 +183,7 @@ test_result test_parser_set_simple(void) {
   PARSE_CODEPOINT('a');
   PARSE_CODEPOINT('b');
   PARSE_CODEPOINT(']');
+  struct passgen_pattern_range *range;
 
   // single segment containing char 'a'
   assert(1 == parser.pattern.group.segments.len);
@@ -193,6 +195,86 @@ test_result test_parser_set_simple(void) {
   item = passgen_pattern_segment_get_item(segment, 0);
   assert(item);
   assert(item->kind == PASSGEN_PATTERN_SET);
+
+  assert(item->data.set.items.len == 2);
+
+  range = passgen_pattern_set_get_range(&item->data.set, 0);
+  assert(range);
+  assert(range->start == 'a');
+  assert(range->end == 'a');
+
+  range = passgen_pattern_set_get_range(&item->data.set, 1);
+  assert(range);
+  assert(range->start == 'b');
+  assert(range->end == 'b');
+
+  return test_ok;
+}
+
+test_result test_parser_range_simple(void) {
+  PREAMBLE();
+  PARSE_CODEPOINT('[');
+  PARSE_CODEPOINT('a');
+  PARSE_CODEPOINT('-');
+  PARSE_CODEPOINT('b');
+  PARSE_CODEPOINT(']');
+  struct passgen_pattern_range *range;
+
+  // single segment containing char 'a'
+  assert(1 == parser.pattern.group.segments.len);
+
+  segment = passgen_pattern_group_get_segment(&parser.pattern.group, 0);
+  assert(segment);
+  assert(1 == segment->items.len);
+
+  item = passgen_pattern_segment_get_item(segment, 0);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_SET);
+
+  assert(item->data.set.items.len == 1);
+
+  range = passgen_pattern_set_get_range(&item->data.set, 0);
+  assert(range);
+  assert(range->start == 'a');
+  assert(range->end == 'b');
+
+  return test_ok;
+}
+
+test_result test_parser_range_multiple(void) {
+  PREAMBLE();
+  PARSE_CODEPOINT('[');
+  PARSE_CODEPOINT('a');
+  PARSE_CODEPOINT('-');
+  PARSE_CODEPOINT('b');
+  PARSE_CODEPOINT('c');
+  PARSE_CODEPOINT('-');
+  PARSE_CODEPOINT('d');
+  PARSE_CODEPOINT(']');
+  struct passgen_pattern_range *range;
+
+  // single segment containing char 'a'
+  assert(1 == parser.pattern.group.segments.len);
+
+  segment = passgen_pattern_group_get_segment(&parser.pattern.group, 0);
+  assert(segment);
+  assert(1 == segment->items.len);
+
+  item = passgen_pattern_segment_get_item(segment, 0);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_SET);
+
+  assert(item->data.set.items.len == 2);
+
+  range = passgen_pattern_set_get_range(&item->data.set, 0);
+  assert(range);
+  assert(range->start == 'a');
+  assert(range->end == 'b');
+
+  range = passgen_pattern_set_get_range(&item->data.set, 1);
+  assert(range);
+  assert(range->start == 'c');
+  assert(range->end == 'd');
 
   return test_ok;
 }
