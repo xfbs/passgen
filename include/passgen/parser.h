@@ -8,7 +8,17 @@ int passgen_parse_finish(struct parser *parser);
 // parses a single token.
 int passgen_parse_token(struct parser *parser, struct passgen_token *token);
 
-int passgen_parse_token_group(
+int passgen_parse_group(
+    struct parser *parser,
+    struct passgen_token *token,
+    struct parser_state *state);
+
+int passgen_parse_set(
+    struct parser *parser,
+    struct passgen_token *token,
+    struct parser_state *state);
+
+int passgen_parse_set_range(
     struct parser *parser,
     struct passgen_token *token,
     struct parser_state *state);

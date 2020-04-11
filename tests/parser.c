@@ -175,3 +175,24 @@ test_result test_parser_multi_nested_groups(void) {
 
   return test_ok;
 }
+
+test_result test_parser_set_simple(void) {
+  PREAMBLE();
+  PARSE_CODEPOINT('[');
+  PARSE_CODEPOINT('a');
+  PARSE_CODEPOINT('b');
+  PARSE_CODEPOINT(']');
+
+  // single segment containing char 'a'
+  assert(1 == parser.pattern.group.segments.len);
+
+  segment = passgen_pattern_group_get_segment(&parser.pattern.group, 0);
+  assert(segment);
+  assert(1 == segment->items.len);
+
+  item = passgen_pattern_segment_get_item(segment, 0);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_SET);
+
+  return test_ok;
+}

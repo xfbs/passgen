@@ -14,27 +14,22 @@ int passgen_parse_start(struct parser *parser) {
 }
 
 int passgen_parse_token(struct parser *parser, struct passgen_token *token) {
-  int ret;
+  struct parser_state *state =
+    passgen_parser_get_state_last(parser);
 
-  do {
-    // get current state
-    struct parser_state *state = passgen_array_get(
-        &parser->state,
-        sizeof(struct parser_state),
-        parser->state.len - 1);
-
-    switch(state->type) {
-      case PARSER_GROUP:
-        ret = passgen_parse_token_group(parser, token, state);
-        break;
-      default: return -1;
-    }
-  } while(ret > 0);
-
-  return ret;
+  switch(state->type) {
+    case PARSER_GROUP:
+      return passgen_parse_group(parser, token, state);
+    case PARSER_SET:
+      return passgen_parse_set(parser, token, state);
+    case PARSER_SET_RANGE:
+      return passgen_parse_set_range(parser, token, state);
+    default:
+      return -1;
+  }
 }
 
-int passgen_parse_token_group(
+int passgen_parse_group(
     struct parser *parser,
     struct passgen_token *token,
     struct parser_state *state) {
@@ -66,11 +61,39 @@ int passgen_parse_token_group(
     struct passgen_pattern_set *set =
         passgen_pattern_segment_new_set(state->data.group.segment);
     parser_state_push_set(parser, set, NULL);
+    return 0;
   }
 
   struct passgen_pattern_char *chr =
       passgen_pattern_segment_new_char(state->data.group.segment);
   chr->codepoint = token->codepoint;
+
+  return 0;
+}
+
+int passgen_parse_set(
+    struct parser *parser,
+    struct passgen_token *token,
+    struct parser_state *state) {
+  // this set's over
+  if(token->codepoint == ']') {
+    parser_state_pop(parser);
+    return 0;
+  }
+
+  // part of a range expression
+  if(token->codepoint == '-') {
+    state->type = PARSER_SET_RANGE;
+  }
+
+  return 0;
+}
+
+int passgen_parse_set_range(
+    struct parser *parser,
+    struct passgen_token *token,
+    struct parser_state *state) {
+  state->type = PARSER_SET;
 
   return 0;
 }
