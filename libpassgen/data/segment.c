@@ -1,4 +1,4 @@
-#include "passgen/pattern/segment.h"
+#include "passgen/data/segment.h"
 #include "passgen/pattern/group.h"
 #include "passgen/data/segment_item.h"
 #include "passgen/data/set.h"

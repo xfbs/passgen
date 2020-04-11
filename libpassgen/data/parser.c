@@ -1,7 +1,7 @@
 #include "passgen/parser.h"
 #include "passgen/data/segment_item.h"
 #include "passgen/data/pattern_kind.h"
-#include "passgen/pattern/segment.h"
+#include "passgen/data/segment.h"
 
 struct parser_state *parser_state_push(struct parser *parser) {
   return passgen_array_push(&parser->state, sizeof(struct parser_state), NULL);
