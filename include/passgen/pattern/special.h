@@ -1,5 +1,5 @@
 #pragma once
-#include "repeat.h"
+#include "passgen/data/repeat.h"
 #include "special_kind.h"
 #include "substring.h"
 

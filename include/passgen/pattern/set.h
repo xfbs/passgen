@@ -1,7 +1,7 @@
 #pragma once
 #include "passgen/data/array.h"
 #include "passgen/data/range.h"
-#include "repeat.h"
+#include "passgen/data/repeat.h"
 #include "substring.h"
 
 struct passgen_pattern_range;

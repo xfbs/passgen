@@ -18,7 +18,7 @@ set(HEADER_LIST
     "../include/passgen/pattern/kind.h"
     "../include/passgen/pattern/pattern.h"
     "../include/passgen/data/range.h"
-    "../include/passgen/pattern/repeat.h"
+    "../include/passgen/data/repeat.h"
     "../include/passgen/pattern/segment.h"
     "../include/passgen/pattern/set.h"
     "../include/passgen/pattern/special.h"
