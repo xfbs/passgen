@@ -21,6 +21,8 @@ int passgen_parse_token(struct parser *parser, struct passgen_token *token) {
     case PARSER_GROUP: return passgen_parse_group(parser, token, state);
     case PARSER_SET: return passgen_parse_set(parser, token, state);
     case PARSER_SET_RANGE: return passgen_parse_set_range(parser, token, state);
+    case PARSER_REPEAT: return passgen_parse_repeat(parser, token, state);
+    case PARSER_REPEAT_RANGE: return passgen_parse_repeat_range(parser, token, state);
     default: return -1;
   }
 }
@@ -30,6 +32,7 @@ int passgen_parse_group(
     struct passgen_token *token,
     struct parser_state *state) {
   struct passgen_pattern_group *group;
+  struct passgen_pattern_item *item;
   switch(token->codepoint) {
     case '|':
       // create new segment and parser state
@@ -52,11 +55,15 @@ int passgen_parse_group(
           NULL);
       return 0;
     case '{':
+      item = passgen_pattern_segment_get_item(
+          state->data.group.segment,
+          state->data.group.segment->items.len - 1);
+      // clear default repetition
+      item->repeat.min = 0;
+      item->repeat.max = 0;
       parser_state_push_repeat(
           parser,
-          passgen_pattern_segment_get_item(
-              state->data.group.segment,
-              state->data.group.segment->items.len - 1));
+          item);
       return 0;
     default: break;
   }
@@ -105,6 +112,56 @@ int passgen_parse_set_range(
   state->type = PARSER_SET;
 
   return 0;
+}
+
+int passgen_parse_repeat(
+    struct parser *parser,
+    struct passgen_token *token,
+    struct parser_state *state) {
+  // this set's over
+  if(token->codepoint == '}') {
+    state->data.repeat.item->repeat.max = state->data.repeat.item->repeat.min;
+    parser_state_pop(parser);
+    return 0;
+  }
+
+  if(token->codepoint == ',') {
+    state->data.repeat.item->repeat.max = 0;
+    state->type = PARSER_REPEAT_RANGE;
+    return 0;
+  }
+
+  if(token->codepoint >= '0' && token->codepoint <= '9') {
+    uint8_t digit = token->codepoint - '0';
+
+    state->data.repeat.item->repeat.min *= 10;
+    state->data.repeat.item->repeat.min += digit;
+
+    return 0;
+  }
+
+  return -1;
+}
+
+int passgen_parse_repeat_range(
+    struct parser *parser,
+    struct passgen_token *token,
+    struct parser_state *state) {
+  if(token->codepoint == '}') {
+    parser_state_pop(parser);
+    return 0;
+  }
+
+  if(token->codepoint >= '0' && token->codepoint <= '9') {
+    uint8_t digit = token->codepoint - '0';
+
+    state->data.repeat.item->repeat.max *= 10;
+    state->data.repeat.item->repeat.max += digit;
+
+    return 0;
+  }
+
+  return -1;
 }
 
 int parse_finish(struct parser *parser) {
