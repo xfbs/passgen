@@ -27,9 +27,10 @@ class Parser
     DONE = 8
   end
 
-  attr_accessor :enum_name, :values
+  attr_accessor :enum_name, :values, :filename
 
-  def initialize
+  def initialize filename: nil
+    @filename = filename
     @state = State::INIT
     @enum_name = ""
     @current = ""
@@ -44,7 +45,7 @@ class Parser
   end
 
   def error token
-    STDERR.puts "error: unexpected token #{token}"
+    STDERR.puts "error (#{@filename}): unexpected token '#{token}'"
     @state = State::INIT
   end
 
@@ -68,7 +69,7 @@ class Parser
     case token
     when '{'
       @state = State::ENUM_CONTENT
-    when /^[a-zA-Z_][a-zA-Z0-9_]*;?$/
+    when /^[a-zA-Z_][a-zA-Z0-9_]*(;|,)?$/
       # variable declaration
       @state = State::INIT
     else
@@ -183,8 +184,8 @@ class Parser
   end
 end
 
-def parse_tokens(output, tokens)
-  parser = Parser.new
+def parse_tokens output:, tokens:, filename:
+  parser = Parser.new filename: filename
 
   tokens.each do |token|
     parser.parse token
@@ -192,7 +193,7 @@ def parse_tokens(output, tokens)
     if parser.done?
       parser.check
       parser.puts(output)
-      parser = Parser.new
+      parser = Parser.new filename: filename
     end
   end
 end
@@ -207,7 +208,7 @@ def parse_files output, inputs
 
     tokens = content.split /\s+/
 
-    parse_tokens output, tokens
+    parse_tokens output: output, tokens: tokens, filename: input
   end
 end
 
