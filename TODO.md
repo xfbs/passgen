@@ -18,6 +18,8 @@
 - [ ] write benchmark for new parser
 - [ ] try changing parser state stack to linked list?
 - [ ] implement stack depth limiting for new parser (as separate method)
+- [ ] rename array to queue or stack
+- [ ] implement type specialisations for array data type
 
 
 - rewrite the passgen parser to use batched operations, meaning that all
