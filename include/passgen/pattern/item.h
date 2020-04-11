@@ -2,7 +2,7 @@
 
 #include "passgen/data/char.h"
 #include "passgen/pattern/group.h"
-#include "passgen/pattern/kind.h"
+#include "passgen/data/pattern_kind.h"
 #include "passgen/data/repeat.h"
 #include "passgen/pattern/set.h"
 #include "passgen/data/special.h"
