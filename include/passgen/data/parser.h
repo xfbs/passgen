@@ -49,6 +49,10 @@ struct parser_state *parser_state_push_set(
     struct passgen_pattern_set *set,
     struct passgen_pattern_range *range);
 
+struct parser_state *parser_state_push_repeat(
+    struct parser *parser,
+    struct passgen_pattern_item *item);
+
 void passgen_parser_init(struct parser *parser);
 void passgen_parser_free(struct parser *parser);
 

@@ -31,6 +31,16 @@ struct parser_state *parser_state_push_set(
   return state;
 }
 
+struct parser_state *parser_state_push_repeat(
+    struct parser *parser,
+    struct passgen_pattern_item *item) {
+  struct parser_state *state = parser_state_push(parser);
+  state->type = PARSER_REPEAT;
+  state->data.repeat.item = item;
+
+  return state;
+}
+
 void passgen_parser_init(struct parser *parser) {
   passgen_array_init(&parser->state, sizeof(struct parser_state), NULL);
   passgen_pattern_init(&parser->pattern);
