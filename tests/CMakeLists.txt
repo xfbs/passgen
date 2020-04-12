@@ -17,23 +17,24 @@ set(TEST_LIST
   "token.c"
   "token_new.c"
   "unicode.c"
-  "utf8.c")
+  "utf8.c"
+)
 
 # the testing framework wants a list of all test functions to execute, this
 # step generates this list automagically from the test sources with the help
 # of a little ruby script.
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/all.c
+  OUTPUT test_list.c
   COMMAND
-    ${PROJECT_SOURCE_DIR}/scripts/tests_generate.rb
-    ${CMAKE_CURRENT_BINARY_DIR}/all.c
+    ${PROJECT_SOURCE_DIR}/scripts/generate_test_list.rb
+    ${CMAKE_CURRENT_BINARY_DIR}/test_list.c
     ${TEST_LIST}
-  DEPENDS ${PROJECT_SOURCE_DIR}/scripts/tests_generate.rb ${TEST_LIST}
+  DEPENDS ${PROJECT_SOURCE_DIR}/scripts/generate_test_list.rb ${TEST_LIST}
   COMMENT "Generating test list"
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   VERBATIM)
 
-add_executable(passgen-test ${CMAKE_CURRENT_BINARY_DIR}/all.c ${TEST_LIST})
+add_executable(passgen-test test_list.c ${TEST_LIST})
 target_link_libraries(passgen-test passgen-static passgen-test-lib)
 target_clangformat_setup(passgen-test)
 
