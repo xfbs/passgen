@@ -25,6 +25,7 @@ include(ExternalProject)
 include(ClangFormat)
 include(CTest)
 include(Passgen)
+include(Sanitizers)
 
 clangformat_setup()
 
