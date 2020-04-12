@@ -16,7 +16,36 @@ static inline bool strprefix(const char *prefix, const char *string) {
   return true;
 }
 
+static inline void memswap(void *a, void *b, size_t size) {
+  char data[size];
+
+  memcpy(data, a, size);
+  memcpy(a, b, size);
+  memcpy(b, data, size);
+}
+
+static inline void shuffle(test_entry *tests) {
+  size_t length = 0;
+  while(tests[length].func) {
+    length++;
+  }
+
+  for(size_t i = 0; i < (length * 2); i++) {
+    size_t pos_a = rand() % length;
+    size_t pos_b = rand() % length;
+
+    memswap(&tests[pos_a], &tests[pos_b], sizeof(test_entry));
+  }
+}
+
 int main(int argc, char *argv[]) {
+  // initialise shitty pseudorandom number generator
+  srand(time(NULL));
+
+  if(getenv("SHUFFLE")) {
+    shuffle(tests);
+  }
+
   size_t failures = 0;
   size_t success = 0;
   if(argc > 1) {
