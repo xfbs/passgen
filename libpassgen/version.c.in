@@ -21,6 +21,7 @@ bool passgen_version_min(passgen_version_t version) {
 }
 
 const char *passgen_git_commit = "@PROJECT_GIT_COMMIT@";
+const char *passgen_git_describe = "@PROJECT_GIT_DESCRIBE@";
 
 bool passgen_is_debug(void) {
 #ifdef PASSGEN_DEBUG
