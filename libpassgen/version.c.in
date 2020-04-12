@@ -14,6 +14,9 @@ const char *passgen_version_str() {
 }
 
 bool passgen_version_min(passgen_version_t version) {
+  // TODO: implement
+  (void) version;
+
   return false;
 }
 

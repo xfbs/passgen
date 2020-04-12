@@ -152,14 +152,14 @@ void passgen_mem_accounting_error(
     // print allocation backtrace
     fprintf(stderr, "\nBacktrace (allocation):\n");
     char **symbols = backtrace_symbols(node->alloc_bt, node->alloc_frames);
-    for(int i = 0; i < node->alloc_frames; i++) {
+    for(size_t i = 0; i < node->alloc_frames; i++) {
       printf("%s\n", symbols[i]);
     }
     free(symbols);
 
     fprintf(stderr, "\nBacktrace (initial free):\n");
     symbols = backtrace_symbols(node->free_bt, node->free_frames);
-    for(int i = 0; i < node->free_frames; i++) {
+    for(size_t i = 0; i < node->free_frames; i++) {
       printf("%s\n", symbols[i]);
     }
     free(symbols);
@@ -385,7 +385,7 @@ void passgen_mem_accounting_cleanup(passgen_mem_accounting_t *acc) {
       // print allocation backtrace
       fprintf(stderr, "\nBacktrace (allocation):\n");
       char **symbols = backtrace_symbols(node->alloc_bt, node->alloc_frames);
-      for(int i = 0; i < node->alloc_frames; i++) {
+      for(size_t i = 0; i < node->alloc_frames; i++) {
         printf("%s\n", symbols[i]);
       }
       free(symbols);

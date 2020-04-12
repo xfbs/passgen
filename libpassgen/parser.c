@@ -109,6 +109,7 @@ int passgen_parse_set_range(
     struct parser *parser,
     struct passgen_token *token,
     struct passgen_parser_state *state) {
+  (void) parser;
   state->data.set.range->end = token->codepoint;
   state->type = PASSGEN_PARSER_SET;
 
@@ -166,5 +167,8 @@ int passgen_parse_repeat_range(
 }
 
 int parse_finish(struct parser *parser) {
+  // TODO: implement
+  (void) parser;
+
   return 0;
 }
