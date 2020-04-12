@@ -1,7 +1,7 @@
 # custom testing framework.
 add_library(passgen-test-lib STATIC "tests.c" "tests.h")
 target_include_directories(passgen-test-lib PUBLIC ".")
-target_clangformat_setup(passgen-test-lib)
+passgen_target_defaults(passgen-test-lib)
 
 # list of test sources.
 set(TEST_LIST
@@ -36,7 +36,7 @@ add_custom_command(
 
 add_executable(passgen-test test_list.c ${TEST_LIST})
 target_link_libraries(passgen-test passgen-static passgen-test-lib)
-target_clangformat_setup(passgen-test)
+passgen_target_defaults(passgen-test)
 
 add_test(
   NAME passgen-test

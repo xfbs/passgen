@@ -88,7 +88,7 @@ target_include_directories(passgen-objects
   $<TARGET_PROPERTY:utf8proc,INCLUDE_DIRECTORIES>)
 #target_link_libraries(passgen-objects utf8proc m ${libjansson})
 set_property(TARGET passgen-objects PROPERTY POSITION_INDEPENDENT_CODE 1)
-target_clangformat_setup(passgen-objects)
+passgen_target_defaults(passgen-objects)
 
 target_include_directories(passgen-objects PUBLIC ../include /usr/local/include)
 target_compile_features(passgen-objects PUBLIC c_std_99)

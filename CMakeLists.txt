@@ -24,32 +24,33 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(ExternalProject)
 include(ClangFormat)
 include(CTest)
+include(Passgen)
 
 clangformat_setup()
 
 # get commit info, if git is available.
 if(BUILD_GIT_INFO)
-    include(GitInfo)
-    git_info()
+  include(GitInfo)
+  git_info()
 endif()
 
 # dependency: utf8proc
 if(BUILD_UTF8PROC)
-add_subdirectory(extern/utf8proc)
+  add_subdirectory(extern/utf8proc)
 else()
-find_package(utf8proc)
+  find_package(utf8proc)
 endif()
 
 # dependency (only on alpine): libexecinfo-dev
 if(USE_LIBEXECINFO)
-find_library(libexecinfo execinfo)
+  find_library(libexecinfo execinfo)
 endif(USE_LIBEXECINFO)
 
 find_library(libjansson jansson)
 
 # build libpassgen
 if(BUILD_LIBPASSGEN)
-add_subdirectory(libpassgen)
+  add_subdirectory(libpassgen)
 endif()
 
 # build passgen binary and perhaps utils
