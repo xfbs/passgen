@@ -6,7 +6,7 @@ outfile = File.open(ARGV.shift, "w")
 inputs = ARGV
 
 tests = inputs
-  .map{|file| File.read(file)}
+  .map{|file| File.read(file).force_encoding('UTF-8')}
   .map{|data| data.scan(TEST_REGEX)}
   .flatten(1)
 
