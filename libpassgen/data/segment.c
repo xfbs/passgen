@@ -2,7 +2,6 @@
 #include "passgen/data/group.h"
 #include "passgen/data/segment_item.h"
 #include "passgen/data/set.h"
-#include "passgen/container/stack_impl.h"
 
 void passgen_pattern_segment_init(struct passgen_pattern_segment *segment) {
   passgen_array_init(
@@ -71,5 +70,3 @@ struct passgen_pattern_item *passgen_pattern_segment_get_item(
       sizeof(struct passgen_pattern_item),
       n);
 }
-
-PASSGEN_STACK_IMPLEMENT(struct passgen_pattern_segment, passgen_pattern_segment)
