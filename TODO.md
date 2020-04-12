@@ -22,6 +22,9 @@
 - [x] rename array to queue or stack
     - [ ] move all uses of array over to stack
 - [x] implement type specialisations for array data type
+- [ ] squash compiler warnings
+    - [x] get rid of easy ones
+    - [ ] get rid of all
 
 
 - rewrite the passgen parser to use batched operations, meaning that all
