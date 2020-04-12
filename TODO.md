@@ -7,7 +7,7 @@
 - [x] move all `include/passgen/pattern/*.h` data structures into `include/passgen/data/`.
 - [ ] remove legacy code
 - [ ] add or think about memory handling
-- [ ] enable memory sanitizer for tests
+- [x] enable memory sanitizer for tests
 - [ ] rewrite the parser, it should be a state machine
     - [x] implement group parsing
     - [x] implement set parsing
@@ -25,6 +25,14 @@
 - [ ] squash compiler warnings
     - [x] get rid of easy ones
     - [ ] get rid of all
+- [x] implement code coverage generation
+- [ ] implement code profiling
+- [x] implement automatic code formatting
+- [ ] implement include-what-you-use
+- [ ] implement static analysis
+- [x] implement sanitizer support
+- [ ] fix debug build on alpine
+- [ ] make generation code work with new parser and data structures
 
 
 - rewrite the passgen parser to use batched operations, meaning that all
