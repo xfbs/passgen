@@ -1,7 +1,7 @@
 FROM alpine:latest
 
 # install dependencies
-RUN apk add build-base cmake ninja sudo libexecinfo-dev jansson-dev git ruby llvm9 clang
+RUN apk add build-base cmake ninja sudo libexecinfo-dev jansson-dev git ruby llvm9 clang git
 
 # setup normal user and sudo
 RUN addgroup sudo
