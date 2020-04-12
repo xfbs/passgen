@@ -1,5 +1,5 @@
 #pragma once
-#include "passgen/container/stack.h"
+#include "passgen/container/stack/parser_state.h"
 #include "passgen/data/pattern.h"
 #include "passgen/enum_mapping.h"
 
@@ -31,4 +31,3 @@ struct passgen_parser_state {
 };
 
 PASSGEN_ENUM_MAPPING(passgen_parser_state_type);
-PASSGEN_STACK_DECLARE(struct passgen_parser_state, passgen_parser_state);

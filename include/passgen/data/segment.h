@@ -1,5 +1,4 @@
 #pragma once
-#include "passgen/container/stack.h"
 #include "passgen/data/array.h"
 #include "passgen/data/substring.h"
 
@@ -17,8 +16,6 @@ typedef struct passgen_pattern_segment {
 
   // struct pattern_repeat repeat;
 } passgen_pattern_segment_t;
-
-PASSGEN_STACK_DECLARE(struct passgen_pattern_segment, passgen_pattern_segment);
 
 void passgen_pattern_segment_init(struct passgen_pattern_segment *segment);
 void passgen_pattern_segment_free(struct passgen_pattern_segment *segment);

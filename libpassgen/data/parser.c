@@ -1,5 +1,7 @@
 #include "passgen/parser.h"
 #include "passgen/data/pattern_kind.h"
+#include "passgen/data/parser_state.h"
+#include "passgen/data/parser.h"
 #include "passgen/data/segment.h"
 #include "passgen/data/segment_item.h"
 

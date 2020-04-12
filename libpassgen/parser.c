@@ -3,6 +3,7 @@
 #include "passgen/data/range.h"
 #include "passgen/data/segment.h"
 #include "passgen/data/segment_item.h"
+#include "passgen/data/parser_state.h"
 
 int passgen_parse_start(struct parser *parser) {
   // set initial group

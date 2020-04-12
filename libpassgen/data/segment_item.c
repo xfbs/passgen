@@ -1,5 +1,6 @@
 #include "passgen/data/segment_item.h"
 #include "passgen/container/stack_impl.h"
+#include "passgen/container/stack/segment_item.h"
 #include "passgen/data/set.h"
 #include "passgen/data/group.h"
 
