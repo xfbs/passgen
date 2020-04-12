@@ -26,6 +26,7 @@ include(ClangFormat)
 include(CTest)
 include(Passgen)
 include(Sanitizers)
+include(CodeCoverage)
 
 clangformat_setup()
 

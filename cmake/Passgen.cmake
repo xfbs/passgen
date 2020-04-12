@@ -9,4 +9,6 @@ function(passgen_target_defaults target)
   # use c99 standard
   target_compile_features(${target}
     PUBLIC c_std_99)
+
+  target_code_coverage(${target})
 endfunction()

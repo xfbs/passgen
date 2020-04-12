@@ -50,3 +50,14 @@ Tests can be run by using the `test` target of the build system.
     make test
 
 These should be run and pass before committing.
+
+## Generating Test Coverage
+
+Enabling test coverage requires either the GCC or Clang compilers and having the LLVM coverage tools installed (`lcov`, `llvm-cov`, `llvm-profdata`). Enabling it is done by setting `CODE_COVERAGE` to a true value.
+
+This enables the `ccov-passgen-test` target, which runs tests and generates a test coverage report.
+
+    cmake -DCODE_COVERAGE=YES ..
+    make ccov-passgen-test
+
+The resulting coverage is placed in `ccov/passgen-test/index.html` in the build folder.
