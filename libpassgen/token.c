@@ -41,7 +41,7 @@ static inline void token_parse_init(
 
 // Simple ASCII escape map. Don't use this for large (unicode) codepoints.
 // Provides efficient O(1) lookup.
-const static char simple_escaped[] = {
+static const char simple_escaped[] = {
     0,
     ['a'] = '\a',
     ['b'] = '\b',

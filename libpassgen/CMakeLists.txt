@@ -50,6 +50,7 @@ set(SOURCE_LIST
   "data/pattern.c"
   "data/range.c"
   "data/segment.c"
+  "data/segment_item.c"
   "data/set.c"
   "enum_mapping.c"
   "json/token.c"

@@ -19,3 +19,5 @@ typedef struct passgen_pattern_item {
 
   struct passgen_pattern_repeat repeat;
 } passgen_pattern_item_t;
+
+void passgen_pattern_item_free(struct passgen_pattern_item *item);

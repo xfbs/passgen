@@ -48,6 +48,7 @@ void passgen_parser_init(struct parser *parser) {
 
 void passgen_parser_free(struct parser *parser) {
   passgen_parser_state_stack_free(&parser->state, NULL);
+  passgen_pattern_free(&parser->pattern);
 }
 
 void parser_state_pop(struct parser *parser) {

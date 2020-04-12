@@ -32,6 +32,8 @@ test_result test_parser_empty(void) {
   segment = passgen_pattern_group_get_segment(&parser.pattern.group, 0);
   assert(0 == segment->items.len);
 
+  passgen_parser_free(&parser);
+
   return test_ok;
 }
 
@@ -50,6 +52,8 @@ test_result test_parser_single_char(void) {
   assert(item);
   assert(item->kind == PASSGEN_PATTERN_CHAR);
   assert(item->data.character.codepoint == 'a');
+
+  passgen_parser_free(&parser);
 
   return test_ok;
 }
@@ -75,6 +79,8 @@ test_result test_parser_multi_char(void) {
   assert(item);
   assert(item->kind == PASSGEN_PATTERN_CHAR);
   assert(item->data.character.codepoint == 'b');
+
+  passgen_parser_free(&parser);
 
   return test_ok;
 }
@@ -103,6 +109,8 @@ test_result test_parser_multi_groups(void) {
   assert(item->kind == PASSGEN_PATTERN_CHAR);
   assert(item->data.character.codepoint == 'b');
 
+  passgen_parser_free(&parser);
+
   return test_ok;
 }
 
@@ -130,6 +138,8 @@ test_result test_parser_nested_groups(void) {
   assert(item);
   assert(item->kind == PASSGEN_PATTERN_CHAR);
   assert(item->data.character.codepoint == 'a');
+
+  passgen_parser_free(&parser);
 
   return test_ok;
 }
@@ -177,6 +187,8 @@ test_result test_parser_multi_nested_groups(void) {
   assert(item->kind == PASSGEN_PATTERN_CHAR);
   assert(item->data.character.codepoint == 'b');
 
+  passgen_parser_free(&parser);
+
   return test_ok;
 }
 
@@ -211,6 +223,8 @@ test_result test_parser_set_simple(void) {
   assert(range->start == 'b');
   assert(range->end == 'b');
 
+  passgen_parser_free(&parser);
+
   return test_ok;
 }
 
@@ -240,6 +254,8 @@ test_result test_parser_range_simple(void) {
   assert(range);
   assert(range->start == 'a');
   assert(range->end == 'b');
+
+  passgen_parser_free(&parser);
 
   return test_ok;
 }
@@ -279,6 +295,8 @@ test_result test_parser_range_multiple(void) {
   assert(range->start == 'c');
   assert(range->end == 'd');
 
+  passgen_parser_free(&parser);
+
   return test_ok;
 }
 
@@ -302,6 +320,8 @@ test_result test_parser_char_repeat(void) {
   assert(item->data.character.codepoint == 'a');
   assert(item->repeat.min == 2);
   assert(item->repeat.max == 2);
+
+  passgen_parser_free(&parser);
 
   return test_ok;
 }
@@ -328,6 +348,8 @@ test_result test_parser_char_repeat_range(void) {
   assert(item->data.character.codepoint == 'a');
   assert(item->repeat.min == 2);
   assert(item->repeat.max == 4);
+
+  passgen_parser_free(&parser);
 
   return test_ok;
 }

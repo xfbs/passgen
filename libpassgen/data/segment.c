@@ -11,6 +11,16 @@ void passgen_pattern_segment_init(struct passgen_pattern_segment *segment) {
 }
 
 void passgen_pattern_segment_free(struct passgen_pattern_segment *segment) {
+  for(size_t i = 0; i < segment->items.len; i++) {
+    struct passgen_pattern_item *item = passgen_array_get(
+        &segment->items,
+        sizeof(struct passgen_pattern_item),
+        i);
+
+    passgen_pattern_item_free(item);
+  }
+
+  passgen_array_free(&segment->items, sizeof(struct passgen_pattern_item), NULL);
 }
 
 struct passgen_pattern_item *

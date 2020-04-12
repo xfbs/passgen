@@ -186,6 +186,13 @@ static inline int pattern_random_special_wordlist(
     pattern_env_t *env,
     void *data,
     pattern_random_cb *func) {
+  // TODO: implement
+  (void) special;
+  (void) rand;
+  (void) env;
+  (void) data;
+  (void) func;
+
   return 0;
 }
 
