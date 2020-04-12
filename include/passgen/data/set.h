@@ -10,8 +10,7 @@ struct passgen_pattern_set {
   struct passgen_pattern_substring pos;
 
   // array of range_items
-  passgen_array_t items;
-  struct passgen_pattern_range_stack _items;
+  struct passgen_pattern_range_stack items;
 
   // how many choices to choose from. for efficient generation. improved
   // locality.
