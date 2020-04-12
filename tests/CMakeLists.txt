@@ -35,7 +35,7 @@ add_custom_command(
   VERBATIM)
 
 add_executable(passgen-test test_list.c ${TEST_LIST})
-target_link_libraries(passgen-test passgen-static passgen-test-lib)
+target_link_libraries(passgen-test PRIVATE passgen-static passgen-test-lib)
 passgen_target_defaults(passgen-test)
 
 add_test(
