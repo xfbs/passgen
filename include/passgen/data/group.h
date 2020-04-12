@@ -8,7 +8,7 @@ typedef struct passgen_pattern_group {
   struct passgen_pattern_substring pos;
 
   // array of segments
-  passgen_array_t segments;
+  struct passgen_pattern_segment_stack segments;
 
   struct passgen_pattern_repeat repeat;
 } passgen_pattern_group_t;

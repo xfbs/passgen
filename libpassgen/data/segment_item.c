@@ -1,4 +1,5 @@
 #include "passgen/data/segment_item.h"
+#include "passgen/container/stack_impl.h"
 #include "passgen/data/set.h"
 #include "passgen/data/group.h"
 
@@ -14,3 +15,5 @@ void passgen_pattern_item_free(struct passgen_pattern_item *item) {
       break;
   }
 }
+
+PASSGEN_STACK_IMPLEMENT(struct passgen_pattern_item, passgen_pattern_item)

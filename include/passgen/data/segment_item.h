@@ -1,11 +1,11 @@
 #pragma once
-
 #include "passgen/data/char.h"
 #include "passgen/data/group.h"
 #include "passgen/data/pattern_kind.h"
 #include "passgen/data/repeat.h"
 #include "passgen/data/set.h"
 #include "passgen/data/special.h"
+#include "passgen/container/stack.h"
 
 typedef struct passgen_pattern_item {
   enum passgen_pattern_kind kind;
@@ -19,5 +19,7 @@ typedef struct passgen_pattern_item {
 
   struct passgen_pattern_repeat repeat;
 } passgen_pattern_item_t;
+
+PASSGEN_STACK_DECLARE(struct passgen_pattern_item, passgen_pattern_item);
 
 void passgen_pattern_item_free(struct passgen_pattern_item *item);
