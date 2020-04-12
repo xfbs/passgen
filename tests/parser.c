@@ -22,7 +22,10 @@
   assert(0 == passgen_parse_token(&parser, &token))
 
 test_result test_parser_empty(void) {
-  PREAMBLE();
+  struct parser parser = {0};
+  struct passgen_pattern_segment *segment;
+  passgen_parser_init(&parser);
+  assert(0 == passgen_parse_start(&parser));
 
   // single empty segment
   assert(1 == parser.pattern.group.segments.len);
