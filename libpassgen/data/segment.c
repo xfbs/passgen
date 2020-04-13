@@ -2,32 +2,28 @@
 #include "passgen/data/group.h"
 #include "passgen/data/segment_item.h"
 #include "passgen/data/set.h"
+#include "passgen/container/stack/segment_item.h"
 
 void passgen_pattern_segment_init(struct passgen_pattern_segment *segment) {
-  passgen_array_init(
-      &segment->items,
-      sizeof(struct passgen_pattern_item),
-      NULL);
+  passgen_pattern_item_stack_init(&segment->items, NULL);
 }
 
 void passgen_pattern_segment_free(struct passgen_pattern_segment *segment) {
   for(size_t i = 0; i < segment->items.len; i++) {
-    struct passgen_pattern_item *item = passgen_array_get(
+    struct passgen_pattern_item *item = passgen_pattern_item_stack_get(
         &segment->items,
-        sizeof(struct passgen_pattern_item),
         i);
 
     passgen_pattern_item_free(item);
   }
 
-  passgen_array_free(&segment->items, sizeof(struct passgen_pattern_item), NULL);
+  passgen_pattern_item_stack_free(&segment->items, NULL);
 }
 
 struct passgen_pattern_item *
 passgen_pattern_segment_new_item(struct passgen_pattern_segment *segment) {
-  struct passgen_pattern_item *item = passgen_array_push(
+  struct passgen_pattern_item *item = passgen_pattern_item_stack_push(
       &segment->items,
-      sizeof(struct passgen_pattern_item),
       NULL);
 
   return item;
@@ -65,8 +61,7 @@ passgen_pattern_segment_new_special(struct passgen_pattern_segment *segment);
 struct passgen_pattern_item *passgen_pattern_segment_get_item(
     struct passgen_pattern_segment *segment,
     size_t n) {
-  return passgen_array_get(
+  return passgen_pattern_item_stack_get(
       &segment->items,
-      sizeof(struct passgen_pattern_item),
       n);
 }
