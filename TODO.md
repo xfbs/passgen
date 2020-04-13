@@ -36,6 +36,8 @@
 - [ ] add check target to see if library exports any symbols that are not
     prefixed with *passgen* and perhaps one to check if it exports any defines
     that aren't prefixed with *PASSGEN*.
+- [ ] change random object to have just a buffer and a pointer to a function
+    used to fill the buffer again (to allow the use of different backends).
 
 
 - rewrite the passgen parser to use batched operations, meaning that all
