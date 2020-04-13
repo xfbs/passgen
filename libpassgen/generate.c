@@ -55,7 +55,7 @@ size_t passgen_generate_fill(
   return fillpos.cur;
 }
 
-static size_t passgen_generate_repeat(
+size_t passgen_generate_repeat(
     random_t *rand,
     struct pattern_env *env,
     struct passgen_pattern_repeat *repeat) {
@@ -77,7 +77,7 @@ static size_t passgen_generate_repeat(
   return repeat->min + choice;
 }
 
-static inline int passgen_generate_ranges(
+int passgen_generate_ranges(
     struct passgen_pattern_set *ranges,
     random_t *rand,
     struct pattern_env *env,
@@ -129,7 +129,7 @@ static inline int passgen_generate_ranges(
   return 0;
 }
 
-static inline int passgen_generate_character(
+int passgen_generate_character(
     struct passgen_pattern_char *character,
     random_t *rand,
     struct pattern_env *env,
@@ -148,7 +148,7 @@ static inline int passgen_generate_character(
   return 0;
 }
 
-static inline int passgen_generate_special_pronounceable(
+int passgen_generate_special_pronounceable(
     struct passgen_pattern_special *special,
     random_t *rand,
     struct pattern_env *env,
@@ -197,7 +197,7 @@ static inline int passgen_generate_special_pronounceable(
   return 0;
 }
 
-static inline int passgen_generate_special_wordlist(
+int passgen_generate_special_wordlist(
     struct passgen_pattern_special *special,
     random_t *rand,
     struct pattern_env *env,
@@ -213,7 +213,7 @@ static inline int passgen_generate_special_wordlist(
   return 0;
 }
 
-static inline int passgen_generate_special(
+int passgen_generate_special(
     struct passgen_pattern_special *special,
     random_t *rand,
     struct pattern_env *env,
@@ -236,14 +236,7 @@ static inline int passgen_generate_special(
   return 0;
 }
 
-static inline int passgen_generate_group(
-    struct passgen_pattern_group *group,
-    random_t *rand,
-    struct pattern_env *env,
-    void *data,
-    passgen_generate_cb *func);
-
-static inline int passgen_generate_segment(
+int passgen_generate_segment(
     struct passgen_pattern_item *segment,
     random_t *rand,
     struct pattern_env *env,
@@ -274,7 +267,7 @@ static inline int passgen_generate_segment(
   return 0;
 }
 
-static inline int passgen_generate_segments(
+int passgen_generate_segments(
     struct passgen_pattern_segment *segments,
     random_t *rand,
     struct pattern_env *env,
@@ -294,7 +287,7 @@ static inline int passgen_generate_segments(
   return 0;
 }
 
-static inline int passgen_generate_group(
+int passgen_generate_group(
     struct passgen_pattern_group *group,
     random_t *rand,
     struct pattern_env *env,
@@ -328,7 +321,7 @@ static inline int passgen_generate_group(
   return 0;
 }
 
-inline int passgen_generate(
+int passgen_generate(
     struct passgen_pattern *pattern,
     random_t *rand,
     struct pattern_env *env,

@@ -2,6 +2,14 @@
 #include "passgen/data/pattern.h"
 #include "passgen/pronounceable.h"
 
+struct passgen_pattern_repeat;
+struct passgen_pattern_set;
+struct passgen_pattern_char;
+struct passgen_pattern_group;
+struct passgen_pattern_item;
+struct passgen_pattern_segment;
+struct passgen_pattern_special;
+
 struct pattern_env {
   bool find_complexity;
   double complexity;
@@ -25,7 +33,63 @@ int passgen_generate(
     void *data,
     passgen_generate_cb *func);
 
-static size_t passgen_generate_repeat(
+size_t passgen_generate_repeat(
     random_t *rand,
     struct pattern_env *env,
     struct passgen_pattern_repeat *repeat);
+
+int passgen_generate_ranges(
+    struct passgen_pattern_set *ranges,
+    random_t *rand,
+    struct pattern_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_character(
+    struct passgen_pattern_char *character,
+    random_t *rand,
+    struct pattern_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_special_pronounceable(
+    struct passgen_pattern_special *special,
+    random_t *rand,
+    struct pattern_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_special_wordlist(
+    struct passgen_pattern_special *special,
+    random_t *rand,
+    struct pattern_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_special(
+    struct passgen_pattern_special *special,
+    random_t *rand,
+    struct pattern_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_group(
+    struct passgen_pattern_group *group,
+    random_t *rand,
+    struct pattern_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_segment(
+    struct passgen_pattern_item *segment,
+    random_t *rand,
+    struct pattern_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_segments(
+    struct passgen_pattern_segment *segments,
+    random_t *rand,
+    struct pattern_env *env,
+    void *data,
+    passgen_generate_cb *func);
