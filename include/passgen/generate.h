@@ -38,8 +38,8 @@ size_t passgen_generate_repeat(
     struct pattern_env *env,
     struct passgen_pattern_repeat *repeat);
 
-int passgen_generate_ranges(
-    struct passgen_pattern_set *ranges,
+int passgen_generate_set(
+    struct passgen_pattern_set *set,
     random_t *rand,
     struct pattern_env *env,
     void *data,
@@ -80,15 +80,15 @@ int passgen_generate_group(
     void *data,
     passgen_generate_cb *func);
 
-int passgen_generate_segment(
-    struct passgen_pattern_item *segment,
+int passgen_generate_item(
+    struct passgen_pattern_item *item,
     random_t *rand,
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func);
 
-int passgen_generate_segments(
-    struct passgen_pattern_segment *segments,
+int passgen_generate_segment(
+    struct passgen_pattern_segment *segment,
     random_t *rand,
     struct pattern_env *env,
     void *data,

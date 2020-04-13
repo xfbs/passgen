@@ -77,17 +77,17 @@ size_t passgen_generate_repeat(
   return repeat->min + choice;
 }
 
-int passgen_generate_ranges(
-    struct passgen_pattern_set *ranges,
+int passgen_generate_set(
+    struct passgen_pattern_set *set,
     random_t *rand,
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
-  size_t reps = passgen_generate_repeat(rand, env, &ranges->repeat);
+  size_t reps = passgen_generate_repeat(rand, env, &set->repeat);
 
   // compute number of possible codepoints
   // TODO: generate this on the fly.
-  size_t possible = ranges->choices_list[ranges->items.len - 1];
+  size_t possible = set->choices_list[set->items.len - 1];
 
   assert(possible != 0);
 
@@ -103,21 +103,21 @@ int passgen_generate_ranges(
     // locate choice in list of choices.
     // TODO: binary search.
     size_t num;
-    for(num = 0; num < ranges->items.len; num++) {
-      if(choice < ranges->choices_list[num]) {
+    for(num = 0; num < set->items.len; num++) {
+      if(choice < set->choices_list[num]) {
         break;
       }
     }
 
-    assert(num != ranges->items.len);
+    assert(num != set->items.len);
 
     /* adjust choice to be relative offset */
     if(num) {
-      choice -= ranges->choices_list[num - 1];
+      choice -= set->choices_list[num - 1];
     }
 
     struct passgen_pattern_range *range =
-        passgen_pattern_range_stack_get(&ranges->items, num);
+        passgen_pattern_range_stack_get(&set->items, num);
 
     int ret = func(data, range->start + choice);
 
@@ -236,48 +236,47 @@ int passgen_generate_special(
   return 0;
 }
 
-int passgen_generate_segment(
-    struct passgen_pattern_item *segment,
+int passgen_generate_item(
+    struct passgen_pattern_item *item,
     random_t *rand,
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
-  switch(segment->kind) {
+  switch(item->kind) {
     case PASSGEN_PATTERN_SET:
-      return passgen_generate_ranges(&segment->data.set, rand, env, data, func);
+      return passgen_generate_set(&item->data.set, rand, env, data, func);
     case PASSGEN_PATTERN_CHAR:
       return passgen_generate_character(
-          &segment->data.character,
+          &item->data.character,
           rand,
           env,
           data,
           func);
     case PASSGEN_PATTERN_SPECIAL:
       return passgen_generate_special(
-          &segment->data.special,
+          &item->data.special,
           rand,
           env,
           data,
           func);
     case PASSGEN_PATTERN_GROUP:
-      return passgen_generate_group(&segment->data.group, rand, env, data, func);
+      return passgen_generate_group(&item->data.group, rand, env, data, func);
   }
 
   // unreachable
   return 0;
 }
 
-int passgen_generate_segments(
-    struct passgen_pattern_segment *segments,
+int passgen_generate_segment(
+    struct passgen_pattern_segment *segment,
     random_t *rand,
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
-  for(size_t i = 0; i < segments->items.len; i++) {
-    struct passgen_pattern_item *segment;
-    segment = passgen_pattern_item_stack_get(&segments->items, i);
+  for(size_t i = 0; i < segment->items.len; i++) {
+    struct passgen_pattern_item *item = passgen_pattern_item_stack_get(&segment->items, i);
 
-    int ret = passgen_generate_segment(segment, rand, env, data, func);
+    int ret = passgen_generate_item(item, rand, env, data, func);
 
     if(0 != ret) {
       return ret;
@@ -311,7 +310,7 @@ int passgen_generate_group(
         &group->segments,
         segment);
 
-    int ret = passgen_generate_segments(segments, rand, env, data, func);
+    int ret = passgen_generate_segment(segments, rand, env, data, func);
 
     if(0 != ret) {
       return ret;
