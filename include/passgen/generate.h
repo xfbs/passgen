@@ -24,3 +24,8 @@ int passgen_generate(
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func);
+
+static size_t passgen_generate_repeat(
+    random_t *rand,
+    struct pattern_env *env,
+    struct passgen_pattern_repeat *repeat);
