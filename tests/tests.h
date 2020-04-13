@@ -20,7 +20,7 @@ typedef struct {
   size_t line;
 } test_result;
 
-test_result test_ok;
+extern test_result test_ok;
 
 typedef test_result test_func(void);
 
@@ -30,6 +30,7 @@ typedef struct {
 } test_entry;
 
 bool run(test_entry test);
+
 #define test(id) \
   { .name = #id, .func = test_##id }
 
