@@ -9,18 +9,18 @@ struct pattern_env {
   enum passgen_pronounceable_type pronounceable_type;
 };
 
-typedef int pattern_random_cb(void *data, int32_t codepoint);
+typedef int passgen_generate_cb(void *data, int32_t codepoint);
 
-size_t pattern2_random_fill(
+size_t passgen_generate_fill(
     struct passgen_pattern *pattern,
     random_t *rand,
     struct pattern_env *env,
     char *buffer,
     size_t len);
 
-int pattern2_random(
+int passgen_generate(
     struct passgen_pattern *pattern,
     random_t *rand,
     struct pattern_env *env,
     void *data,
-    pattern_random_cb *func);
+    passgen_generate_cb *func);
