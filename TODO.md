@@ -33,6 +33,9 @@
 - [x] implement sanitizer support
 - [ ] fix debug build on alpine
 - [ ] make generation code work with new parser and data structures
+- [ ] add check target to see if library exports any symbols that are not
+    prefixed with *passgen* and perhaps one to check if it exports any defines
+    that aren't prefixed with *PASSGEN*.
 
 
 - rewrite the passgen parser to use batched operations, meaning that all
