@@ -8,9 +8,6 @@ function gen_coverage() {
   binary="$1"
   outdir=$2
 
-  mkdir "$outdir"
-  cd "$outdir"
-
   ctest --build-and-test \
     "$source_dir" \
     "$outdir" \
