@@ -2,20 +2,43 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef __linux__
+#define PASSGEN_RANDOM_HAVE_SYSTEM
+#include <sys/random.h>
+
+size_t passgen_random_read_system(void *dest, size_t size, void *data) {
+  (void) data;
+  return getrandom(dest, size, 0);
+}
+#endif
+
 #define check(ptr) \
   if(ptr == NULL) goto error
 
 static const char *random_default_device = "/dev/urandom";
 
+size_t passgen_random_read_file(void *dest, size_t size, void *data) {
+  return fread(dest, 1, size, data);
+}
+
+void passgen_random_close_file(void *data) {
+  fclose(data);
+}
+
+void passgen_random_close_system(void *data) {
+  (void) data;
+}
+
 void random_reload(random_t *random) {
   assert(random != NULL);
 
   // read random data.
-  size_t bytes = fread(
+  size_t bytes = random->read(
       &random->buffer,
-      sizeof(random->buffer[0]),
       sizeof(random->buffer),
-      random->device);
+      random->data);
+  (void) bytes;
 
   // make sure we've read enough.
   assert(bytes == sizeof(random->buffer));
@@ -23,6 +46,20 @@ void random_reload(random_t *random) {
   // reset position in ring buffer.
   random->pos = 0;
 }
+
+#ifdef PASSGEN_RANDOM_HAVE_SYSTEM
+random_t *random_open_system(random_t *random) {
+  random->data = NULL;
+  random->read = passgen_random_read_system;
+  random->close = passgen_random_close_system;
+  random_reload(random);
+  return random;
+}
+#else
+random_t *random_open_system(random_t *random) {
+  return NULL;
+}
+#endif
 
 void random_read(random_t *random, void *data, size_t bytes) {
   if(bytes <= sizeof(random->buffer)) {
@@ -44,12 +81,15 @@ void random_read(random_t *random, void *data, size_t bytes) {
       }
     }
   } else {
-    assert(fread(data, 1, bytes, random->device) == bytes);
+    assert(random->read(data, bytes, random->data) == bytes);
   }
 }
 
 random_t *random_new() {
-  return random_new_path(random_default_device);
+  random_t *random = malloc(sizeof(random_t));
+  assert(random);
+
+  return random_open(random);
 }
 
 random_t *random_new_path(const char *path) {
@@ -74,7 +114,11 @@ random_t *random_new_file(FILE *file) {
 }
 
 random_t *random_open(random_t *random) {
+#ifdef PASSGEN_RANDOM_HAVE_SYSTEM
+  return random_open_system(random);
+#else
   return random_open_path(random, random_default_device);
+#endif
 }
 
 random_t *random_open_path(random_t *random, const char *path) {
@@ -89,24 +133,24 @@ random_t *random_open_path(random_t *random, const char *path) {
 }
 
 random_t *random_open_file(random_t *random, FILE *file) {
-  random->device = file;
+  random->data = file;
+  random->read = passgen_random_read_file;
+  random->close = passgen_random_close_file;
   random_reload(random);
   return random;
 }
 
 void random_close(random_t *random) {
   if(random != NULL) {
-    fclose(random->device);
-    random->device = NULL;
+    random->close(random->data);
+    random->data = NULL;
+    random->read = NULL;
+    random->close = NULL;
   }
 }
 
 void random_free(random_t *random) {
-  if(random != NULL) {
-    fclose(random->device);
-    random->device = NULL;
-  }
-
+  random_close(random);
   free(random);
 }
 

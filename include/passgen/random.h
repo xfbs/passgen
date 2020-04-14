@@ -12,6 +12,9 @@
 /// requests smaller than this are read from the buffer.
 #define RANDOM_H_BUFEN 1024
 
+typedef size_t passgen_random_read_func(void *dest, size_t size, void *data);
+typedef void passgen_random_close_func(void *data);
+
 /// Random object. Caches some random data to reduce read() syscalls.
 typedef struct random_t {
   /// Ring buffer to hold random data in.
@@ -21,7 +24,10 @@ typedef struct random_t {
   size_t pos;
 
   /// Device to read random data from.
-  FILE *device;
+  void *data;
+
+  passgen_random_read_func *read;
+  passgen_random_close_func *close;
 } random_t;
 
 /// Allocates and opens new random object. Returns `NULL` on error. Uses
@@ -113,3 +119,9 @@ uint32_t random_uint32_max(random_t *random, uint32_t max);
 ///
 /// @param max must be nonzero.
 uint64_t random_uint64_max(random_t *random, uint64_t max);
+
+size_t passgen_random_read_file(void *dest, size_t size, void *data);
+size_t passgen_random_read_system(void *dest, size_t size, void *data);
+
+void passgen_random_close_file(void *data);
+void passgen_random_close_system(void *data);

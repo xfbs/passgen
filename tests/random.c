@@ -142,7 +142,7 @@ test_result test_random_uint64_max(void) {
 test_result test_random_new(void) {
   random_t *random = random_new();
   assert(random);
-  assert(random->device);
+  assert(random->read);
   random_free(random);
 
   return test_ok;
@@ -155,7 +155,7 @@ test_result test_random_new_path(void) {
 
   random = random_new_path("/dev/zero");
   assert(random);
-  assert(random->device);
+  assert(random->data);
   assert(random_uint8(random) == 0);
   assert(random_uint16(random) == 0);
   assert(random_uint32(random) == 0);
@@ -168,9 +168,9 @@ test_result test_random_new_path(void) {
 test_result test_random_open(void) {
   random_t random;
   assert(random_open(&random));
-  assert(random.device);
+  assert(random.read);
   random_close(&random);
-  assert(!random.device);
+  assert(!random.read);
 
   return test_ok;
 }
@@ -180,13 +180,13 @@ test_result test_random_open_path(void) {
   assert(!random_open_path(&random, "/dev/nonexistent"));
 
   assert(random_open_path(&random, "/dev/zero"));
-  assert(random.device);
+  assert(random.data);
   assert(random_uint8(&random) == 0);
   assert(random_uint16(&random) == 0);
   assert(random_uint32(&random) == 0);
   assert(random_uint64(&random) == 0);
   random_close(&random);
-  assert(!random.device);
+  assert(!random.data);
 
   return test_ok;
 }
