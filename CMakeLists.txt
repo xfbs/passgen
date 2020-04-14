@@ -36,12 +36,8 @@ include(Sanitizers)
 include(CodeCoverage)
 
 clangformat_setup()
-cmakeformat_setup(
-  CMakeLists.txt
-  libpassgen/CMakeLists.txt
-  tests/CMakeLists.txt
-  tools/CMakeLists.txt
-  bin/CMakeLists.txt)
+cmakeformat_setup(CMakeLists.txt libpassgen/CMakeLists.txt tests/CMakeLists.txt
+                  tools/CMakeLists.txt bin/CMakeLists.txt)
 
 # get commit info, if git is available.
 if(BUILD_GIT_INFO)
