@@ -47,24 +47,8 @@ test:bionic:
   image: registry.gitlab.com/xfbs/passgen:bionic
   stage: test
   script:
-    - CC=clang-10 ctest --build-and-test
-      .
-      build-clang
-      --build-generator Ninja
-      --build-options
-      -DCMAKE_BUILD_TYPE=Debug
-      -DCODE_COVERAGE=YES
-      -DBUILD_GIT_INFO=NO
-      --test-command ninja ccov-passgen-test
-    - CC=gcc ctest --build-and-test
-      .
-      build-gcc
-      --build-generator Ninja
-      --build-options
-      -DCMAKE_BUILD_TYPE=Debug
-      -DCODE_COVERAGE=YES
-      -DBUILD_GIT_INFO=NO
-      --test-command ninja ccov-passgen-test
+    - CC=clang-10 ./scripts/gen_coverage.sh passgen-test build-clang
+    - CC=gcc ./scripts/gen_coverage.sh passgen-test build-gcc
   artifacts:
     paths:
       - build-clang/ccov/passgen-test

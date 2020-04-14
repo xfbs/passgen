@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+# I don't know why, but generated the coverage doesn't work when using Ninja as
+# build system, only with Makefiles. Investigate?
 function gen_coverage() {
   source_dir="${3:-$(pwd)}"
   binary="$1"
