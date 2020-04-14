@@ -51,7 +51,7 @@ test:bionic:
       -DCMAKE_BUILD_TYPE=Debug
       -DCODE_COVERAGE=YES
       -DBUILD_GIT_INFO=NO
-      --test-command ninja ccov
+      --test-command ninja ccov-passgen-test
   artifacts:
     paths:
       - build-clang
