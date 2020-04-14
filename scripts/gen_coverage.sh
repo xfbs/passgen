@@ -4,21 +4,21 @@ set -euo pipefail
 function gen_coverage() {
   source_dir="${3:-$(pwd)}"
   binary="$1"
-  tmp_dir=$2
+  outdir=$2
 
-  mkdir "$tmp_dir"
-  cd "$tmp_dir"
+  mkdir "$outdir"
+  cd "$outdir"
 
   ctest --build-and-test \
     "$source_dir" \
-    "$tmp_dir" \
-    --build-generator Ninja \
+    "$outdir" \
+    --build-generator "Unix Makefiles" \
     --build-options \
     -DCMAKE_BUILD_TYPE=Debug \
     -DCODE_COVERAGE=YES \
     -DBUILD_GIT_INFO=NO \
     --test-command \
-    ninja "ccov-$binary"
+    make "ccov-$binary"
 }
 
 if test "$#" -lt 1; then
