@@ -78,7 +78,7 @@ size_t passgen_generate_repeat(
     env->complexity *= difference + 1;
   }
 
-  //return repeat->min + choice;
+  // return repeat->min + choice;
   return 1;
 }
 
