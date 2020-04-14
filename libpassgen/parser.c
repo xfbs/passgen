@@ -83,8 +83,21 @@ int passgen_parse_set(
     struct parser *parser,
     struct passgen_token *token,
     struct passgen_parser_state *state) {
+  struct passgen_pattern_set *set = state->data.set.set;
+
   // this set's over
   if(token->codepoint == ']') {
+    // compute sum of choices and choices list for binary search.
+    size_t choices = 0;
+    set->choices_list =
+        passgen_malloc(NULL, sizeof(size_t) * set->items.len);
+    for(size_t i = 0; i < set->items.len; i++) {
+      struct passgen_pattern_range *range =
+          passgen_pattern_range_stack_get(&set->items, i);
+      choices += 1 + range->end - range->start;
+      set->choices_list[i] = choices;
+    }
+
     parser_state_pop(parser);
     return 0;
   }
@@ -96,7 +109,7 @@ int passgen_parse_set(
   }
 
   struct passgen_pattern_range *range =
-      passgen_pattern_set_new_range(state->data.set.set);
+      passgen_pattern_set_new_range(set);
 
   range->start = token->codepoint;
   range->end = token->codepoint;

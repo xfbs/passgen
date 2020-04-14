@@ -139,6 +139,8 @@ test_result test_parser_nested_groups(void) {
   assert(item);
   assert(item->kind == PASSGEN_PATTERN_CHAR);
   assert(item->data.character.codepoint == 'a');
+  assert(item->repeat.min == 1);
+  assert(item->repeat.max == 1);
 
   passgen_parser_free(&parser);
 

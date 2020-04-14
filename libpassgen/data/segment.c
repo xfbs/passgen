@@ -23,6 +23,8 @@ struct passgen_pattern_item *
 passgen_pattern_segment_new_item(struct passgen_pattern_segment *segment) {
   struct passgen_pattern_item *item =
       passgen_pattern_item_stack_push(&segment->items, NULL);
+  item->repeat.min = 1;
+  item->repeat.max = 1;
 
   return item;
 }
