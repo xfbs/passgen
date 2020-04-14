@@ -9,6 +9,26 @@ This project uses the CMake build system. Basic building is done by creating a b
 
 When setting up the build system with CMake, it can be given 
 
+## Dependencies
+
+To build, some dependencies are necessary.
+
+- C compiler (clang or gcc are recommended)
+- cmake (at least 3.10)
+- build system (make or ninja are recommended)
+- libjansson
+- libexecinfo (when building for musl instead of libc, such as with Alpine Linux)
+- ruby
+- git (optional)
+- coverage reporting tool (llvm-cov or lcov, optional)
+- libutf8proc (optional)
+
+On Ubuntu or Debian, the base dependencies can be installed by running the following.
+
+    sudo apt install gcc make cmake libjansson-dev ruby
+
+On other systems, these packages should also be easily available.
+
 ## Setting Compiler
 
 The compiler to use can be set with the `CC` environment variable. Recommended compilers are `gcc` and `clang`.
