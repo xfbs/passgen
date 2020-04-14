@@ -37,7 +37,7 @@ docker:bionic:
 sanitize:
   image: registry.gitlab.com/xfbs/passgen:bionic
   stage: test
-  script: scripts/run_sanitizers.sh
+  script: scripts/run_sanitizers.sh .
 
 # build stuff on ubuntu.
 build:bionic:debug:
