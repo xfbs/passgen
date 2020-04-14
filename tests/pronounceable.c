@@ -85,6 +85,8 @@ test_result test_pronounceable(void) {
     assert(ret <= sizeof(buffer));
   }
 
+  random_free(rand);
+
   return test_ok;
 }
 
@@ -115,6 +117,8 @@ test_result test_pronounceable_englendist(void) {
   assert(lens[8] > 10);
   assert(lens[9] > 10);
   assert(lens[10] > 10);
+
+  random_free(rand);
 
   return test_ok;
 }
@@ -148,6 +152,8 @@ test_result test_pronounceable_latlendist(void) {
   assert(lens[8] > 10);
   assert(lens[9] > 10);
   assert(lens[10] > 10);
+
+  random_free(rand);
 
   return test_ok;
 }
@@ -183,6 +189,8 @@ test_result test_pronounceable_len(void) {
     assert(0 == ret);
   }
 
+  random_free(rand);
+
   return test_ok;
 }
 
@@ -200,6 +208,8 @@ test_result test_pronounceable_engascii(void) {
       assert(buffer[i] <= 'z');
     }
   }
+
+  random_free(rand);
 
   return test_ok;
 }
@@ -223,6 +233,8 @@ test_result test_pronounceable_minascii(void) {
       assert(buffer[i] <= 'z');
     }
   }
+
+  random_free(rand);
 
   return test_ok;
 }
@@ -256,6 +268,8 @@ test_result test_pronounceable_lendist(void) {
   assert(80 < lens[1]);
   assert(80 < lens[2]);
   assert(80 < lens[3]);
+
+  random_free(rand);
 
   return test_ok;
 }
