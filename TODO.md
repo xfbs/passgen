@@ -15,12 +15,14 @@
     - [x] implement repeat parsing
     - [ ] implement escape handling
     - [ ] implement special character handling
+- [ ] change token parser to merge codepoint and escaped members
+- [ ] remove normal_escaped hangling
 - [ ] adapt generation for new data structures
 - [ ] write benchmark for new parser
 - [ ] try changing parser state stack to linked list?
 - [ ] implement stack depth limiting for new parser (as separate method)
 - [x] rename array to queue or stack
-    - [ ] move all uses of array over to stack
+    - [x] move all uses of array over to stack
 - [x] implement type specialisations for array data type
 - [ ] squash compiler warnings
     - [x] get rid of easy ones
@@ -29,10 +31,10 @@
 - [ ] implement code profiling
 - [x] implement automatic code formatting
 - [ ] implement include-what-you-use
-- [ ] implement static analysis
+- [ ] implement static analysis (linter, clang-tidy?)
 - [x] implement sanitizer support
 - [ ] fix debug build on alpine
-- [ ] make generation code work with new parser and data structures
+- [x] make generation code work with new parser and data structures
 - [ ] add check target to see if library exports any symbols that are not
     prefixed with *passgen* and perhaps one to check if it exports any defines
     that aren't prefixed with *PASSGEN*.
