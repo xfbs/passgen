@@ -1,10 +1,10 @@
 #pragma once
 
+#include "passgen/container/stack/parser_state.h"
 #include "passgen/data/pattern.h"
 #include "passgen/data/range.h"
 #include "passgen/data/segment.h"
 #include "passgen/data/segment_item.h"
-#include "passgen/container/stack/parser_state.h"
 #include "passgen/token.h"
 
 struct parser {

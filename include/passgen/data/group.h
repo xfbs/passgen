@@ -1,7 +1,7 @@
 #pragma once
+#include "passgen/container/stack/segment.h"
 #include "passgen/data/repeat.h"
 #include "passgen/data/substring.h"
-#include "passgen/container/stack/segment.h"
 
 typedef struct passgen_pattern_group {
   struct passgen_pattern_substring pos;

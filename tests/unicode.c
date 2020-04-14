@@ -18,7 +18,7 @@ test_result test_unicode_iter_peek(void) {
   struct unicode_iter_result result;
   const unsigned char data[] = {195, 188, 195, 159, 0};
 
-  iter = unicode_iter((const char *) data);
+  iter = unicode_iter((const char *)data);
   assert(iter.pos == 0);
   assert(iter.length == 4);
 

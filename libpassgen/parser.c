@@ -1,9 +1,9 @@
 #include "passgen/parser.h"
+#include "passgen/data/parser_state.h"
 #include "passgen/data/pattern_kind.h"
 #include "passgen/data/range.h"
 #include "passgen/data/segment.h"
 #include "passgen/data/segment_item.h"
-#include "passgen/data/parser_state.h"
 
 int passgen_parse_start(struct parser *parser) {
   // set initial group
@@ -110,7 +110,7 @@ int passgen_parse_set_range(
     struct parser *parser,
     struct passgen_token *token,
     struct passgen_parser_state *state) {
-  (void) parser;
+  (void)parser;
   state->data.set.range->end = token->codepoint;
   state->type = PASSGEN_PARSER_SET;
 
@@ -169,7 +169,7 @@ int passgen_parse_repeat_range(
 
 int parse_finish(struct parser *parser) {
   // TODO: implement
-  (void) parser;
+  (void)parser;
 
   return 0;
 }

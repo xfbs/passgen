@@ -1,11 +1,11 @@
-#include "passgen/assert.h"
-#include "passgen/debug.h"
 #include "passgen/generate.h"
+#include "passgen/assert.h"
+#include "passgen/container/stack/segment_item.h"
+#include "passgen/data/group.h"
 #include "passgen/data/range.h"
 #include "passgen/data/segment.h"
 #include "passgen/data/segment_item.h"
-#include "passgen/data/group.h"
-#include "passgen/container/stack/segment_item.h"
+#include "passgen/debug.h"
 
 struct fillpos {
   char *buffer;
@@ -45,8 +45,12 @@ size_t passgen_generate_fill(
       .cur = 0,
   };
 
-  int ret =
-      passgen_generate(pattern, rand, env, &fillpos, passgen_generate_write_buffer);
+  int ret = passgen_generate(
+      pattern,
+      rand,
+      env,
+      &fillpos,
+      passgen_generate_write_buffer);
 
   if(0 != ret) {
     return 0;
@@ -160,12 +164,12 @@ int passgen_generate_special_pronounceable(
 
   int32_t buffer[max];
 
-  (void) max;
-  (void) buffer;
-  (void) rand;
-  (void) env;
-  (void) data;
-  (void) func;
+  (void)max;
+  (void)buffer;
+  (void)rand;
+  (void)env;
+  (void)data;
+  (void)func;
   // TODO: fixme
 
   /* TODO: get tries and default from env! */
@@ -204,11 +208,11 @@ int passgen_generate_special_wordlist(
     void *data,
     passgen_generate_cb *func) {
   // TODO: implement
-  (void) special;
-  (void) rand;
-  (void) env;
-  (void) data;
-  (void) func;
+  (void)special;
+  (void)rand;
+  (void)env;
+  (void)data;
+  (void)func;
 
   return 0;
 }
@@ -274,7 +278,8 @@ int passgen_generate_segment(
     void *data,
     passgen_generate_cb *func) {
   for(size_t i = 0; i < segment->items.len; i++) {
-    struct passgen_pattern_item *item = passgen_pattern_item_stack_get(&segment->items, i);
+    struct passgen_pattern_item *item =
+        passgen_pattern_item_stack_get(&segment->items, i);
 
     int ret = passgen_generate_item(item, rand, env, data, func);
 
@@ -306,9 +311,7 @@ int passgen_generate_group(
 
     // get segment from array
     struct passgen_pattern_segment *segments;
-    segments = passgen_pattern_segment_stack_get(
-        &group->segments,
-        segment);
+    segments = passgen_pattern_segment_stack_get(&group->segments, segment);
 
     int ret = passgen_generate_segment(segments, rand, env, data, func);
 

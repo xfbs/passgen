@@ -187,11 +187,11 @@ static inline int pattern_random_special_wordlist(
     void *data,
     pattern_random_cb *func) {
   // TODO: implement
-  (void) special;
-  (void) rand;
-  (void) env;
-  (void) data;
-  (void) func;
+  (void)special;
+  (void)rand;
+  (void)env;
+  (void)data;
+  (void)func;
 
   return 0;
 }

@@ -1,8 +1,8 @@
 #include "tests.h"
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <stdbool.h>
 
 test_result test_ok = {.ok = true};
 
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
   size_t success = 0;
   if(argc > 1) {
     // go through the arguments.
-    for(size_t r = 1; r < (size_t) argc; ++r) {
+    for(size_t r = 1; r < (size_t)argc; ++r) {
       // go through the tests.
       for(size_t i = 0; tests[i].name; ++i) {
         // find the test with the name that is the current argument.

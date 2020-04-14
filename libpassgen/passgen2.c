@@ -1,7 +1,7 @@
 #include "passgen/passgen2.h"
 #include "passgen/debug.h"
-#include "passgen/parser.h"
 #include "passgen/generate.h"
+#include "passgen/parser.h"
 #include "passgen/random.h"
 #include "passgen/version.h"
 #include <assert.h>
