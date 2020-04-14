@@ -1,5 +1,6 @@
 #include "passgen/data/set.h"
 #include "passgen/data/range.h"
+#include "passgen/memory.h"
 
 void passgen_pattern_set_init(struct passgen_pattern_set *set) {
   passgen_pattern_range_stack_init(&set->items, NULL);
@@ -9,6 +10,8 @@ void passgen_pattern_set_init(struct passgen_pattern_set *set) {
 
 void passgen_pattern_set_free(struct passgen_pattern_set *set) {
   passgen_pattern_range_stack_free(&set->items, NULL);
+
+  passgen_free(NULL, set->choices_list);
 }
 
 struct passgen_pattern_range *
