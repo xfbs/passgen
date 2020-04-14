@@ -1,0 +1,7 @@
+[apple-old]
+pattern = ""
+description = "Generate passwords like 'oKC-T37-Dew-Qyn'."
+
+[apple]
+pattern = ""
+description = "Generate passwords like 'mHXr4X-CiK4w6-hbjF7T'."
