@@ -4,6 +4,7 @@ variables:
 
 stages:
   - setup
+  - test
   - build
   - release
 
@@ -32,6 +33,11 @@ docker:bionic:
     - docker push "$CI_REGISTRY_IMAGE:bionic"
   only:
     - docker
+
+sanitize:
+  image: registry.gitlab.com/xfbs/passgen:bionic
+  stage: test
+  script: scripts/run_sanitizers.sh
 
 # build stuff on ubuntu.
 build:bionic:debug:
