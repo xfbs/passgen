@@ -10,7 +10,7 @@ RUN apt update && \
   apt clean
 
 RUN apt update && \
-  apt install -y sudo gcc ninja-build cmake git libjansson-dev ruby git clang-10 llvm lcov && \
+  apt install -y sudo gcc ninja-build cmake git libjansson-dev ruby git clang-10 lcov && \
   apt clean
 
 # create nonprivileged user to build stuff under with access to sudo
