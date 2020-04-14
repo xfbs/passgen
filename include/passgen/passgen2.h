@@ -28,6 +28,8 @@ typedef struct pattern_preset {
   const char *name;
   /// The format of this preset.
   const char *format;
+
+  const char *description;
 } pattern_preset;
 
 /// List of pattern presets.
