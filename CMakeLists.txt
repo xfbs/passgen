@@ -8,15 +8,7 @@ project(
 
 # project build options.
 option(BUILD_UTF8PROC "Build utf8proc, a dependency." YES)
-option(
-  BUILD_LIBPASSGEN
-  "Build libpassgen. Enabled by default, if disabled uses system-wide libpassgen."
-  ON)
-option(BUILD_PASSGEN "Build passgen main binary." ON)
-option(BUILD_CMOCKA "Build cmocka library for unit tests." YES)
 option(BUILD_UTILS "Build utility binaries." OFF)
-option(BUILD_BINARY "Build passgen binary." ON)
-option(BUILD_UTILS "Build utility executables." OFF)
 option(BUILD_FUZZER
        "Build fuzzer using afl (requires setting compiler to afl-gcc)." OFF)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
@@ -45,6 +37,8 @@ if(BUILD_GIT_INFO)
   git_info()
 endif()
 
+add_subdirectory(bench)
+
 # dependency: utf8proc
 if(BUILD_UTF8PROC)
   add_subdirectory(extern/utf8proc)
@@ -60,9 +54,7 @@ endif(USE_LIBEXECINFO)
 find_library(libjansson jansson)
 
 # build libpassgen
-if(BUILD_LIBPASSGEN)
-  add_subdirectory(libpassgen)
-endif()
+add_subdirectory(libpassgen)
 
 # build passgen binary and perhaps utils
 add_subdirectory(bin)

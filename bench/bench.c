@@ -1,5 +1,3 @@
-#include "passgen/pattern.h"
-#include "passgen/version.h"
 #include <stdio.h>
 #include <time.h>
 #include <assert.h>
@@ -320,7 +318,7 @@ void bench_list(const struct bench_options *opts, const struct bench_item *items
 void bench_help(const char *prog) {
   fprintf(
       stderr,
-      "passgen_bench version %s\n"
+      "passgen_bench\n"
       "Run benchmarks against libpassgen.\n"
       "Usage: %s [OPTIONS] [FILTER]\n\n"
       "OPTIONS\n"
@@ -333,7 +331,6 @@ void bench_help(const char *prog) {
       "  -h, --help         Show this help text.\n\n"
       "FILTER\n"
       "  A regular expression that is used to filter which benchmarks are to be run.\n",
-      passgen_version_str(),
       prog);
 }
 
@@ -341,7 +338,7 @@ void bench_version(void) {
   fprintf(
       stderr,
       "passgen_bench version %s\n",
-      passgen_version_str());
+      "0000");
 }
 
 static double parse_time(const char *str) {
