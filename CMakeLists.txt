@@ -37,7 +37,6 @@ if(BUILD_GIT_INFO)
   git_info()
 endif()
 
-add_subdirectory(bench)
 
 # dependency: utf8proc
 if(BUILD_UTF8PROC)
@@ -52,6 +51,8 @@ if(USE_LIBEXECINFO)
 endif(USE_LIBEXECINFO)
 
 find_library(libjansson jansson)
+
+add_subdirectory(bench)
 
 # build libpassgen
 add_subdirectory(libpassgen)
