@@ -47,7 +47,7 @@ test:bionic:
   image: registry.gitlab.com/xfbs/passgen:bionic
   stage: test
   script:
-    - CC=clang ctest --build-and-test
+    - CC=clang-10 ctest --build-and-test
       .
       build-clang
       --build-generator Ninja
