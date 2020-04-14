@@ -39,6 +39,23 @@ sanitize:
   stage: test
   script: scripts/run_sanitizers.sh .
 
+test:bionic:
+  image: registry.gitlab.com/xfbs/passgen:bionic
+  stage: test
+  script:
+    - CC=clang ctest --build-and-test \
+      . \
+      build-clang \
+      --build-generator Ninja \
+      --build-options \
+      -DCMAKE_BUILD_TYPE=Debug \
+      -DCODE_COVERAGE=YES \
+      -DBUILD_GIT_INFO=NO \
+      --test-command ctest --output-on-failure
+  artifacts:
+    paths:
+      - build-clang/ccov/passgen-test
+
 # build stuff on ubuntu.
 build:bionic:debug:
   image: registry.gitlab.com/xfbs/passgen:bionic
