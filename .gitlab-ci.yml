@@ -37,7 +37,11 @@ docker:bionic:
 sanitize:
   image: registry.gitlab.com/xfbs/passgen:bionic
   stage: test
-  script: scripts/run_sanitizers.sh .
+  script:
+    - CC=clang-10 scripts/run_sanitizers.sh Address
+    - CC=clang-10 scripts/run_sanitizers.sh Memory
+    - CC=clang-10 scripts/run_sanitizers.sh Undefined
+    - CC=clang-10 scripts/run_sanitizers.sh Leak
 
 test:bionic:
   image: registry.gitlab.com/xfbs/passgen:bionic

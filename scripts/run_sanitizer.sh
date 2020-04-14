@@ -1,13 +1,16 @@
 #!/bin/bash
+# Run a sanitizer against the tests. Execute as
+# ./scripts/run_sanitizer.sh <Sanitizer> [<Path to Source>]
+# Valid sanitizers are: Address Memory Undefined Leak Thread
+
 set -euo pipefail
 
-source_dir="$1"
-
 function run_sanitizer() {
+  source_dir="${2:-.}"
   sanitizer="$1"
   tmp_dir=$(mktemp -d)
 
-  CC=clang ctest --build-and-test \
+  ctest --build-and-test \
     "$source_dir" \
     "$tmp_dir" \
     --build-generator Ninja \
@@ -20,7 +23,4 @@ function run_sanitizer() {
   rm -rf "$tmp_dir"
 }
 
-run_sanitizer "Address"
-run_sanitizer "Undefined"
-run_sanitizer "Memory"
-run_sanitizer "Leak"
+run_sanitizer "$@"
