@@ -41,6 +41,7 @@ endif()
 # dependency: utf8proc
 if(BUILD_UTF8PROC)
   add_subdirectory(extern/utf8proc)
+  #target_code_coverage(utf8proc)
 else()
   find_package(utf8proc)
 endif()
