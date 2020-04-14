@@ -52,9 +52,20 @@ test:bionic:
       -DCODE_COVERAGE=YES
       -DBUILD_GIT_INFO=NO
       --test-command ninja ccov-passgen-test
+    - CC=gcc ctest --build-and-test
+      .
+      build-gcc
+      --build-generator Ninja
+      --build-options
+      -DCMAKE_BUILD_TYPE=Debug
+      -DCODE_COVERAGE=YES
+      -DBUILD_GIT_INFO=NO
+      --test-command ninja ccov-passgen-test
   artifacts:
     paths:
-      - build-clang
+      - build-clang/ccov/passgen-test
+      - build-gcc/ccov/passgen-test
+    expire_in: 1 week
 
 # build stuff on ubuntu.
 build:bionic:debug:
