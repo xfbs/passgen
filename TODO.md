@@ -16,7 +16,7 @@
     - [ ] implement escape handling
     - [ ] implement special character handling
 - [ ] change token parser to merge codepoint and escaped members
-- [ ] remove normal_escaped hangling
+- [ ] remove normal_escaped handling
 - [ ] adapt generation for new data structures
 - [ ] write benchmark for new parser
 - [ ] try changing parser state stack to linked list?
@@ -28,6 +28,8 @@
     - [x] get rid of easy ones
     - [ ] get rid of all
 - [x] implement code coverage generation
+- [ ] add code coverage generation to CI system
+- [ ] remove or disable non-deterministic tests
 - [ ] implement code profiling
 - [x] implement automatic code formatting
 - [ ] implement include-what-you-use
