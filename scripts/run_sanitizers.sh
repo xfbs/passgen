@@ -12,7 +12,9 @@ function run_sanitizer() {
     "$tmp_dir" \
     --build-generator Ninja \
     --build-options \
-    -DCMAKE_BUILD_TYPE=Debug -DUSE_SANITIZER=$sanitizer \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DUSE_SANITIZER=$sanitizer \
+    -DBUILD_GIT_INFO=NO \
     --test-command ctest --output-on-failure
 
   rm -rf "$tmp_dir"
