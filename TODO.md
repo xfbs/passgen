@@ -1,14 +1,7 @@
 # ToDo
 
-- [x] change token parser to merge codepoint and escaped members
 - [ ] improve token parser API with new codepoint semantics
-- [x] remove useless enums from token parser
 - [ ] incorporate token parser change into parser
-- [x] remove or disable non-deterministic tests (made tests deterministic)
-- [x] add pseudorandom number generation to randomness
-- [x] add ~~~cldoc~~~ doxygen documentation output to build system
-- [x] publish doxygen documentation in CI
-- [x] add code coverage generation to CI system
 - [ ] rewrite the parser, it should be a state machine
     - [x] implement group parsing
     - [x] implement set parsing
@@ -34,6 +27,13 @@
 - [ ] add check target to see if library exports any symbols that are not
     prefixed with *passgen* and perhaps one to check if it exports any defines
     that aren't prefixed with *PASSGEN*.
+- [x] change token parser to merge codepoint and escaped members
+- [x] remove useless enums from token parser
+- [x] remove or disable non-deterministic tests (made tests deterministic)
+- [x] add pseudorandom number generation to randomness
+- [x] add ~~cldoc~~ doxygen documentation output to build system (why not cldoc? unmaintained, unfortunately).
+- [x] publish doxygen documentation in CI
+- [x] add code coverage generation to CI system
 - [x] write or enable benchmarks for random API to check performance
 - [x] change random object to have just a buffer and a pointer to a function
     used to fill the buffer again (to allow the use of different backends).
