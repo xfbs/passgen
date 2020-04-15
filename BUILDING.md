@@ -124,3 +124,10 @@ Documentation is generated using doxygen. Both `doxygen` and the `graphviz` pack
     doxygen Doxyfile
 
 The resulting documentation is placed in `docs/html`.
+
+## Packaging
+
+CPack is supported for generating packages from the built code.
+
+    cpack -G TXZ
+
