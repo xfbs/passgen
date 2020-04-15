@@ -19,21 +19,6 @@ enum passgen_token_state {
   PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN = -3
 };
 
-enum passgen_token_type {
-  PASSGEN_TOKEN_NORMAL,
-  PASSGEN_TOKEN_SPECIAL,
-  PASSGEN_TOKEN_ESCAPED_TYPE,
-  PASSGEN_TOKEN_ESCAPED_SIMPLE_TYPE,
-  PASSGEN_TOKEN_ESCAPED_PASSTHRU,
-  PASSGEN_TOKEN_ESCAPED_UNICODE
-};
-
-enum passgen_token_escaped {
-  PASSGEN_TOKEN_ESCAPED_NOT,
-  PASSGEN_TOKEN_ESCAPED_SIMPLE,
-  PASSGEN_TOKEN_ESCPAED_NORMAL
-};
-
 struct passgen_token_parser {
   enum passgen_token_state state;
   union {
@@ -52,5 +37,3 @@ struct passgen_token {
 };
 
 PASSGEN_ENUM_MAPPING(passgen_token_state);
-PASSGEN_ENUM_MAPPING(passgen_token_type);
-PASSGEN_ENUM_MAPPING(passgen_token_escaped);
