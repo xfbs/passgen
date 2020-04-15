@@ -51,6 +51,10 @@ There is also support for enabling LLVM Sanitizers. This can be done by setting 
 
 Supported Sanitizers and Sanitizer combinations are *Address*, *Memory*, *MemoryWithOrigins*, *Undefined*, *Thread*, *Leak*, *Address;Undefined*.
 
+There is a script for compiling the code with a sanitizer in a temporary folder and running tests, this can be done by running the following, using the Address sanitizer for example:
+
+    ./scripts/run_sanitizer.sh Address
+
 ## Formatting Code
 
 If `clang-format` is present on the system, the *clangformat* target can be used to format the code.
@@ -74,6 +78,8 @@ Which will automatically format the files of the CMake build system. This only n
 
 ## Running Include-What-You-Use
 
+Not yet supported.
+
 ## Running Tests
 
 Tests can be run by using the `test` target of the build system.
@@ -82,6 +88,18 @@ Tests can be run by using the `test` target of the build system.
     make test
 
 These should be run and pass before committing.
+
+## Checking Symbols
+
+The library should only export symbols starting with `passgen_` in order to
+avoid conflicts with other libraries.
+
+There is a target to check for this, simply running the following:
+
+    make check-symbols
+
+If there are symbols that don't match the expected name, an error message and
+the name of the file will be printed.
 
 ## Generating Test Coverage
 
@@ -93,3 +111,11 @@ This enables the `ccov-passgen-test` target, which runs tests and generates a te
     make ccov-passgen-test
 
 The resulting coverage is placed in `ccov/passgen-test/index.html` in the build folder.
+
+## Generating Documentation
+
+Documentation is generated using doxygen. Both `doxygen` and the `graphviz` packages need to be installed for it to work. To generate it, run doxygen in the root of the project:
+
+    doxygen Doxyfile
+
+The resulting documentation is placed in `docs/html`.

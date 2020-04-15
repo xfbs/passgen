@@ -1,4 +1,7 @@
-find_program(NM_PATH nm)
+function(passgen_check_symbols_setup)
+  add_custom_target(symbols-check)
+  find_program(NM_PATH nm)
+endfunction()
 
 # TODO: limit exported symbols to passgen_*
 function(passgen_check_symbols target)
@@ -16,6 +19,8 @@ function(passgen_check_symbols target)
       $<TARGET_FILE:${target}>
     DEPENDS ${target}
     VERBATIM)
+
+  add_dependencies(symbols-check ${target}-symbols-check)
 endfunction()
 
 function(passgen_target_defaults target)
