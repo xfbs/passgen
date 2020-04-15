@@ -1,4 +1,6 @@
-# ToDo
+# To Do
+
+## Current
 
 - [ ] fix include-what-you-use recommendations
 - [ ] improve token parser API with new codepoint semantics
@@ -51,6 +53,11 @@
 - [x] implement sanitizer support
 - [x] make generation code work with new parser and data structures
 
+## Ideas
+
+- Unity build (better optimisation)
+- Link-time optimisation
+- CPack generate tarball, debian package, etc.
 
 - rewrite the passgen parser to use batched operations, meaning that all
   all unicode should be parsed in one go, then all (or 128) tokens should
@@ -65,6 +72,5 @@
 - optimise the testing system, perhaps use another testing framework that is
   more actively maintained, test more edge cases and use macros to write clean
   tests.
-- package it nicely
 - implement wordlist functionality (find a space-efficient way to store large
   word lists?)
