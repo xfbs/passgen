@@ -98,11 +98,11 @@ target_include_directories(passgen-objects PUBLIC ../include /usr/local/include)
 target_compile_features(passgen-objects PUBLIC c_std_99)
 
 add_library(passgen-static STATIC $<TARGET_OBJECTS:passgen-objects>)
-target_link_libraries(passgen-static utf8proc m ${libjansson})
+target_link_libraries(passgen-static INTERFACE utf8proc m ${libjansson})
 set_target_properties(passgen-static PROPERTIES OUTPUT_NAME passgen)
 
 add_library(passgen-shared SHARED $<TARGET_OBJECTS:passgen-objects>)
-target_link_libraries(passgen-shared utf8proc m ${libjansson})
+target_link_libraries(passgen-shared PRIVATE utf8proc m ${libjansson})
 set_target_properties(passgen-shared PROPERTIES OUTPUT_NAME passgen)
 
 target_include_directories(passgen-static PUBLIC ../include /usr/local/include)
