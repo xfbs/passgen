@@ -34,9 +34,9 @@ json_t *passgen_token_to_json(struct passgen_token *token) {
 }
 
 json_t *passgen_token_state_to_json(enum passgen_token_state state) {
-  for(size_t i = 0; passgen_token_state_mapping[i].name; i++) {
-    if(state == passgen_token_state_mapping[i].value) {
-      return json_string(passgen_token_state_mapping[i].name);
+  for(size_t i = 0; passgen_token_state_enum_by_value[i].name; i++) {
+    if(state == passgen_token_state_enum_by_value[i].value) {
+      return json_string(passgen_token_state_enum_by_value[i].name);
     }
   }
 
@@ -44,9 +44,9 @@ json_t *passgen_token_state_to_json(enum passgen_token_state state) {
 }
 
 json_t *passgen_token_type_to_json(enum passgen_token_type type) {
-  for(size_t i = 0; passgen_token_type_mapping[i].name; i++) {
-    if(type == passgen_token_type_mapping[i].value) {
-      return json_string(passgen_token_type_mapping[i].name);
+  for(size_t i = 0; passgen_token_type_enum_by_value[i].name; i++) {
+    if(type == passgen_token_type_enum_by_value[i].value) {
+      return json_string(passgen_token_type_enum_by_value[i].name);
     }
   }
 
@@ -54,9 +54,9 @@ json_t *passgen_token_type_to_json(enum passgen_token_type type) {
 }
 
 json_t *passgen_token_escaped_to_json(enum passgen_token_escaped escaped) {
-  for(size_t i = 0; passgen_token_escaped_mapping[i].name; i++) {
-    if(escaped == passgen_token_escaped_mapping[i].value) {
-      return json_string(passgen_token_escaped_mapping[i].name);
+  for(size_t i = 0; passgen_token_escaped_enum_by_value[i].name; i++) {
+    if(escaped == passgen_token_escaped_enum_by_value[i].value) {
+      return json_string(passgen_token_escaped_enum_by_value[i].name);
     }
   }
 

@@ -54,7 +54,3 @@ struct passgen_token {
 PASSGEN_ENUM_MAPPING(passgen_token_state);
 PASSGEN_ENUM_MAPPING(passgen_token_type);
 PASSGEN_ENUM_MAPPING(passgen_token_escaped);
-
-extern const struct passgen_enum_mapping passgen_token_type_mapping[];
-extern const struct passgen_enum_mapping passgen_token_escaped_mapping[];
-extern const struct passgen_enum_mapping passgen_token_state_mapping[];

@@ -1,30 +1,6 @@
 #include "passgen/token.h"
 #include "passgen/util.h"
 
-const struct passgen_enum_mapping passgen_token_state_mapping[] = {
-    {PASSGEN_TOKEN_INIT, "PASSGEN_TOKEN_INIT"},
-    {PASSGEN_TOKEN_ESCAPED, "PASSGEN_TOKEN_ESCAPED"},
-    {PASSGEN_TOKEN_UNICODE, "PASSGEN_TOKEN_UNICODE"},
-    {PASSGEN_TOKEN_UNICODE_PAYLOAD, "PASSGEN_TOKEN_UNICODE_PAYLOAD"},
-    {PASSGEN_TOKEN_ERROR_UNICODE_START, "PASSGEN_TOKEN_ERROR_UNICODE_START"},
-    {PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD,
-     "PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD"},
-    {PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN,
-     "PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN"},
-    {0, NULL},
-};
-
-const struct passgen_enum_mapping passgen_token_type_mapping[] = {
-    {PASSGEN_TOKEN_NORMAL, "PASSGEN_TOKEN_NORMAL"},
-    {PASSGEN_TOKEN_SPECIAL, "PASSGEN_TOKEN_SPECIAL"},
-    {0, NULL}};
-
-const struct passgen_enum_mapping passgen_token_escaped_mapping[] = {
-    {PASSGEN_TOKEN_ESCAPED_NOT, "PASSGEN_TOKEN_ESCAPED_NOT"},
-    {PASSGEN_TOKEN_ESCAPED_SIMPLE, "PASSGEN_TOKEN_ESCAPED_SIMPLE"},
-    {PASSGEN_TOKEN_ESCPAED_NORMAL, "PASSGEN_TOKEN_ESCAPED_NORMAL"},
-    {0, NULL}};
-
 static inline void token_parse_init(
     struct passgen_token_parser *parser,
     struct passgen_token *token,
