@@ -46,7 +46,7 @@ See the [BUILDING.md](BUILDING.md) for more information about building the proje
 ## Developers
 
 Code Coverage: [lcov](https://xfbs.gitlab.io/passgen/coverage/lcov), [llvm-cov](https://xfbs.gitlab.io/passgen/coverage/llvm-cov).  
-Pipelines: https://gitlab.com/xfbs/passgen/pipelines  
+Pipelines: [GitLab Pipelines](https://gitlab.com/xfbs/passgen/pipelines)  
 
 ## Prior art
 
