@@ -13,6 +13,14 @@ size_t passgen_random_read_system(void *dest, size_t size, void *data) {
 }
 #endif
 
+#ifdef __APPLE__
+size_t passgen_random_read_system(void *dest, size_t size, void *data) {
+  (void) data;
+  arc4random_buf(dest, size);
+  return size;
+}
+#endif
+
 #define check(ptr) \
   if(ptr == NULL) goto error
 
@@ -28,6 +36,46 @@ void passgen_random_close_file(void *data) {
 
 void passgen_random_close_system(void *data) {
   (void) data;
+}
+
+uint64_t xorshift64(uint64_t *state) {
+	uint64_t x = *state;
+	x ^= x << 13;
+	x ^= x >> 7;
+	x ^= x << 17;
+	return *state = x;
+}
+
+size_t passgen_random_read_xorshift(void *dest, size_t size, void *data) {
+  size_t written = 0;
+  uint64_t result;
+
+  // fill all whole uint64 blocks
+  while((size - written) >= sizeof(result)) {
+    result = xorshift64(data);
+    memcpy(dest + written, &result, sizeof(result));
+    written += sizeof(result);
+  }
+
+  // maybe fill the last incomplete block
+  if(size != written) {
+    result = xorshift64(data);
+    memcpy(dest + written, &result, size - written);
+    written += size - written;
+  }
+
+  return written;
+}
+
+void passgen_random_close_xorshift(void *data) {
+  free(data);
+}
+
+random_t *random_new_xorshift(uint64_t seed) {
+  random_t *random = malloc(sizeof(random_t));
+  if(!random) return NULL;
+
+  return random_open_xorshift(random, seed);
 }
 
 void random_reload(random_t *random) {
@@ -47,6 +95,22 @@ void random_reload(random_t *random) {
   random->pos = 0;
 }
 
+random_t *random_open_xorshift(random_t *random, uint64_t seed) {
+  // create state
+  uint64_t *state = malloc(sizeof(uint64_t));
+  if(!state) return NULL;
+
+  // initialise state
+  *state = seed;
+
+  random->data = state;
+  random->read = passgen_random_read_xorshift;
+  random->close = passgen_random_close_xorshift;
+  random_reload(random);
+
+  return random;
+}
+
 #ifdef PASSGEN_RANDOM_HAVE_SYSTEM
 random_t *random_open_system(random_t *random) {
   random->data = NULL;
@@ -57,6 +121,8 @@ random_t *random_open_system(random_t *random) {
 }
 #else
 random_t *random_open_system(random_t *random) {
+  (void) random;
+
   return NULL;
 }
 #endif

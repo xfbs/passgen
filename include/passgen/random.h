@@ -54,6 +54,8 @@ random_t *random_new_path(const char *path);
 /// Allocates and opens a new random object with @p file as randomness source.
 random_t *random_new_file(FILE *file);
 
+random_t *random_new_xorshift(uint64_t seed);
+
 /// Opens a new, existing random object. Returns `NULL` on failure. Uses
 /// `/dev/urandom` as random device.
 ///
@@ -75,6 +77,9 @@ random_t *random_open_path(random_t *random, const char *path);
 
 /// Opens a new random object with @p file as randomness source.
 random_t *random_open_file(random_t *random, FILE *file);
+
+/// Opens a new random object using the xorshift PRNG (nor really random!)
+random_t *random_open_xorshift(random_t *random, uint64_t seed);
 
 /// Close @p random. Use this with object opened by random_open().
 void random_close(random_t *random);
@@ -122,6 +127,8 @@ uint64_t random_uint64_max(random_t *random, uint64_t max);
 
 size_t passgen_random_read_file(void *dest, size_t size, void *data);
 size_t passgen_random_read_system(void *dest, size_t size, void *data);
+size_t passgen_random_read_xorshift(void *dest, size_t size, void *data);
 
 void passgen_random_close_file(void *data);
 void passgen_random_close_system(void *data);
+void passgen_random_close_xorshift(void *data);

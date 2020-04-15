@@ -252,3 +252,25 @@ test_result test_random_read(void) {
 
   return test_ok;
 }
+
+test_result test_random_xorshift(void) {
+  random_t random;
+
+  // using a state of zero generates only zeroes.
+  assert(random_open_xorshift(&random, 0) != NULL);
+  assert(random_uint8(&random) == 0);
+  assert(random_uint16(&random) == 0);
+  assert(random_uint32(&random) == 0);
+  assert(random_uint64(&random) == 0);
+  random_close(&random);
+
+  // same seed always yields the same output
+  assert(random_open_xorshift(&random, 123) != NULL);
+  assert(random_uint8(&random) == 187);
+  assert(random_uint16(&random) == 31102);
+  assert(random_uint32(&random) == 7933);
+  assert(random_uint64(&random) == 2214108778545186304ULL);
+  random_close(&random);
+
+  return test_ok;
+}
