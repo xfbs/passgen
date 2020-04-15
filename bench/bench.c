@@ -10,9 +10,9 @@
 #include <jansson.h>
 #include <stdbool.h>
 #include <getopt.h>
-#include <_regex.h>
+#include <regex.h>
 #include <stddef.h>
-#include <sys/_pthread/_pthread_t.h>
+#include <pthread.h>
 
 #include "bench.h"
 
