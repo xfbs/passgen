@@ -1,64 +1,5 @@
 # Notes
 
-## Dependencies
-
-Passgen depends on `libutf8proc`, `libsodium` and `libjansson`. It also depends
-on `meson` and `pkg-config` for building.
-
-    # on macOS
-    brew install pkg-config meson ninja utf8proc libsodium jansson
-
-    # on ubuntu
-    apt install build-essential pkg-config meson ninja-build libutf8proc-dev libsodium-dev libjansson-dev ruby
-
-## Building
-
-Use the Makefile to build the project. For example, to build it in release
-mode, do:
-
-    $ make release
-
-When compiling, resulting files are placed in `./build/`. There are multiple
-targets:
-
-* `release` for a release build with optimisations enabled.
-* `debug` for a debug build without optimisations, with debug symbols and
-  `DEBUG` defined.
-* `debug-address` for a debug build with LLVM AddressSanitizer.
-* `debug-memory` for a debug build with LLVM MemorySanitizer.
-* `debug-undefined` for a debug build with LLVM UndefinedSanitizer.
-
-## Testing
-
-Tests live in the `tests/` folder in the source tree. The files `generate.rb`,
-`tests.c` and `tests.h` are part of the testing framework and don't need to be
-touched, unless the testing framework needs to be adapted. All other files
-contain tests. Every test looks like
-
-```c
-test_result test_name(void) {
-    assert(4 == 4);
-
-    return test_ok;
-}
-```
-
-To add a new test, just add a new function with this layout to an existing
-tests file. It will be picked up automatically.
-
-To add a new test file, use an existing tests file as a template (it needs at
-the very least to include the `tests.h` for the definitions). This test file
-needs to be added to the `test_files` list in `meson.build`, otherwise it will
-not be run.
-
-To run all the tests, use the test target of the Makefile.
-
-    make test
-
-It is possible to run tests with a specific configuration. This allows you to run tests with a sanitizer enabled to check for memory leaks, invalid accesses or other kinds of errors. Do this by using the `TARGET` variable. For example, to run tests with the address sanitizer, run:
-
-    make TARGET=debug-address test
-
 ## Benchmarks
 
 Benchmarks live in `src/bench/`. 
@@ -71,12 +12,6 @@ Ideally, most of the code should have a benchmark to go with it. It is not
 neccessary to optimize code for speed, but the benchmarks might be interesting
 to see how the perfomance changes between versions.
 
-## Actions
-
-* `make format` to use clang-format to clean up the code.
-* `make clean` to remove all build output.
-* `make docs` build docs using doxygen.
-
 ## Tools
 
 This repository also contains a few tools that are useful in working with or
@@ -85,25 +20,6 @@ inspecting the parsed data.
 * `pattern-dump` parses a pattern and dumps it in a human-readable format.
 * `pattern-choices` calculates how many possible choices there are for a given
   pattern.
-
-## Releasing
-
-When releasing a new version, be sure to change it in the `meson.build` file, which
-contains the authoratative version number that is used to generate the man page
-and the code.
-
-Add a description of the changes to the `CHANGELOG.md` file, using the existing
-as a templa.te
-
-Create a tag for the version, named something like `v0.0.0`, and push it to
-github.
-
-    git tag v0.0.0
-    git push origin v0.0.0
-
-Then open the [tags list](https://github.com/xfbs/passgen/tags) on the github
-project page, find the newly created tag, and click on "Make Release", filling
-in all the details.
 
 ## Documentation
 
@@ -137,15 +53,6 @@ Experimental. There's a tutorial for it [here](http://www.tldp.org/HOWTO/html_si
 There is a Makefile target for creating a debian package, but it is currently broken.
 
     make deb
-
-## Bugs
-
-It doesn't seem to parse `(a|b)[dfg912]` right?
-
-There are assertions sprinkled over the code. These will not be included in
-release builds. Usually no need to test for NULL pointers, these types of
-errors are evident from crashes in tests. Use these to test for wrong runtime
-calls.
 
 ## Research
 
