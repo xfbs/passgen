@@ -36,6 +36,11 @@ if ARGV.empty?
 end
 
 def check_symbol options, file, symbol
+  # on macOS, symbols are prefixed with an underscore. strip these out.
+  if /darwin/ =~ RUBY_PLATFORM
+    symbol = symbol.gsub /^_/, ""
+  end
+
   match = false
 
   options[:prefix].each do |prefix|
