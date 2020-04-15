@@ -1,12 +1,13 @@
 # ToDo
 
-- [ ] change token parser to merge codepoint and escaped members
-    - [ ] improve API
-    - [ ] remove useless enums
-    - [ ] incorporate into parser
+- [x] change token parser to merge codepoint and escaped members
+- [ ] improve token parser API with new codepoint semantics
+- [x] remove useless enums from token parser
+- [ ] incorporate token parser change into parser
 - [x] remove or disable non-deterministic tests (made tests deterministic)
 - [x] add pseudorandom number generation to randomness
-- [ ] add cldoc documentation output to build system
+- [x] add ~~~cldoc~~~ doxygen documentation output to build system
+- [x] publish doxygen documentation in CI
 - [x] add code coverage generation to CI system
 - [ ] rewrite the parser, it should be a state machine
     - [x] implement group parsing
