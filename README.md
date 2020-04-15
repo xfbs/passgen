@@ -1,6 +1,9 @@
-# Passgen [![Build Status](https://travis-ci.org/xfbs/passgen.svg?branch=master)](https://travis-ci.org/xfbs/passgen) ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/xfbs/passgen.svg)
+# Passgen 
 
 Passgen is a tool to generate passwords from a regex-like format string.
+
+Code Coverage: [lcov](https://xfbs.gitlab.io/passgen/coverage/lcov), [llvm-cov](https://xfbs.gitlab.io/passgen/coverage/llvm-cov).  
+Pipelines: [GitLab Pipelines](https://gitlab.com/xfbs/passgen/pipelines).  
 
 ## Usage
 
@@ -42,11 +45,6 @@ If you are on macOS, you can install this using homebrew.
 ## Building
 
 See the [BUILDING.md](BUILDING.md) for more information about building the project.
-
-## Developers
-
-Code Coverage: [lcov](https://xfbs.gitlab.io/passgen/coverage/lcov), [llvm-cov](https://xfbs.gitlab.io/passgen/coverage/llvm-cov).  
-Pipelines: [GitLab Pipelines](https://gitlab.com/xfbs/passgen/pipelines)  
 
 ## Prior art
 
