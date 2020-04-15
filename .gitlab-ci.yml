@@ -9,28 +9,19 @@ stages:
   - deploy
 
 # rebuild alpine docker container.
-docker:alpine:
+docker:
   image: docker
   stage: setup
   services:
     - docker:dind
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f Dockerfile.alpine -t "$CI_REGISTRY_IMAGE:alpine"
+    - docker build . -f scripts/alpine.Dockerfile -t "$CI_REGISTRY_IMAGE:alpine"
+    - docker build . -f scripts/bionic.Dockerfile -t "$CI_REGISTRY_IMAGE:bionic"
+    - docker build . -f scripts/deploy.Dockerfile -t "$CI_REGISTRY_IMAGE:deploy"
     - docker push "$CI_REGISTRY_IMAGE:alpine"
-  only:
-    - docker
-
-# rebuild bionic docker container
-docker:bionic:
-  image: docker
-  stage: setup
-  services:
-    - docker:dind
-  script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f Dockerfile.bionic -t "$CI_REGISTRY_IMAGE:bionic"
     - docker push "$CI_REGISTRY_IMAGE:bionic"
+    - docker push "$CI_REGISTRY_IMAGE:deploy"
   only:
     - docker
 

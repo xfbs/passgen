@@ -1,7 +1,7 @@
 FROM alpine:latest
 
 # create nonprivileged user
-RUN adduser -s /bin/ash -G sudo -D user
+RUN adduser -s /bin/ash -D user
 
 # install things needed for deployment
 RUN apk add doxygen graphviz
