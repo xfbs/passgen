@@ -32,6 +32,8 @@ function(clangformat_add target)
       -style=file
       -i
       ${clangformat_sources}
+    VERBATIM
+    DEPENDS ${clangformat_sources}
     COMMENT
       "Formating with ${CLANGFORMAT_EXECUTABLE}"
   )
