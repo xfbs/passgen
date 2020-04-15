@@ -26,11 +26,13 @@ include(CTest)
 include(Passgen)
 include(Sanitizers)
 include(CodeCoverage)
+include(IWYU)
 
 clangformat_setup()
 cmakeformat_setup(CMakeLists.txt libpassgen/CMakeLists.txt tests/CMakeLists.txt
                   tools/CMakeLists.txt bin/CMakeLists.txt)
 passgen_check_symbols_setup()
+iwyu_setup()
 
 # get commit info, if git is available.
 if(BUILD_GIT_INFO)

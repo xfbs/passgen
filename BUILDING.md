@@ -78,7 +78,12 @@ Which will automatically format the files of the CMake build system. This only n
 
 ## Running Include-What-You-Use
 
-Not yet supported.
+Set the option `ENABLE_IWYU` to YES to turn it on. For example, when setting up the build folder, run something like
+
+    cmake -S . -B build-iwyu -DENABLE_IWYU=YES
+    cmake --build build-iwyu
+
+To generate a build folder and do the build with include-what-you-use activated.
 
 ## Running Tests
 

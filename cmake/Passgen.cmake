@@ -36,4 +36,6 @@ function(passgen_target_defaults target)
     PUBLIC c_std_99)
 
   target_code_coverage(${target})
+
+  target_iwyu_setup(${target})
 endfunction()

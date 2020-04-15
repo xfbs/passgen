@@ -26,6 +26,6 @@ function(target_iwyu_setup target)
   if(ENABLE_IWYU)
     set_property(TARGET ${target}
         PROPERTY
-        CXX_INCLUDE_WHAT_YOU_USE ${IWYU_EXECUTABLE})
+        C_INCLUDE_WHAT_YOU_USE ${IWYU_EXECUTABLE})
   endif()
 endfunction()
