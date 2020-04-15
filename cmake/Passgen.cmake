@@ -1,3 +1,23 @@
+find_program(NM_PATH nm)
+
+# TODO: limit exported symbols to passgen_*
+function(passgen_check_symbols target)
+  add_custom_target(${target}-symbols-check
+    COMMAND
+    ruby ${PROJECT_SOURCE_DIR}/scripts/check_symbols.rb
+      -n ${NM_PATH}
+      -p passgen
+      -p pattern
+      -p random
+      -p parse
+      -p reader
+      -p unicode
+      -p utf8
+      $<TARGET_FILE:${target}>
+    DEPENDS ${target}
+    VERBATIM)
+endfunction()
+
 function(passgen_target_defaults target)
   # enable clang-format
   target_clangformat_setup(${target})

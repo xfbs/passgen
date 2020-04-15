@@ -100,6 +100,7 @@ target_compile_features(passgen-objects PUBLIC c_std_99)
 add_library(passgen-static STATIC $<TARGET_OBJECTS:passgen-objects>)
 target_link_libraries(passgen-static INTERFACE utf8proc m ${libjansson})
 set_target_properties(passgen-static PROPERTIES OUTPUT_NAME passgen)
+passgen_check_symbols(passgen-static)
 
 add_library(passgen-shared SHARED $<TARGET_OBJECTS:passgen-objects>)
 target_link_libraries(passgen-shared PRIVATE utf8proc m ${libjansson})
