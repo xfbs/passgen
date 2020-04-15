@@ -1,6 +1,7 @@
 #include "passgen/pronounceable.h"
 #include "passgen/pronounceable_private.h"
 #include "tests.h"
+#define SEED 328543091702ULL
 
 test_result test_pronounceable_lists(void) {
   // TODO: test list properties (sorted, sums, etc).
@@ -73,7 +74,7 @@ test_result test_pronounceable_find(void) {
 }
 
 test_result test_pronounceable(void) {
-  random_t *rand = random_new();
+  random_t *rand = random_new_xorshift(SEED);
   assert(rand);
 
   for(size_t i = 0; i < 1000; i++) {
@@ -93,7 +94,7 @@ test_result test_pronounceable(void) {
 /* rough test to see that there is a reasonable length distribution when
  * generating english words. */
 test_result test_pronounceable_englendist(void) {
-  random_t *rand = random_new();
+  random_t *rand = random_new_xorshift(SEED);
   assert(rand);
   size_t lens[64] = {0};
 
@@ -126,7 +127,7 @@ test_result test_pronounceable_englendist(void) {
 /* rough test to see that there is a reasonable length distribution when
  * generating english words. */
 test_result test_pronounceable_latlendist(void) {
-  random_t *rand = random_new();
+  random_t *rand = random_new_xorshift(SEED);
   assert(rand);
   size_t lens[64] = {0};
 
@@ -159,7 +160,7 @@ test_result test_pronounceable_latlendist(void) {
 }
 
 test_result test_pronounceable_len(void) {
-  random_t *rand = random_new();
+  random_t *rand = random_new_xorshift(SEED);
   assert(rand);
 
   for(size_t i = 0; i < 1000; i++) {
@@ -195,7 +196,7 @@ test_result test_pronounceable_len(void) {
 }
 
 test_result test_pronounceable_engascii(void) {
-  random_t *rand = random_new();
+  random_t *rand = random_new_xorshift(SEED);
   assert(rand);
 
   for(size_t i = 0; i < 1000; i++) {
@@ -215,7 +216,7 @@ test_result test_pronounceable_engascii(void) {
 }
 
 test_result test_pronounceable_minascii(void) {
-  random_t *rand = random_new();
+  random_t *rand = random_new_xorshift(SEED);
   assert(rand);
 
   for(size_t i = 0; i < 1000; i++) {
@@ -242,7 +243,7 @@ test_result test_pronounceable_minascii(void) {
 test_result test_pronounceable_lendist(void) {
   /* make sure that when specifying lengths [8, 11], you really can get all
    * possible lengths. */
-  random_t *rand = random_new();
+  random_t *rand = random_new_xorshift(SEED);
   assert(rand);
 
   size_t repeat = 1000;

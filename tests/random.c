@@ -4,9 +4,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
+#define SEED 234720984723
 
 test_result test_random_uint8(void) {
-  random_t *rand = random_new();
+  random_t *rand = random_new_xorshift(SEED);
   assert(rand);
 
   // generate random nubers until we got almost all of them.
@@ -26,7 +27,7 @@ test_result test_random_uint8(void) {
 }
 
 test_result test_random_uint8_max(void) {
-  random_t *rand = random_new();
+  random_t *rand = random_new_xorshift(SEED);
   assert(rand);
 
   for(size_t max = 1; max < UINT8_MAX; ++max) {
@@ -50,7 +51,7 @@ test_result test_random_uint8_max(void) {
 }
 
 test_result test_random_uint16(void) {
-  random_t *rand = random_new();
+  random_t *rand = random_new_xorshift(SEED);
   assert(rand);
 
   // generate random nubers until we got almost all of them.
@@ -70,7 +71,7 @@ test_result test_random_uint16(void) {
 }
 
 test_result test_random_uint16_max(void) {
-  random_t *rand = random_new();
+  random_t *rand = random_new_xorshift(SEED);
   assert(rand);
 
   size_t max[] = {
@@ -113,7 +114,7 @@ test_result test_random_uint16_max(void) {
 }
 
 test_result test_random_uint32_max(void) {
-  random_t *rand = random_new();
+  random_t *rand = random_new_xorshift(SEED);
   assert(rand);
 
   for(size_t max = 1; max <= UINT32_MAX; max += UINT16_MAX) {
@@ -126,7 +127,7 @@ test_result test_random_uint32_max(void) {
 }
 
 test_result test_random_uint64_max(void) {
-  random_t *rand = random_new();
+  random_t *rand = random_new_xorshift(SEED);
   assert(rand);
 
   for(size_t max = 1; max <= (UINT64_MAX >> 1); max += 1) {
@@ -143,6 +144,7 @@ test_result test_random_new(void) {
   random_t *random = random_new();
   assert(random);
   assert(random->read);
+  assert(random->close);
   random_free(random);
 
   return test_ok;
@@ -153,6 +155,7 @@ test_result test_random_new_path(void) {
   random = random_new_path("/dev/nonexistent");
   assert(!random);
 
+  // reading from /dev/zero should always yield zero.
   random = random_new_path("/dev/zero");
   assert(random);
   assert(random->data);
@@ -169,6 +172,7 @@ test_result test_random_open(void) {
   random_t random;
   assert(random_open(&random));
   assert(random.read);
+  assert(random.close);
   random_close(&random);
   assert(!random.read);
 
@@ -193,7 +197,7 @@ test_result test_random_open_path(void) {
 
 test_result test_random_read(void) {
   random_t random;
-  assert(random_open(&random));
+  assert(random_open_xorshift(&random, SEED));
 
   uint8_t data[2000] = {0};
 
