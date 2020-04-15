@@ -1,6 +1,8 @@
 #pragma once
 #include <stddef.h>
 
+struct passgen_enum_mapping;
+
 #define PASSGEN_ENUM_MAPPING(name)                          \
   extern size_t name##_enum_count;                          \
   extern struct passgen_enum_mapping name##_enum_by_name[]; \

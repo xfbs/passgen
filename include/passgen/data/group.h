@@ -1,4 +1,6 @@
 #pragma once
+#include <stddef.h>
+
 #include "passgen/container/stack/segment.h"
 #include "passgen/data/repeat.h"
 #include "passgen/data/substring.h"

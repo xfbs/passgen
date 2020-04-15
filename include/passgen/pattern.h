@@ -4,14 +4,16 @@
 /// Methods for parsing a regex-subset used to generate custom data.
 
 #pragma once
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdint.h>
+
 #include "memory.h"
 #include "passgen/data/array.h"
 #include "passgen/pronounceable.h"
 #include "random.h"
 #include "token_old.h"
 #include "unicode.h"
-#include <stdbool.h>
-#include <stdlib.h>
 
 enum pattern_kind {
   PATTERN_RANGE,

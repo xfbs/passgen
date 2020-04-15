@@ -1,5 +1,4 @@
 #include "passgen/reader.h"
-#include <string.h>
 
 #define STATUS_EOF        1
 #define is_status_eof(n)  ((n)&STATUS_EOF)

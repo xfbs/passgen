@@ -1,5 +1,10 @@
 #include "passgen/json/token.h"
 
+#include <stddef.h>
+
+#include "jansson.h"
+#include "passgen/enum_mapping.h"
+
 json_t *passgen_token_parser_to_json(struct passgen_token_parser *parser) {
   json_t *obj = json_object();
 

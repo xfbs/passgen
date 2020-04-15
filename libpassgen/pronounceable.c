@@ -1,9 +1,10 @@
 #include "passgen/pronounceable.h"
-#include "passgen/assert.h"
-#include "passgen/debug.h"
-#include "passgen/pronounceable_private.h"
+
 #include <stdlib.h>
 #include <string.h>
+
+#include "passgen/assert.h"
+#include "passgen/pronounceable_private.h"
 
 const struct markov *markov_pronounceable_all[] = {
     &passgen_pronounceable_english,

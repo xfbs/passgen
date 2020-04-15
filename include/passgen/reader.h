@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+struct reader_t;
+
 struct read_result;
 struct reader_t;
 struct bufreader_t;

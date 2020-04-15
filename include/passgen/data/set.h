@@ -1,4 +1,6 @@
 #pragma once
+#include <stddef.h>
+
 #include "passgen/container/stack/range.h"
 #include "passgen/data/array.h"
 #include "passgen/data/repeat.h"

@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #include "passgen/passgen.h"
 
 pattern_preset pattern_presets[] = {

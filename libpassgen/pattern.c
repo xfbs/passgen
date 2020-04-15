@@ -1,6 +1,11 @@
 #include "passgen/pattern.h"
+
+#include <stdio.h>
+
 #include "passgen/pattern_private.h"
-#include <assert.h>
+#include "passgen/memory.h"
+#include "passgen/token_old.h"
+#include "passgen/unicode.h"
 
 const char *passgen_error_str[PATTERN_ERROR_LAST] = {
     "cannot allocate memory.",

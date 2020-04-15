@@ -1,7 +1,12 @@
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include "passgen/assert.h"
-#include "passgen/debug.h"
 #include "passgen/pattern.h"
 #include "passgen/pronounceable.h"
+#include "passgen/data/array.h"
+#include "passgen/random.h"
 
 struct fillpos {
   char *buffer;

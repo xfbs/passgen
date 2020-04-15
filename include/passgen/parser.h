@@ -1,6 +1,10 @@
 #pragma once
 #include "passgen/data/parser.h"
 
+struct parser;
+struct passgen_parser_state;
+struct passgen_token;
+
 int passgen_parse_start(struct parser *parser);
 
 int passgen_parse_finish(struct parser *parser);

@@ -1,9 +1,10 @@
 #include "passgen/random.h"
-#include "passgen/pattern.h"
-#include "tests.h"
+
 #include <stdbool.h>
 #include <stdio.h>
-#include <time.h>
+
+#include "tests.h"
+
 #define SEED 234720984723
 
 test_result test_random_uint8(void) {

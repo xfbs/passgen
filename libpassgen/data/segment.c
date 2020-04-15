@@ -1,8 +1,11 @@
 #include "passgen/data/segment.h"
+
 #include "passgen/container/stack/segment_item.h"
 #include "passgen/data/group.h"
 #include "passgen/data/segment_item.h"
 #include "passgen/data/set.h"
+#include "passgen/data/pattern_kind.h"
+#include "passgen/data/repeat.h"
 
 void passgen_pattern_segment_init(struct passgen_pattern_segment *segment) {
   passgen_pattern_item_stack_init(&segment->items, NULL);

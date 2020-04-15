@@ -1,6 +1,10 @@
 #include "passgen/token_old.h"
+
 #include <stdlib.h>
 #include <utf8proc.h>
+#include <sys/types.h>
+
+#include "passgen/unicode.h"
 
 static inline passgen_token_t
 passgen_token_error_utf8(size_t start, size_t pos, size_t end, ssize_t error) {

@@ -1,5 +1,7 @@
 #include "passgen/assert.h"
 
+#include <stdlib.h>
+
 #ifdef PASSGEN_DEBUG
 #  include <execinfo.h>
 #  include <stdio.h>

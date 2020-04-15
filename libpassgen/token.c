@@ -1,5 +1,7 @@
 #include "passgen/token.h"
+
 #include "passgen/util.h"
+#include "passgen/data/token.h"
 
 static inline void token_parse_init(
     struct passgen_token_parser *parser,

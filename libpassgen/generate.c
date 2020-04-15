@@ -1,11 +1,20 @@
 #include "passgen/generate.h"
+
 #include "passgen/assert.h"
 #include "passgen/container/stack/segment_item.h"
 #include "passgen/data/group.h"
 #include "passgen/data/range.h"
 #include "passgen/data/segment.h"
 #include "passgen/data/segment_item.h"
-#include "passgen/debug.h"
+#include "passgen/container/stack/range.h"
+#include "passgen/container/stack/segment.h"
+#include "passgen/data/char.h"
+#include "passgen/data/pattern.h"
+#include "passgen/data/pattern_kind.h"
+#include "passgen/data/repeat.h"
+#include "passgen/data/set.h"
+#include "passgen/data/special.h"
+#include "passgen/data/special_kind.h"
 
 struct fillpos {
   char *buffer;

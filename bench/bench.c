@@ -10,6 +10,10 @@
 #include <jansson.h>
 #include <stdbool.h>
 #include <getopt.h>
+#include <_regex.h>
+#include <stddef.h>
+#include <sys/_pthread/_pthread_t.h>
+
 #include "bench.h"
 
 struct bench_options {

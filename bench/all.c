@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #include "bench.h"
 
 bench_declare(pattern_parse);

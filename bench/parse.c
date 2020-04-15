@@ -1,6 +1,4 @@
-#include "passgen/pattern.h"
 #include "bench.h"
-#include <assert.h>
 
 bench_new(pattern_parse, "Parses a pattern using pattern_parse().");
 

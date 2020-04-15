@@ -7,6 +7,12 @@
 #pragma once
 #include "passgen/data/token.h"
 
+#include <stddef.h>
+#include <stdint.h>
+
+struct passgen_token;
+struct passgen_token_parser;
+
 /* parse a single codepoint. The return value signals what happened. If it
  * returns zero (PASSGEN_TOKEN_INIT), it means that a token has been parsed into
  * `token`. If it returns a positive integer, it means that it was successful

@@ -1,6 +1,20 @@
 #pragma once
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include "passgen/data/pattern.h"
 #include "passgen/pronounceable.h"
+#include "passgen/random.h"
+
+struct passgen_pattern;
+struct passgen_pattern_char;
+struct passgen_pattern_group;
+struct passgen_pattern_item;
+struct passgen_pattern_repeat;
+struct passgen_pattern_segment;
+struct passgen_pattern_set;
+struct passgen_pattern_special;
 
 struct passgen_pattern_repeat;
 struct passgen_pattern_set;

@@ -1,9 +1,17 @@
 #include "passgen/parser.h"
+
+#include <stddef.h>
+
 #include "passgen/data/parser.h"
 #include "passgen/data/parser_state.h"
-#include "passgen/data/pattern_kind.h"
-#include "passgen/data/segment.h"
-#include "passgen/data/segment_item.h"
+#include "passgen/container/stack/parser_state.h"
+#include "passgen/data/pattern.h"
+
+struct passgen_pattern_group;
+struct passgen_pattern_item;
+struct passgen_pattern_range;
+struct passgen_pattern_segment;
+struct passgen_pattern_set;
 
 struct passgen_parser_state *parser_state_push(struct parser *parser) {
   return passgen_parser_state_stack_push(&parser->state, NULL);

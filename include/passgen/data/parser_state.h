@@ -1,5 +1,6 @@
 #pragma once
 #include "passgen/container/stack/parser_state.h"
+
 #include "passgen/data/pattern.h"
 #include "passgen/enum_mapping.h"
 

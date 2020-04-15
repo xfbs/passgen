@@ -1,4 +1,7 @@
 #include "passgen/data/pattern.h"
+
+#include <stddef.h>
+
 #include "passgen/data/group.h"
 
 void passgen_pattern_init(passgen_pattern_t *pattern) {

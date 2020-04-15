@@ -1,9 +1,5 @@
 #include "passgen/passgen2.h"
-#include "passgen/debug.h"
-#include "passgen/generate.h"
-#include "passgen/parser.h"
-#include "passgen/random.h"
-#include "passgen/version.h"
+
 #include <assert.h>
 #include <getopt.h>
 #include <math.h>
@@ -11,7 +7,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+
+#include "passgen/generate.h"
+#include "passgen/parser.h"
+#include "passgen/random.h"
+#include "passgen/version.h"
+#include "passgen/data/parser.h"
+#include "passgen/data/token.h"
+#include "passgen/pronounceable.h"
+#include "passgen/token.h"
+
 #define bail(kind, data) passgen2_bail(PASSGEN_ERROR_##kind, (void *)data)
 
 void passgen2_run(passgen_opts opts) {
