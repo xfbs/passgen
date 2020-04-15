@@ -21,12 +21,12 @@
     - [x] get rid of easy ones
     - [ ] get rid of all
 - [ ] implement code profiling
-- [ ] implement include-what-you-use
 - [ ] implement static analysis (linter, clang-tidy?)
 - [ ] fix debug build on alpine
 - [ ] add check target to see if library exports any symbols that are not
     prefixed with *passgen* and perhaps one to check if it exports any defines
     that aren't prefixed with *PASSGEN*.
+- [x] implement include-what-you-use
 - [x] change token parser to merge codepoint and escaped members
 - [x] remove useless enums from token parser
 - [x] remove or disable non-deterministic tests (made tests deterministic)
