@@ -3,7 +3,8 @@
 Passgen is a tool to generate passwords from a regex-like format string.
 
 Code Coverage: [lcov](https://xfbs.gitlab.io/passgen/coverage/lcov), [llvm-cov](https://xfbs.gitlab.io/passgen/coverage/llvm-cov).  
-Pipelines: [GitLab Pipelines](https://gitlab.com/xfbs/passgen/pipelines).  
+Documentation: [doxygen](https://xfbs.gitlab.io/passgen/doxygen/annotated.html).  
+Continuous Integration: [GitLab Pipelines](https://gitlab.com/xfbs/passgen/pipelines).  
 
 ## Usage
 
