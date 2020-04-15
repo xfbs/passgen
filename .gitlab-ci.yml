@@ -6,7 +6,7 @@ stages:
   - setup
   - test
   - build
-  - release
+  - deploy
 
 # rebuild alpine docker container.
 docker:alpine:
@@ -56,25 +56,12 @@ test:bionic:
     expire_in: 1 week
 
 # build stuff on ubuntu.
-build:bionic:debug:
-  image: registry.gitlab.com/xfbs/passgen:bionic
-  stage: build
-  script:
-    - mkdir build-bionic-debug && cd build-bionic-debug
-    - cmake -GNinja -DCMAKE_BUILD_TYPE=Release ..
-    - ninja
-    - ./tests/passgen-test
-  artifacts:
-    paths:
-      - build-bionic-debug
-    expire_in: 1 week
-
 build:bionic:release:
   image: registry.gitlab.com/xfbs/passgen:bionic
   stage: build
   script:
     - mkdir build-bionic-release && cd build-bionic-release
-    - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug ..
+    - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DBUILD_GIT_INFO=NO ..
     - ninja
     - ./tests/passgen-test
   artifacts:
@@ -88,7 +75,7 @@ build:alpine:release:
   stage: build
   script:
     - mkdir -p build-alpine-release && cd build-alpine-release
-    - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC=y ..
+    - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_GIT_INFO=NO -DBUILD_STATIC=y ..
     - ninja
     - ./tests/passgen-test
   artifacts:
@@ -96,47 +83,17 @@ build:alpine:release:
       - build-alpine-release
     expire_in: 1 week
 
-# alpine uses musl libc by default which does not have a backtrace() function
-# built-in. therefore, the debug build needs USE_LIBEXECINFO to build.
-build:alpine:debug:
-  image: registry.gitlab.com/xfbs/passgen:alpine
-  stage: build
-  script:
-    - mkdir build-alpine-debug && cd build-alpine-debug
-    - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DUSE_LIBEXECINFO=y ..
-    - ninja
-    - ./tests/passgen-test
-  artifacts:
-    paths:
-      - build-alpine-debug
-    expire_in: 1 week
-
-release:alpine:
-  # no need to fetch submodules for this stage
-  variables: {}
-  image: registry.gitlab.com/xfbs/passgen:alpine
-  stage: release
+pages:
+  stage: deploy
   dependencies:
-    - build:alpine:release
+    - test:bionic
   script:
-    - mkdir release
-    - cp build-bionic-release/{libpassgen/libpassgen.a,tests/passgen-test,bin/passgen} release
-    - tar c -f release.tar.gz -z release
+    - mkdir public
+    - mv build-clang/ccov/passgen-test public/coverage-clang
+    - mv build-gcc/ccov/passgen-test public/coverage-gcc
   artifacts:
     paths:
-      - release.tar.gz
-
-release:bionic:
-  # no need to fetch submodules for this stage
-  variables: {}
-  image: registry.gitlab.com/xfbs/passgen:alpine
-  stage: release
-  dependencies:
-    - build:bionic:release
-  script:
-    - mkdir release
-    - cp build-bionic-release/{libpassgen/libpassgen.a,tests/passgen-test,bin/passgen} release
-    - tar c -f release.tar.gz -z release
-  artifacts:
-    paths:
-      - release.tar.gz
+      - public
+    expire_in: 30 days
+  only:
+    - master
