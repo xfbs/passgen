@@ -2,7 +2,7 @@
 
 ## Current
 
-- [ ] fix include-what-you-use recommendations
+- [ ] use CPack in CI to generate packages and publish
 - [ ] improve token parser API with new codepoint semantics
 - [ ] incorporate token parser change into parser
 - [ ] rewrite the parser, it should be a state machine
@@ -26,6 +26,7 @@
 - [ ] implement code profiling
 - [ ] implement static analysis (linter, clang-tidy?)
 - [ ] fix debug build on alpine
+- [x] fix include-what-you-use recommendations
 - [x] add check target to see if library exports any symbols that are not
     prefixed with *passgen* and perhaps one to check if it exports any defines
     that aren't prefixed with *PASSGEN*.
