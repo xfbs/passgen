@@ -1,8 +1,8 @@
 # ToDo
 
 - [ ] change token parser to merge codepoint and escaped members
-- [ ] remove or disable non-deterministic tests
-- [ ] add pseudorandom number generation to randomness
+- [x] remove or disable non-deterministic tests (made tests deterministic)
+- [x] add pseudorandom number generation to randomness
 - [ ] add cldoc documentation output to build system
 - [x] add code coverage generation to CI system
 - [ ] rewrite the parser, it should be a state machine
