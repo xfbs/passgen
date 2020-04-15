@@ -39,9 +39,14 @@ If you are on macOS, you can install this using homebrew.
 
     brew install xfbs/local/passgen
 
-# Building
+## Building
 
-See the [notes](NOTES.md) for more information about building the project.
+See the [BUILDING.md](BUILDING.md) for more information about building the project.
+
+## Developers
+
+Code Coverage: [lcov](https://xfbs.gitlab.io/passgen/coverage/lcov), [llvm-cov](https://xfbs.gitlab.io/passgen/coverage/llvm-cov).  
+Pipelines: https://gitlab.com/xfbs/passgen/pipelines  
 
 ## Prior art
 

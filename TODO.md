@@ -1,6 +1,9 @@
 # ToDo
 
 - [ ] change token parser to merge codepoint and escaped members
+    - [ ] improve API
+    - [ ] remove useless enums
+    - [ ] incorporate into parser
 - [x] remove or disable non-deterministic tests (made tests deterministic)
 - [x] add pseudorandom number generation to randomness
 - [ ] add cldoc documentation output to build system
