@@ -1,17 +1,17 @@
 #include "passgen/generate.h"
 
 #include "passgen/assert.h"
-#include "passgen/container/stack/segment_item.h"
-#include "passgen/data/group.h"
-#include "passgen/data/range.h"
-#include "passgen/data/segment.h"
-#include "passgen/data/segment_item.h"
 #include "passgen/container/stack/range.h"
 #include "passgen/container/stack/segment.h"
+#include "passgen/container/stack/segment_item.h"
 #include "passgen/data/char.h"
+#include "passgen/data/group.h"
 #include "passgen/data/pattern.h"
 #include "passgen/data/pattern_kind.h"
+#include "passgen/data/range.h"
 #include "passgen/data/repeat.h"
+#include "passgen/data/segment.h"
+#include "passgen/data/segment_item.h"
 #include "passgen/data/set.h"
 #include "passgen/data/special.h"
 #include "passgen/data/special_kind.h"
@@ -261,9 +261,7 @@ int passgen_generate_item(
       case PASSGEN_PATTERN_GROUP:
         ret = passgen_generate_group(&item->data.group, rand, env, data, func);
         break;
-      default:
-        assert(false);
-        break;
+      default: assert(false); break;
     }
 
     if(ret != 0) return ret;
@@ -299,7 +297,6 @@ int passgen_generate_group(
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
-
   // choose random segment from segments
   size_t segment = random_uint64_max(rand, group->segments.len);
 

@@ -7,12 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "passgen/pattern.h"
-#include "passgen/random.h"
-#include "passgen/version.h"
 #include "passgen/data/array.h"
 #include "passgen/memory.h"
+#include "passgen/pattern.h"
 #include "passgen/pronounceable.h"
+#include "passgen/random.h"
+#include "passgen/version.h"
 
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *)data)
 

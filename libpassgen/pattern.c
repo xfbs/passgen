@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 
-#include "passgen/pattern_private.h"
 #include "passgen/memory.h"
+#include "passgen/pattern_private.h"
 #include "passgen/token_old.h"
 #include "passgen/unicode.h"
 

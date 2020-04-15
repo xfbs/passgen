@@ -1,23 +1,21 @@
 #pragma once
 #include <stddef.h>
 
-#define bench_declare(_name_) \
-  extern const char bench_##_name_##_name[]; \
-  extern const char bench_##_name_##_info[]; \
+#define bench_declare(_name_)                     \
+  extern const char bench_##_name_##_name[];      \
+  extern const char bench_##_name_##_info[];      \
   void *bench_##_name_##_setup(const char *data); \
-  void bench_##_name_##_func(void *state); \
+  void bench_##_name_##_func(void *state);        \
   void bench_##_name_##_free(void *state);
 
-#define bench_define(_name_) \
-  { \
-    .name = bench_##_name_##_name, \
-    .info = bench_##_name_##_info, \
-    .setup = bench_##_name_##_setup, \
-    .func = bench_##_name_##_func, \
-    .free = bench_##_name_##_free \
+#define bench_define(_name_)                                        \
+  {                                                                 \
+    .name = bench_##_name_##_name, .info = bench_##_name_##_info,   \
+    .setup = bench_##_name_##_setup, .func = bench_##_name_##_func, \
+    .free = bench_##_name_##_free                                   \
   }
 
-#define bench_new(_name_, _info_) \
+#define bench_new(_name_, _info_)               \
   const char bench_##_name_##_name[] = #_name_; \
   const char bench_##_name_##_info[] = _info_
 

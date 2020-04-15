@@ -5,8 +5,8 @@
 
 #pragma once
 #include <stdbool.h>
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "memory.h"
 #include "passgen/data/array.h"

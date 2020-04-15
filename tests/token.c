@@ -1,8 +1,8 @@
 #include <stddef.h>
 
 #include "passgen/token_old.h"
-#include "tests.h"
 #include "passgen/unicode.h"
+#include "tests.h"
 
 test_result test_passgen_token_next(void) {
   struct unicode_iter iter;

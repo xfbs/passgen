@@ -1,8 +1,8 @@
 #include "passgen/token_old.h"
 
 #include <stdlib.h>
-#include <utf8proc.h>
 #include <sys/types.h>
+#include <utf8proc.h>
 
 #include "passgen/unicode.h"
 

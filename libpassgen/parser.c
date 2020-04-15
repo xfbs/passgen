@@ -3,17 +3,17 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "passgen/data/parser_state.h"
-#include "passgen/data/range.h"
-#include "passgen/data/segment.h"
-#include "passgen/data/segment_item.h"
 #include "passgen/container/stack/range.h"
 #include "passgen/container/stack/segment_item.h"
 #include "passgen/data/char.h"
 #include "passgen/data/group.h"
 #include "passgen/data/parser.h"
+#include "passgen/data/parser_state.h"
 #include "passgen/data/pattern.h"
+#include "passgen/data/range.h"
 #include "passgen/data/repeat.h"
+#include "passgen/data/segment.h"
+#include "passgen/data/segment_item.h"
 #include "passgen/data/set.h"
 #include "passgen/data/token.h"
 #include "passgen/memory.h"
@@ -102,8 +102,7 @@ int passgen_parse_set(
   if(token->codepoint == ']') {
     // compute sum of choices and choices list for binary search.
     size_t choices = 0;
-    set->choices_list =
-        passgen_malloc(NULL, sizeof(size_t) * set->items.len);
+    set->choices_list = passgen_malloc(NULL, sizeof(size_t) * set->items.len);
     for(size_t i = 0; i < set->items.len; i++) {
       struct passgen_pattern_range *range =
           passgen_pattern_range_stack_get(&set->items, i);
@@ -121,8 +120,7 @@ int passgen_parse_set(
     return 0;
   }
 
-  struct passgen_pattern_range *range =
-      passgen_pattern_set_new_range(set);
+  struct passgen_pattern_range *range = passgen_pattern_set_new_range(set);
 
   range->start = token->codepoint;
   range->end = token->codepoint;

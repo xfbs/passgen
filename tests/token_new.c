@@ -1,6 +1,6 @@
+#include "passgen/data/token.h"
 #include "passgen/token.h"
 #include "tests.h"
-#include "passgen/data/token.h"
 
 test_result test_token_normal(void) {
   struct passgen_token_parser parser = {0};

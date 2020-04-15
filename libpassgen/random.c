@@ -4,18 +4,18 @@
 #include <string.h>
 
 #ifdef __linux__
-#define PASSGEN_RANDOM_HAVE_SYSTEM
-#include <sys/random.h>
+#  define PASSGEN_RANDOM_HAVE_SYSTEM
+#  include <sys/random.h>
 
 size_t passgen_random_read_system(void *dest, size_t size, void *data) {
-  (void) data;
+  (void)data;
   return getrandom(dest, size, 0);
 }
 #endif
 
 #ifdef __APPLE__
 size_t passgen_random_read_system(void *dest, size_t size, void *data) {
-  (void) data;
+  (void)data;
   arc4random_buf(dest, size);
   return size;
 }
@@ -35,15 +35,15 @@ void passgen_random_close_file(void *data) {
 }
 
 void passgen_random_close_system(void *data) {
-  (void) data;
+  (void)data;
 }
 
 static uint64_t xorshift64(uint64_t *state) {
-	uint64_t x = *state;
-	x ^= x << 13;
-	x ^= x >> 7;
-	x ^= x << 17;
-	return *state = x;
+  uint64_t x = *state;
+  x ^= x << 13;
+  x ^= x >> 7;
+  x ^= x << 17;
+  return *state = x;
 }
 
 size_t passgen_random_read_xorshift(void *dest, size_t size, void *data) {
@@ -82,11 +82,9 @@ void random_reload(random_t *random) {
   assert(random != NULL);
 
   // read random data.
-  size_t bytes = random->read(
-      &random->buffer,
-      sizeof(random->buffer),
-      random->data);
-  (void) bytes;
+  size_t bytes =
+      random->read(&random->buffer, sizeof(random->buffer), random->data);
+  (void)bytes;
 
   // make sure we've read enough.
   assert(bytes == sizeof(random->buffer));
@@ -121,7 +119,7 @@ random_t *random_open_system(random_t *random) {
 }
 #else
 random_t *random_open_system(random_t *random) {
-  (void) random;
+  (void)random;
 
   return NULL;
 }

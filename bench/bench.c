@@ -1,18 +1,16 @@
-#include <stdio.h>
-#include <time.h>
 #include <assert.h>
-#include <regex.h>
+#include <getopt.h>
+#include <jansson.h>
+#include <math.h>
 #include <pthread.h>
+#include <regex.h>
 #include <stdatomic.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
-#include <jansson.h>
-#include <stdbool.h>
-#include <getopt.h>
-#include <regex.h>
-#include <stddef.h>
-#include <pthread.h>
+#include <time.h>
 
 #include "bench.h"
 
@@ -50,7 +48,6 @@ struct bench_state {
 
   atomic_size_t pos;
 };
-
 
 void *bench_thread(void *data) {
   struct bench_state *state = data;
@@ -123,11 +120,11 @@ int compare_clock(const void *a, const void *b) {
 
 struct bench_times bench_process(const struct bench_result *result) {
   struct bench_times times = {
-    .mean = 0,
-    .median = 0,
-    .min = result->time[0],
-    .max = result->time[0],
-    .dev = 0,
+      .mean = 0,
+      .median = 0,
+      .min = result->time[0],
+      .max = result->time[0],
+      .dev = 0,
   };
 
   // find mean, min and max
@@ -211,11 +208,11 @@ void bench_output_json(const struct bench_state *state) {
 
 void bench(const struct bench_options *opts, const struct bench_item *items) {
   struct bench_state state = {
-    .item_count = 0,
-    .target = opts->time * CLOCKS_PER_SEC,
-    .opts = opts,
-    .items = items,
-    .results = NULL,
+      .item_count = 0,
+      .target = opts->time * CLOCKS_PER_SEC,
+      .opts = opts,
+      .items = items,
+      .results = NULL,
   };
 
   // find out how many we have to test.
@@ -271,7 +268,8 @@ void bench(const struct bench_options *opts, const struct bench_item *items) {
       struct bench_times times = bench_process(res);
 
       printf("%s got %zu iterations\n", items[i].name, res->amount);
-      printf("  mean %f median %f min %f max %f dev %f\n",
+      printf(
+          "  mean %f median %f min %f max %f dev %f\n",
           1000 * times.mean,
           1000 * times.median,
           1000 * times.min,
@@ -288,7 +286,9 @@ void bench(const struct bench_options *opts, const struct bench_item *items) {
   free(state.results);
 }
 
-void bench_list_json(const struct bench_options *opts, const struct bench_item *items) {
+void bench_list_json(
+    const struct bench_options *opts,
+    const struct bench_item *items) {
   json_t *list = json_array();
 
   for(size_t i = 0; items[i].name; i++) {
@@ -305,13 +305,17 @@ void bench_list_json(const struct bench_options *opts, const struct bench_item *
   json_decref(list);
 }
 
-void bench_list_text(const struct bench_options *opts, const struct bench_item *items) {
+void bench_list_text(
+    const struct bench_options *opts,
+    const struct bench_item *items) {
   for(size_t i = 0; items[i].name; i++) {
     printf("%s  %s\n", items[i].name, items[i].info);
   }
 }
 
-void bench_list(const struct bench_options *opts, const struct bench_item *items) {
+void bench_list(
+    const struct bench_options *opts,
+    const struct bench_item *items) {
   if(opts->json) {
     bench_list_json(opts, items);
   } else {
@@ -327,28 +331,29 @@ void bench_help(const char *prog) {
       "Usage: %s [OPTIONS] [FILTER]\n\n"
       "OPTIONS\n"
       "  -l, --list         List all available benchmarks.\n"
-      "  -d, --duration     The duration to run each test. Default is 50ms. Can be any length,\n"
+      "  -d, --duration     The duration to run each test. Default is 50ms. "
+      "Can be any length,\n"
       "                     accepted units are h, m, s, ms, us, ns.\n"
-      "  -t, --threads      How many threads to launch to run benchmarks. Using too many threads\n"
+      "  -t, --threads      How many threads to launch to run benchmarks. "
+      "Using too many threads\n"
       "                     will slow down the benchmarks.\n"
       "  -v, --version      Show the version of this build.\n"
       "  -h, --help         Show this help text.\n\n"
       "FILTER\n"
-      "  A regular expression that is used to filter which benchmarks are to be run.\n",
+      "  A regular expression that is used to filter which benchmarks are to "
+      "be run.\n",
       prog);
 }
 
 void bench_version(void) {
-  fprintf(
-      stderr,
-      "passgen_bench version %s\n",
-      "0000");
+  fprintf(stderr, "passgen_bench version %s\n", "0000");
 }
 
 static double parse_time(const char *str) {
   double number;
   char prefix[3];
-  int ret = sscanf(str, "%lf%c%c%c", &number, &prefix[0], &prefix[1], &prefix[2]);
+  int ret =
+      sscanf(str, "%lf%c%c%c", &number, &prefix[0], &prefix[1], &prefix[2]);
 
   if(ret < 2) {
     return NAN;
@@ -356,28 +361,19 @@ static double parse_time(const char *str) {
 
   if(ret == 2) {
     switch(prefix[0]) {
-      case 'h':
-        number *= 60;
-      case 'm':
-        number *= 60;
-      case 's':
-        return number;
-      default:
-        break;
+      case 'h': number *= 60;
+      case 'm': number *= 60;
+      case 's': return number;
+      default: break;
     }
   }
 
   if(ret == 3 && prefix[1] == 's') {
     switch(prefix[0]) {
-      case 'n':
-        number /= 1000;
-      case 'u':
-        number /= 1000;
-      case 'm':
-        number /= 1000;
-        return number;
-      default:
-        break;
+      case 'n': number /= 1000;
+      case 'u': number /= 1000;
+      case 'm': number /= 1000; return number;
+      default: break;
     }
   }
 
@@ -386,37 +382,33 @@ static double parse_time(const char *str) {
 
 struct bench_options bench_parse_opts(int argc, char *argv[]) {
   struct bench_options opts = {
-    .time = 0.05,
-    .threads = 1,
-    .regex = NULL,
-    .json = false,
-    .list = false,
-    .help = false,
-    .version = false,
-    .error = false,
+      .time = 0.05,
+      .threads = 1,
+      .regex = NULL,
+      .json = false,
+      .list = false,
+      .help = false,
+      .version = false,
+      .error = false,
   };
 
   const char *short_opts = "d:t:ljhv";
   static struct option long_opts[] = {
-    {"duration", required_argument, NULL, 'd'},
-    {"threads", required_argument, NULL, 't'},
-    {"list", no_argument, NULL, 'l'},
-    {"json", no_argument, NULL, 'j'},
-    {"help", no_argument, NULL, 'h'},
-    {"version", no_argument, NULL, 'v'},
-    {NULL, no_argument, NULL, 0}
-  };
+      {"duration", required_argument, NULL, 'd'},
+      {"threads", required_argument, NULL, 't'},
+      {"list", no_argument, NULL, 'l'},
+      {"json", no_argument, NULL, 'j'},
+      {"help", no_argument, NULL, 'h'},
+      {"version", no_argument, NULL, 'v'},
+      {NULL, no_argument, NULL, 0}};
 
   while(true) {
     int opt = getopt_long(argc, argv, short_opts, long_opts, NULL);
 
     if(opt < 0) break;
     switch(opt) {
-      case 0:
-        break;
-      case 'h':
-        opts.help = true;
-        break;
+      case 0: break;
+      case 'h': opts.help = true; break;
       case 't':
         opt = atoi(optarg);
         if(opt < 1) {
@@ -430,19 +422,11 @@ struct bench_options bench_parse_opts(int argc, char *argv[]) {
           opts.error = true;
         }
         break;
-      case 'v':
-        opts.version = true;
-        break;
-      case 'l':
-        opts.list = true;
-        break;
-      case 'j':
-        opts.json = true;
-        break;
+      case 'v': opts.version = true; break;
+      case 'l': opts.list = true; break;
+      case 'j': opts.json = true; break;
       case '?':
-      default:
-        opts.error = true;
-        break;
+      default: opts.error = true; break;
     }
   }
 
@@ -450,7 +434,8 @@ struct bench_options bench_parse_opts(int argc, char *argv[]) {
   if(optind < argc) {
     opts.regex = calloc(1, sizeof(regex_t));
     assert(opts.regex);
-    int ret = regcomp(opts.regex, argv[optind], REG_EXTENDED | REG_ICASE | REG_NOSUB);
+    int ret =
+        regcomp(opts.regex, argv[optind], REG_EXTENDED | REG_ICASE | REG_NOSUB);
     if(ret != 0) {
       fprintf(stderr, "Error parsing regex '%s'.\n", argv[optind]);
       opts.error = true;

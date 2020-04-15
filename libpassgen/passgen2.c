@@ -8,14 +8,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "passgen/generate.h"
-#include "passgen/parser.h"
-#include "passgen/random.h"
-#include "passgen/version.h"
 #include "passgen/data/parser.h"
 #include "passgen/data/token.h"
+#include "passgen/generate.h"
+#include "passgen/parser.h"
 #include "passgen/pronounceable.h"
+#include "passgen/random.h"
 #include "passgen/token.h"
+#include "passgen/version.h"
 
 #define bail(kind, data) passgen2_bail(PASSGEN_ERROR_##kind, (void *)data)
 
