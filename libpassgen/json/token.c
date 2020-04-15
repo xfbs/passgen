@@ -27,8 +27,8 @@ json_t *passgen_token_to_json(struct passgen_token *token) {
   json_t *obj = json_object();
 
   json_object_set_new(obj, "codepoint", json_integer(token->codepoint));
-  json_object_set_new(obj, "escaped", json_boolean(token->escaped));
-  json_object_set_new(obj, "type", passgen_token_type_to_json(token->type));
+  //json_object_set_new(obj, "escaped", json_boolean(token->escaped));
+  //json_object_set_new(obj, "type", passgen_token_type_to_json(token->type));
 
   return obj;
 }

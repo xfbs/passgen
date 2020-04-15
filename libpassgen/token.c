@@ -9,8 +9,6 @@ static inline void token_parse_init(
     parser->state = PASSGEN_TOKEN_ESCAPED;
   } else {
     token->codepoint = codepoint;
-    token->type = PASSGEN_TOKEN_NORMAL;
-    token->escaped = false;
     parser->state = PASSGEN_TOKEN_INIT;
   }
 }
@@ -35,9 +33,6 @@ static inline void token_parse_escaped(
     uint32_t codepoint) {
   // simple_escaped only covers ASCII, whereas codepoint could be much larger.
   if(codepoint < sizeof(simple_escaped) && simple_escaped[codepoint]) {
-    token->escaped = true;
-    token->normal_escaped = false;
-    token->type = PASSGEN_TOKEN_NORMAL;
     token->codepoint = simple_escaped[codepoint];
     parser->state = PASSGEN_TOKEN_INIT;
 
@@ -47,9 +42,7 @@ static inline void token_parse_escaped(
   switch(codepoint) {
     case 'u': parser->state = PASSGEN_TOKEN_UNICODE; break;
     default:
-      token->escaped = true;
-      token->normal_escaped = true;
-      token->codepoint = codepoint;
+      token->codepoint = codepoint | PASSGEN_TOKEN_ESCAPED_BIT;
       parser->state = PASSGEN_TOKEN_INIT;
   }
 }
@@ -73,7 +66,6 @@ static inline void token_parse_unicode_payload(
   // token.
   if(codepoint == '}') {
     token->codepoint = parser->data.unicode_payload.codepoint;
-    token->escaped = true;
     parser->state = PASSGEN_TOKEN_INIT;
 
     return;

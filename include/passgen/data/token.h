@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define PASSGEN_TOKEN_ESCAPED_BIT (1 << 30)
+
 // when updating any of the enums, make sure to also update the mappings.
 enum passgen_token_state {
   PASSGEN_TOKEN_INIT = 0,
@@ -46,9 +48,7 @@ struct passgen_token_parser {
 
 struct passgen_token {
   uint32_t codepoint;
-  enum passgen_token_type type;
-  bool escaped;
-  bool normal_escaped;
+  void *origin;
 };
 
 PASSGEN_ENUM_MAPPING(passgen_token_state);

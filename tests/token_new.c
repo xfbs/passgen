@@ -14,9 +14,7 @@ test_result test_token_normal(void) {
 #define TEST_NORMAL(cp)                                                   \
   assert(passgen_token_parse(&parser, &token, cp) == PASSGEN_TOKEN_INIT); \
   assert(parser.state == PASSGEN_TOKEN_INIT);                             \
-  assert(token.codepoint == cp);                                          \
-  assert(token.type == PASSGEN_TOKEN_NORMAL);                             \
-  assert(token.escaped == false)
+  assert(token.codepoint == cp);
 
   TEST_NORMAL('a');
   TEST_NORMAL('b');
@@ -42,9 +40,7 @@ test_result test_token_escaped(void) {
   assert(parser.state == PASSGEN_TOKEN_ESCAPED);                               \
   assert(passgen_token_parse(&parser, &token, in) == PASSGEN_TOKEN_INIT);      \
   assert(parser.state == PASSGEN_TOKEN_INIT);                                  \
-  assert(token.codepoint == out);                                              \
-  assert(token.type == PASSGEN_TOKEN_NORMAL);                                  \
-  assert(token.escaped == true)
+  assert(token.codepoint == out);
 
   TEST_ESCAPED('\\', '\\');
   TEST_ESCAPED('a', '\a');
