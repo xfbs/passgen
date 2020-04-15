@@ -88,9 +88,9 @@ pages:
   dependencies:
     - test:bionic
   script:
-    - mkdir public
-    - mv build-clang/ccov/passgen-test public/coverage-clang
-    - mv build-gcc/ccov/passgen-test public/coverage-gcc
+    - mkdir -p public/coverage
+    - mv build-clang/ccov/passgen-test public/coverage/llvm-cov
+    - mv build-gcc/ccov/passgen-test public/coverage/lcov
   artifacts:
     paths:
       - public
