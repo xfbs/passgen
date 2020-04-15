@@ -38,7 +38,7 @@ void passgen_random_close_system(void *data) {
   (void) data;
 }
 
-uint64_t xorshift64(uint64_t *state) {
+static uint64_t xorshift64(uint64_t *state) {
 	uint64_t x = *state;
 	x ^= x << 13;
 	x ^= x >> 7;
