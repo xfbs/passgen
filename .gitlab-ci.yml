@@ -81,12 +81,19 @@ pages:
   stage: deploy
   dependencies:
     - test:bionic
+    - build:alpine:release
+    - build:bionic:release
   script:
     - mkdir -p public/coverage
     - mv build-clang/ccov/passgen-test public/coverage/llvm-cov
     - mv build-gcc/ccov/passgen-test public/coverage/lcov
     - doxygen Doxyfile
     - mv docs/html public/doxygen
+    - mv build-alpine-release public/
+    - mv build-bionic-release public/
+    - mkdir public/snapshot
+    - cp public/build-alpine-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-musl-amd64.tar.xz
+    - cp public/build-bionic-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-amd64.tar.xz
   artifacts:
     paths:
       - public
