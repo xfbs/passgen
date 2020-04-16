@@ -55,6 +55,7 @@ build:bionic:release:
     - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DBUILD_GIT_INFO=NO ..
     - ninja
     - ./tests/passgen-test
+    - cpack -G TXZ
   artifacts:
     paths:
       - build-bionic-release
@@ -69,6 +70,7 @@ build:alpine:release:
     - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_GIT_INFO=NO -DBUILD_STATIC=y ..
     - ninja
     - ./tests/passgen-test
+    - cpack -G TXZ
   artifacts:
     paths:
       - build-alpine-release
