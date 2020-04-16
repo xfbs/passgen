@@ -118,7 +118,9 @@ test_result test_random_uint32_max(void) {
   random_t *rand = random_new_xorshift(SEED);
   assert(rand);
 
-  for(size_t max = 1; max <= UINT32_MAX; max += UINT16_MAX) {
+  for(size_t i = 1; i < 1000000; i++) {
+    uint32_t max = random_uint32(rand);
+
     assert(random_uint32_max(rand, max) < max);
   }
 
@@ -131,9 +133,10 @@ test_result test_random_uint64_max(void) {
   random_t *rand = random_new_xorshift(SEED);
   assert(rand);
 
-  for(size_t max = 1; max <= (UINT64_MAX >> 1); max += 1) {
+  for(size_t i = 1; i < 1000000; i++) {
+    uint32_t max = random_uint64(rand);
+
     assert(random_uint64_max(rand, max) < max);
-    max = 1.001 * max;
   }
 
   random_free(rand);
