@@ -53,6 +53,28 @@ test_result test_token_escaped(void) {
   return test_ok;
 }
 
+test_result test_token_special_escaped(void) {
+  struct passgen_token_parser parser;
+  struct passgen_token token;
+  passgen_token_parser_init(&parser);
+
+  // make sure that regular escaped characters have the escaped bit set
+
+#define TEST_SPECIAL_ESCAPED(chr)                                              \
+  assert(passgen_token_parse(&parser, &token, '\\') == PASSGEN_TOKEN_ESCAPED); \
+  assert(parser.state == PASSGEN_TOKEN_ESCAPED);                               \
+  assert(passgen_token_parse(&parser, &token, chr) == PASSGEN_TOKEN_INIT);      \
+  assert(parser.state == PASSGEN_TOKEN_INIT);                                  \
+  assert(token.codepoint == (chr | PASSGEN_TOKEN_ESCAPED_BIT));
+
+  TEST_SPECIAL_ESCAPED('p');
+  TEST_SPECIAL_ESCAPED('w');
+
+#undef TEST_SPECIAL_ESCAPED
+
+  return test_ok;
+}
+
 test_result test_token_unicode(void) {
   struct passgen_token_parser parser = {0};
   struct passgen_token token = {0};
