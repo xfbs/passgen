@@ -22,15 +22,15 @@ void passgen_run(passgen_opts opts) {
   pattern_result_t result;
 
   // initialize source of random numbers
-  random_t random;
-  if(!random_open(&random)) bail(RANDOM_ALLOC, NULL);
+  passgen_random_t random;
+  if(!passgen_random_open(&random)) bail(RANDOM_ALLOC, NULL);
 
   // parse format
   pattern_t pattern;
   result = pattern_parse(&pattern, opts.format, opts.depth, &mem);
 
   if(!result.ok) {
-    random_close(&random);
+    passgen_random_close(&random);
     pattern_error_show(result, opts.format);
     bail(PATTERN_PARSE, opts.format);
   }
@@ -40,7 +40,7 @@ void passgen_run(passgen_opts opts) {
   size_t pass_len = 256;
   char *pass = malloc(pass_len + 1);
   if(!pass) {
-    random_close(&random);
+    passgen_random_close(&random);
     bail(ALLOC, NULL);
   }
 
@@ -58,7 +58,7 @@ void passgen_run(passgen_opts opts) {
 
     // get a NULL-terminated, random pass.
     size_t written =
-        pattern_random_fill(&pattern, &random, &env, pass, pass_len);
+        pattern_passgen_random_fill(&pattern, &random, &env, pass, pass_len);
     pass[written] = '\0';
 
     if(opts.complexity) {
@@ -76,7 +76,7 @@ void passgen_run(passgen_opts opts) {
   free(pass);
   pattern_free(&pattern);
   passgen_mem_accounting_cleanup(&acc);
-  random_close(&random);
+  passgen_random_close(&random);
 }
 
 passgen_opts passgen_optparse(int argc, char *argv[]) {

@@ -27,7 +27,7 @@ passgen_pronounceable_lookup(size_t length, const char *name);
  */
 size_t passgen_pronounceable(
     enum passgen_pronounceable_type type,
-    random_t *rand,
+    passgen_random_t *rand,
     int32_t *buf,
     size_t len);
 
@@ -36,7 +36,7 @@ size_t passgen_pronounceable(
  * into the buffer, and exits non-zero if it would. */
 size_t passgen_pronounceable_len(
     enum passgen_pronounceable_type type,
-    random_t *rand,
+    passgen_random_t *rand,
     int32_t *buf,
     size_t min,
     size_t max,

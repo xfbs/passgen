@@ -30,7 +30,7 @@ passgen_pronounceable_lookup(size_t length, const char *name) {
 
 const struct markov0 *passgen_pronounceable_choose(
     const struct markov *list,
-    random_t *rand,
+    passgen_random_t *rand,
     int32_t p1,
     int32_t p2) {
   const struct markov2 *list2 = passgen_pronounceable_find2(list, p1);
@@ -44,14 +44,14 @@ const struct markov0 *passgen_pronounceable_choose(
   }
 
   size_t choices = list1->frequency_sum;
-  size_t nchoice = random_uint64_max(rand, choices);
+  size_t nchoice = passgen_random_uint64_max(rand, choices);
 
   return passgen_pronounceable_find(list1, nchoice);
 }
 
 size_t passgen_pronounceable2(
     const struct markov *list,
-    random_t *rand,
+    passgen_random_t *rand,
     int32_t *buf,
     size_t len) {
   int32_t p1 = 0, p2 = 0;
@@ -77,7 +77,7 @@ size_t passgen_pronounceable2(
 
 size_t passgen_pronounceable(
     enum passgen_pronounceable_type type,
-    random_t *rand,
+    passgen_random_t *rand,
     int32_t *buf,
     size_t len) {
   assert(type < PASSGEN_PRONOUNCEABLE_LAST);
@@ -91,7 +91,7 @@ size_t passgen_pronounceable(
 
 size_t passgen_pronounceable_len(
     enum passgen_pronounceable_type type,
-    random_t *rand,
+    passgen_random_t *rand,
     int32_t *buf,
     size_t min,
     size_t max,

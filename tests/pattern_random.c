@@ -1,5 +1,5 @@
 #include "tests.h"
 
-test_result test_pattern_random_simple() {
+test_result test_pattern_passgen_random_simple() {
   return test_ok;
 }

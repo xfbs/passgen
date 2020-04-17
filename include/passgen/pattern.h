@@ -165,7 +165,7 @@ typedef struct pattern_env pattern_env_t;
 
 typedef struct pattern_repeat pattern_repeat_t;
 
-typedef int pattern_random_cb(void *data, int32_t codepoint);
+typedef int pattern_passgen_random_cb(void *data, int32_t codepoint);
 
 void pattern_free(pattern_t *pattern);
 
@@ -178,19 +178,19 @@ pattern_result_t pattern_parse(
 size_t pattern_maxlen(pattern_t *pattern);
 size_t pattern_minlen(pattern_t *pattern);
 
-size_t pattern_random_fill(
+size_t pattern_passgen_random_fill(
     pattern_t *pattern,
-    random_t *rand,
+    passgen_random_t *rand,
     pattern_env_t *env,
     char *buffer,
     size_t len);
 
 int pattern_random(
     pattern_t *pattern,
-    random_t *rand,
+    passgen_random_t *rand,
     pattern_env_t *env,
     void *data,
-    pattern_random_cb *func);
+    pattern_passgen_random_cb *func);
 
 size_t pattern_choices(pattern_t *pattern);
 

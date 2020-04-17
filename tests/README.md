@@ -32,7 +32,7 @@ be linker errors when compiling.
 
 Tests should not depend on each other. Also, tests should not be nondeterministic,
 meaning that if you use random data, use it with a constant seed. For practical
-purposes, that means using `random_new_xorshift()` instead of `random_new()`.
+purposes, that means using `passgen_random_new_xorshift()` instead of `passgen_random_new()`.
 
 ## Adding a file
 

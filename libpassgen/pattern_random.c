@@ -20,7 +20,7 @@ static pattern_env_t pattern_env_default = {
     .pronounceable_type = PASSGEN_PRONOUNCEABLE_ENGLISH,
 };
 
-static int pattern_random_write_buffer(void *data, int32_t codepoint) {
+static int pattern_passgen_random_write_buffer(void *data, int32_t codepoint) {
   struct fillpos *fillpos = data;
 
   if(fillpos->cur == fillpos->len) {
@@ -34,9 +34,9 @@ static int pattern_random_write_buffer(void *data, int32_t codepoint) {
   return 0;
 }
 
-size_t pattern_random_fill(
+size_t pattern_passgen_random_fill(
     pattern_t *pattern,
-    random_t *rand,
+    passgen_random_t *rand,
     pattern_env_t *env,
     char *buffer,
     size_t len) {
@@ -47,7 +47,7 @@ size_t pattern_random_fill(
   };
 
   int ret =
-      pattern_random(pattern, rand, env, &fillpos, pattern_random_write_buffer);
+      pattern_random(pattern, rand, env, &fillpos, pattern_passgen_random_write_buffer);
 
   if(0 != ret) {
     return 0;
@@ -56,8 +56,8 @@ size_t pattern_random_fill(
   return fillpos.cur;
 }
 
-static size_t pattern_random_repeat(
-    random_t *rand,
+static size_t pattern_passgen_random_repeat(
+    passgen_random_t *rand,
     pattern_env_t *env,
     pattern_repeat_t *repeat) {
   size_t difference = repeat->max - repeat->min;
@@ -68,7 +68,7 @@ static size_t pattern_random_repeat(
   }
 
   // get random number to choose from the range
-  size_t choice = random_uint64_max(rand, difference + 1);
+  size_t choice = passgen_random_uint64_max(rand, difference + 1);
 
   // keep track of complexity
   if(env->find_complexity) {
@@ -78,13 +78,13 @@ static size_t pattern_random_repeat(
   return repeat->min + choice;
 }
 
-static inline int pattern_random_ranges(
+static inline int pattern_passgen_random_ranges(
     pattern_ranges_t *ranges,
-    random_t *rand,
+    passgen_random_t *rand,
     pattern_env_t *env,
     void *data,
-    pattern_random_cb *func) {
-  size_t reps = pattern_random_repeat(rand, env, &ranges->repeat);
+    pattern_passgen_random_cb *func) {
+  size_t reps = pattern_passgen_random_repeat(rand, env, &ranges->repeat);
 
   // compute number of possible codepoints
   size_t possible = ranges->choices_list[ranges->items.len - 1];
@@ -93,7 +93,7 @@ static inline int pattern_random_ranges(
 
   // repeat chose rep size times
   for(size_t i = 0; i < reps; i++) {
-    size_t choice = random_uint64_max(rand, possible);
+    size_t choice = passgen_random_uint64_max(rand, possible);
 
     // keep track of complexity
     if(env->find_complexity) {
@@ -129,13 +129,13 @@ static inline int pattern_random_ranges(
   return 0;
 }
 
-static inline int pattern_random_character(
+static inline int pattern_passgen_random_character(
     pattern_char_t *character,
-    random_t *rand,
+    passgen_random_t *rand,
     pattern_env_t *env,
     void *data,
-    pattern_random_cb *func) {
-  size_t reps = pattern_random_repeat(rand, env, &character->repeat);
+    pattern_passgen_random_cb *func) {
+  size_t reps = pattern_passgen_random_repeat(rand, env, &character->repeat);
 
   for(size_t i = 0; i < reps; i++) {
     int ret = func(data, character->codepoint);
@@ -148,12 +148,12 @@ static inline int pattern_random_character(
   return 0;
 }
 
-static inline int pattern_random_special_pronounceable(
+static inline int pattern_passgen_random_special_pronounceable(
     pattern_special_t *special,
-    random_t *rand,
+    passgen_random_t *rand,
     pattern_env_t *env,
     void *data,
-    pattern_random_cb *func) {
+    pattern_passgen_random_cb *func) {
   /* limit length to 64, that should be plenty. */
   size_t max = special->length.max;
   if(64 < max) max = 64;
@@ -185,12 +185,12 @@ static inline int pattern_random_special_pronounceable(
   return 0;
 }
 
-static inline int pattern_random_special_wordlist(
+static inline int pattern_passgen_random_special_wordlist(
     pattern_special_t *special,
-    random_t *rand,
+    passgen_random_t *rand,
     pattern_env_t *env,
     void *data,
-    pattern_random_cb *func) {
+    pattern_passgen_random_cb *func) {
   // TODO: implement
   (void)special;
   (void)rand;
@@ -201,15 +201,15 @@ static inline int pattern_random_special_wordlist(
   return 0;
 }
 
-static inline int pattern_random_special(
+static inline int pattern_passgen_random_special(
     pattern_special_t *special,
-    random_t *rand,
+    passgen_random_t *rand,
     pattern_env_t *env,
     void *data,
-    pattern_random_cb *func) {
+    pattern_passgen_random_cb *func) {
   switch(special->kind) {
     case PATTERN_SPECIAL_PRONOUNCABLE:
-      return pattern_random_special_pronounceable(
+      return pattern_passgen_random_special_pronounceable(
           special,
           rand,
           env,
@@ -217,62 +217,62 @@ static inline int pattern_random_special(
           func);
       break;
     case PATTERN_SPECIAL_WORDLIST:
-      return pattern_random_special_wordlist(special, rand, env, data, func);
+      return pattern_passgen_random_special_wordlist(special, rand, env, data, func);
       break;
     default: assert(false); break;
   }
   return 0;
 }
 
-static inline int pattern_random_group(
+static inline int pattern_passgen_random_group(
     pattern_group_t *group,
-    random_t *rand,
+    passgen_random_t *rand,
     pattern_env_t *env,
     void *data,
-    pattern_random_cb *func);
+    pattern_passgen_random_cb *func);
 
-static inline int pattern_random_segment(
+static inline int pattern_passgen_random_segment(
     pattern_segment_t *segment,
-    random_t *rand,
+    passgen_random_t *rand,
     pattern_env_t *env,
     void *data,
-    pattern_random_cb *func) {
+    pattern_passgen_random_cb *func) {
   switch(segment->kind) {
     case PATTERN_RANGE:
-      return pattern_random_ranges(&segment->data.range, rand, env, data, func);
+      return pattern_passgen_random_ranges(&segment->data.range, rand, env, data, func);
     case PATTERN_CHAR:
-      return pattern_random_character(
+      return pattern_passgen_random_character(
           &segment->data.character,
           rand,
           env,
           data,
           func);
     case PATTERN_SPECIAL:
-      return pattern_random_special(
+      return pattern_passgen_random_special(
           &segment->data.special,
           rand,
           env,
           data,
           func);
     case PATTERN_GROUP:
-      return pattern_random_group(&segment->data.group, rand, env, data, func);
+      return pattern_passgen_random_group(&segment->data.group, rand, env, data, func);
   }
 
   // unreachable
   return 0;
 }
 
-static inline int pattern_random_segments(
+static inline int pattern_passgen_random_segments(
     pattern_segments_t *segments,
-    random_t *rand,
+    passgen_random_t *rand,
     pattern_env_t *env,
     void *data,
-    pattern_random_cb *func) {
+    pattern_passgen_random_cb *func) {
   for(size_t i = 0; i < segments->items.len; i++) {
     pattern_segment_t *segment;
     segment = passgen_array_get(&segments->items, sizeof(pattern_segment_t), i);
 
-    int ret = pattern_random_segment(segment, rand, env, data, func);
+    int ret = pattern_passgen_random_segment(segment, rand, env, data, func);
 
     if(0 != ret) {
       return ret;
@@ -282,18 +282,18 @@ static inline int pattern_random_segments(
   return 0;
 }
 
-static inline int pattern_random_group(
+static inline int pattern_passgen_random_group(
     pattern_group_t *group,
-    random_t *rand,
+    passgen_random_t *rand,
     pattern_env_t *env,
     void *data,
-    pattern_random_cb *func) {
+    pattern_passgen_random_cb *func) {
   // choose random number of repetitions
-  size_t reps = pattern_random_repeat(rand, env, &group->repeat);
+  size_t reps = pattern_passgen_random_repeat(rand, env, &group->repeat);
 
   for(size_t r = 0; r < reps; r++) {
     // choose random segment from segments
-    size_t segment = random_uint64_max(rand, group->segments.len);
+    size_t segment = passgen_random_uint64_max(rand, group->segments.len);
 
     // keep track of complexity
     if(env->find_complexity) {
@@ -307,7 +307,7 @@ static inline int pattern_random_group(
         sizeof(pattern_segments_t),
         segment);
 
-    int ret = pattern_random_segments(segments, rand, env, data, func);
+    int ret = pattern_passgen_random_segments(segments, rand, env, data, func);
 
     if(0 != ret) {
       return ret;
@@ -319,10 +319,10 @@ static inline int pattern_random_group(
 
 inline int pattern_random(
     pattern_t *pattern,
-    random_t *rand,
+    passgen_random_t *rand,
     pattern_env_t *env,
     void *data,
-    pattern_random_cb *func) {
+    pattern_passgen_random_cb *func) {
   /* use default env if none was supplied. this should be relatively sane. */
   if(!env) {
     env = &pattern_env_default;
@@ -332,5 +332,5 @@ inline int pattern_random(
     env->complexity = 1;
   }
 
-  return pattern_random_group(&pattern->group, rand, env, data, func);
+  return pattern_passgen_random_group(&pattern->group, rand, env, data, func);
 }

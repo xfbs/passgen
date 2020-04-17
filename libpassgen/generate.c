@@ -44,7 +44,7 @@ static int passgen_generate_write_buffer(void *data, int32_t codepoint) {
 
 size_t passgen_generate_fill(
     struct passgen_pattern *pattern,
-    random_t *rand,
+    passgen_random_t *rand,
     struct pattern_env *env,
     char *buffer,
     size_t len) {
@@ -69,7 +69,7 @@ size_t passgen_generate_fill(
 }
 
 size_t passgen_generate_repeat(
-    random_t *rand,
+    passgen_random_t *rand,
     struct pattern_env *env,
     struct passgen_pattern_repeat *repeat) {
   size_t difference = repeat->max - repeat->min;
@@ -80,7 +80,7 @@ size_t passgen_generate_repeat(
   }
 
   // get random number to choose from the range
-  size_t choice = random_uint64_max(rand, difference + 1);
+  size_t choice = passgen_random_uint64_max(rand, difference + 1);
 
   // keep track of complexity
   if(env->find_complexity) {
@@ -92,7 +92,7 @@ size_t passgen_generate_repeat(
 
 int passgen_generate_set(
     struct passgen_pattern_set *set,
-    random_t *rand,
+    passgen_random_t *rand,
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -102,7 +102,7 @@ int passgen_generate_set(
 
   assert(possible != 0);
 
-  size_t choice = random_uint64_max(rand, possible);
+  size_t choice = passgen_random_uint64_max(rand, possible);
 
   // keep track of complexity
   if(env->find_complexity) {
@@ -133,7 +133,7 @@ int passgen_generate_set(
 
 int passgen_generate_character(
     struct passgen_pattern_char *character,
-    random_t *rand,
+    passgen_random_t *rand,
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -142,7 +142,7 @@ int passgen_generate_character(
 
 int passgen_generate_special_pronounceable(
     struct passgen_pattern_special *special,
-    random_t *rand,
+    passgen_random_t *rand,
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -191,7 +191,7 @@ int passgen_generate_special_pronounceable(
 
 int passgen_generate_special_wordlist(
     struct passgen_pattern_special *special,
-    random_t *rand,
+    passgen_random_t *rand,
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -207,7 +207,7 @@ int passgen_generate_special_wordlist(
 
 int passgen_generate_special(
     struct passgen_pattern_special *special,
-    random_t *rand,
+    passgen_random_t *rand,
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -230,7 +230,7 @@ int passgen_generate_special(
 
 int passgen_generate_item(
     struct passgen_pattern_item *item,
-    random_t *rand,
+    passgen_random_t *rand,
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -273,7 +273,7 @@ int passgen_generate_item(
 
 int passgen_generate_segment(
     struct passgen_pattern_segment *segment,
-    random_t *rand,
+    passgen_random_t *rand,
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -293,12 +293,12 @@ int passgen_generate_segment(
 
 int passgen_generate_group(
     struct passgen_pattern_group *group,
-    random_t *rand,
+    passgen_random_t *rand,
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
   // choose random segment from segments
-  size_t segment = random_uint64_max(rand, group->segments.len);
+  size_t segment = passgen_random_uint64_max(rand, group->segments.len);
 
   // keep track of complexity
   if(env->find_complexity) {
@@ -314,7 +314,7 @@ int passgen_generate_group(
 
 int passgen_generate(
     struct passgen_pattern *pattern,
-    random_t *rand,
+    passgen_random_t *rand,
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {

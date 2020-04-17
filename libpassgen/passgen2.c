@@ -32,15 +32,15 @@ void passgen2_run(passgen_opts opts) {
   }
 
   // initialize source of random numbers
-  random_t random;
-  if(!random_open(&random)) bail(RANDOM_ALLOC, NULL);
+  passgen_random_t random;
+  if(!passgen_random_open(&random)) bail(RANDOM_ALLOC, NULL);
 
   // allocate some space for pass.
   // size_t pass_len = pattern_maxlen(pattern);
   size_t pass_len = 256;
   char *pass = malloc(pass_len + 1);
   if(!pass) {
-    random_close(&random);
+    passgen_random_close(&random);
     bail(ALLOC, NULL);
   }
 
@@ -75,7 +75,7 @@ void passgen2_run(passgen_opts opts) {
   printf("\n");
   free(pass);
   passgen_parser_free(&parser);
-  random_close(&random);
+  passgen_random_close(&random);
 }
 
 passgen_opts passgen2_optparse(int argc, char *argv[]) {

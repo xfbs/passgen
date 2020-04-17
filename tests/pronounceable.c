@@ -74,7 +74,7 @@ test_result test_pronounceable_find(void) {
 }
 
 test_result test_pronounceable(void) {
-  random_t *rand = random_new_xorshift(SEED);
+  passgen_random_t *rand = passgen_random_new_xorshift(SEED);
   assert(rand);
 
   for(size_t i = 0; i < 1000; i++) {
@@ -86,7 +86,7 @@ test_result test_pronounceable(void) {
     assert(ret <= sizeof(buffer));
   }
 
-  random_free(rand);
+  passgen_random_free(rand);
 
   return test_ok;
 }
@@ -94,7 +94,7 @@ test_result test_pronounceable(void) {
 /* rough test to see that there is a reasonable length distribution when
  * generating english words. */
 test_result test_pronounceable_englendist(void) {
-  random_t *rand = random_new_xorshift(SEED);
+  passgen_random_t *rand = passgen_random_new_xorshift(SEED);
   assert(rand);
   size_t lens[64] = {0};
 
@@ -119,7 +119,7 @@ test_result test_pronounceable_englendist(void) {
   assert(lens[9] > 10);
   assert(lens[10] > 10);
 
-  random_free(rand);
+  passgen_random_free(rand);
 
   return test_ok;
 }
@@ -127,7 +127,7 @@ test_result test_pronounceable_englendist(void) {
 /* rough test to see that there is a reasonable length distribution when
  * generating english words. */
 test_result test_pronounceable_latlendist(void) {
-  random_t *rand = random_new_xorshift(SEED);
+  passgen_random_t *rand = passgen_random_new_xorshift(SEED);
   assert(rand);
   size_t lens[64] = {0};
 
@@ -154,13 +154,13 @@ test_result test_pronounceable_latlendist(void) {
   assert(lens[9] > 10);
   assert(lens[10] > 10);
 
-  random_free(rand);
+  passgen_random_free(rand);
 
   return test_ok;
 }
 
 test_result test_pronounceable_len(void) {
-  random_t *rand = random_new_xorshift(SEED);
+  passgen_random_t *rand = passgen_random_new_xorshift(SEED);
   assert(rand);
 
   for(size_t i = 0; i < 1000; i++) {
@@ -190,13 +190,13 @@ test_result test_pronounceable_len(void) {
     assert(0 == ret);
   }
 
-  random_free(rand);
+  passgen_random_free(rand);
 
   return test_ok;
 }
 
 test_result test_pronounceable_engascii(void) {
-  random_t *rand = random_new_xorshift(SEED);
+  passgen_random_t *rand = passgen_random_new_xorshift(SEED);
   assert(rand);
 
   for(size_t i = 0; i < 1000; i++) {
@@ -210,13 +210,13 @@ test_result test_pronounceable_engascii(void) {
     }
   }
 
-  random_free(rand);
+  passgen_random_free(rand);
 
   return test_ok;
 }
 
 test_result test_pronounceable_minascii(void) {
-  random_t *rand = random_new_xorshift(SEED);
+  passgen_random_t *rand = passgen_random_new_xorshift(SEED);
   assert(rand);
 
   for(size_t i = 0; i < 1000; i++) {
@@ -235,7 +235,7 @@ test_result test_pronounceable_minascii(void) {
     }
   }
 
-  random_free(rand);
+  passgen_random_free(rand);
 
   return test_ok;
 }
@@ -243,7 +243,7 @@ test_result test_pronounceable_minascii(void) {
 test_result test_pronounceable_lendist(void) {
   /* make sure that when specifying lengths [8, 11], you really can get all
    * possible lengths. */
-  random_t *rand = random_new_xorshift(SEED);
+  passgen_random_t *rand = passgen_random_new_xorshift(SEED);
   assert(rand);
 
   size_t repeat = 1000;
@@ -270,7 +270,7 @@ test_result test_pronounceable_lendist(void) {
   assert(80 < lens[2]);
   assert(80 < lens[3]);
 
-  random_free(rand);
+  passgen_random_free(rand);
 
   return test_ok;
 }
