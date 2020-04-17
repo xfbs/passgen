@@ -18,7 +18,7 @@
 #include "passgen/data/token.h"
 #include "passgen/memory.h"
 
-int passgen_parse_start(struct parser *parser) {
+int passgen_parse_start(struct passgen_parser *parser) {
   // set initial group
   parser_state_push_group(
       parser,
@@ -28,7 +28,7 @@ int passgen_parse_start(struct parser *parser) {
   return 0;
 }
 
-int passgen_parse_token(struct parser *parser, struct passgen_token *token) {
+int passgen_parse_token(struct passgen_parser *parser, struct passgen_token *token) {
   struct passgen_parser_state *state = passgen_parser_get_state_last(parser);
 
   switch(state->type) {
@@ -45,7 +45,7 @@ int passgen_parse_token(struct parser *parser, struct passgen_token *token) {
 }
 
 int passgen_parse_group(
-    struct parser *parser,
+    struct passgen_parser *parser,
     struct passgen_token *token,
     struct passgen_parser_state *state) {
   struct passgen_pattern_group *group;
@@ -93,7 +93,7 @@ int passgen_parse_group(
 }
 
 int passgen_parse_set(
-    struct parser *parser,
+    struct passgen_parser *parser,
     struct passgen_token *token,
     struct passgen_parser_state *state) {
   struct passgen_pattern_set *set = state->data.set.set;
@@ -131,7 +131,7 @@ int passgen_parse_set(
 }
 
 int passgen_parse_set_range(
-    struct parser *parser,
+    struct passgen_parser *parser,
     struct passgen_token *token,
     struct passgen_parser_state *state) {
   (void)parser;
@@ -142,7 +142,7 @@ int passgen_parse_set_range(
 }
 
 int passgen_parse_repeat(
-    struct parser *parser,
+    struct passgen_parser *parser,
     struct passgen_token *token,
     struct passgen_parser_state *state) {
   // this set's over
@@ -171,7 +171,7 @@ int passgen_parse_repeat(
 }
 
 int passgen_parse_repeat_range(
-    struct parser *parser,
+    struct passgen_parser *parser,
     struct passgen_token *token,
     struct passgen_parser_state *state) {
   if(token->codepoint == '}') {
@@ -191,7 +191,7 @@ int passgen_parse_repeat_range(
   return -1;
 }
 
-int parse_finish(struct parser *parser) {
+int parse_finish(struct passgen_parser *parser) {
   // TODO: implement
   (void)parser;
 

@@ -20,7 +20,7 @@
 #define bail(kind, data) passgen2_bail(PASSGEN_ERROR_##kind, (void *)data)
 
 void passgen2_run(passgen_opts opts) {
-  struct parser parser = {0};
+  struct passgen_parser parser = {0};
   struct passgen_token_parser token_parser = {0};
   struct passgen_token token = {0};
   passgen_parser_init(&parser);

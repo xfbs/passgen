@@ -18,7 +18,7 @@
 #include "tests.h"
 
 #define PREAMBLE()                                \
-  struct parser parser = {0};                     \
+  struct passgen_parser parser;                     \
   struct passgen_token_parser token_parser = {0}; \
   struct passgen_token token = {0};               \
   struct passgen_pattern_segment *segment;        \
@@ -33,7 +33,7 @@
   assert(0 == passgen_parse_token(&parser, &token))
 
 test_result test_parser_empty(void) {
-  struct parser parser = {0};
+  struct passgen_parser parser;
   struct passgen_pattern_segment *segment;
   passgen_parser_init(&parser);
   assert(0 == passgen_parse_start(&parser));

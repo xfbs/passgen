@@ -13,12 +13,12 @@ struct passgen_pattern_range;
 struct passgen_pattern_segment;
 struct passgen_pattern_set;
 
-struct passgen_parser_state *parser_state_push(struct parser *parser) {
+struct passgen_parser_state *parser_state_push(struct passgen_parser *parser) {
   return passgen_parser_state_stack_push(&parser->state, NULL);
 }
 
 struct passgen_parser_state *parser_state_push_group(
-    struct parser *parser,
+    struct passgen_parser *parser,
     struct passgen_pattern_group *group,
     struct passgen_pattern_segment *segment) {
   struct passgen_parser_state *state = parser_state_push(parser);
@@ -30,7 +30,7 @@ struct passgen_parser_state *parser_state_push_group(
 }
 
 struct passgen_parser_state *parser_state_push_set(
-    struct parser *parser,
+    struct passgen_parser *parser,
     struct passgen_pattern_set *set,
     struct passgen_pattern_range *range) {
   struct passgen_parser_state *state = parser_state_push(parser);
@@ -42,7 +42,7 @@ struct passgen_parser_state *parser_state_push_set(
 }
 
 struct passgen_parser_state *parser_state_push_repeat(
-    struct parser *parser,
+    struct passgen_parser *parser,
     struct passgen_pattern_item *item) {
   struct passgen_parser_state *state = parser_state_push(parser);
   state->type = PASSGEN_PARSER_REPEAT;
@@ -51,26 +51,26 @@ struct passgen_parser_state *parser_state_push_repeat(
   return state;
 }
 
-void passgen_parser_init(struct parser *parser) {
+void passgen_parser_init(struct passgen_parser *parser) {
   passgen_parser_state_stack_init(&parser->state, NULL);
   passgen_pattern_init(&parser->pattern);
 }
 
-void passgen_parser_free(struct parser *parser) {
+void passgen_parser_free(struct passgen_parser *parser) {
   passgen_parser_state_stack_free(&parser->state, NULL);
   passgen_pattern_free(&parser->pattern);
 }
 
-void parser_state_pop(struct parser *parser) {
+void parser_state_pop(struct passgen_parser *parser) {
   passgen_parser_state_stack_pop(&parser->state, NULL);
 }
 
 struct passgen_parser_state *
-passgen_parser_get_state(struct parser *parser, size_t n) {
+passgen_parser_get_state(struct passgen_parser *parser, size_t n) {
   return passgen_parser_state_stack_get(&parser->state, n);
 }
 
 struct passgen_parser_state *
-passgen_parser_get_state_last(struct parser *parser) {
+passgen_parser_get_state_last(struct passgen_parser *parser) {
   return passgen_parser_state_stack_top(&parser->state);
 }
