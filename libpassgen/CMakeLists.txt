@@ -54,6 +54,7 @@ set(SOURCE_LIST
     "data/segment.c"
     "data/segment_item.c"
     "data/set.c"
+    "data/special.c"
     "data/token.c"
     "enum_mapping.c"
     "generate.c"

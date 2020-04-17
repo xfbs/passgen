@@ -390,30 +390,30 @@ test_result test_parser_group_ignore_escaped(void) {
   item = passgen_pattern_segment_get_item(segment, 0);
   assert(item);
   assert(item->kind == PASSGEN_PATTERN_CHAR);
-  assert(item->data.character.codepoint == '(');
-  assert(item->repeat.min == 0);
-  assert(item->repeat.max == 0);
+  assert(item->data.character.codepoint == ('(' | PASSGEN_TOKEN_ESCAPED_BIT));
+  assert(item->repeat.min == 1);
+  assert(item->repeat.max == 1);
 
   item = passgen_pattern_segment_get_item(segment, 1);
   assert(item);
   assert(item->kind == PASSGEN_PATTERN_CHAR);
-  assert(item->data.character.codepoint == '{');
-  assert(item->repeat.min == 0);
-  assert(item->repeat.max == 0);
+  assert(item->data.character.codepoint == ('{' | PASSGEN_TOKEN_ESCAPED_BIT));
+  assert(item->repeat.min == 1);
+  assert(item->repeat.max == 1);
 
   item = passgen_pattern_segment_get_item(segment, 2);
   assert(item);
   assert(item->kind == PASSGEN_PATTERN_CHAR);
-  assert(item->data.character.codepoint == '[');
-  assert(item->repeat.min == 0);
-  assert(item->repeat.max == 0);
+  assert(item->data.character.codepoint == ('[' | PASSGEN_TOKEN_ESCAPED_BIT));
+  assert(item->repeat.min == 1);
+  assert(item->repeat.max == 1);
 
   item = passgen_pattern_segment_get_item(segment, 3);
   assert(item);
   assert(item->kind == PASSGEN_PATTERN_CHAR);
-  assert(item->data.character.codepoint == '|');
-  assert(item->repeat.min == 0);
-  assert(item->repeat.max == 0);
+  assert(item->data.character.codepoint == ('|' | PASSGEN_TOKEN_ESCAPED_BIT));
+  assert(item->repeat.min == 1);
+  assert(item->repeat.max == 1);
 
   passgen_parser_free(&parser);
 

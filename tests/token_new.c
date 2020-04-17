@@ -69,6 +69,10 @@ test_result test_token_special_escaped(void) {
 
   TEST_SPECIAL_ESCAPED('p');
   TEST_SPECIAL_ESCAPED('w');
+  TEST_SPECIAL_ESCAPED('|');
+  TEST_SPECIAL_ESCAPED('[');
+  TEST_SPECIAL_ESCAPED(']');
+  TEST_SPECIAL_ESCAPED('(');
 
 #undef TEST_SPECIAL_ESCAPED
 

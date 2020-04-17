@@ -64,18 +64,20 @@ int passgen_parse_group(
       case '}':
       case '[':
       case ']':
+        // escaped token which would normally do something but should be
+        // treated as text
         codepoint &= ~PASSGEN_TOKEN_ESCAPED_BIT;
         break;
       case 'p':
       case 'w':
         // special token
         special = passgen_pattern_segment_new_special(state->data.group.segment);
-        special->kind = codepoint;
+        passgen_pattern_special_init_char(special, codepoint);
         parser_state_push_special(parser, special);
         break;
       default:
         // error
-        break;
+        return -1;
     }
   } else {
     switch((char) codepoint) {
