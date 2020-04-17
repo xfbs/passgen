@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "passgen/data/array.h"
 #include "passgen/memory.h"
 #include "passgen/pattern.h"
 #include "passgen/pronounceable.h"

@@ -5,7 +5,6 @@
 #include "passgen/container/stack/parser_state.h"
 #include "passgen/data/parser.h"
 #include "passgen/data/parser_state.h"
-#include "passgen/data/pattern.h"
 
 struct passgen_pattern_group;
 struct passgen_pattern_item;
