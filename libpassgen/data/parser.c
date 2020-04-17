@@ -50,6 +50,11 @@ struct passgen_parser_state *parser_state_push_repeat(
   return state;
 }
 
+struct passgen_parser_state *parser_state_push_special(
+    struct passgen_parser *parser,
+    struct passgen_pattern_special *special) {
+}
+
 void passgen_parser_init(struct passgen_parser *parser) {
   passgen_parser_state_stack_init(&parser->state, NULL);
   passgen_pattern_init(&parser->pattern);

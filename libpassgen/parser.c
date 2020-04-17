@@ -50,39 +50,66 @@ int passgen_parse_group(
     struct passgen_parser *parser,
     struct passgen_token *token,
     struct passgen_parser_state *state) {
+  uint32_t codepoint = token->codepoint;
   struct passgen_pattern_group *group;
+  struct passgen_pattern_special *special;
   struct passgen_pattern_item *item;
-  switch(token->codepoint) {
-    case '|':
-      // create new segment and parser state
-      state->data.group.segment =
-          passgen_pattern_group_new_segment(state->data.group.group);
-      return 0;
-    case ')': parser_state_pop(parser); return 0;
-    case '(':
-      // we're supposed to read something in.
-      group = passgen_pattern_segment_new_group(state->data.group.segment);
-      parser_state_push_group(
-          parser,
-          group,
-          passgen_pattern_group_new_segment(group));
-      return 0;
-    case '[':
-      parser_state_push_set(
-          parser,
-          passgen_pattern_segment_new_set(state->data.group.segment),
-          NULL);
-      return 0;
-    case '{':
-      item = passgen_pattern_segment_get_item(
-          state->data.group.segment,
-          state->data.group.segment->items.len - 1);
-      // clear default repetition
-      item->repeat.min = 0;
-      item->repeat.max = 0;
-      parser_state_push_repeat(parser, item);
-      return 0;
-    default: break;
+
+  if(codepoint & PASSGEN_TOKEN_ESCAPED_BIT) {
+    switch((char) codepoint) {
+      case '|':
+      case '(':
+      case ')':
+      case '{':
+      case '}':
+      case '[':
+      case ']':
+        codepoint &= ~PASSGEN_TOKEN_ESCAPED_BIT;
+        break;
+      case 'p':
+      case 'w':
+        // special token
+        special = passgen_pattern_segment_new_special(state->data.group.segment);
+        special->kind = codepoint;
+        parser_state_push_special(parser, special);
+        break;
+      default:
+        // error
+        break;
+    }
+  } else {
+    switch((char) codepoint) {
+      case '|':
+        // create new segment and parser state
+        state->data.group.segment =
+            passgen_pattern_group_new_segment(state->data.group.group);
+        return 0;
+      case ')': parser_state_pop(parser); return 0;
+      case '(':
+        // we're supposed to read something in.
+        group = passgen_pattern_segment_new_group(state->data.group.segment);
+        parser_state_push_group(
+            parser,
+            group,
+            passgen_pattern_group_new_segment(group));
+        return 0;
+      case '[':
+        parser_state_push_set(
+            parser,
+            passgen_pattern_segment_new_set(state->data.group.segment),
+            NULL);
+        return 0;
+      case '{':
+        item = passgen_pattern_segment_get_item(
+            state->data.group.segment,
+            state->data.group.segment->items.len - 1);
+        // clear default repetition
+        item->repeat.min = 0;
+        item->repeat.max = 0;
+        parser_state_push_repeat(parser, item);
+        return 0;
+      default: break;
+    }
   }
 
   struct passgen_pattern_char *chr =

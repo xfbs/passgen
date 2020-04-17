@@ -59,7 +59,12 @@ passgen_pattern_segment_new_group(struct passgen_pattern_segment *segment) {
 }
 
 struct passgen_pattern_special *
-passgen_pattern_segment_new_special(struct passgen_pattern_segment *segment);
+passgen_pattern_segment_new_special(struct passgen_pattern_segment *segment) {
+  struct passgen_pattern_item *item = passgen_pattern_segment_new_item(segment);
+  item->kind = PASSGEN_PATTERN_SPECIAL;
+
+  return &item->data.special;
+}
 
 struct passgen_pattern_item *passgen_pattern_segment_get_item(
     struct passgen_pattern_segment *segment,

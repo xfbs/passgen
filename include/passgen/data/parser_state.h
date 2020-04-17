@@ -28,6 +28,9 @@ struct passgen_parser_state {
       struct passgen_pattern_set *set;
       struct passgen_pattern_range *range;
     } set;
+    struct {
+      struct passgen_pattern_special *special;
+    } special;
   } data;
 };
 

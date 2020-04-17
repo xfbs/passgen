@@ -32,6 +32,13 @@
       PASSGEN_TOKEN_INIT);                                     \
   assert(0 == passgen_parse_token(&parser, &token))
 
+#define PARSE_CODEPOINT_DOUBLE(a, b)                             \
+  assert(passgen_token_parse(&token_parser, &token, a) > 0);  \
+  assert(                                                      \
+      passgen_token_parse(&token_parser, &token, b) == \
+      PASSGEN_TOKEN_INIT);                                     \
+  assert(0 == passgen_parse_token(&parser, &token))
+
 test_result test_parser_empty(void) {
   struct passgen_parser parser;
   struct passgen_pattern_segment *segment;
@@ -361,6 +368,52 @@ test_result test_parser_char_repeat_range(void) {
   assert(item->data.character.codepoint == 'a');
   assert(item->repeat.min == 2);
   assert(item->repeat.max == 4);
+
+  passgen_parser_free(&parser);
+
+  return test_ok;
+}
+
+test_result test_parser_group_ignore_escaped(void) {
+  PREAMBLE();
+  PARSE_CODEPOINT_DOUBLE('\\', '(');
+  PARSE_CODEPOINT_DOUBLE('\\', '{');
+  PARSE_CODEPOINT_DOUBLE('\\', '[');
+  PARSE_CODEPOINT_DOUBLE('\\', '|');
+
+  assert(1 == parser.pattern.group.segments.len);
+
+  segment = passgen_pattern_group_get_segment(&parser.pattern.group, 0);
+  assert(segment);
+  assert(4 == segment->items.len);
+
+  item = passgen_pattern_segment_get_item(segment, 0);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_CHAR);
+  assert(item->data.character.codepoint == '(');
+  assert(item->repeat.min == 0);
+  assert(item->repeat.max == 0);
+
+  item = passgen_pattern_segment_get_item(segment, 1);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_CHAR);
+  assert(item->data.character.codepoint == '{');
+  assert(item->repeat.min == 0);
+  assert(item->repeat.max == 0);
+
+  item = passgen_pattern_segment_get_item(segment, 2);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_CHAR);
+  assert(item->data.character.codepoint == '[');
+  assert(item->repeat.min == 0);
+  assert(item->repeat.max == 0);
+
+  item = passgen_pattern_segment_get_item(segment, 3);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_CHAR);
+  assert(item->data.character.codepoint == '|');
+  assert(item->repeat.min == 0);
+  assert(item->repeat.max == 0);
 
   passgen_parser_free(&parser);
 
