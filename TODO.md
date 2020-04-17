@@ -3,6 +3,7 @@
 ## Current
 
 - [ ] improve token parser API with new codepoint semantics
+- [ ] implement question mark operator (a? -> 'a' or '')
 - [ ] rewrite the parser, it should be a state machine
     - [x] implement group parsing
     - [x] implement set parsing
