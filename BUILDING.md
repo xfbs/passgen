@@ -83,7 +83,17 @@ Set the option `ENABLE_IWYU` to YES to turn it on. For example, when setting up 
     cmake -S . -B build-iwyu -DENABLE_IWYU=YES
     cmake --build build-iwyu
 
-To generate a build folder and do the build with include-what-you-use activated.
+To generate a build folder and do the build with include-what-you-use
+activated.
+
+If you just want to run Include-What-You-Use and apply the suggested fixes,
+there is a bash script that will do just that. Run
+
+    ./scripts/fix-includes.sh
+
+From within the root of the project, it will generate a build folder in a
+temporary directory, run include-what-you-use on all files, and apply the fixes
+automatically.
 
 ## Running Tests
 
