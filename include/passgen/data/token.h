@@ -38,5 +38,6 @@ struct passgen_token {
 };
 
 void passgen_token_parser_init(struct passgen_token_parser *token_parser);
+const char *passgen_token_state_to_str(enum passgen_token_state state);
 
 PASSGEN_ENUM_MAPPING(passgen_token_state);
