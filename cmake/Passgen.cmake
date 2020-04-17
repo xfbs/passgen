@@ -11,7 +11,6 @@ function(passgen_check_symbols target)
       -n ${NM_PATH}
       -p passgen
       -p pattern
-      -p random
       -p parse
       -p reader
       -p unicode
