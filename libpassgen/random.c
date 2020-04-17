@@ -93,7 +93,8 @@ void passgen_random_reload(passgen_random_t *random) {
   random->pos = 0;
 }
 
-passgen_random_t *passgen_random_open_xorshift(passgen_random_t *random, uint64_t seed) {
+passgen_random_t *
+passgen_random_open_xorshift(passgen_random_t *random, uint64_t seed) {
   // create state
   uint64_t *state = malloc(sizeof(uint64_t));
   if(!state) return NULL;
@@ -185,7 +186,8 @@ passgen_random_t *passgen_random_open(passgen_random_t *random) {
 #endif
 }
 
-passgen_random_t *passgen_random_open_path(passgen_random_t *random, const char *path) {
+passgen_random_t *
+passgen_random_open_path(passgen_random_t *random, const char *path) {
   FILE *device = fopen(path, "r");
   if(!device) return NULL;
 
@@ -196,7 +198,8 @@ passgen_random_t *passgen_random_open_path(passgen_random_t *random, const char 
   return random;
 }
 
-passgen_random_t *passgen_random_open_file(passgen_random_t *random, FILE *file) {
+passgen_random_t *
+passgen_random_open_file(passgen_random_t *random, FILE *file) {
   random->data = file;
   random->read = passgen_random_read_file;
   random->close = passgen_random_close_file;
@@ -256,7 +259,8 @@ inline uint8_t passgen_random_uint8_max(passgen_random_t *random, uint8_t max) {
   return num;
 }
 
-inline uint16_t passgen_random_uint16_max(passgen_random_t *random, uint16_t max) {
+inline uint16_t
+passgen_random_uint16_max(passgen_random_t *random, uint16_t max) {
   if(max <= UINT8_MAX) {
     return passgen_random_uint8_max(random, max);
   }
@@ -276,7 +280,8 @@ inline uint16_t passgen_random_uint16_max(passgen_random_t *random, uint16_t max
   return num;
 }
 
-inline uint32_t passgen_random_uint32_max(passgen_random_t *random, uint32_t max) {
+inline uint32_t
+passgen_random_uint32_max(passgen_random_t *random, uint32_t max) {
   if(max < UINT16_MAX) {
     return passgen_random_uint16_max(random, max);
   }
@@ -297,7 +302,8 @@ inline uint32_t passgen_random_uint32_max(passgen_random_t *random, uint32_t max
   return num;
 }
 
-inline uint64_t passgen_random_uint64_max(passgen_random_t *random, uint64_t max) {
+inline uint64_t
+passgen_random_uint64_max(passgen_random_t *random, uint64_t max) {
   if(max < UINT32_MAX) {
     return passgen_random_uint32_max(random, max);
   }

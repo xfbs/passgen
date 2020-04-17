@@ -73,18 +73,22 @@ passgen_random_t *passgen_random_new_xorshift(uint64_t seed);
 passgen_random_t *passgen_random_open(passgen_random_t *random);
 
 /// Opens a new, existing random object using @p path as random device.
-passgen_random_t *passgen_random_open_path(passgen_random_t *random, const char *path);
+passgen_random_t *
+passgen_random_open_path(passgen_random_t *random, const char *path);
 
 /// Opens a new random object with @p file as randomness source.
-passgen_random_t *passgen_random_open_file(passgen_random_t *random, FILE *file);
+passgen_random_t *
+passgen_random_open_file(passgen_random_t *random, FILE *file);
 
 /// Opens a new random object using the xorshift PRNG (nor really random!)
-passgen_random_t *passgen_random_open_xorshift(passgen_random_t *random, uint64_t seed);
+passgen_random_t *
+passgen_random_open_xorshift(passgen_random_t *random, uint64_t seed);
 
 /// Close @p random. Use this with object opened by passgen_random_open().
 void passgen_random_close(passgen_random_t *random);
 
-/// Close and free @p random. Use this with objects allocated by passgen_random_new().
+/// Close and free @p random. Use this with objects allocated by
+/// passgen_random_new().
 void passgen_random_free(passgen_random_t *random);
 
 /// Read random data from @a random.

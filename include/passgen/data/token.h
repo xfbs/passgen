@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define PASSGEN_TOKEN_ESCAPED_BIT (1 << 30)
+#define PASSGEN_TOKEN_ESCAPED_BIT  (1 << 30)
 #define PASSGEN_TOKEN_UNICODE_MASK (1 << 21 - 1)
 
 // when updating any of the enums, make sure to also update the mappings.

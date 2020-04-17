@@ -18,7 +18,7 @@
 #include "tests.h"
 
 #define PREAMBLE()                                \
-  struct passgen_parser parser;                     \
+  struct passgen_parser parser;                   \
   struct passgen_token_parser token_parser = {0}; \
   struct passgen_token token = {0};               \
   struct passgen_pattern_segment *segment;        \

@@ -10,7 +10,9 @@ int passgen_parse_start(struct passgen_parser *parser);
 int passgen_parse_finish(struct passgen_parser *parser);
 
 // parses a single token.
-int passgen_parse_token(struct passgen_parser *parser, struct passgen_token *token);
+int passgen_parse_token(
+    struct passgen_parser *parser,
+    struct passgen_token *token);
 
 int passgen_parse_group(
     struct passgen_parser *parser,

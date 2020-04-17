@@ -63,7 +63,7 @@ test_result test_token_special_escaped(void) {
 #define TEST_SPECIAL_ESCAPED(chr)                                              \
   assert(passgen_token_parse(&parser, &token, '\\') == PASSGEN_TOKEN_ESCAPED); \
   assert(parser.state == PASSGEN_TOKEN_ESCAPED);                               \
-  assert(passgen_token_parse(&parser, &token, chr) == PASSGEN_TOKEN_INIT);      \
+  assert(passgen_token_parse(&parser, &token, chr) == PASSGEN_TOKEN_INIT);     \
   assert(parser.state == PASSGEN_TOKEN_INIT);                                  \
   assert(token.codepoint == (chr | PASSGEN_TOKEN_ESCAPED_BIT));
 

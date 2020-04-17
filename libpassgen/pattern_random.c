@@ -46,8 +46,12 @@ size_t pattern_passgen_random_fill(
       .cur = 0,
   };
 
-  int ret =
-      pattern_random(pattern, rand, env, &fillpos, pattern_passgen_random_write_buffer);
+  int ret = pattern_random(
+      pattern,
+      rand,
+      env,
+      &fillpos,
+      pattern_passgen_random_write_buffer);
 
   if(0 != ret) {
     return 0;
@@ -217,7 +221,12 @@ static inline int pattern_passgen_random_special(
           func);
       break;
     case PATTERN_SPECIAL_WORDLIST:
-      return pattern_passgen_random_special_wordlist(special, rand, env, data, func);
+      return pattern_passgen_random_special_wordlist(
+          special,
+          rand,
+          env,
+          data,
+          func);
       break;
     default: assert(false); break;
   }
@@ -239,7 +248,12 @@ static inline int pattern_passgen_random_segment(
     pattern_passgen_random_cb *func) {
   switch(segment->kind) {
     case PATTERN_RANGE:
-      return pattern_passgen_random_ranges(&segment->data.range, rand, env, data, func);
+      return pattern_passgen_random_ranges(
+          &segment->data.range,
+          rand,
+          env,
+          data,
+          func);
     case PATTERN_CHAR:
       return pattern_passgen_random_character(
           &segment->data.character,
@@ -255,7 +269,12 @@ static inline int pattern_passgen_random_segment(
           data,
           func);
     case PATTERN_GROUP:
-      return pattern_passgen_random_group(&segment->data.group, rand, env, data, func);
+      return pattern_passgen_random_group(
+          &segment->data.group,
+          rand,
+          env,
+          data,
+          func);
   }
 
   // unreachable
