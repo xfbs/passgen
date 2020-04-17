@@ -10,7 +10,7 @@
     - [ ] utf8.h
     - [ ] unicode.h
     - [ ] data/parser.h
-    - [ ] random.h
+    - [x] random.h
 - [ ] rewrite the parser, it should be a state machine
     - [x] implement group parsing
     - [x] implement set parsing
