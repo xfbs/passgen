@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #define PASSGEN_TOKEN_ESCAPED_BIT (1 << 30)
+#define PASSGEN_TOKEN_UNICODE_MASK (1 << 21 - 1)
 
 // when updating any of the enums, make sure to also update the mappings.
 enum passgen_token_state {
@@ -35,5 +36,7 @@ struct passgen_token {
   uint32_t codepoint;
   void *origin;
 };
+
+void passgen_token_parser_init(struct passgen_token_parser *token_parser);
 
 PASSGEN_ENUM_MAPPING(passgen_token_state);
