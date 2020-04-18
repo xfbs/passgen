@@ -419,3 +419,56 @@ test_result test_parser_group_ignore_escaped(void) {
 
   return test_ok;
 }
+
+test_result test_parser_item_maybe(void) {
+  PREAMBLE();
+  PARSE_CODEPOINT('a');
+  PARSE_CODEPOINT('a');
+  PARSE_CODEPOINT('?');
+  PARSE_CODEPOINT('(');
+  PARSE_CODEPOINT(')');
+  PARSE_CODEPOINT('(');
+  PARSE_CODEPOINT(')');
+  PARSE_CODEPOINT('?');
+
+  // single segment containing char 'a'
+  assert(1 == parser.pattern.group.segments.len);
+
+  segment = passgen_pattern_group_get_segment(&parser.pattern.group, 0);
+  assert(segment);
+  assert(4 == segment->items.len);
+
+  item = passgen_pattern_segment_get_item(segment, 0);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_CHAR);
+  assert(item->data.character.codepoint == 'a');
+  assert(item->repeat.min == 1);
+  assert(item->repeat.max == 1);
+  assert(item->maybe == false);
+
+  item = passgen_pattern_segment_get_item(segment, 1);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_CHAR);
+  assert(item->data.character.codepoint == 'a');
+  assert(item->repeat.min == 1);
+  assert(item->repeat.max == 1);
+  assert(item->maybe == true);
+
+  item = passgen_pattern_segment_get_item(segment, 2);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_GROUP);
+  assert(item->repeat.min == 1);
+  assert(item->repeat.max == 1);
+  assert(item->maybe == false);
+
+  item = passgen_pattern_segment_get_item(segment, 3);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_GROUP);
+  assert(item->repeat.min == 1);
+  assert(item->repeat.max == 1);
+  assert(item->maybe == true);
+
+  passgen_parser_free(&parser);
+
+  return test_ok;
+}
