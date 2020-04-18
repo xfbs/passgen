@@ -102,13 +102,15 @@ int passgen_parse_group(
             NULL);
         return 0;
       case '{':
-        item = passgen_pattern_segment_get_item(
-            state->data.group.segment,
-            state->data.group.segment->items.len - 1);
+        item = passgen_pattern_item_stack_top(&state->data.group.segment->items);
         // clear default repetition
         item->repeat.min = 0;
         item->repeat.max = 0;
         parser_state_push_repeat(parser, item);
+        return 0;
+      case '?':
+        item = passgen_pattern_item_stack_top(&state->data.group.segment->items);
+        item->maybe = true;
         return 0;
       default: break;
     }

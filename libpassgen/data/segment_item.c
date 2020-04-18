@@ -11,3 +11,9 @@ void passgen_pattern_item_free(struct passgen_pattern_item *item) {
     default: break;
   }
 }
+
+void passgen_pattern_item_init(struct passgen_pattern_item *item) {
+  item->repeat.min = 1;
+  item->repeat.max = 1;
+  item->maybe = 0;
+}

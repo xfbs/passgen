@@ -1,4 +1,6 @@
 #pragma once
+#include <stdbool.h>
+
 #include "passgen/container/stack.h"
 #include "passgen/data/char.h"
 #include "passgen/data/group.h"
@@ -18,6 +20,8 @@ typedef struct passgen_pattern_item {
   } data;
 
   struct passgen_pattern_repeat repeat;
+  bool maybe;
 } passgen_pattern_item_t;
 
+void passgen_pattern_item_init(struct passgen_pattern_item *item);
 void passgen_pattern_item_free(struct passgen_pattern_item *item);

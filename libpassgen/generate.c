@@ -137,6 +137,9 @@ int passgen_generate_character(
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
+  (void) rand;
+  (void) env;
+
   return func(data, character->codepoint);
 }
 
@@ -234,6 +237,13 @@ int passgen_generate_item(
     struct pattern_env *env,
     void *data,
     passgen_generate_cb *func) {
+  // if it is a maybe (has a question mark following it), decide first if we
+  // want to emit it or not.
+  if(item->maybe) {
+    if(!passgen_random_bool(rand)) {
+      return 0;
+    }
+  }
   size_t reps = passgen_generate_repeat(rand, env, &item->repeat);
 
   for(size_t i = 0; i < reps; i++) {
