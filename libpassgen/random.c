@@ -245,6 +245,12 @@ inline uint64_t passgen_random_uint64(passgen_random_t *random) {
   return data;
 }
 
+inline bool passgen_random_bool(passgen_random_t *random) {
+  uint8_t data;
+  passgen_random_read(random, &data, sizeof(data));
+  return (data & 128) == 0;
+}
+
 inline uint8_t passgen_random_uint8_max(passgen_random_t *random, uint8_t max) {
   uint8_t mask = max;
   mask |= mask >> 4;

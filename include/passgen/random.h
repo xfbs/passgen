@@ -4,6 +4,7 @@
 /// random data device, typically `/dev/urandom`, that can be used safely.
 
 #pragma once
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -108,6 +109,9 @@ uint32_t passgen_random_uint32(passgen_random_t *random);
 
 /// Read a `uint64_t` from @p random.
 uint64_t passgen_random_uint64(passgen_random_t *random);
+
+/// Generate a random boolean.
+bool passgen_random_bool(passgen_random_t *random);
 
 /// Read a `uint8_t` that is strictly smaller than @p max from @p random.
 ///
