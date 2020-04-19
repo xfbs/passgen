@@ -226,7 +226,7 @@ int passgen_parse_repeat_range(
   return -1;
 }
 
-int parse_finish(struct passgen_parser *parser) {
+int passgen_parse_finish(struct passgen_parser *parser) {
   // TODO: implement
   (void)parser;
 

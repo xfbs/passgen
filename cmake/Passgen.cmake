@@ -11,8 +11,8 @@ function(passgen_check_symbols target)
       -n ${NM_PATH}
       -p passgen
       -p pattern
-      -p parse
       -p reader
+      -p parser
       -p unicode
       -p utf8
       $<TARGET_FILE:${target}>
