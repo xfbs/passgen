@@ -3,7 +3,6 @@
 ## Current
 
 - [ ] improve token parser API with new codepoint semantics
-- [ ] implement question mark operator (a? -> 'a' or '')
 - [ ] rewrite the parser, it should be a state machine
     - [x] implement group parsing
     - [x] implement set parsing
@@ -23,9 +22,6 @@
 - [ ] write benchmark for new parser
 - [ ] try changing parser state stack to linked list?
 - [ ] implement stack depth limiting for new parser (as separate method)
-- [ ] squash compiler warnings
-    - [x] get rid of easy ones
-    - [ ] get rid of all
 - [ ] implement code profiling
 - [ ] implement static analysis (linter, clang-tidy?)
 - [ ] fix debug build on alpine
@@ -36,6 +32,10 @@
     - [ ] data/parser.h
     - [x] parser.h
     - [x] random.h
+- [x] implement question mark operator (a? -> 'a' or '')
+- [x] squash compiler warnings
+    - [x] get rid of easy ones
+    - [x] get rid of all
 - [x] incorporate token parser change into parser
 - [x] remove normal_escaped handling
 - [x] use CPack in CI to generate packages and publish
