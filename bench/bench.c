@@ -289,6 +289,8 @@ void bench(const struct bench_options *opts, const struct bench_item *items) {
 void bench_list_json(
     const struct bench_options *opts,
     const struct bench_item *items) {
+  (void) opts;
+
   json_t *list = json_array();
 
   for(size_t i = 0; items[i].name; i++) {
@@ -308,6 +310,8 @@ void bench_list_json(
 void bench_list_text(
     const struct bench_options *opts,
     const struct bench_item *items) {
+  // FIXME
+  (void) opts;
   for(size_t i = 0; items[i].name; i++) {
     printf("%s  %s\n", items[i].name, items[i].info);
   }

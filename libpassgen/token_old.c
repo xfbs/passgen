@@ -205,6 +205,10 @@ passgen_token_parse_unicode(size_t start, unicode_iter_t *iter) {
 
 passgen_token_t passgen_token_wordlist(size_t start, unicode_iter_t *iter) {
   // TODO: parse \w{name}
+  (void) start;
+  (void) iter;
+
+  return (passgen_token_t){};
 }
 
 typedef passgen_token_t

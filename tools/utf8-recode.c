@@ -14,6 +14,10 @@ int main(int argc, char *argv[]) {
   uint8_t utf8_output[128];
   int ret;
 
+  (void) argc;
+  (void) argv;
+  (void) utf8_output;
+
   while(true) {
     if(ferror(stdin)) {
       goto error;

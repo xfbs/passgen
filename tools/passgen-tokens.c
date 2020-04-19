@@ -12,6 +12,10 @@ int main(int argc, char *argv[]) {
   uint32_t codepoint_buffer[128];
   size_t stdin_buffer_len;
 
+  (void) argc;
+  (void) argv;
+  (void) codepoint_buffer;
+
   while((stdin_buffer_len =
              fread(stdin_buffer, 1, sizeof(stdin_buffer), stdin)) > 0) {
     if(ferror(stdin)) {
@@ -41,6 +45,7 @@ void dump(const unsigned char *str) {
     json_object_set_new(obj, "character", json_integer(str[i]));
 
     int ret = passgen_token_parse(&parser, &token, str[i]);
+    (void) ret;
 
     json_t *parser_json = passgen_token_parser_to_json(&parser);
     json_object_set_new(obj, "parser", parser_json);

@@ -206,6 +206,8 @@ pattern_result_t pattern_char_parse(
     pattern_char_t *character,
     unicode_iter_t *iter,
     passgen_mem_t *mem) {
+  (void) mem;
+
   pattern_result_t result;
   character->pos.offset = iter->pos;
 
@@ -223,6 +225,8 @@ pattern_result_t pattern_range_parse(
     pattern_range_t *range,
     unicode_iter_t *iter,
     passgen_mem_t *mem) {
+  (void) mem;
+
   passgen_token_t token;
 
   range->pos.offset = iter->pos;
@@ -385,6 +389,8 @@ pattern_result_t pattern_special_parse(
     pattern_special_t *special,
     unicode_iter_t *iter,
     passgen_mem_t *mem) {
+  (void) mem;
+
   pattern_result_t result;
 
   special->pos.offset = iter->pos;
@@ -429,14 +435,18 @@ pattern_result_t pattern_special_parse(
 }
 
 size_t pattern_maxlen(pattern_t *pattern) {
+  (void) pattern;
+
   return 0;
 }
 
 size_t pattern_minlen(pattern_t *pattern) {
+  (void) pattern;
   return 0;
 }
 
 size_t pattern_choices(pattern_t *pattern) {
+  (void) pattern;
   return 0;
 }
 

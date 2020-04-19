@@ -11,6 +11,7 @@ void *bench_pattern_parse_setup(const char *data) {
 }
 
 void bench_pattern_parse_func(void *data) {
+  (void) data;
   /*
   const char *str = data;
 
@@ -21,4 +22,5 @@ void bench_pattern_parse_func(void *data) {
 }
 
 void bench_pattern_parse_free(void *state) {
+  (void) state;
 }
