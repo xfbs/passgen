@@ -40,5 +40,3 @@ struct passgen_parser_state *parser_state_push_special(
 
 void passgen_parser_init(struct passgen_parser *parser);
 void passgen_parser_free(struct passgen_parser *parser);
-
-void parser_state_pop(struct passgen_parser *parser);

@@ -73,10 +73,6 @@ void passgen_parser_free(struct passgen_parser *parser) {
   passgen_pattern_free(&parser->pattern);
 }
 
-void parser_state_pop(struct passgen_parser *parser) {
-  passgen_parser_state_stack_pop(&parser->state, NULL);
-}
-
 struct passgen_parser_state *
 passgen_parser_get_state(struct passgen_parser *parser, size_t n) {
   return passgen_parser_state_stack_get(&parser->state, n);
