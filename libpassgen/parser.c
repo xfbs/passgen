@@ -263,6 +263,7 @@ int passgen_parse_special_name_end(
     struct passgen_parser_state *state) {
   if(token->codepoint == '{') {
     state->type = PASSGEN_PARSER_REPEAT;
+    state->data.repeat.repeat = &state->data.special.special->length;
     return 0;
   }
 
