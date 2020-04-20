@@ -11,12 +11,8 @@ struct passgen_pattern_group;
 struct passgen_pattern_special;
 
 typedef struct passgen_pattern_segment {
-  struct passgen_pattern_substring pos;
-
   // array of segment_items
   struct passgen_pattern_item_stack items;
-
-  // struct pattern_repeat repeat;
 } passgen_pattern_segment_t;
 
 void passgen_pattern_segment_init(struct passgen_pattern_segment *segment);
