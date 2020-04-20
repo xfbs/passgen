@@ -38,6 +38,16 @@ Create 12-digit alphanumeric password.
     $ passgen "[a-zA-Z0-9]{12}"
     DnJ4bOIGmZbj
 
+Create something that looks like an email address.
+
+    $ passgen '[a-z0-9.]{3,10}@[a-z]{3,10}.(com|net|org)'
+    njd0xh@gbnjzlkij.com
+
+Create an password consisting of three pronounceable (but randomly generated) words.
+
+    $ passgen '\p[english]{9,12}(-\p[english]{9,12}){2}'
+    arapurity-readygoauce-nathundly
+
 ## Installing
 
 If you are on macOS, you can install this using homebrew.
@@ -45,6 +55,12 @@ If you are on macOS, you can install this using homebrew.
     brew install xfbs/local/passgen
 
 ## Building
+
+In general, if you have all dependencies installed, doing the following should result in a working binary.
+
+    $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    $ cmake --build build
+    $ cmake --install build
 
 See the [BUILDING.md](BUILDING.md) for more information about building the project.
 
