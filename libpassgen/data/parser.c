@@ -45,6 +45,8 @@ struct passgen_parser_state *passgen_parser_state_push_repeat(
     struct passgen_pattern_repeat *repeat) {
   struct passgen_parser_state *state = passgen_parser_state_stack_push(&parser->state, NULL);
   state->type = PASSGEN_PARSER_REPEAT;
+  repeat->min = 0;
+  repeat->max = 0;
   state->data.repeat.repeat = repeat;
 
   return state;

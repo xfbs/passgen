@@ -115,9 +115,6 @@ int passgen_parse_group(
         return 0;
       case '{':
         item = passgen_pattern_item_stack_top(&state->data.group.segment->items);
-        // clear default repetition
-        item->repeat.min = 0;
-        item->repeat.max = 0;
         passgen_parser_state_push_repeat(parser, &item->repeat);
         return 0;
       case '?':
@@ -262,9 +259,9 @@ int passgen_parse_special_name_end(
     struct passgen_token *token,
     struct passgen_parser_state *state) {
   if(token->codepoint == '{') {
-    state->type = PASSGEN_PARSER_REPEAT;
     struct passgen_pattern_repeat *length = &state->data.special.special->length;
-    state->data.repeat.repeat = length;
+    passgen_parser_state_stack_pop(&parser->state, NULL);
+    passgen_parser_state_push_repeat(parser, length);
     return 0;
   }
 
