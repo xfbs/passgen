@@ -57,10 +57,7 @@ struct passgen_parser_state *passgen_parser_state_push_special(
     struct passgen_pattern_special *special) {
   struct passgen_parser_state *state = passgen_parser_state_stack_push(&parser->state, NULL);
   state->type = PASSGEN_PARSER_SPECIAL;
-
-  // FIXME
-  (void) special;
-  //state->data.repeat.item = item;
+  state->data.special.special = special;
 
   return state;
 }
