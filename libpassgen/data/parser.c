@@ -42,10 +42,10 @@ struct passgen_parser_state *passgen_parser_state_push_set(
 
 struct passgen_parser_state *passgen_parser_state_push_repeat(
     struct passgen_parser *parser,
-    struct passgen_pattern_item *item) {
+    struct passgen_pattern_repeat *repeat) {
   struct passgen_parser_state *state = passgen_parser_state_stack_push(&parser->state, NULL);
   state->type = PASSGEN_PARSER_REPEAT;
-  state->data.repeat.item = item;
+  state->data.repeat.repeat = repeat;
 
   return state;
 }

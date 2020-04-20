@@ -26,6 +26,10 @@
   passgen_parser_init(&parser);                   \
   assert(0 == passgen_parse_start(&parser))
 
+#define POSTAMBLE() \
+  assert(0 == passgen_parse_finish(&parser)) \
+  passgen_parser_free(&parser)
+
 #define PARSE_CODEPOINT(codepoint)                             \
   assert(                                                      \
       passgen_token_parse(&token_parser, &token, codepoint) == \
@@ -50,7 +54,7 @@ test_result test_parser_empty(void) {
   segment = passgen_pattern_group_get_segment(&parser.pattern.group, 0);
   assert(0 == segment->items.len);
 
-  passgen_parser_free(&parser);
+  POSTAMBLE();
 
   return test_ok;
 }
@@ -71,7 +75,7 @@ test_result test_parser_single_char(void) {
   assert(item->kind == PASSGEN_PATTERN_CHAR);
   assert(item->data.character.codepoint == 'a');
 
-  passgen_parser_free(&parser);
+  POSTAMBLE();
 
   return test_ok;
 }
@@ -98,7 +102,7 @@ test_result test_parser_multi_char(void) {
   assert(item->kind == PASSGEN_PATTERN_CHAR);
   assert(item->data.character.codepoint == 'b');
 
-  passgen_parser_free(&parser);
+  POSTAMBLE();
 
   return test_ok;
 }
@@ -127,7 +131,7 @@ test_result test_parser_multi_groups(void) {
   assert(item->kind == PASSGEN_PATTERN_CHAR);
   assert(item->data.character.codepoint == 'b');
 
-  passgen_parser_free(&parser);
+  POSTAMBLE();
 
   return test_ok;
 }
@@ -159,7 +163,7 @@ test_result test_parser_nested_groups(void) {
   assert(item->repeat.min == 1);
   assert(item->repeat.max == 1);
 
-  passgen_parser_free(&parser);
+  POSTAMBLE();
 
   return test_ok;
 }
@@ -207,7 +211,7 @@ test_result test_parser_multi_nested_groups(void) {
   assert(item->kind == PASSGEN_PATTERN_CHAR);
   assert(item->data.character.codepoint == 'b');
 
-  passgen_parser_free(&parser);
+  POSTAMBLE();
 
   return test_ok;
 }
@@ -243,7 +247,7 @@ test_result test_parser_set_simple(void) {
   assert(range->start == 'b');
   assert(range->end == 'b');
 
-  passgen_parser_free(&parser);
+  POSTAMBLE();
 
   return test_ok;
 }
@@ -275,7 +279,7 @@ test_result test_parser_range_simple(void) {
   assert(range->start == 'a');
   assert(range->end == 'b');
 
-  passgen_parser_free(&parser);
+  POSTAMBLE();
 
   return test_ok;
 }
@@ -315,7 +319,7 @@ test_result test_parser_range_multiple(void) {
   assert(range->start == 'c');
   assert(range->end == 'd');
 
-  passgen_parser_free(&parser);
+  POSTAMBLE();
 
   return test_ok;
 }
@@ -369,7 +373,7 @@ test_result test_parser_char_repeat_range(void) {
   assert(item->repeat.min == 2);
   assert(item->repeat.max == 4);
 
-  passgen_parser_free(&parser);
+  POSTAMBLE();
 
   return test_ok;
 }
@@ -415,7 +419,7 @@ test_result test_parser_group_ignore_escaped(void) {
   assert(item->repeat.min == 1);
   assert(item->repeat.max == 1);
 
-  passgen_parser_free(&parser);
+  POSTAMBLE();
 
   return test_ok;
 }
@@ -468,7 +472,31 @@ test_result test_parser_item_maybe(void) {
   assert(item->repeat.max == 1);
   assert(item->maybe == true);
 
-  passgen_parser_free(&parser);
+  POSTAMBLE();
+
+  return test_ok;
+}
+
+test_result test_parser_special_pronounceable(void) {
+  PREAMBLE();
+  PARSE_CODEPOINT_DOUBLE('\\', 'p');
+  PARSE_CODEPOINT('[');
+  PARSE_CODEPOINT('e');
+  PARSE_CODEPOINT('n');
+  PARSE_CODEPOINT('g');
+  PARSE_CODEPOINT('l');
+  PARSE_CODEPOINT('i');
+  PARSE_CODEPOINT('s');
+  PARSE_CODEPOINT('h');
+  PARSE_CODEPOINT(']');
+  PARSE_CODEPOINT('{');
+  PARSE_CODEPOINT('9');
+  PARSE_CODEPOINT(',');
+  PARSE_CODEPOINT('1');
+  PARSE_CODEPOINT('2');
+  PARSE_CODEPOINT('}');
+
+  POSTAMBLE();
 
   return test_ok;
 }

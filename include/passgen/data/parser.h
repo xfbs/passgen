@@ -32,7 +32,7 @@ struct passgen_parser_state *passgen_parser_state_push_set(
 
 struct passgen_parser_state *passgen_parser_state_push_repeat(
     struct passgen_parser *parser,
-    struct passgen_pattern_item *item);
+    struct passgen_pattern_repeat *repeat);
 
 struct passgen_parser_state *passgen_parser_state_push_special(
     struct passgen_parser *parser,

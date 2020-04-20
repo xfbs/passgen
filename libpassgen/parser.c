@@ -19,6 +19,10 @@
 #include "passgen/memory.h"
 
 int passgen_parse_start(struct passgen_parser *parser) {
+  if(parser->state.len != 0) {
+    return -1;
+  }
+
   // set initial group
   passgen_parser_state_push_group(
       parser,
@@ -42,6 +46,12 @@ int passgen_parse_token(
       return passgen_parse_repeat(parser, token, state);
     case PASSGEN_PARSER_REPEAT_RANGE:
       return passgen_parse_repeat_range(parser, token, state);
+    case PASSGEN_PARSER_SPECIAL:
+      return passgen_parse_special(parser, token, state);
+    case PASSGEN_PARSER_SPECIAL_NAME:
+      return passgen_parse_special_name(parser, token, state);
+    case PASSGEN_PARSER_SPECIAL_NAME_END:
+      return passgen_parse_special_name_end(parser, token, state);
     default: return -1;
   }
 }
@@ -108,7 +118,7 @@ int passgen_parse_group(
         // clear default repetition
         item->repeat.min = 0;
         item->repeat.max = 0;
-        passgen_parser_state_push_repeat(parser, item);
+        passgen_parser_state_push_repeat(parser, &item->repeat);
         return 0;
       case '?':
         item = passgen_pattern_item_stack_top(&state->data.group.segment->items);
@@ -121,8 +131,6 @@ int passgen_parse_group(
   struct passgen_pattern_char *chr =
       passgen_pattern_segment_new_char(state->data.group.segment);
   chr->codepoint = token->codepoint;
-  chr->repeat.min = 1;
-  chr->repeat.max = 1;
 
   return 0;
 }
@@ -182,13 +190,13 @@ int passgen_parse_repeat(
     struct passgen_parser_state *state) {
   // this set's over
   if(token->codepoint == '}') {
-    state->data.repeat.item->repeat.max = state->data.repeat.item->repeat.min;
+    state->data.repeat.repeat->max = state->data.repeat.repeat->min;
     passgen_parser_state_stack_pop(&parser->state, NULL);
     return 0;
   }
 
   if(token->codepoint == ',') {
-    state->data.repeat.item->repeat.max = 0;
+    state->data.repeat.repeat->max = 0;
     state->type = PASSGEN_PARSER_REPEAT_RANGE;
     return 0;
   }
@@ -196,8 +204,8 @@ int passgen_parse_repeat(
   if(token->codepoint >= '0' && token->codepoint <= '9') {
     uint8_t digit = token->codepoint - '0';
 
-    state->data.repeat.item->repeat.min *= 10;
-    state->data.repeat.item->repeat.min += digit;
+    state->data.repeat.repeat->min *= 10;
+    state->data.repeat.repeat->min += digit;
 
     return 0;
   }
@@ -217,8 +225,8 @@ int passgen_parse_repeat_range(
   if(token->codepoint >= '0' && token->codepoint <= '9') {
     uint8_t digit = token->codepoint - '0';
 
-    state->data.repeat.item->repeat.max *= 10;
-    state->data.repeat.item->repeat.max += digit;
+    state->data.repeat.repeat->max *= 10;
+    state->data.repeat.repeat->max += digit;
 
     return 0;
   }
@@ -226,9 +234,46 @@ int passgen_parse_repeat_range(
   return -1;
 }
 
+int passgen_parse_special(
+    struct passgen_parser *parser,
+    struct passgen_token *token,
+    struct passgen_parser_state *state) {
+  if(token->codepoint == '[') {
+    state->type = PASSGEN_PARSER_SPECIAL_NAME;
+    return 0;
+  }
+
+  return -1;
+}
+
+int passgen_parse_special_name(
+    struct passgen_parser *parser,
+    struct passgen_token *token,
+    struct passgen_parser_state *state) {
+  if(token->codepoint == ']') {
+    state->type = PASSGEN_PARSER_SPECIAL_NAME_END;
+  }
+
+  return 0;
+}
+
+int passgen_parse_special_name_end(
+    struct passgen_parser *parser,
+    struct passgen_token *token,
+    struct passgen_parser_state *state) {
+  if(token->codepoint == '{') {
+    state->type = PASSGEN_PARSER_REPEAT;
+    return 0;
+  }
+
+  return -1;
+}
+
 int passgen_parse_finish(struct passgen_parser *parser) {
-  // TODO: implement
-  (void)parser;
+  // make sure we just have one state on the stack, the initial one.
+  if(parser->state.len != 1) {
+    return -1;
+  }
 
   return 0;
 }

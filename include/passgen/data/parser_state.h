@@ -12,7 +12,7 @@ enum passgen_parser_state_type {
   PASSGEN_PARSER_REPEAT_RANGE,
   PASSGEN_PARSER_SPECIAL,
   PASSGEN_PARSER_SPECIAL_NAME,
-  PASSGEN_PARSER_SPECIAL_LEN,
+  PASSGEN_PARSER_SPECIAL_NAME_END,
   PASSGEN_PARSER_DONE,
 };
 
@@ -24,7 +24,7 @@ struct passgen_parser_state {
       struct passgen_pattern_segment *segment;
     } group;
     struct {
-      struct passgen_pattern_item *item;
+      struct passgen_pattern_repeat *repeat;
     } repeat;
     struct {
       struct passgen_pattern_set *set;
