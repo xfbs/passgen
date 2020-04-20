@@ -20,7 +20,7 @@
 
 int passgen_parse_start(struct passgen_parser *parser) {
   // set initial group
-  parser_state_push_group(
+  passgen_parser_state_push_group(
       parser,
       &parser->pattern.group,
       passgen_pattern_group_new_segment(&parser->pattern.group));
@@ -73,7 +73,7 @@ int passgen_parse_group(
         // special token
         special = passgen_pattern_segment_new_special(state->data.group.segment);
         passgen_pattern_special_init_char(special, codepoint);
-        parser_state_push_special(parser, special);
+        passgen_parser_state_push_special(parser, special);
         break;
       default:
         // error
@@ -92,13 +92,13 @@ int passgen_parse_group(
       case '(':
         // we're supposed to read something in.
         group = passgen_pattern_segment_new_group(state->data.group.segment);
-        parser_state_push_group(
+        passgen_parser_state_push_group(
             parser,
             group,
             passgen_pattern_group_new_segment(group));
         return 0;
       case '[':
-        parser_state_push_set(
+        passgen_parser_state_push_set(
             parser,
             passgen_pattern_segment_new_set(state->data.group.segment),
             NULL);
@@ -108,7 +108,7 @@ int passgen_parse_group(
         // clear default repetition
         item->repeat.min = 0;
         item->repeat.max = 0;
-        parser_state_push_repeat(parser, item);
+        passgen_parser_state_push_repeat(parser, item);
         return 0;
       case '?':
         item = passgen_pattern_item_stack_top(&state->data.group.segment->items);

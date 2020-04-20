@@ -12,15 +12,15 @@ struct passgen_pattern_range;
 struct passgen_pattern_segment;
 struct passgen_pattern_set;
 
-struct passgen_parser_state *parser_state_push(struct passgen_parser *parser) {
+struct passgen_parser_state *passgen_parser_state_push(struct passgen_parser *parser) {
   return passgen_parser_state_stack_push(&parser->state, NULL);
 }
 
-struct passgen_parser_state *parser_state_push_group(
+struct passgen_parser_state *passgen_parser_state_push_group(
     struct passgen_parser *parser,
     struct passgen_pattern_group *group,
     struct passgen_pattern_segment *segment) {
-  struct passgen_parser_state *state = parser_state_push(parser);
+  struct passgen_parser_state *state = passgen_parser_state_stack_push(&parser->state, NULL);
   state->type = PASSGEN_PARSER_GROUP;
   state->data.group.group = group;
   state->data.group.segment = segment;
@@ -28,11 +28,11 @@ struct passgen_parser_state *parser_state_push_group(
   return state;
 }
 
-struct passgen_parser_state *parser_state_push_set(
+struct passgen_parser_state *passgen_parser_state_push_set(
     struct passgen_parser *parser,
     struct passgen_pattern_set *set,
     struct passgen_pattern_range *range) {
-  struct passgen_parser_state *state = parser_state_push(parser);
+  struct passgen_parser_state *state = passgen_parser_state_stack_push(&parser->state, NULL);
   state->type = PASSGEN_PARSER_SET;
   state->data.set.set = set;
   state->data.set.range = range;
@@ -40,20 +40,20 @@ struct passgen_parser_state *parser_state_push_set(
   return state;
 }
 
-struct passgen_parser_state *parser_state_push_repeat(
+struct passgen_parser_state *passgen_parser_state_push_repeat(
     struct passgen_parser *parser,
     struct passgen_pattern_item *item) {
-  struct passgen_parser_state *state = parser_state_push(parser);
+  struct passgen_parser_state *state = passgen_parser_state_stack_push(&parser->state, NULL);
   state->type = PASSGEN_PARSER_REPEAT;
   state->data.repeat.item = item;
 
   return state;
 }
 
-struct passgen_parser_state *parser_state_push_special(
+struct passgen_parser_state *passgen_parser_state_push_special(
     struct passgen_parser *parser,
     struct passgen_pattern_special *special) {
-  struct passgen_parser_state *state = parser_state_push(parser);
+  struct passgen_parser_state *state = passgen_parser_state_stack_push(&parser->state, NULL);
   state->type = PASSGEN_PARSER_SPECIAL;
 
   // FIXME

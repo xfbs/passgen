@@ -12,7 +12,6 @@ function(passgen_check_symbols target)
       -p passgen
       -p pattern
       -p reader
-      -p parser
       -p unicode
       -p utf8
       $<TARGET_FILE:${target}>
