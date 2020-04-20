@@ -26,12 +26,13 @@
 - [ ] implement static analysis (linter, clang-tidy?)
 - [ ] fix debug build on alpine
 - [ ] change all APIs that aren't prefixed with passgen_ to have that prefix
-    - [ ] pattern.h
-    - [ ] utf8.h
-    - [ ] unicode.h
-    - [ ] data/parser.h
-    - [x] parser.h
-    - [x] random.h
+    - [x] `parser_*`
+    - [x] `random_*`
+    - [x] `parse_*`
+    - [ ] `pattern_*`
+    - [ ] `reader_*`
+    - [ ] `unicode_*`
+    - [ ] `utf8_*`
 - [x] implement question mark operator (a? -> 'a' or '')
 - [x] squash compiler warnings
     - [x] get rid of easy ones
