@@ -158,7 +158,7 @@ int passgen_generate_special_pronounceable(
 
   /* TODO: get tries and default from env! */
   size_t count = passgen_pronounceable_len(
-      &passgen_pronounceable_english,
+      PASSGEN_PRONOUNCEABLE_ENGLISH,
       rand,
       buffer,
       special->length.min,
