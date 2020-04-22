@@ -14,6 +14,8 @@ size_t passgen_random_read_system(void *dest, size_t size, void *data) {
 #endif
 
 #ifdef __APPLE__
+#  define PASSGEN_RANDOM_HAVE_SYSTEM
+
 size_t passgen_random_read_system(void *dest, size_t size, void *data) {
   (void) data;
   arc4random_buf(dest, size);
@@ -21,10 +23,9 @@ size_t passgen_random_read_system(void *dest, size_t size, void *data) {
 }
 #endif
 
-#define check(ptr) \
-  if(ptr == NULL) goto error
-
+#ifndef PASSGEN_RANDOM_HAVE_SYSTEM
 static const char *passgen_random_default_device = "/dev/urandom";
+#endif
 
 size_t passgen_random_read_file(void *dest, size_t size, void *data) {
   return fread(dest, 1, size, data);
