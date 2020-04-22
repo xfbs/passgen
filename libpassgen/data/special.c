@@ -1,8 +1,13 @@
 #include "passgen/data/special.h"
+#include "passgen/assert.h"
 
 void passgen_pattern_special_init_char(
     struct passgen_pattern_special *special,
     uint32_t kind) {
+  // set sane defaults for length.
+  special->length.min = 0;
+  special->length.max = 64;
+
   switch(kind) {
     case 'p':
       special->kind = PASSGEN_PATTERN_SPECIAL_PRONOUNCABLE;
@@ -11,7 +16,7 @@ void passgen_pattern_special_init_char(
       special->kind = PASSGEN_PATTERN_SPECIAL_WORDLIST;
       break;
     default:
-      special->kind = 3;
+      assert(false);
       break;
   }
 }
