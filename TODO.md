@@ -2,6 +2,8 @@
 
 ## Current
 
+- [ ] make pronounceable work for passgen2
+- [ ] investigate crashes with passgen "\p[german]{2,20}"
 - [ ] expose all enum mappings in their headers
 - [ ] make pronounceable take simple pointer to markov structure
 - [ ] move data structures from pronounceable and memory into data/
