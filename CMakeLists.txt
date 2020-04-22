@@ -40,11 +40,10 @@ if(BUILD_GIT_INFO)
   git_info()
 endif()
 
-
 # dependency: utf8proc
 if(BUILD_UTF8PROC)
   add_subdirectory(extern/utf8proc)
-  #target_code_coverage(utf8proc)
+  # target_code_coverage(utf8proc)
 else()
   find_package(utf8proc)
 endif()
@@ -69,7 +68,6 @@ add_subdirectory(tools)
 if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
-
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Passgen")
 set(CPACK_PACKAGE_VENDOR "xfbs")
