@@ -1,4 +1,5 @@
 #pragma once
+#include "passgen/assert.h"
 #include "passgen/container/stack.h"
 #include "passgen/memory.h"
 
@@ -57,6 +58,7 @@
   }                                                                          \
                                                                              \
   data_type *name##_stack_get(struct name##_stack *stack, size_t pos) {      \
+    assert(pos < stack->len);                                                \
     size_t bin = pos / ITEMS_PER_BIN(sizeof(data_type));                     \
     size_t offset = pos % ITEMS_PER_BIN(sizeof(data_type));                  \
     return &stack->data[bin][offset];                                        \
@@ -76,6 +78,7 @@
   }                                                                          \
                                                                              \
   void name##_stack_pop(struct name##_stack *stack, passgen_mem_t *mem) {    \
+    assert(stack->len != 0);                                                 \
     size_t bin = stack->len / ITEMS_PER_BIN(sizeof(data_type));              \
     size_t offset = stack->len % ITEMS_PER_BIN(sizeof(data_type));           \
                                                                              \
