@@ -38,8 +38,10 @@ int passgen_parse_token(
   struct passgen_parser_state *state = passgen_parser_get_state_last(parser);
 
   switch(state->type) {
-    case PASSGEN_PARSER_GROUP: return passgen_parse_group(parser, token, state);
-    case PASSGEN_PARSER_SET: return passgen_parse_set(parser, token, state);
+    case PASSGEN_PARSER_GROUP:
+      return passgen_parse_group(parser, token, state);
+    case PASSGEN_PARSER_SET:
+      return passgen_parse_set(parser, token, state);
     case PASSGEN_PARSER_SET_RANGE:
       return passgen_parse_set_range(parser, token, state);
     case PASSGEN_PARSER_REPEAT:
@@ -52,7 +54,8 @@ int passgen_parse_token(
       return passgen_parse_special_name(parser, token, state);
     case PASSGEN_PARSER_SPECIAL_NAME_END:
       return passgen_parse_special_name_end(parser, token, state);
-    default: return -1;
+    default:
+      return -1;
   }
 }
 
@@ -66,6 +69,7 @@ int passgen_parse_group(
   struct passgen_pattern_item *item;
 
   if(codepoint & PASSGEN_TOKEN_ESCAPED_BIT) {
+    codepoint &= ~PASSGEN_TOKEN_ESCAPED_BIT;
     switch((char) codepoint) {
       case '|':
       case '(':
@@ -76,15 +80,15 @@ int passgen_parse_group(
       case ']':
         // escaped token which would normally do something but should be
         // treated as text
-        codepoint &= ~PASSGEN_TOKEN_ESCAPED_BIT;
         break;
       case 'p':
       case 'w':
         // special token
-        special = passgen_pattern_segment_new_special(state->data.group.segment);
-        passgen_pattern_special_init_char(special, codepoint);
+        special =
+            passgen_pattern_segment_new_special(state->data.group.segment);
+        passgen_pattern_special_init_char(special, (char) codepoint);
         passgen_parser_state_push_special(parser, special);
-        break;
+        return 0;
       default:
         // error
         return -1;
@@ -114,14 +118,17 @@ int passgen_parse_group(
             NULL);
         return 0;
       case '{':
-        item = passgen_pattern_item_stack_top(&state->data.group.segment->items);
+        item =
+            passgen_pattern_item_stack_top(&state->data.group.segment->items);
         passgen_parser_state_push_repeat(parser, &item->repeat);
         return 0;
       case '?':
-        item = passgen_pattern_item_stack_top(&state->data.group.segment->items);
+        item =
+            passgen_pattern_item_stack_top(&state->data.group.segment->items);
         item->maybe = true;
         return 0;
-      default: break;
+      default:
+        break;
     }
   }
 
@@ -174,7 +181,7 @@ int passgen_parse_set_range(
     struct passgen_parser *parser,
     struct passgen_token *token,
     struct passgen_parser_state *state) {
-  (void)parser;
+  (void) parser;
   state->data.set.range->end = token->codepoint;
   state->type = PASSGEN_PARSER_SET;
 
@@ -259,7 +266,8 @@ int passgen_parse_special_name_end(
     struct passgen_token *token,
     struct passgen_parser_state *state) {
   if(token->codepoint == '{') {
-    struct passgen_pattern_repeat *length = &state->data.special.special->length;
+    struct passgen_pattern_repeat *length =
+        &state->data.special.special->length;
     length->min = 0;
     length->max = 0;
     passgen_parser_state_stack_pop(&parser->state, NULL);
