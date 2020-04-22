@@ -15,6 +15,7 @@
 #include "passgen/data/set.h"
 #include "passgen/data/special.h"
 #include "passgen/data/special_kind.h"
+#include "passgen/pronounceable_private.h"
 
 struct fillpos {
   char *buffer;
@@ -155,27 +156,16 @@ int passgen_generate_special_pronounceable(
 
   int32_t buffer[max];
 
-  (void)max;
-  (void)buffer;
-  (void)rand;
-  (void)env;
-  (void)data;
-  (void)func;
-  // TODO: fixme
-
   /* TODO: get tries and default from env! */
-  /*
   size_t count = passgen_pronounceable_len(
-      special->data.pronounceable,
+      &passgen_pronounceable_english,
       rand,
       buffer,
       special->length.min,
       max,
       env->pronounceable_limit);
-      */
 
   /* TODO error handling */
-  /*
   if(!count) {
     return -2;
   }
@@ -187,7 +177,6 @@ int passgen_generate_special_pronounceable(
       return ret;
     }
   }
-  */
 
   return 0;
 }
@@ -199,11 +188,11 @@ int passgen_generate_special_wordlist(
     void *data,
     passgen_generate_cb *func) {
   // TODO: implement
-  (void)special;
-  (void)rand;
-  (void)env;
-  (void)data;
-  (void)func;
+  (void) special;
+  (void) rand;
+  (void) env;
+  (void) data;
+  (void) func;
 
   return 0;
 }
@@ -226,7 +215,9 @@ int passgen_generate_special(
     case PASSGEN_PATTERN_SPECIAL_WORDLIST:
       return passgen_generate_special_wordlist(special, rand, env, data, func);
       break;
-    default: assert(false); break;
+    default:
+      assert(false);
+      break;
   }
   return 0;
 }
@@ -271,7 +262,9 @@ int passgen_generate_item(
       case PASSGEN_PATTERN_GROUP:
         ret = passgen_generate_group(&item->data.group, rand, env, data, func);
         break;
-      default: assert(false); break;
+      default:
+        assert(false);
+        break;
     }
 
     if(ret != 0) return ret;
