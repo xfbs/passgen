@@ -27,8 +27,7 @@
   assert(0 == passgen_parse_start(&parser))
 
 #define POSTAMBLE() \
-  assert(0 == passgen_parse_finish(&parser)) \
-  passgen_parser_free(&parser)
+  assert(0 == passgen_parse_finish(&parser)) passgen_parser_free(&parser)
 
 #define PARSE_CODEPOINT(codepoint)                             \
   assert(                                                      \
@@ -36,11 +35,9 @@
       PASSGEN_TOKEN_INIT);                                     \
   assert(0 == passgen_parse_token(&parser, &token))
 
-#define PARSE_CODEPOINT_DOUBLE(a, b)                             \
-  assert(passgen_token_parse(&token_parser, &token, a) > 0);  \
-  assert(                                                      \
-      passgen_token_parse(&token_parser, &token, b) == \
-      PASSGEN_TOKEN_INIT);                                     \
+#define PARSE_CODEPOINT_DOUBLE(a, b)                                           \
+  assert(passgen_token_parse(&token_parser, &token, a) > 0);                   \
+  assert(passgen_token_parse(&token_parser, &token, b) == PASSGEN_TOKEN_INIT); \
   assert(0 == passgen_parse_token(&parser, &token))
 
 test_result test_parser_empty(void) {
@@ -495,6 +492,24 @@ test_result test_parser_special_pronounceable(void) {
   PARSE_CODEPOINT('1');
   PARSE_CODEPOINT('2');
   PARSE_CODEPOINT('}');
+
+  assert(parser.state.len == 1);
+
+  assert(1 == parser.pattern.group.segments.len);
+
+  segment = passgen_pattern_group_get_segment(&parser.pattern.group, 0);
+  assert(segment);
+  assert(1 == segment->items.len);
+
+  item = passgen_pattern_segment_get_item(segment, 0);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_SPECIAL);
+  assert(item->repeat.min == 1);
+  assert(item->repeat.max == 1);
+  assert(item->maybe == false);
+  assert(item->data.special.kind == PASSGEN_PATTERN_SPECIAL_PRONOUNCABLE);
+  assert(item->data.special.length.min == 9);
+  assert(item->data.special.length.max == 12);
 
   POSTAMBLE();
 

@@ -69,10 +69,16 @@ void pattern_range_free(pattern_ranges_t *ranges, passgen_mem_t *mem) {
 
 void pattern_segment_free(pattern_segment_t *segment, passgen_mem_t *mem) {
   switch(segment->kind) {
-    case PATTERN_RANGE: pattern_range_free(&segment->data.range, mem); break;
-    case PATTERN_SPECIAL: break;
-    case PATTERN_GROUP: pattern_group_free(&segment->data.group, mem); break;
-    case PATTERN_CHAR: break;
+    case PATTERN_RANGE:
+      pattern_range_free(&segment->data.range, mem);
+      break;
+    case PATTERN_SPECIAL:
+      break;
+    case PATTERN_GROUP:
+      pattern_group_free(&segment->data.group, mem);
+      break;
+    case PATTERN_CHAR:
+      break;
   }
 }
 
@@ -411,8 +417,11 @@ pattern_result_t pattern_special_parse(
           special->arg.length,
           iter->data + special->arg.offset);
       break;
-    case 'w': special->kind = PATTERN_SPECIAL_WORDLIST; break;
-    default: break;
+    case 'w':
+      special->kind = PATTERN_SPECIAL_WORDLIST;
+      break;
+    default:
+      break;
   }
 
   /* parse length. */
@@ -503,8 +512,10 @@ bool pattern_segments_is_end(passgen_token_t token) {
     switch(token.codepoint) {
       case ']':
       case ')':
-      case '|': return true;
-      default: break;
+      case '|':
+        return true;
+      default:
+        break;
     }
   }
 

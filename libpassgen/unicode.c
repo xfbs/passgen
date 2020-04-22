@@ -29,7 +29,7 @@ struct unicode_iter_result unicode_iter_peek(const struct unicode_iter *iter) {
   }
 
   result.error = utf8proc_iterate(
-      (const utf8proc_uint8_t *)(iter->data) + iter->pos,
+      (const utf8proc_uint8_t *) (iter->data) + iter->pos,
       iter->length - iter->pos,
       &result.codepoint);
 

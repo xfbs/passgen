@@ -365,19 +365,28 @@ static double parse_time(const char *str) {
 
   if(ret == 2) {
     switch(prefix[0]) {
-      case 'h': number *= 60;
-      case 'm': number *= 60;
-      case 's': return number;
-      default: break;
+      case 'h':
+        number *= 60;
+      case 'm':
+        number *= 60;
+      case 's':
+        return number;
+      default:
+        break;
     }
   }
 
   if(ret == 3 && prefix[1] == 's') {
     switch(prefix[0]) {
-      case 'n': number /= 1000;
-      case 'u': number /= 1000;
-      case 'm': number /= 1000; return number;
-      default: break;
+      case 'n':
+        number /= 1000;
+      case 'u':
+        number /= 1000;
+      case 'm':
+        number /= 1000;
+        return number;
+      default:
+        break;
     }
   }
 
@@ -411,8 +420,11 @@ struct bench_options bench_parse_opts(int argc, char *argv[]) {
 
     if(opt < 0) break;
     switch(opt) {
-      case 0: break;
-      case 'h': opts.help = true; break;
+      case 0:
+        break;
+      case 'h':
+        opts.help = true;
+        break;
       case 't':
         opt = atoi(optarg);
         if(opt < 1) {
@@ -426,11 +438,19 @@ struct bench_options bench_parse_opts(int argc, char *argv[]) {
           opts.error = true;
         }
         break;
-      case 'v': opts.version = true; break;
-      case 'l': opts.list = true; break;
-      case 'j': opts.json = true; break;
+      case 'v':
+        opts.version = true;
+        break;
+      case 'l':
+        opts.list = true;
+        break;
+      case 'j':
+        opts.json = true;
+        break;
       case '?':
-      default: opts.error = true; break;
+      default:
+        opts.error = true;
+        break;
     }
   }
 

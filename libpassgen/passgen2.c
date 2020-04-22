@@ -17,7 +17,7 @@
 #include "passgen/token.h"
 #include "passgen/version.h"
 
-#define bail(kind, data) passgen2_bail(PASSGEN_ERROR_##kind, (void *)data)
+#define bail(kind, data) passgen2_bail(PASSGEN_ERROR_##kind, (void *) data)
 
 void passgen2_run(passgen_opts opts) {
   struct passgen_parser parser;
@@ -109,8 +109,11 @@ passgen_opts passgen2_optparse(int argc, char *argv[]) {
     if(opt < 0) break;
 
     switch(opt) {
-      case 0: break;
-      case 'h': bail(HELP, argv[0]); break;
+      case 0:
+        break;
+      case 'h':
+        bail(HELP, argv[0]);
+        break;
       case 'a':
         opt = atoi(optarg);
         if(opt < 1) {
@@ -118,14 +121,21 @@ passgen_opts passgen2_optparse(int argc, char *argv[]) {
         }
         opts.amount = opt;
         break;
-      case 'p': preset = optarg; break;
+      case 'p':
+        preset = optarg;
+        break;
       case 'd':
         opt = atoi(optarg);
         opts.depth = opt;
         break;
-      case 'z': opts.null = true; break;
-      case 'c': opts.complexity = true; break;
-      case 'v': bail(VERSION, NULL);
+      case 'z':
+        opts.null = true;
+        break;
+      case 'c':
+        opts.complexity = true;
+        break;
+      case 'v':
+        bail(VERSION, NULL);
       case '?':
       default:
         fprintf(stderr, "Error unrecognised: %s\n", argv[optind]);
@@ -152,7 +162,7 @@ passgen_opts passgen2_optparse(int argc, char *argv[]) {
   // parse a given format, making sure we don't have multiple."
   if(optind < argc) {
     if(opts.format || (argc - optind) > 1) {
-      bail(MULTIPLE_FORMATS, (void *)argv[optind]);
+      bail(MULTIPLE_FORMATS, (void *) argv[optind]);
     } else {
       opts.format = argv[optind];
     }
@@ -208,10 +218,14 @@ void passgen2_show_version(void) {
 
 void passgen2_bail(passgen_error error, void *data) {
   switch(error) {
-    case PASSGEN_ERROR_HELP: passgen2_usage(data); exit(-1);
-    case PASSGEN_ERROR_VERSION: passgen2_show_version(); exit(-1);
+    case PASSGEN_ERROR_HELP:
+      passgen2_usage(data);
+      exit(-1);
+    case PASSGEN_ERROR_VERSION:
+      passgen2_show_version();
+      exit(-1);
     case PASSGEN_ERROR_MULTIPLE_FORMATS:
-      printf("Error: multiple formats specified (%s).\n", (const char *)data);
+      printf("Error: multiple formats specified (%s).\n", (const char *) data);
       exit(-2);
     case PASSGEN_ERROR_RANDOM_ALLOC:
       printf("Error: couldn't open random object.\n");
@@ -220,8 +234,10 @@ void passgen2_bail(passgen_error error, void *data) {
       // printf("Error: couldn't parse pattern '%s'.\n", (const char *)data);
       exit(-4);
     case PASSGEN_ERROR_ILLEGAL_AMOUNT:
-      printf("Error: illegal amount entered (%i).\n", *((int *)data));
+      printf("Error: illegal amount entered (%i).\n", *((int *) data));
       exit(-5);
-    default: printf("Error: unknown error.\n"); exit(-100);
+    default:
+      printf("Error: unknown error.\n");
+      exit(-100);
   }
 }

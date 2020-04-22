@@ -196,11 +196,11 @@ static inline int pattern_passgen_random_special_wordlist(
     void *data,
     pattern_passgen_random_cb *func) {
   // TODO: implement
-  (void)special;
-  (void)rand;
-  (void)env;
-  (void)data;
-  (void)func;
+  (void) special;
+  (void) rand;
+  (void) env;
+  (void) data;
+  (void) func;
 
   return 0;
 }
@@ -228,7 +228,9 @@ static inline int pattern_passgen_random_special(
           data,
           func);
       break;
-    default: assert(false); break;
+    default:
+      assert(false);
+      break;
   }
   return 0;
 }

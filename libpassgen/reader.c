@@ -1,7 +1,7 @@
 #include "passgen/reader.h"
 
 #define STATUS_EOF        1
-#define is_status_eof(n)  ((n)&STATUS_EOF)
+#define is_status_eof(n)  ((n) &STATUS_EOF)
 #define set_status_eof(n) (n) |= STATUS_EOF
 
 read_result reader_fread(reader_t *reader, void *dest, size_t size) {
@@ -69,7 +69,7 @@ reader_t reader_from_file(FILE *file) {
 reader_t reader_from_string(const char *string) {
   reader_t reader = {
       .read = reader_string_read,
-      .data = (void *)string,
+      .data = (void *) string,
       .pos = 0,
   };
 

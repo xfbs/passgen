@@ -42,7 +42,9 @@ static inline void token_parse_escaped(
   }
 
   switch(codepoint) {
-    case 'u': parser->state = PASSGEN_TOKEN_UNICODE; break;
+    case 'u':
+      parser->state = PASSGEN_TOKEN_UNICODE;
+      break;
     default:
       token->codepoint = codepoint | PASSGEN_TOKEN_ESCAPED_BIT;
       parser->state = PASSGEN_TOKEN_INIT;
@@ -98,15 +100,20 @@ int passgen_token_parse(
     struct passgen_token *token,
     uint32_t codepoint) {
   switch(parser->state) {
-    case PASSGEN_TOKEN_INIT: token_parse_init(parser, token, codepoint); break;
+    case PASSGEN_TOKEN_INIT:
+      token_parse_init(parser, token, codepoint);
+      break;
     case PASSGEN_TOKEN_ESCAPED:
       token_parse_escaped(parser, token, codepoint);
       break;
-    case PASSGEN_TOKEN_UNICODE: token_parse_unicode(parser, codepoint); break;
+    case PASSGEN_TOKEN_UNICODE:
+      token_parse_unicode(parser, codepoint);
+      break;
     case PASSGEN_TOKEN_UNICODE_PAYLOAD:
       token_parse_unicode_payload(parser, token, codepoint);
       break;
-    default: break;
+    default:
+      break;
   }
 
   return parser->state;

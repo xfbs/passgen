@@ -10,7 +10,7 @@
 
 #define PASSGEN_STACK_IMPLEMENT(data_type, name)                             \
   void name##_stack_init(struct name##_stack *stack, passgen_mem_t *mem) {   \
-    (void)mem;                                                               \
+    (void) mem;                                                              \
                                                                              \
     stack->data = NULL;                                                      \
     stack->len = 0;                                                          \

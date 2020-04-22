@@ -18,7 +18,8 @@ passgen_parser_get_state(struct passgen_parser *parser, size_t n);
 struct passgen_parser_state *
 passgen_parser_get_state_last(struct passgen_parser *parser);
 
-struct passgen_parser_state *passgen_parser_state_push(struct passgen_parser *parser);
+struct passgen_parser_state *
+passgen_parser_state_push(struct passgen_parser *parser);
 
 struct passgen_parser_state *passgen_parser_state_push_group(
     struct passgen_parser *parser,

@@ -8,14 +8,14 @@
 #  include <sys/random.h>
 
 size_t passgen_random_read_system(void *dest, size_t size, void *data) {
-  (void)data;
+  (void) data;
   return getrandom(dest, size, 0);
 }
 #endif
 
 #ifdef __APPLE__
 size_t passgen_random_read_system(void *dest, size_t size, void *data) {
-  (void)data;
+  (void) data;
   arc4random_buf(dest, size);
   return size;
 }
@@ -35,7 +35,7 @@ void passgen_random_close_file(void *data) {
 }
 
 void passgen_random_close_system(void *data) {
-  (void)data;
+  (void) data;
 }
 
 static uint64_t xorshift64(uint64_t *state) {
@@ -84,7 +84,7 @@ void passgen_random_reload(passgen_random_t *random) {
   // read random data.
   size_t bytes =
       random->read(&random->buffer, sizeof(random->buffer), random->data);
-  (void)bytes;
+  (void) bytes;
 
   // make sure we've read enough.
   assert(bytes == sizeof(random->buffer));
@@ -120,7 +120,7 @@ passgen_random_t *passgen_random_open_system(passgen_random_t *random) {
 }
 #else
 passgen_random_t *passgen_random_open_system(passgen_random_t *random) {
-  (void)random;
+  (void) random;
 
   return NULL;
 }

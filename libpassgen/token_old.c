@@ -302,8 +302,10 @@ bool passgen_token_is_normal(passgen_token_t *token) {
   switch(token->type) {
     case PATTERN_TOKEN_REGULAR:
     case PATTERN_TOKEN_ESCAPED:
-    case PATTERN_TOKEN_UNICODE: return true;
-    default: return false;
+    case PATTERN_TOKEN_UNICODE:
+      return true;
+    default:
+      return false;
   }
 }
 

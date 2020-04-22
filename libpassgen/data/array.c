@@ -23,8 +23,8 @@ void passgen_array_init(
   array->size = size;
   array->mem = mem;
 #else
-  (void)size;
-  (void)mem;
+  (void) size;
+  (void) mem;
 #endif
 }
 
