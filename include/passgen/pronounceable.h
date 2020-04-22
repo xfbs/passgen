@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include "passgen/random.h"
+#include "passgen/enum_mapping.h"
 
 /* list of pronounceable word types that can be generated. */
 enum passgen_pronounceable_type {
@@ -10,6 +11,8 @@ enum passgen_pronounceable_type {
   PASSGEN_PRONOUNCEABLE_LATIN,
   PASSGEN_PRONOUNCEABLE_LAST,
 };
+
+PASSGEN_ENUM_MAPPING(passgen_pronounceable_type);
 
 typedef struct {
   const char *name;
