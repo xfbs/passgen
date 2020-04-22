@@ -89,6 +89,10 @@ add_custom_command(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   VERBATIM)
 
+# for the pronounceable word generation to work, we take a word list (they
+# are compressed in data/name.txt.gz), and run it through this script, which
+# generates a markov chain data structure for us, which is then compiled into
+# the binary.
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pronounceable_latin_autogen.c
   COMMAND
