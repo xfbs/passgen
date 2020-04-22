@@ -25,7 +25,7 @@ Language: Cpp
 PointerAlignment: Right
 ReflowComments: 'true'
 SortIncludes: 'true'
-SpaceAfterCStyleCast: 'false'
+SpaceAfterCStyleCast: 'true'
 SpaceAfterLogicalNot: 'false'
 SpaceAfterTemplateKeyword: 'false'
 SpaceBeforeAssignmentOperators: 'true'
