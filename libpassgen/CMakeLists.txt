@@ -69,6 +69,7 @@ set(SOURCE_LIST
     "pronounceable.c"
     "pronounceable_english.c"
     "${CMAKE_CURRENT_BINARY_DIR}/pronounceable_latin_autogen.c"
+    "${CMAKE_CURRENT_BINARY_DIR}/pronounceable_german_autogen.c"
     "random.c"
     "reader.c"
     "token.c"
@@ -101,6 +102,16 @@ add_custom_command(
     ${CMAKE_CURRENT_BINARY_DIR}/pronounceable_latin_autogen.c
   DEPENDS ${PROJECT_SOURCE_DIR}/scripts/generate_markov.rb
           ${PROJECT_SOURCE_DIR}/data/latin.txt.gz
+  COMMENT "Generating markov chain for latin words"
+  VERBATIM)
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pronounceable_german_autogen.c
+  COMMAND
+    ${PROJECT_SOURCE_DIR}/scripts/generate_markov.rb
+    ${PROJECT_SOURCE_DIR}/data/german.txt.gz passgen_pronounceable_german >
+    ${CMAKE_CURRENT_BINARY_DIR}/pronounceable_german_autogen.c
+  DEPENDS ${PROJECT_SOURCE_DIR}/scripts/generate_markov.rb
+          ${PROJECT_SOURCE_DIR}/data/german.txt.gz
   COMMENT "Generating markov chain for latin words"
   VERBATIM)
 

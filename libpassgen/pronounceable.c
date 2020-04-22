@@ -8,11 +8,13 @@
 
 const struct markov *markov_pronounceable_all[] = {
     &passgen_pronounceable_english,
+    &passgen_pronounceable_german,
     &passgen_pronounceable_latin,
     NULL};
 
 passgen_pronounceable_map_t passgen_pronounceable_map[] = {
     {"english", PASSGEN_PRONOUNCEABLE_ENGLISH},
+    {"german", PASSGEN_PRONOUNCEABLE_GERMAN},
     {"latin", PASSGEN_PRONOUNCEABLE_LATIN},
     {NULL, 0},
 };

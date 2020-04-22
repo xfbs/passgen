@@ -55,3 +55,4 @@ passgen_pronounceable_find(const struct markov1 *list, size_t choice);
 /* list of symbols of all markov chains */
 extern const struct markov passgen_pronounceable_english;
 extern const struct markov passgen_pronounceable_latin;
+extern const struct markov passgen_pronounceable_german;

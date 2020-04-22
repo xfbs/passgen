@@ -8,6 +8,7 @@
 /* list of pronounceable word types that can be generated. */
 enum passgen_pronounceable_type {
   PASSGEN_PRONOUNCEABLE_ENGLISH,
+  PASSGEN_PRONOUNCEABLE_GERMAN,
   PASSGEN_PRONOUNCEABLE_LATIN,
   PASSGEN_PRONOUNCEABLE_LAST,
 };
