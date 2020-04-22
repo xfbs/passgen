@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
+require 'zlib'
 
 # use a dictionary file like https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt
 
-dictionary_file = File.read(ARGV[0])
+dictionary_file = Zlib::GzipReader.open(ARGV[0]).read
+name = ARGV[1]
 
 words = dictionary_file.split("\n")
 
@@ -21,7 +23,7 @@ end
 
 puts '#include "passgen/pronounceable_private.h"'
 puts
-puts 'const struct markov english = {'
+puts "const struct markov #{name} = {"
 puts '    .list = (const struct markov2[]) {'
 
 table.sort_by{|k, v| k}.each do |first, tsecond|
