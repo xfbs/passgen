@@ -68,7 +68,7 @@ set(SOURCE_LIST
     "pattern_random.c"
     "pronounceable.c"
     "pronounceable_english.c"
-    "pronounceable_latin.c"
+    "${CMAKE_CURRENT_BINARY_DIR}/pronounceable_latin_autogen.c"
     "random.c"
     "reader.c"
     "token.c"
@@ -87,6 +87,17 @@ add_custom_command(
   DEPENDS ${PROJECT_SOURCE_DIR}/scripts/generate_enum_mapping.rb ${HEADER_LIST}
   COMMENT "Generating enum mapping"
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  VERBATIM)
+
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pronounceable_latin_autogen.c
+  COMMAND ${PROJECT_SOURCE_DIR}/scripts/generate_markov.rb
+     ${PROJECT_SOURCE_DIR}/data/latin.txt.gz
+     passgen_pronounceable_latin >
+     ${CMAKE_CURRENT_BINARY_DIR}/pronounceable_latin_autogen.c
+  DEPENDS ${PROJECT_SOURCE_DIR}/scripts/generate_markov.rb
+     ${PROJECT_SOURCE_DIR}/data/latin.txt.gz
+  COMMENT "Generating markov chain for latin words"
   VERBATIM)
 
 add_library(passgen-objects OBJECT ${SOURCE_LIST} ${HEADER_LIST})
