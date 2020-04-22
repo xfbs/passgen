@@ -72,3 +72,8 @@ See the [BUILDING.md](BUILDING.md) for more information about building the proje
 ## License
 
 MIT, see [License](LICENSE) file.
+
+There are word lists included in this repository, their respective license applies:
+
+- German word list taken from <https://github.com/davidak/wortliste>
+- Latin word list taken from <https://github.com/bbloomf/verbalatina>
