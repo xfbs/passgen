@@ -17,8 +17,8 @@
 #include "passgen/data/substring.h"
 #include "passgen/data/token.h"
 
-
-#define SHOW_SIZE(name) printf("sizeof(" #name ") == %zu\n", sizeof(struct name))
+#define SHOW_SIZE(name) \
+  printf("sizeof(" #name ") == %zu\n", sizeof(struct name))
 
 int main(int argc, char *argv[]) {
   (void) argc;
