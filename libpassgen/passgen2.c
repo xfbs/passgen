@@ -27,8 +27,11 @@ void passgen2_run(passgen_opts opts) {
   assert(0 == passgen_parse_start(&parser));
 
   for(size_t i = 0; opts.format[i]; i++) {
-    passgen_token_parse(&token_parser, &token, opts.format[i]);
-    assert(0 == passgen_parse_token(&parser, &token));
+    int ret = passgen_token_parse(&token_parser, &token, opts.format[i]);
+
+    if(ret == PASSGEN_TOKEN_INIT) {
+      assert(0 == passgen_parse_token(&parser, &token));
+    }
   }
 
   // initialize source of random numbers

@@ -515,3 +515,63 @@ test_result test_parser_special_pronounceable(void) {
 
   return test_ok;
 }
+
+test_result test_parser_mixed_special(void) {
+  PREAMBLE();
+  PARSE_CODEPOINT('a');
+  PARSE_CODEPOINT_DOUBLE('\\', 'p');
+  PARSE_CODEPOINT('[');
+  PARSE_CODEPOINT('e');
+  PARSE_CODEPOINT('n');
+  PARSE_CODEPOINT('g');
+  PARSE_CODEPOINT('l');
+  PARSE_CODEPOINT('i');
+  PARSE_CODEPOINT('s');
+  PARSE_CODEPOINT('h');
+  PARSE_CODEPOINT(']');
+  PARSE_CODEPOINT('{');
+  PARSE_CODEPOINT('9');
+  PARSE_CODEPOINT(',');
+  PARSE_CODEPOINT('1');
+  PARSE_CODEPOINT('2');
+  PARSE_CODEPOINT('}');
+  PARSE_CODEPOINT('x');
+
+  assert(parser.state.len == 1);
+
+  assert(1 == parser.pattern.group.segments.len);
+
+  segment = passgen_pattern_group_get_segment(&parser.pattern.group, 0);
+  assert(segment);
+  assert(3 == segment->items.len);
+
+  item = passgen_pattern_segment_get_item(segment, 0);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_CHAR);
+  assert(item->data.character.codepoint == 'a');
+  assert(item->repeat.min == 1);
+  assert(item->repeat.max == 1);
+  assert(item->maybe == false);
+
+  item = passgen_pattern_segment_get_item(segment, 1);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_SPECIAL);
+  assert(item->repeat.min == 1);
+  assert(item->repeat.max == 1);
+  assert(item->maybe == false);
+  assert(item->data.special.kind == PASSGEN_PATTERN_SPECIAL_PRONOUNCABLE);
+  assert(item->data.special.length.min == 9);
+  assert(item->data.special.length.max == 12);
+
+  item = passgen_pattern_segment_get_item(segment, 2);
+  assert(item);
+  assert(item->kind == PASSGEN_PATTERN_CHAR);
+  assert(item->data.character.codepoint == 'x');
+  assert(item->repeat.min == 1);
+  assert(item->repeat.max == 1);
+  assert(item->maybe == false);
+
+  POSTAMBLE();
+
+  return test_ok;
+}
