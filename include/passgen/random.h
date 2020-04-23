@@ -99,16 +99,16 @@ void passgen_random_free(passgen_random_t *random);
 void passgen_random_read(passgen_random_t *random, void *dest, size_t bytes);
 
 /// Read a `uint8_t` from @p random.
-uint8_t passgen_random_uint8(passgen_random_t *random);
+uint8_t passgen_random_u8(passgen_random_t *random);
 
 /// Read a `uint16_t` from @p random.
-uint16_t passgen_random_uint16(passgen_random_t *random);
+uint16_t passgen_random_u16(passgen_random_t *random);
 
 /// Read a `uint32_t` from @p random.
-uint32_t passgen_random_uint32(passgen_random_t *random);
+uint32_t passgen_random_u32(passgen_random_t *random);
 
 /// Read a `uint64_t` from @p random.
-uint64_t passgen_random_uint64(passgen_random_t *random);
+uint64_t passgen_random_u64(passgen_random_t *random);
 
 /// Generate a random boolean.
 bool passgen_random_bool(passgen_random_t *random);
@@ -116,22 +116,22 @@ bool passgen_random_bool(passgen_random_t *random);
 /// Read a `uint8_t` that is strictly smaller than @p max from @p random.
 ///
 /// @param max must be nonzero.
-uint8_t passgen_random_uint8_max(passgen_random_t *random, uint8_t max);
+uint8_t passgen_random_u8_max(passgen_random_t *random, uint8_t max);
 
 /// Read a `uint16_t` that is strictly smaller than @p max from @p random.
 ///
 /// @param max must be nonzero.
-uint16_t passgen_random_uint16_max(passgen_random_t *random, uint16_t max);
+uint16_t passgen_random_u16_max(passgen_random_t *random, uint16_t max);
 
 /// Read a `uint32_t` that is strictly smaller than @p max from @p random.
 ///
 /// @param max must be nonzero.
-uint32_t passgen_random_uint32_max(passgen_random_t *random, uint32_t max);
+uint32_t passgen_random_u32_max(passgen_random_t *random, uint32_t max);
 
 /// Read a `uint64_t` that is strictly smaller than @p max from @p random.
 ///
 /// @param max must be nonzero.
-uint64_t passgen_random_uint64_max(passgen_random_t *random, uint64_t max);
+uint64_t passgen_random_u64_max(passgen_random_t *random, uint64_t max);
 
 size_t passgen_random_read_file(void *dest, size_t size, void *data);
 size_t passgen_random_read_system(void *dest, size_t size, void *data);

@@ -222,25 +222,25 @@ void passgen_random_free(passgen_random_t *random) {
   free(random);
 }
 
-inline uint8_t passgen_random_uint8(passgen_random_t *random) {
+inline uint8_t passgen_random_u8(passgen_random_t *random) {
   uint8_t data;
   passgen_random_read(random, &data, sizeof(data));
   return data;
 }
 
-inline uint16_t passgen_random_uint16(passgen_random_t *random) {
+inline uint16_t passgen_random_u16(passgen_random_t *random) {
   uint16_t data;
   passgen_random_read(random, &data, sizeof(data));
   return data;
 }
 
-inline uint32_t passgen_random_uint32(passgen_random_t *random) {
+inline uint32_t passgen_random_u32(passgen_random_t *random) {
   uint32_t data;
   passgen_random_read(random, &data, sizeof(data));
   return data;
 }
 
-inline uint64_t passgen_random_uint64(passgen_random_t *random) {
+inline uint64_t passgen_random_u64(passgen_random_t *random) {
   uint64_t data;
   passgen_random_read(random, &data, sizeof(data));
   return data;
@@ -252,7 +252,7 @@ inline bool passgen_random_bool(passgen_random_t *random) {
   return (data & 128) == 0;
 }
 
-inline uint8_t passgen_random_uint8_max(passgen_random_t *random, uint8_t max) {
+inline uint8_t passgen_random_u8_max(passgen_random_t *random, uint8_t max) {
   uint8_t mask = max;
   mask |= mask >> 4;
   mask |= mask >> 2;
@@ -260,16 +260,16 @@ inline uint8_t passgen_random_uint8_max(passgen_random_t *random, uint8_t max) {
 
   uint8_t num;
   do {
-    num = passgen_random_uint8(random) & mask;
+    num = passgen_random_u8(random) & mask;
   } while(num >= max);
 
   return num;
 }
 
 inline uint16_t
-passgen_random_uint16_max(passgen_random_t *random, uint16_t max) {
+passgen_random_u16_max(passgen_random_t *random, uint16_t max) {
   if(max <= UINT8_MAX) {
-    return passgen_random_uint8_max(random, max);
+    return passgen_random_u8_max(random, max);
   }
 
   uint16_t mask = max;
@@ -281,16 +281,16 @@ passgen_random_uint16_max(passgen_random_t *random, uint16_t max) {
   uint16_t num;
 
   do {
-    num = passgen_random_uint16(random) & mask;
+    num = passgen_random_u16(random) & mask;
   } while(num >= max);
 
   return num;
 }
 
 inline uint32_t
-passgen_random_uint32_max(passgen_random_t *random, uint32_t max) {
+passgen_random_u32_max(passgen_random_t *random, uint32_t max) {
   if(max < UINT16_MAX) {
-    return passgen_random_uint16_max(random, max);
+    return passgen_random_u16_max(random, max);
   }
 
   uint32_t mask = max;
@@ -303,16 +303,16 @@ passgen_random_uint32_max(passgen_random_t *random, uint32_t max) {
   uint32_t num;
 
   do {
-    num = passgen_random_uint32(random) & mask;
+    num = passgen_random_u32(random) & mask;
   } while(num >= max);
 
   return num;
 }
 
 inline uint64_t
-passgen_random_uint64_max(passgen_random_t *random, uint64_t max) {
+passgen_random_u64_max(passgen_random_t *random, uint64_t max) {
   if(max < UINT32_MAX) {
-    return passgen_random_uint32_max(random, max);
+    return passgen_random_u32_max(random, max);
   }
 
   uint64_t mask = max;
@@ -326,7 +326,7 @@ passgen_random_uint64_max(passgen_random_t *random, uint64_t max) {
   uint64_t num;
 
   do {
-    num = passgen_random_uint64(random) & mask;
+    num = passgen_random_u64(random) & mask;
   } while(num >= max);
 
   return num;

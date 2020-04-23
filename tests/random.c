@@ -7,14 +7,14 @@
 
 #define SEED 234720984723
 
-test_result test_passgen_random_uint8(void) {
+test_result test_passgen_random_u8(void) {
   passgen_random_t *rand = passgen_random_new_xorshift(SEED);
   assert(rand);
 
   // generate random nubers until we got almost all of them.
   bool gotten[UINT8_MAX + 1] = {false};
   for(size_t i = 0; i < (32 * UINT8_MAX); ++i) {
-    gotten[passgen_random_uint8(rand)] = true;
+    gotten[passgen_random_u8(rand)] = true;
   }
 
   // there's still a (255/256)^(8*256) = 0.03% chance this fails.
@@ -27,7 +27,7 @@ test_result test_passgen_random_uint8(void) {
   return test_ok;
 }
 
-test_result test_passgen_random_uint8_max(void) {
+test_result test_passgen_random_u8_max(void) {
   passgen_random_t *rand = passgen_random_new_xorshift(SEED);
   assert(rand);
 
@@ -35,7 +35,7 @@ test_result test_passgen_random_uint8_max(void) {
     // generate random nubers until we got almost all of them.
     bool gotten[UINT8_MAX] = {false};
     for(size_t i = 0; i < (16 * UINT8_MAX); ++i) {
-      uint8_t r = passgen_random_uint8_max(rand, max);
+      uint8_t r = passgen_random_u8_max(rand, max);
       assert(r < max);
       gotten[r] = true;
     }
@@ -51,14 +51,14 @@ test_result test_passgen_random_uint8_max(void) {
   return test_ok;
 }
 
-test_result test_passgen_random_uint16(void) {
+test_result test_passgen_random_u16(void) {
   passgen_random_t *rand = passgen_random_new_xorshift(SEED);
   assert(rand);
 
   // generate random nubers until we got almost all of them.
   bool gotten[UINT16_MAX + 1] = {false};
   for(size_t i = 0; i < (32 * UINT16_MAX); ++i) {
-    gotten[passgen_random_uint16(rand)] = true;
+    gotten[passgen_random_u16(rand)] = true;
   }
 
   // there's still a (255/256)^(8*256) = 0.03% chance this fails.
@@ -71,7 +71,7 @@ test_result test_passgen_random_uint16(void) {
   return test_ok;
 }
 
-test_result test_passgen_random_uint16_max(void) {
+test_result test_passgen_random_u16_max(void) {
   passgen_random_t *rand = passgen_random_new_xorshift(SEED);
   assert(rand);
 
@@ -99,7 +99,7 @@ test_result test_passgen_random_uint16_max(void) {
   for(size_t n = 1; max[n]; ++n) {
     bool gotten[UINT16_MAX] = {false};
     for(size_t i = 0; i < (16 * max[n]); ++i) {
-      uint16_t r = passgen_random_uint16_max(rand, max[n]);
+      uint16_t r = passgen_random_u16_max(rand, max[n]);
       assert(r < max[n]);
       gotten[r] = true;
     }
@@ -114,14 +114,14 @@ test_result test_passgen_random_uint16_max(void) {
   return test_ok;
 }
 
-test_result test_passgen_random_uint32_max(void) {
+test_result test_passgen_random_u32_max(void) {
   passgen_random_t *rand = passgen_random_new_xorshift(SEED);
   assert(rand);
 
   for(size_t i = 1; i < 1000000; i++) {
-    uint32_t max = passgen_random_uint32(rand);
+    uint32_t max = passgen_random_u32(rand);
 
-    assert(passgen_random_uint32_max(rand, max) < max);
+    assert(passgen_random_u32_max(rand, max) < max);
   }
 
   passgen_random_free(rand);
@@ -129,14 +129,14 @@ test_result test_passgen_random_uint32_max(void) {
   return test_ok;
 }
 
-test_result test_passgen_random_uint64_max(void) {
+test_result test_passgen_random_u64_max(void) {
   passgen_random_t *rand = passgen_random_new_xorshift(SEED);
   assert(rand);
 
   for(size_t i = 1; i < 1000000; i++) {
-    uint32_t max = passgen_random_uint64(rand);
+    uint32_t max = passgen_random_u64(rand);
 
-    assert(passgen_random_uint64_max(rand, max) < max);
+    assert(passgen_random_u64_max(rand, max) < max);
   }
 
   passgen_random_free(rand);
@@ -163,10 +163,10 @@ test_result test_passgen_random_new_path(void) {
   random = passgen_random_new_path("/dev/zero");
   assert(random);
   assert(random->data);
-  assert(passgen_random_uint8(random) == 0);
-  assert(passgen_random_uint16(random) == 0);
-  assert(passgen_random_uint32(random) == 0);
-  assert(passgen_random_uint64(random) == 0);
+  assert(passgen_random_u8(random) == 0);
+  assert(passgen_random_u16(random) == 0);
+  assert(passgen_random_u32(random) == 0);
+  assert(passgen_random_u64(random) == 0);
   passgen_random_free(random);
 
   return test_ok;
@@ -189,10 +189,10 @@ test_result test_passgen_random_open_path(void) {
 
   assert(passgen_random_open_path(&random, "/dev/zero"));
   assert(random.data);
-  assert(passgen_random_uint8(&random) == 0);
-  assert(passgen_random_uint16(&random) == 0);
-  assert(passgen_random_uint32(&random) == 0);
-  assert(passgen_random_uint64(&random) == 0);
+  assert(passgen_random_u8(&random) == 0);
+  assert(passgen_random_u16(&random) == 0);
+  assert(passgen_random_u32(&random) == 0);
+  assert(passgen_random_u64(&random) == 0);
   passgen_random_close(&random);
   assert(!random.data);
 
@@ -266,18 +266,18 @@ test_result test_passgen_random_xorshift(void) {
 
   // using a state of zero generates only zeroes.
   assert(passgen_random_open_xorshift(&random, 0) != NULL);
-  assert(passgen_random_uint8(&random) == 0);
-  assert(passgen_random_uint16(&random) == 0);
-  assert(passgen_random_uint32(&random) == 0);
-  assert(passgen_random_uint64(&random) == 0);
+  assert(passgen_random_u8(&random) == 0);
+  assert(passgen_random_u16(&random) == 0);
+  assert(passgen_random_u32(&random) == 0);
+  assert(passgen_random_u64(&random) == 0);
   passgen_random_close(&random);
 
   // same seed always yields the same output
   assert(passgen_random_open_xorshift(&random, 123) != NULL);
-  assert(passgen_random_uint8(&random) == 187);
-  assert(passgen_random_uint16(&random) == 31102);
-  assert(passgen_random_uint32(&random) == 7933);
-  assert(passgen_random_uint64(&random) == 2214108778545186304ULL);
+  assert(passgen_random_u8(&random) == 187);
+  assert(passgen_random_u16(&random) == 31102);
+  assert(passgen_random_u32(&random) == 7933);
+  assert(passgen_random_u64(&random) == 2214108778545186304ULL);
   passgen_random_close(&random);
 
   return test_ok;

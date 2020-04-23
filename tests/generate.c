@@ -115,7 +115,7 @@ test_result test_generate_segments(void) {
   assert(output[0] == 'a');
   assert(output[1] == '\0');
 
-  passgen_random_uint64(&random);
+  passgen_random_u64(&random);
 
   GENERATE(output, pattern);
   assert(output[0] == 'b');
@@ -143,8 +143,8 @@ test_result test_generate_group(void) {
   assert(output[0] == 'a');
   assert(output[1] == '\0');
 
-  passgen_random_uint64(&random);
-  passgen_random_uint64(&random);
+  passgen_random_u64(&random);
+  passgen_random_u64(&random);
 
   GENERATE(output, pattern);
   assert(output[0] == 'b');
@@ -170,14 +170,14 @@ test_result test_generate_set(void) {
   assert(output[0] == 'c');
   assert(output[1] == '\0');
 
-  passgen_random_uint64(&random);
+  passgen_random_u64(&random);
   GENERATE(output, pattern);
   assert(output[0] == 'a');
   assert(output[1] == '\0');
 
-  passgen_random_uint64(&random);
-  passgen_random_uint64(&random);
-  passgen_random_uint64(&random);
+  passgen_random_u64(&random);
+  passgen_random_u64(&random);
+  passgen_random_u64(&random);
   GENERATE(output, pattern);
   assert(output[0] == 'b');
   assert(output[1] == '\0');
@@ -191,10 +191,10 @@ test_result test_generate_set(void) {
   assert(output[0] == 'b');
   assert(output[1] == '\0');
 
-  passgen_random_uint64(&random);
-  passgen_random_uint64(&random);
-  passgen_random_uint64(&random);
-  passgen_random_uint64(&random);
+  passgen_random_u64(&random);
+  passgen_random_u64(&random);
+  passgen_random_u64(&random);
+  passgen_random_u64(&random);
   GENERATE(output, pattern);
   assert(output[0] == 'a');
   assert(output[1] == '\0');
@@ -213,7 +213,7 @@ test_result test_generate_maybe(void) {
   assert(output[0] == 'a');
   assert(output[1] == '\0');
 
-  passgen_random_uint64(&random);
+  passgen_random_u64(&random);
 
   GENERATE(output, pattern);
   assert(output[0] == '\0');
@@ -223,7 +223,7 @@ test_result test_generate_maybe(void) {
   GENERATE(output, pattern);
   assert(output[0] == '\0');
 
-  passgen_random_uint64(&random);
+  passgen_random_u64(&random);
 
   GENERATE(output, pattern);
   assert(output[0] == 'b');
@@ -234,7 +234,7 @@ test_result test_generate_maybe(void) {
   GENERATE(output, pattern);
   assert(output[0] == '\0');
 
-  passgen_random_uint64(&random);
+  passgen_random_u64(&random);
 
   GENERATE(output, pattern);
   assert(output[0] == 'c');
@@ -264,7 +264,7 @@ test_result test_generate_repeat(void) {
   assert(output[1] == 'b');
   assert(output[2] == '\0');
 
-  passgen_random_uint64(&random);
+  passgen_random_u64(&random);
   GENERATE(output, pattern);
   assert(output[0] == 'b');
   assert(output[1] == 'b');

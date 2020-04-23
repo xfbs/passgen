@@ -72,7 +72,7 @@ static size_t pattern_passgen_random_repeat(
   }
 
   // get random number to choose from the range
-  size_t choice = passgen_random_uint64_max(rand, difference + 1);
+  size_t choice = passgen_random_u64_max(rand, difference + 1);
 
   // keep track of complexity
   if(env->find_complexity) {
@@ -97,7 +97,7 @@ static inline int pattern_passgen_random_ranges(
 
   // repeat chose rep size times
   for(size_t i = 0; i < reps; i++) {
-    size_t choice = passgen_random_uint64_max(rand, possible);
+    size_t choice = passgen_random_u64_max(rand, possible);
 
     // keep track of complexity
     if(env->find_complexity) {
@@ -314,7 +314,7 @@ static inline int pattern_passgen_random_group(
 
   for(size_t r = 0; r < reps; r++) {
     // choose random segment from segments
-    size_t segment = passgen_random_uint64_max(rand, group->segments.len);
+    size_t segment = passgen_random_u64_max(rand, group->segments.len);
 
     // keep track of complexity
     if(env->find_complexity) {

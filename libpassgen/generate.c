@@ -81,7 +81,7 @@ size_t passgen_generate_repeat(
   }
 
   // get random number to choose from the range
-  size_t choice = passgen_random_uint64_max(rand, difference + 1);
+  size_t choice = passgen_random_u64_max(rand, difference + 1);
 
   // keep track of complexity
   if(env->find_complexity) {
@@ -103,7 +103,7 @@ int passgen_generate_set(
 
   assert(possible != 0);
 
-  size_t choice = passgen_random_uint64_max(rand, possible);
+  size_t choice = passgen_random_u64_max(rand, possible);
 
   // keep track of complexity
   if(env->find_complexity) {
@@ -304,7 +304,7 @@ int passgen_generate_group(
     void *data,
     passgen_generate_cb *func) {
   // choose random segment from segments
-  size_t segment = passgen_random_uint64_max(rand, group->segments.len);
+  size_t segment = passgen_random_u64_max(rand, group->segments.len);
 
   // keep track of complexity
   if(env->find_complexity) {

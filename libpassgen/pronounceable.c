@@ -46,7 +46,7 @@ const struct markov0 *passgen_pronounceable_choose(
   }
 
   size_t choices = list1->frequency_sum;
-  size_t nchoice = passgen_random_uint64_max(rand, choices);
+  size_t nchoice = passgen_random_u64_max(rand, choices);
 
   return passgen_pronounceable_find(list1, nchoice);
 }
