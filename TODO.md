@@ -2,8 +2,9 @@
 
 ## Current
 
+- [x] fix `generate_markov.rb` script for CI
 - [ ] rename `passgen_random_uint64` to `_u64`, and `_i64`, for more concise function names
-- [ ] make pronounceable work for passgen2
+- [x] make pronounceable work for passgen2
 - [ ] investigate crashes with passgen "\p[german]{2,20}"
 - [ ] expose all enum mappings in their headers
 - [ ] make pronounceable take simple pointer to markov structure
