@@ -27,8 +27,6 @@
   struct passgen_token token = {0};               \
   const char *pattern;                            \
   passgen_random_t random;                        \
-  passgen_parser_init(&parser);                   \
-  assert(0 == passgen_parse_start(&parser));      \
   assert(passgen_random_open_xorshift(&random, SEED))
 
 #define GENERATE(output, pattern)                                 \
@@ -37,7 +35,7 @@
     assert(0 == passgen_parse_start(&parser));                    \
     passgen_token_parser_init(&token_parser);                     \
                                                                   \
-    int token_parser_state;                                       \
+    int token_parser_state = PASSGEN_TOKEN_INIT;                  \
     for(size_t i = 0; pattern[i]; i++) {                          \
       token_parser_state =                                        \
           passgen_token_parse(&token_parser, &token, pattern[i]); \
