@@ -17,6 +17,7 @@ set(TEST_LIST
     "token.c"
     "token_new.c"
     "unicode.c"
+    "generate.c"
     "utf8.c")
 
 # the testing framework wants a list of all test functions to execute, this step
