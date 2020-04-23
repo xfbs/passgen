@@ -2,10 +2,6 @@
 
 ## Current
 
-- [x] fix `generate_markov.rb` script for CI
-- [ ] rename `passgen_random_uint64` to `_u64`, and `_i64`, for more concise function names
-- [x] make pronounceable work for passgen2
-- [ ] investigate crashes with passgen "\p[german]{2,20}"
 - [ ] expose all enum mappings in their headers
 - [ ] make pronounceable take simple pointer to markov structure
 - [ ] move data structures from pronounceable and memory into data/
@@ -42,6 +38,10 @@
     - [ ] `reader_*`
     - [ ] `unicode_*`
     - [ ] `utf8_*`
+- [x] fix `generate_markov.rb` script for CI
+- [x] rename `passgen_random_uint64` to `_u64`, and `_i64`, for more concise function names
+- [x] make pronounceable work for passgen2
+- [x] investigate crashes with passgen "\p[german]{2,20}"
 - [x] build utility to check size of data structures
 - [x] rewrite the parser, it should be a state machine
     - [x] implement group parsing
