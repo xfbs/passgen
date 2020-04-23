@@ -235,6 +235,8 @@ int passgen_generate_item(
       return 0;
     }
   }
+
+  // compute random number of repetitions
   size_t reps = passgen_generate_repeat(rand, env, &item->repeat);
 
   for(size_t i = 0; i < reps; i++) {
@@ -267,6 +269,7 @@ int passgen_generate_item(
         break;
     }
 
+    // exit early on error
     if(ret != 0) return ret;
   }
 

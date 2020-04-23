@@ -26,8 +26,9 @@
   passgen_parser_init(&parser);                   \
   assert(0 == passgen_parse_start(&parser))
 
-#define POSTAMBLE() \
-  assert(0 == passgen_parse_finish(&parser)) passgen_parser_free(&parser)
+#define POSTAMBLE()                           \
+  assert(0 == passgen_parse_finish(&parser)); \
+  passgen_parser_free(&parser)
 
 #define PARSE_CODEPOINT(codepoint)                             \
   assert(                                                      \

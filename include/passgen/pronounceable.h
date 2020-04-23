@@ -2,8 +2,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "passgen/random.h"
 #include "passgen/enum_mapping.h"
+#include "passgen/random.h"
 
 /* list of pronounceable word types that can be generated. */
 enum passgen_pronounceable_type {
