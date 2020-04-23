@@ -1,9 +1,20 @@
 #!/usr/bin/env ruby
 require 'zlib'
 
-# use a dictionary file like https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt
+if ARGV.empty?
+  puts "generate_markov.rb <dictionary_file> <name>"
+  puts
+  puts "Generates a markov chain from the given dictionary file (which is assumed"
+  puts "to be a GZipped text file, with one word per line. Outputs the resulting"
+  puts "markov chain C code on standard output."
+  puts
+  puts "Example:"
+  puts
+  puts "  ./scripts/generate_markov.rb ./data/english.txt.gz passgen_markov_english"
+  exit
+end
 
-dictionary_file = Zlib::GzipReader.open(ARGV[0]).read
+dictionary_file = Zlib::GzipReader.open(ARGV[0]).read.force_encoding('UTF-8')
 name = ARGV[1]
 
 words = dictionary_file.split("\n")
