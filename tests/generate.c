@@ -245,3 +245,49 @@ test_result test_generate_maybe(void) {
   POSTAMBLE();
   return test_ok;
 }
+
+test_result test_generate_repeat(void) {
+  PREAMBLE();
+  char output[10];
+
+  // char or not?
+  pattern = "a{5}";
+  GENERATE(output, pattern);
+  assert(output[0] == 'a');
+  assert(output[1] == 'a');
+  assert(output[2] == 'a');
+  assert(output[3] == 'a');
+  assert(output[4] == 'a');
+  assert(output[5] == '\0');
+
+  pattern = "b{2,3}";
+  GENERATE(output, pattern);
+  assert(output[0] == 'b');
+  assert(output[1] == 'b');
+  assert(output[2] == '\0');
+
+  passgen_random_uint64(&random);
+  GENERATE(output, pattern);
+  assert(output[0] == 'b');
+  assert(output[1] == 'b');
+  assert(output[2] == 'b');
+  assert(output[3] == '\0');
+
+  pattern = "[abc]{3}";
+  GENERATE(output, pattern);
+  assert(output[0] == 'a');
+  assert(output[1] == 'a');
+  assert(output[2] == 'c');
+  assert(output[3] == '\0');
+
+  pattern = "(ab|x){3}";
+  GENERATE(output, pattern);
+  assert(output[0] == 'x');
+  assert(output[1] == 'x');
+  assert(output[2] == 'a');
+  assert(output[3] == 'b');
+  assert(output[4] == '\0');
+
+  POSTAMBLE();
+  return test_ok;
+}
