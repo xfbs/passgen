@@ -18,12 +18,14 @@
 #include "passgen/token.h"
 #include "tests.h"
 
+// don't change this seed - that will break tests!
 #define SEED 320843200
 
 #define PREAMBLE()                                \
   struct passgen_parser parser;                   \
   struct passgen_token_parser token_parser = {0}; \
   struct passgen_token token = {0};               \
+  const char *pattern;                            \
   passgen_random_t random;                        \
   passgen_parser_init(&parser);                   \
   assert(0 == passgen_parse_start(&parser));      \
@@ -46,12 +48,13 @@
                                                                   \
     assert(token_parser_state == PASSGEN_TOKEN_INIT);             \
     assert(0 == passgen_parse_finish(&parser));                   \
-    passgen_generate_fill(                                        \
+    size_t len = passgen_generate_fill(                           \
         &parser.pattern,                                          \
         &random,                                                  \
         NULL,                                                     \
         output,                                                   \
         sizeof(output));                                          \
+    output[len] = 0;                                              \
                                                                   \
     passgen_parser_free(&parser);                                 \
   } while(0)
@@ -61,10 +64,184 @@
 test_result test_generate_empty(void) {
   PREAMBLE();
   char output[10];
-  const char *pattern = "";
+
+  pattern = "";
   GENERATE(output, pattern);
+  assert(output[0] == '\0');
 
   POSTAMBLE();
+  return test_ok;
+}
 
+test_result test_generate_chars(void) {
+  PREAMBLE();
+  char output[10];
+
+  // single char
+  pattern = "a";
+  GENERATE(output, pattern);
+  assert(output[0] == 'a');
+  assert(output[1] == '\0');
+
+  // multiple chars
+  pattern = "abc";
+  GENERATE(output, pattern);
+  assert(output[0] == 'a');
+  assert(output[1] == 'b');
+  assert(output[2] == 'c');
+  assert(output[3] == '\0');
+
+  // escaped chars
+  pattern = "pass\\[\\{\\u{78}";
+  GENERATE(output, pattern);
+  assert(output[0] == 'p');
+  assert(output[1] == 'a');
+  assert(output[2] == 's');
+  assert(output[3] == 's');
+  assert(output[4] == '[');
+  assert(output[5] == '{');
+  assert(output[6] == 'x');
+  assert(output[7] == '\0');
+
+  POSTAMBLE();
+  return test_ok;
+}
+
+test_result test_generate_segments(void) {
+  PREAMBLE();
+  char output[10];
+
+  // either a or b
+  pattern = "a|b";
+  GENERATE(output, pattern);
+  assert(output[0] == 'a');
+  assert(output[1] == '\0');
+
+  passgen_random_uint64(&random);
+
+  GENERATE(output, pattern);
+  assert(output[0] == 'b');
+  assert(output[1] == '\0');
+
+  POSTAMBLE();
+  return test_ok;
+}
+
+test_result test_generate_group(void) {
+  PREAMBLE();
+  char output[10];
+
+  // "abc"
+  pattern = "(abc)";
+  GENERATE(output, pattern);
+  assert(output[0] == 'a');
+  assert(output[1] == 'b');
+  assert(output[2] == 'c');
+  assert(output[3] == '\0');
+
+  // either "a" or "b"
+  pattern = "(a|b)";
+  GENERATE(output, pattern);
+  assert(output[0] == 'a');
+  assert(output[1] == '\0');
+
+  passgen_random_uint64(&random);
+  passgen_random_uint64(&random);
+
+  GENERATE(output, pattern);
+  assert(output[0] == 'b');
+  assert(output[1] == '\0');
+
+  POSTAMBLE();
+  return test_ok;
+}
+
+test_result test_generate_set(void) {
+  PREAMBLE();
+  char output[10];
+
+  // "abc"
+  pattern = "[a]";
+  GENERATE(output, pattern);
+  assert(output[0] == 'a');
+  assert(output[1] == '\0');
+
+  // "a" or "b" or "c"
+  pattern = "[abc]";
+  GENERATE(output, pattern);
+  assert(output[0] == 'c');
+  assert(output[1] == '\0');
+
+  passgen_random_uint64(&random);
+  GENERATE(output, pattern);
+  assert(output[0] == 'a');
+  assert(output[1] == '\0');
+
+  passgen_random_uint64(&random);
+  passgen_random_uint64(&random);
+  passgen_random_uint64(&random);
+  GENERATE(output, pattern);
+  assert(output[0] == 'b');
+  assert(output[1] == '\0');
+
+  pattern = "[a-c]";
+  GENERATE(output, pattern);
+  assert(output[0] == 'c');
+  assert(output[1] == '\0');
+
+  GENERATE(output, pattern);
+  assert(output[0] == 'b');
+  assert(output[1] == '\0');
+
+  passgen_random_uint64(&random);
+  passgen_random_uint64(&random);
+  passgen_random_uint64(&random);
+  passgen_random_uint64(&random);
+  GENERATE(output, pattern);
+  assert(output[0] == 'a');
+  assert(output[1] == '\0');
+
+  POSTAMBLE();
+  return test_ok;
+}
+
+test_result test_generate_maybe(void) {
+  PREAMBLE();
+  char output[10];
+
+  // char or not?
+  pattern = "a?";
+  GENERATE(output, pattern);
+  assert(output[0] == 'a');
+  assert(output[1] == '\0');
+
+  passgen_random_uint64(&random);
+
+  GENERATE(output, pattern);
+  assert(output[0] == '\0');
+
+  // group or not?
+  pattern = "(b)?";
+  GENERATE(output, pattern);
+  assert(output[0] == '\0');
+
+  passgen_random_uint64(&random);
+
+  GENERATE(output, pattern);
+  assert(output[0] == 'b');
+  assert(output[1] == '\0');
+
+  // set or not?
+  pattern = "[c]?";
+  GENERATE(output, pattern);
+  assert(output[0] == '\0');
+
+  passgen_random_uint64(&random);
+
+  GENERATE(output, pattern);
+  assert(output[0] == 'c');
+  assert(output[1] == '\0');
+
+  POSTAMBLE();
   return test_ok;
 }
