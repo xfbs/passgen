@@ -39,19 +39,19 @@ puts '    .list = (const struct markov2[]) {'
 
 table.sort_by{|k, v| k}.each do |first, tsecond|
 puts '        {'
-puts "            .codepoint = 0x#{first.bytes[0].to_s(16)},"
+puts "            .codepoint = 0x#{first.ord.to_s(16)},"
 puts "            .list = (const struct markov1[]){"
 
 tsecond.sort_by{|k, v| k}.each do |second, tthird|
 
 puts '                {'
-puts "                    .codepoint = 0x#{second.bytes[0].to_s(16)},"
+puts "                    .codepoint = 0x#{second.ord.to_s(16)},"
 puts "                    .list = (const struct markov0[]){"
 
-tthird.sort_by{|k, v| k}.each do |third, count|
+tthird.sort_by{|k, v| -v}.each do |third, count|
 
 puts '                        {'
-puts "                            .codepoint = 0x#{third.bytes[0].to_s(16)},"
+puts "                            .codepoint = 0x#{third.ord.to_s(16)},"
 puts "                            .frequency = #{count},"
 puts '                        },'
 

@@ -64,11 +64,11 @@ test_result test_pronounceable_find(void) {
 
   choice = passgen_pronounceable_find(list, 0);
   assert(choice != NULL);
-  assert(choice->codepoint == 'a');
+  assert(choice->codepoint == 's');
 
   choice = passgen_pronounceable_find(list, list->frequency_sum - 1);
   assert(choice != NULL);
-  assert(choice->codepoint == 'z');
+  assert(choice->codepoint == 'x');
 
   return test_ok;
 }
