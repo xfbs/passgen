@@ -397,10 +397,10 @@ test_result test_parser_group_ignore_escaped(void) {
   item = passgen_pattern_segment_get_item(segment, 0);
   assert(item);
   assert(item->kind == PASSGEN_PATTERN_CHAR);
-  assert(item->data.character.codepoints[0] == ('(' | PASSGEN_TOKEN_ESCAPED_BIT));
-  assert(item->data.character.codepoints[1] == ('{' | PASSGEN_TOKEN_ESCAPED_BIT));
-  assert(item->data.character.codepoints[2] == ('[' | PASSGEN_TOKEN_ESCAPED_BIT));
-  assert(item->data.character.codepoints[3] == ('|' | PASSGEN_TOKEN_ESCAPED_BIT));
+  assert(item->data.character.codepoints[0] == '(');
+  assert(item->data.character.codepoints[1] == '{');
+  assert(item->data.character.codepoints[2] == '[');
+  assert(item->data.character.codepoints[3] == '|');
   assert(item->data.character.count == 4);
   assert(item->repeat.min == 1);
   assert(item->repeat.max == 1);

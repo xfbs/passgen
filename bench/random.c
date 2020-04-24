@@ -22,26 +22,14 @@ int main() {
   bench("passgen_random_u32", &bench_passgen_random_u32, rand, 5000000);
   bench("passgen_random_u64", &bench_passgen_random_u64, rand, 2000000);
 
-  bench(
-      "passgen_random_u8_max",
-      &bench_passgen_random_u8_max,
-      rand,
-      10000000);
+  bench("passgen_random_u8_max", &bench_passgen_random_u8_max, rand, 10000000);
   bench(
       "passgen_random_u16_max",
       &bench_passgen_random_u16_max,
       rand,
       10000000);
-  bench(
-      "passgen_random_u32_max",
-      &bench_passgen_random_u32_max,
-      rand,
-      100000);
-  bench(
-      "passgen_random_u64_max",
-      &bench_passgen_random_u64_max,
-      rand,
-      100000);
+  bench("passgen_random_u32_max", &bench_passgen_random_u32_max, rand, 100000);
+  bench("passgen_random_u64_max", &bench_passgen_random_u64_max, rand, 100000);
 
   passgen_random_close(rand);
   return 0;

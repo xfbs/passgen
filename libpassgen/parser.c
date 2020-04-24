@@ -1,8 +1,8 @@
 #include "passgen/parser.h"
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 #include "passgen/container/stack/range.h"
 #include "passgen/container/stack/segment_item.h"
@@ -35,14 +35,16 @@ int passgen_parse_start(struct passgen_parser *parser) {
 
 // get the last item, making sure that it's only a single character.
 // in case of characters, mark it as tainted.
-static inline struct passgen_pattern_item *last_single_item_taint(struct passgen_pattern_segment *segment) {
+static inline struct passgen_pattern_item *
+last_single_item_taint(struct passgen_pattern_segment *segment) {
   struct passgen_pattern_item *item =
       passgen_pattern_item_stack_top(&segment->items);
 
   if(item->kind == PASSGEN_PATTERN_CHAR) {
     if(item->data.character.count > 1) {
       // save last codepoint
-      int32_t codepoint = item->data.character.codepoints[item->data.character.count - 1];
+      int32_t codepoint =
+          item->data.character.codepoints[item->data.character.count - 1];
 
       // trim codepoints
       item->data.character.count -= 1;
@@ -161,11 +163,12 @@ int passgen_parse_group(
 
   // check if the last item was a character that we can add this one to
   if(state->data.group.segment->items.len) {
-    struct passgen_pattern_item *last = passgen_pattern_item_stack_top(&state->data.group.segment->items);
+    struct passgen_pattern_item *last =
+        passgen_pattern_item_stack_top(&state->data.group.segment->items);
 
     if(last->kind == PASSGEN_PATTERN_CHAR) {
       if(last->data.character.count < 7 && !last->data.character.tainted) {
-        last->data.character.codepoints[last->data.character.count] = token->codepoint;
+        last->data.character.codepoints[last->data.character.count] = codepoint;
         last->data.character.count += 1;
 
         return 0;
@@ -177,7 +180,7 @@ int passgen_parse_group(
       passgen_pattern_segment_new_char(state->data.group.segment);
   chr->count = 1;
   chr->tainted = 0;
-  chr->codepoints[0] = token->codepoint;
+  chr->codepoints[0] = codepoint;
 
   return 0;
 }

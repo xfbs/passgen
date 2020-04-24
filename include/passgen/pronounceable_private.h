@@ -1,8 +1,8 @@
 #pragma once
+#include "passgen/data/markov.h"
 #include "passgen/random.h"
 #include <stddef.h>
 #include <stdint.h>
-#include "passgen/data/markov.h"
 
 struct markov0 {
   int32_t codepoint;

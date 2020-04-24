@@ -266,8 +266,7 @@ inline uint8_t passgen_random_u8_max(passgen_random_t *random, uint8_t max) {
   return num;
 }
 
-inline uint16_t
-passgen_random_u16_max(passgen_random_t *random, uint16_t max) {
+inline uint16_t passgen_random_u16_max(passgen_random_t *random, uint16_t max) {
   if(max <= UINT8_MAX) {
     return passgen_random_u8_max(random, max);
   }
@@ -287,8 +286,7 @@ passgen_random_u16_max(passgen_random_t *random, uint16_t max) {
   return num;
 }
 
-inline uint32_t
-passgen_random_u32_max(passgen_random_t *random, uint32_t max) {
+inline uint32_t passgen_random_u32_max(passgen_random_t *random, uint32_t max) {
   if(max < UINT16_MAX) {
     return passgen_random_u16_max(random, max);
   }
@@ -309,8 +307,7 @@ passgen_random_u32_max(passgen_random_t *random, uint32_t max) {
   return num;
 }
 
-inline uint64_t
-passgen_random_u64_max(passgen_random_t *random, uint64_t max) {
+inline uint64_t passgen_random_u64_max(passgen_random_t *random, uint64_t max) {
   if(max < UINT32_MAX) {
     return passgen_random_u32_max(random, max);
   }
