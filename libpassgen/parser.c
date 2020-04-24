@@ -34,7 +34,8 @@ int passgen_parse_start(struct passgen_parser *parser) {
 }
 
 // get the last item, making sure that it's only a single character.
-static inline struct passgen_pattern_item *last_single_item(struct passgen_pattern_segment *segment) {
+// in case of characters, mark it as tainted.
+static inline struct passgen_pattern_item *last_single_item_taint(struct passgen_pattern_segment *segment) {
   struct passgen_pattern_item *item =
       passgen_pattern_item_stack_top(&segment->items);
 
@@ -51,8 +52,10 @@ static inline struct passgen_pattern_item *last_single_item(struct passgen_patte
       item->kind = PASSGEN_PATTERN_CHAR;
       item->data.character.count = 1;
       item->data.character.codepoints[0] = codepoint;
-      item->data.character.tainted = true;
     }
+
+    // characters are always marked as tainted.
+    item->data.character.tainted = true;
   }
 
   return item;
@@ -144,11 +147,11 @@ int passgen_parse_group(
             NULL);
         return 0;
       case '{':
-        item = last_single_item(state->data.group.segment);
+        item = last_single_item_taint(state->data.group.segment);
         passgen_parser_state_push_repeat(parser, &item->repeat);
         return 0;
       case '?':
-        item = last_single_item(state->data.group.segment);
+        item = last_single_item_taint(state->data.group.segment);
         item->maybe = true;
         return 0;
       default:
