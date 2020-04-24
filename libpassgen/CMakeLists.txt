@@ -42,6 +42,9 @@ set(HEADER_LIST
 set(SOURCE_LIST
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
     "${CMAKE_CURRENT_BINARY_DIR}/enum_mapping_autogen.c"
+    "${CMAKE_CURRENT_BINARY_DIR}/markov_latin_autogen.c"
+    "${CMAKE_CURRENT_BINARY_DIR}/markov_german_autogen.c"
+    "${CMAKE_CURRENT_BINARY_DIR}/markov_english_autogen.c"
     "assert.c"
     "container/stack/parser_state.c"
     "container/stack/range.c"
@@ -67,9 +70,6 @@ set(SOURCE_LIST
     "pattern_presets.c"
     "pattern_random.c"
     "pronounceable.c"
-    "${CMAKE_CURRENT_BINARY_DIR}/markov_latin_autogen.c"
-    "${CMAKE_CURRENT_BINARY_DIR}/markov_german_autogen.c"
-    "${CMAKE_CURRENT_BINARY_DIR}/markov_english_autogen.c"
     "random.c"
     "reader.c"
     "token.c"
@@ -90,21 +90,23 @@ add_custom_command(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   VERBATIM)
 
-# for the pronounceable word generation to work, we take a word list (they
-# are compressed in data/name.txt.gz), and run it through this script, which
+# for the pronounceable word generation to work, we take a word list (they are
+# compressed in data/name.txt.gz), and run it through this script, which
 # generates a markov chain data structure for us, which is then compiled into
 # the binary.
 function(passgen_generate_markov language)
-add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/markov_${language}_autogen.c
-  COMMAND
-    ${PROJECT_SOURCE_DIR}/scripts/generate_markov.rb
-    ${PROJECT_SOURCE_DIR}/data/${language}.txt.gz passgen_pronounceable_${language} >
-    ${CMAKE_CURRENT_BINARY_DIR}/markov_${language}_autogen.c
-  DEPENDS ${PROJECT_SOURCE_DIR}/scripts/generate_markov.rb
-          ${PROJECT_SOURCE_DIR}/data/${language}.txt.gz
-  COMMENT "Generating markov_${language}_autogen.c from data/${language}.txt.gz"
-  VERBATIM)
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/markov_${language}_autogen.c
+    COMMAND
+      ${PROJECT_SOURCE_DIR}/scripts/generate_markov.rb
+      ${PROJECT_SOURCE_DIR}/data/${language}.txt.gz
+      passgen_pronounceable_${language} >
+      ${CMAKE_CURRENT_BINARY_DIR}/markov_${language}_autogen.c
+    DEPENDS ${PROJECT_SOURCE_DIR}/scripts/generate_markov.rb
+            ${PROJECT_SOURCE_DIR}/data/${language}.txt.gz
+    COMMENT
+      "Generating markov_${language}_autogen.c from data/${language}.txt.gz"
+    VERBATIM)
 endfunction()
 
 passgen_generate_markov(english)
