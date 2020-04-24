@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "passgen/container/stack/range.h"
 #include "passgen/container/stack/segment_item.h"
@@ -30,6 +31,31 @@ int passgen_parse_start(struct passgen_parser *parser) {
       passgen_pattern_group_new_segment(&parser->pattern.group));
 
   return 0;
+}
+
+// get the last item, making sure that it's only a single character.
+static inline struct passgen_pattern_item *last_single_item(struct passgen_pattern_segment *segment) {
+  struct passgen_pattern_item *item =
+      passgen_pattern_item_stack_top(&segment->items);
+
+  if(item->kind == PASSGEN_PATTERN_CHAR) {
+    if(item->data.character.count > 1) {
+      // save last codepoint
+      int32_t codepoint = item->data.character.codepoints[item->data.character.count - 1];
+
+      // trim codepoints
+      item->data.character.count -= 1;
+
+      // create new item
+      item = passgen_pattern_segment_new_item(segment);
+      item->kind = PASSGEN_PATTERN_CHAR;
+      item->data.character.count = 1;
+      item->data.character.codepoints[0] = codepoint;
+      item->data.character.tainted = true;
+    }
+  }
+
+  return item;
 }
 
 int passgen_parse_token(
@@ -118,13 +144,11 @@ int passgen_parse_group(
             NULL);
         return 0;
       case '{':
-        item =
-            passgen_pattern_item_stack_top(&state->data.group.segment->items);
+        item = last_single_item(state->data.group.segment);
         passgen_parser_state_push_repeat(parser, &item->repeat);
         return 0;
       case '?':
-        item =
-            passgen_pattern_item_stack_top(&state->data.group.segment->items);
+        item = last_single_item(state->data.group.segment);
         item->maybe = true;
         return 0;
       default:
@@ -132,9 +156,25 @@ int passgen_parse_group(
     }
   }
 
+  // check if the last item was a character that we can add this one to
+  if(state->data.group.segment->items.len) {
+    struct passgen_pattern_item *last = passgen_pattern_item_stack_top(&state->data.group.segment->items);
+
+    if(last->kind == PASSGEN_PATTERN_CHAR) {
+      if(last->data.character.count < 7 && !last->data.character.tainted) {
+        last->data.character.codepoints[last->data.character.count] = token->codepoint;
+        last->data.character.count += 1;
+
+        return 0;
+      }
+    }
+  }
+
   struct passgen_pattern_char *chr =
       passgen_pattern_segment_new_char(state->data.group.segment);
-  chr->codepoint = token->codepoint;
+  chr->count = 1;
+  chr->tainted = 0;
+  chr->codepoints[0] = token->codepoint;
 
   return 0;
 }
@@ -242,6 +282,8 @@ int passgen_parse_special(
     struct passgen_parser *parser,
     struct passgen_token *token,
     struct passgen_parser_state *state) {
+  (void) parser;
+
   if(token->codepoint == '[') {
     state->type = PASSGEN_PARSER_SPECIAL_NAME;
     return 0;
@@ -254,6 +296,8 @@ int passgen_parse_special_name(
     struct passgen_parser *parser,
     struct passgen_token *token,
     struct passgen_parser_state *state) {
+  (void) parser;
+
   if(token->codepoint == ']') {
     state->type = PASSGEN_PARSER_SPECIAL_NAME_END;
   }

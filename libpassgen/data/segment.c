@@ -35,6 +35,8 @@ struct passgen_pattern_char *
 passgen_pattern_segment_new_char(struct passgen_pattern_segment *segment) {
   struct passgen_pattern_item *item = passgen_pattern_segment_new_item(segment);
   item->kind = PASSGEN_PATTERN_CHAR;
+  item->data.character.count = 0;
+  item->data.character.tainted = 0;
 
   return &item->data.character;
 }

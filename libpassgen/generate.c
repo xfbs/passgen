@@ -141,7 +141,18 @@ int passgen_generate_character(
   (void) rand;
   (void) env;
 
-  return func(data, character->codepoint);
+  assert(character->count > 0);
+  assert(character->count < 8);
+
+  for(size_t i = 0; i < character->count; i++) {
+    int ret = func(data, character->codepoints[i]);
+
+    if(ret != 0) {
+      return ret;
+    }
+  }
+
+  return 0;
 }
 
 int passgen_generate_special_pronounceable(
