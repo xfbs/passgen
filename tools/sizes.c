@@ -76,10 +76,10 @@ const static struct size_info struct_sizes[] = {
     add_struct(passgen_token),
     add_struct(passgen_token_parser),
     add_struct(passgen_enum_mapping),
-    add_struct(markov),
-    add_struct(markov0),
-    add_struct(markov1),
-    add_struct(markov2),
+    add_struct(passgen_markov),
+    add_struct(passgen_markov0),
+    add_struct(passgen_markov1),
+    add_struct(passgen_markov2),
     size_info_end()};
 
 void show_size_info(const struct size_info size_info[]) {

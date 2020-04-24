@@ -32,21 +32,21 @@ words.each do |word|
     end
 end
 
-puts '#include "passgen/pronounceable_private.h"'
+puts '#include "passgen/data/markov.h"'
 puts
-puts "const struct markov #{name} = {"
-puts '    .list = (const struct markov2[]) {'
+puts "const struct passgen_markov #{name} = {"
+puts '    .list = (const struct passgen_markov2[]) {'
 
 table.sort_by{|k, v| k}.each do |first, tsecond|
 puts '        {'
 puts "            .codepoint = 0x#{first.ord.to_s(16)},"
-puts "            .list = (const struct markov1[]){"
+puts "            .list = (const struct passgen_markov1[]){"
 
 tsecond.sort_by{|k, v| k}.each do |second, tthird|
 
 puts '                {'
 puts "                    .codepoint = 0x#{second.ord.to_s(16)},"
-puts "                    .list = (const struct markov0[]){"
+puts "                    .list = (const struct passgen_markov0[]){"
 
 tthird.sort_by{|k, v| -v}.each do |third, count|
 

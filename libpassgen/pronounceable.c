@@ -6,7 +6,7 @@
 #include "passgen/assert.h"
 #include "passgen/pronounceable_private.h"
 
-const struct markov *markov_pronounceable_all[] = {
+const struct passgen_markov *markov_pronounceable_all[] = {
     &passgen_pronounceable_english,
     &passgen_pronounceable_german,
     &passgen_pronounceable_latin,
@@ -30,17 +30,17 @@ passgen_pronounceable_lookup(size_t length, const char *name) {
   return PASSGEN_PRONOUNCEABLE_LAST;
 }
 
-const struct markov0 *passgen_pronounceable_choose(
-    const struct markov *list,
+const struct passgen_markov0 *passgen_pronounceable_choose(
+    const struct passgen_markov *list,
     passgen_random_t *rand,
     int32_t p1,
     int32_t p2) {
-  const struct markov2 *list2 = passgen_pronounceable_find2(list, p1);
+  const struct passgen_markov2 *list2 = passgen_pronounceable_find2(list, p1);
   if(!list2) {
     return NULL;
   }
 
-  const struct markov1 *list1 = passgen_pronounceable_find1(list2, p2);
+  const struct passgen_markov1 *list1 = passgen_pronounceable_find1(list2, p2);
   if(!list1) {
     return NULL;
   }
@@ -52,7 +52,7 @@ const struct markov0 *passgen_pronounceable_choose(
 }
 
 size_t passgen_pronounceable2(
-    const struct markov *list,
+    const struct passgen_markov *list,
     passgen_random_t *rand,
     int32_t *buf,
     size_t len) {
@@ -60,7 +60,7 @@ size_t passgen_pronounceable2(
   size_t pos = 0;
 
   do {
-    const struct markov0 *choice =
+    const struct passgen_markov0 *choice =
         passgen_pronounceable_choose(list, rand, p1, p2);
     assert(choice);
 
@@ -85,7 +85,7 @@ size_t passgen_pronounceable(
   assert(type < PASSGEN_PRONOUNCEABLE_LAST);
 
   /* get list */
-  const struct markov *list = markov_pronounceable_all[type];
+  const struct passgen_markov *list = markov_pronounceable_all[type];
   assert(list);
 
   return passgen_pronounceable2(list, rand, buf, len);
@@ -101,7 +101,7 @@ size_t passgen_pronounceable_len(
   assert(type < PASSGEN_PRONOUNCEABLE_LAST);
 
   /* get list */
-  const struct markov *list = markov_pronounceable_all[type];
+  const struct passgen_markov *list = markov_pronounceable_all[type];
   assert(list);
 
   /* try tries times (or infinite times if tries is 0) to fill buffer up with
@@ -113,7 +113,7 @@ size_t passgen_pronounceable_len(
     size_t pos = 0;
 
     do {
-      const struct markov0 *choice;
+      const struct passgen_markov0 *choice;
       choice = passgen_pronounceable_choose(list, rand, p1, p2);
       assert(choice);
 
@@ -144,7 +144,7 @@ size_t passgen_pronounceable_len(
 
 static int markov1_find(const void *key_p, const void *item_p) {
   const int32_t *key = key_p;
-  const struct markov1 *item = item_p;
+  const struct passgen_markov1 *item = item_p;
 
   if(*key < item->codepoint) {
     return -1;
@@ -155,15 +155,15 @@ static int markov1_find(const void *key_p, const void *item_p) {
   }
 }
 
-const struct markov1 *
-passgen_pronounceable_find1(const struct markov2 *list, int32_t codepoint) {
-  const struct markov1 *result;
+const struct passgen_markov1 *
+passgen_pronounceable_find1(const struct passgen_markov2 *list, int32_t codepoint) {
+  const struct passgen_markov1 *result;
 
   result = bsearch(
       &codepoint,
       list->list,
       list->list_len,
-      sizeof(struct markov1),
+      sizeof(struct passgen_markov1),
       markov1_find);
 
   return result;
@@ -171,7 +171,7 @@ passgen_pronounceable_find1(const struct markov2 *list, int32_t codepoint) {
 
 static int markov_find(const void *key_p, const void *item_p) {
   const int32_t *key = key_p;
-  const struct markov2 *item = item_p;
+  const struct passgen_markov2 *item = item_p;
 
   if(*key < item->codepoint) {
     return -1;
@@ -182,22 +182,22 @@ static int markov_find(const void *key_p, const void *item_p) {
   }
 }
 
-const struct markov2 *
-passgen_pronounceable_find2(const struct markov *list, int32_t codepoint) {
-  const struct markov2 *result;
+const struct passgen_markov2 *
+passgen_pronounceable_find2(const struct passgen_markov *list, int32_t codepoint) {
+  const struct passgen_markov2 *result;
 
   result = bsearch(
       &codepoint,
       list->list,
       list->list_len,
-      sizeof(struct markov2),
+      sizeof(struct passgen_markov2),
       markov_find);
 
   return result;
 }
 
-const struct markov0 *
-passgen_pronounceable_find(const struct markov1 *list, size_t choice) {
+const struct passgen_markov0 *
+passgen_pronounceable_find(const struct passgen_markov1 *list, size_t choice) {
   for(size_t i = 0; i < list->list_len; i++) {
     if(choice < list->list[i].frequency) {
       return &list->list[i];
