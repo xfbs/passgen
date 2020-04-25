@@ -221,7 +221,7 @@ struct special_chars {
   passgen_token_special *parser;
 };
 
-const static struct special_chars special_chars[] = {
+static const struct special_chars special_chars[] = {
     {'a', '\a', PATTERN_TOKEN_ESCAPED, NULL},
     {'b', '\b', PATTERN_TOKEN_ESCAPED, NULL},
     {'e', '\033', PATTERN_TOKEN_ESCAPED, NULL},
