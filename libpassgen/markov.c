@@ -1,5 +1,6 @@
 #include "passgen/markov.h"
 #include "passgen/assert.h"
+#include <stdlib.h>
 
 const struct passgen_markov0 *passgen_markov2_choose(
     const struct passgen_markov3 *list,
