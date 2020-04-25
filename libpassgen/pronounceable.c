@@ -4,10 +4,10 @@
 #include <string.h>
 
 #include "passgen/assert.h"
-#include "passgen/pronounceable_private.h"
+#include "passgen/markov.h"
 #include "passgen/markov_data.h"
 
-const struct passgen_markov *markov_pronounceable_all[] = {
+const struct passgen_markov3 *markov_pronounceable_all[] = {
     &passgen_pronounceable_english,
     &passgen_pronounceable_german,
     &passgen_pronounceable_latin,
@@ -31,17 +31,17 @@ passgen_pronounceable_lookup(size_t length, const char *name) {
   return PASSGEN_PRONOUNCEABLE_LAST;
 }
 
-const struct passgen_markov0 *passgen_pronounceable_choose(
-    const struct passgen_markov *list,
+const struct passgen_markov0 *passgen_markov2_choose(
+    const struct passgen_markov3 *list,
     passgen_random_t *rand,
     int32_t p1,
     int32_t p2) {
-  const struct passgen_markov2 *list2 = passgen_pronounceable_find2(list, p1);
+  const struct passgen_markov2 *list2 = passgen_markov3_find(list, p1);
   if(!list2) {
     return NULL;
   }
 
-  const struct passgen_markov1 *list1 = passgen_pronounceable_find1(list2, p2);
+  const struct passgen_markov1 *list1 = passgen_markov2_find(list2, p2);
   if(!list1) {
     return NULL;
   }
@@ -49,11 +49,11 @@ const struct passgen_markov0 *passgen_pronounceable_choose(
   size_t choices = list1->frequency_sum;
   size_t nchoice = passgen_random_u64_max(rand, choices);
 
-  return passgen_pronounceable_find(list1, nchoice);
+  return passgen_markov1_find(list1, nchoice);
 }
 
-size_t passgen_pronounceable2(
-    const struct passgen_markov *list,
+size_t passgen_markov2_generate(
+    const struct passgen_markov3 *list,
     passgen_random_t *rand,
     int32_t *buf,
     size_t len) {
@@ -62,7 +62,7 @@ size_t passgen_pronounceable2(
 
   do {
     const struct passgen_markov0 *choice =
-        passgen_pronounceable_choose(list, rand, p1, p2);
+        passgen_markov2_choose(list, rand, p1, p2);
     assert(choice);
 
     /* save codepoint */
@@ -86,10 +86,10 @@ size_t passgen_pronounceable(
   assert(type < PASSGEN_PRONOUNCEABLE_LAST);
 
   /* get list */
-  const struct passgen_markov *list = markov_pronounceable_all[type];
+  const struct passgen_markov3 *list = markov_pronounceable_all[type];
   assert(list);
 
-  return passgen_pronounceable2(list, rand, buf, len);
+  return passgen_markov2_generate(list, rand, buf, len);
 }
 
 size_t passgen_pronounceable_len(
@@ -102,7 +102,7 @@ size_t passgen_pronounceable_len(
   assert(type < PASSGEN_PRONOUNCEABLE_LAST);
 
   /* get list */
-  const struct passgen_markov *list = markov_pronounceable_all[type];
+  const struct passgen_markov3 *list = markov_pronounceable_all[type];
   assert(list);
 
   /* try tries times (or infinite times if tries is 0) to fill buffer up with
@@ -115,7 +115,7 @@ size_t passgen_pronounceable_len(
 
     do {
       const struct passgen_markov0 *choice;
-      choice = passgen_pronounceable_choose(list, rand, p1, p2);
+      choice = passgen_markov2_choose(list, rand, p1, p2);
       assert(choice);
 
       /* advante to next pair of previour */
@@ -157,7 +157,7 @@ static int markov1_find(const void *key_p, const void *item_p) {
 }
 
 const struct passgen_markov1 *
-passgen_pronounceable_find1(const struct passgen_markov2 *list, int32_t codepoint) {
+passgen_markov2_find(const struct passgen_markov2 *list, int32_t codepoint) {
   const struct passgen_markov1 *result;
 
   result = bsearch(
@@ -184,7 +184,7 @@ static int markov_find(const void *key_p, const void *item_p) {
 }
 
 const struct passgen_markov2 *
-passgen_pronounceable_find2(const struct passgen_markov *list, int32_t codepoint) {
+passgen_markov3_find(const struct passgen_markov3 *list, int32_t codepoint) {
   const struct passgen_markov2 *result;
 
   result = bsearch(
@@ -198,7 +198,7 @@ passgen_pronounceable_find2(const struct passgen_markov *list, int32_t codepoint
 }
 
 const struct passgen_markov0 *
-passgen_pronounceable_find(const struct passgen_markov1 *list, size_t choice) {
+passgen_markov1_find(const struct passgen_markov1 *list, size_t choice) {
   for(size_t i = 0; i < list->list_len; i++) {
     if(choice < list->list[i].frequency) {
       return &list->list[i];

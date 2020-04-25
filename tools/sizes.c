@@ -19,7 +19,7 @@
 #include "passgen/data/token.h"
 #include "passgen/enum_mapping.h"
 #include "passgen/pronounceable.h"
-#include "passgen/pronounceable_private.h"
+#include "passgen/markov.h"
 
 #define add_type(name) \
   { #name, sizeof(name) }
@@ -76,7 +76,7 @@ const static struct size_info struct_sizes[] = {
     add_struct(passgen_token),
     add_struct(passgen_token_parser),
     add_struct(passgen_enum_mapping),
-    add_struct(passgen_markov),
+    add_struct(passgen_markov3),
     add_struct(passgen_markov0),
     add_struct(passgen_markov1),
     add_struct(passgen_markov2),

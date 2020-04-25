@@ -34,7 +34,8 @@ end
 
 puts '#include "passgen/data/markov.h"'
 puts
-puts "const struct passgen_markov #{name} = {"
+puts "const struct passgen_markov3 #{name} = {"
+puts '    .codepoint = 0x0,'
 puts '    .list = (const struct passgen_markov2[]) {'
 
 table.sort_by{|k, v| k}.each do |first, tsecond|

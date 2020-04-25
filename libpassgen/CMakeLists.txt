@@ -28,7 +28,7 @@ set(HEADER_LIST
     "../include/passgen/pattern.h"
     "../include/passgen/pattern_private.h"
     "../include/passgen/pronounceable.h"
-    "../include/passgen/pronounceable_private.h"
+    "../include/passgen/markov.h"
     "../include/passgen/random.h"
     "../include/passgen/reader.h"
     "../include/passgen/token.h"

@@ -20,7 +20,8 @@ struct passgen_markov2 {
   size_t list_len;
 };
 
-struct passgen_markov {
+struct passgen_markov3 {
+  int32_t codepoint;
   const struct passgen_markov2 *list;
   size_t list_len;
 };

@@ -1,5 +1,5 @@
 #include "passgen/pronounceable.h"
-#include "passgen/pronounceable_private.h"
+#include "passgen/markov.h"
 #include "passgen/markov_data.h"
 #include "tests.h"
 #define SEED 328543091702ULL
@@ -13,14 +13,14 @@ test_result test_pronounceable_lists(void) {
 test_result test_pronounceable_find2(void) {
   const struct passgen_markov2 *list;
 
-  list = passgen_pronounceable_find2(&passgen_pronounceable_english, '+');
+  list = passgen_markov3_find(&passgen_pronounceable_english, '+');
   assert(list == NULL);
 
-  list = passgen_pronounceable_find2(&passgen_pronounceable_english, 0);
+  list = passgen_markov3_find(&passgen_pronounceable_english, 0);
   assert(list != NULL);
   assert(list->codepoint == 0);
 
-  list = passgen_pronounceable_find2(&passgen_pronounceable_english, 'a');
+  list = passgen_markov3_find(&passgen_pronounceable_english, 'a');
   assert(list != NULL);
   assert(list->codepoint == 'a');
 
@@ -31,17 +31,17 @@ test_result test_pronounceable_find1(void) {
   const struct passgen_markov1 *list;
   const struct passgen_markov2 *list2;
 
-  list2 = passgen_pronounceable_find2(&passgen_pronounceable_english, 0);
+  list2 = passgen_markov3_find(&passgen_pronounceable_english, 0);
   assert(list2);
 
-  list = passgen_pronounceable_find1(list2, '+');
+  list = passgen_markov2_find(list2, '+');
   assert(list == NULL);
 
-  list = passgen_pronounceable_find1(list2, 0);
+  list = passgen_markov2_find(list2, 0);
   assert(list != NULL);
   assert(list->codepoint == 0);
 
-  list = passgen_pronounceable_find1(list2, 'a');
+  list = passgen_markov2_find(list2, 'a');
   assert(list != NULL);
   assert(list->codepoint == 'a');
 
@@ -53,21 +53,21 @@ test_result test_pronounceable_find(void) {
   const struct passgen_markov1 *list;
   const struct passgen_markov2 *list2;
 
-  list2 = passgen_pronounceable_find2(&passgen_pronounceable_english, 0);
+  list2 = passgen_markov3_find(&passgen_pronounceable_english, 0);
   assert(list2);
 
-  list = passgen_pronounceable_find1(list2, 0);
+  list = passgen_markov2_find(list2, 0);
   assert(list != NULL);
   assert(list->codepoint == 0);
 
-  choice = passgen_pronounceable_find(list, list->frequency_sum);
+  choice = passgen_markov1_find(list, list->frequency_sum);
   assert(choice == NULL);
 
-  choice = passgen_pronounceable_find(list, 0);
+  choice = passgen_markov1_find(list, 0);
   assert(choice != NULL);
   assert(choice->codepoint == 's');
 
-  choice = passgen_pronounceable_find(list, list->frequency_sum - 1);
+  choice = passgen_markov1_find(list, list->frequency_sum - 1);
   assert(choice != NULL);
   assert(choice->codepoint == 'x');
 

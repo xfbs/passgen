@@ -15,7 +15,7 @@
 #include "passgen/data/set.h"
 #include "passgen/data/special.h"
 #include "passgen/data/special_kind.h"
-#include "passgen/pronounceable_private.h"
+#include "passgen/markov.h"
 
 struct fillpos {
   char *buffer;
