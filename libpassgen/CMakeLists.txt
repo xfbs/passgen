@@ -62,6 +62,7 @@ set(SOURCE_LIST
     "enum_mapping.c"
     "generate.c"
     "json/token.c"
+    "markov.c"
     "memory.c"
     "parser.c"
     "passgen.c"
@@ -100,7 +101,7 @@ function(passgen_generate_markov language)
     COMMAND
       ${PROJECT_SOURCE_DIR}/scripts/generate_markov.rb
       ${PROJECT_SOURCE_DIR}/data/${language}.txt.gz
-      passgen_pronounceable_${language} >
+      passgen_markov_${language} >
       ${CMAKE_CURRENT_BINARY_DIR}/markov_${language}_autogen.c
     DEPENDS ${PROJECT_SOURCE_DIR}/scripts/generate_markov.rb
             ${PROJECT_SOURCE_DIR}/data/${language}.txt.gz
