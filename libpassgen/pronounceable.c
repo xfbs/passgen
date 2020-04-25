@@ -5,6 +5,7 @@
 
 #include "passgen/assert.h"
 #include "passgen/pronounceable_private.h"
+#include "passgen/markov_data.h"
 
 const struct passgen_markov *markov_pronounceable_all[] = {
     &passgen_pronounceable_english,

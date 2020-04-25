@@ -1,5 +1,6 @@
 #include "passgen/pronounceable.h"
 #include "passgen/pronounceable_private.h"
+#include "passgen/markov_data.h"
 #include "tests.h"
 #define SEED 328543091702ULL
 
