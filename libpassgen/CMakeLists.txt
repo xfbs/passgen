@@ -153,6 +153,6 @@ install(
   COMPONENT Headers)
 
 if(USE_LIBEXECINFO)
-  target_link_libraries(passgen-static execinfo)
-  target_link_libraries(passgen-shared execinfo)
+  target_link_libraries(passgen-static PRIVATE execinfo)
+  target_link_libraries(passgen-shared PRIVATE execinfo)
 endif(USE_LIBEXECINFO)
