@@ -46,6 +46,15 @@ test:bionic:
       - build-gcc/ccov/passgen-test
     expire_in: 1 week
 
+test:alpine:
+  image: registry.gitlab.com/xfbs/passgen:bionic
+  stage: test
+  script:
+    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DUSE_BACKTRACE=NO -GNinja
+    - cmake --build build
+    - ./build/tests/passgen-test
+    - valgrind ./build/tests/passgen-test
+
 # build stuff on ubuntu.
 build:bionic:release:
   image: registry.gitlab.com/xfbs/passgen:bionic
