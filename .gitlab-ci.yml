@@ -56,12 +56,12 @@ test:alpine:
     - valgrind ./build/tests/passgen-test
 
 # build stuff on ubuntu.
-build:bionic:release:
+build:bionic:
   image: registry.gitlab.com/xfbs/passgen:bionic
   stage: build
   script:
     - mkdir build-bionic-release && cd build-bionic-release
-    - cmake -GNinja -DCMAKE_BUILD_TYPE=Debug -DBUILD_GIT_INFO=NO ..
+    - cmake -GNinja -DCMAKE_BUILD_TYPE=Release ..
     - ninja
     - ./tests/passgen-test
     - cpack -G TXZ
@@ -71,12 +71,12 @@ build:bionic:release:
     expire_in: 1 week
 
 # build stuff on alpine.
-build:alpine:release:
+build:alpine:
   image: registry.gitlab.com/xfbs/passgen:alpine
   stage: build
   script:
     - mkdir -p build-alpine-release && cd build-alpine-release
-    - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_GIT_INFO=NO -DBUILD_STATIC=y ..
+    - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC=y ..
     - ninja
     - ./tests/passgen-test
     - cpack -G TXZ
@@ -90,8 +90,8 @@ pages:
   stage: deploy
   dependencies:
     - test:bionic
-    - build:alpine:release
-    - build:bionic:release
+    - build:alpine
+    - build:bionic
   script:
     - mkdir -p public/coverage
     - mv build-clang/ccov/passgen-test public/coverage/llvm-cov
