@@ -29,7 +29,14 @@ typedef struct {
   test_func *func;
 } test_entry;
 
-bool run(test_entry test);
+typedef struct {
+  test_entry entry;
+  int number;
+  int amount;
+  int verbosity;
+} test_run;
+
+bool run(test_run test);
 
 #define test(id) \
   { .name = #id, .func = test_##id }
