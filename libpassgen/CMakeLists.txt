@@ -148,8 +148,8 @@ install(
   COMPONENT Libraries)
 
 install(
-  FILES ${HEADER_LIST}
-  DESTINATION include/passgen
+  DIRECTORY ../include/passgen
+  DESTINATION include
   COMPONENT Headers)
 
 if(USE_LIBEXECINFO)
