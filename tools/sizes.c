@@ -18,8 +18,8 @@
 #include "passgen/data/substring.h"
 #include "passgen/data/token.h"
 #include "passgen/enum_mapping.h"
-#include "passgen/pronounceable.h"
 #include "passgen/markov.h"
+#include "passgen/pronounceable.h"
 
 #define add_type(name) \
   { #name, sizeof(name) }
