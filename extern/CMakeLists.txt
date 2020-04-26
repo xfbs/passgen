@@ -20,7 +20,6 @@ else()
   set_target_properties(jansson::jansson PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${JANSSON_INCLUDE_DIRS}"
     IMPORTED_LOCATION "${libjansson}")
-  message("jannson has " $<TARGET_PROPERTY:jansson,INCLUDE_DIRECTORIES>)
 endif()
 
 # dependency (only on alpine): libexecinfo-dev
