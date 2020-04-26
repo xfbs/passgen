@@ -27,4 +27,7 @@ outfile.puts tests
 outfile.puts "    {NULL, NULL},"
 
 outfile.puts "};"
+
+outfile.puts
+outfile.puts "size_t tests_len = #{tests.size};"
 outfile.close

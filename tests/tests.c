@@ -25,14 +25,9 @@ static inline void memswap(void *a, void *b, size_t size) {
 }
 
 static inline void shuffle(test_entry *tests) {
-  size_t length = 0;
-  while(tests[length].func) {
-    length++;
-  }
-
-  for(size_t i = 0; i < (length * 2); i++) {
-    size_t pos_a = rand() % length;
-    size_t pos_b = rand() % length;
+  for(size_t i = 0; i < (tests_len * 2); i++) {
+    size_t pos_a = rand() % tests_len;
+    size_t pos_b = rand() % tests_len;
 
     memswap(&tests[pos_a], &tests[pos_b], sizeof(test_entry));
   }

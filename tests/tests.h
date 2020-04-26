@@ -43,3 +43,4 @@ bool run(test_entry test);
         .func = __func__};
 
 extern test_entry tests[];
+extern size_t tests_len;
