@@ -20,7 +20,8 @@ option(USE_LIBEXECINFO
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-include(ExternalProject)
+#include(ExternalProject)
+include(FindPkgConfig)
 include(ClangFormat)
 include(CMakeFormat)
 include(CTest)
@@ -41,29 +42,7 @@ if(BUILD_GIT_INFO)
   git_info()
 endif()
 
-# dependency: utf8proc
-if(BUILD_UTF8PROC)
-  add_subdirectory(extern/utf8proc)
-  # target_code_coverage(utf8proc)
-else()
-  find_package(utf8proc)
-endif()
-
-if(BUILD_JANSSON)
-  set(JANSSON_BUILD_DOCS OFF CACHE BOOL "")
-  set(JANSSON_EXAMPLES OFF CACHE BOOL "")
-  set(JANSSON_WITHOUT_TESTS ON CACHE BOOL "")
-  add_subdirectory(extern/jansson)
-  set(libjansson jansson)
-else()
-  find_library(libjansson jansson)
-endif()
-
-# dependency (only on alpine): libexecinfo-dev
-if(USE_LIBEXECINFO)
-  find_library(libexecinfo execinfo)
-endif(USE_LIBEXECINFO)
-
+add_subdirectory(extern)
 
 if(BUILD_BENCH)
   add_subdirectory(bench)

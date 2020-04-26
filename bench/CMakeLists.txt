@@ -1,6 +1,6 @@
 add_library(passgen-bench-lib STATIC "bench.c" "bench.h")
 target_include_directories(passgen-bench-lib PUBLIC "." "/usr/local/include")
-target_link_libraries(passgen-bench-lib PUBLIC ${libjansson})
+target_link_libraries(passgen-bench-lib PUBLIC jansson::jansson)
 passgen_target_defaults(passgen-bench-lib)
 
 set(SOURCE_FILES

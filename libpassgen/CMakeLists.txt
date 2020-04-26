@@ -114,27 +114,29 @@ passgen_generate_markov(english)
 passgen_generate_markov(german)
 passgen_generate_markov(latin)
 
-add_library(passgen-objects OBJECT ${SOURCE_LIST} ${HEADER_LIST})
-target_include_directories(
-  passgen-objects PUBLIC $<TARGET_PROPERTY:utf8proc,INCLUDE_DIRECTORIES>)
+#add_library(passgen-objects OBJECT ${SOURCE_LIST} ${HEADER_LIST})
+#target_include_directories(
+#  passgen-objects PUBLIC $<TARGET_PROPERTY:utf8proc,INCLUDE_DIRECTORIES>
+#  $<TARGET_PROPERTY:jansson,INTERFACE_INCLUDE_DIRECTORIES>)
 # target_link_libraries(passgen-objects utf8proc m ${libjansson})
-set_property(TARGET passgen-objects PROPERTY POSITION_INDEPENDENT_CODE 1)
-passgen_target_defaults(passgen-objects)
+#set_property(TARGET passgen-objects PROPERTY POSITION_INDEPENDENT_CODE 1)
 
-target_include_directories(passgen-objects PUBLIC ../include /usr/local/include)
-target_compile_features(passgen-objects PUBLIC c_std_99)
+#target_include_directories(passgen-objects PUBLIC ../include)
+#target_compile_features(passgen-objects PUBLIC c_std_99)
 
-add_library(passgen-static STATIC $<TARGET_OBJECTS:passgen-objects>)
-target_link_libraries(passgen-static INTERFACE utf8proc m ${libjansson})
+add_library(passgen-static ${SOURCE_LIST} ${HEADER_LIST})
+target_link_libraries(passgen-static PUBLIC utf8proc m jansson::jansson)
 set_target_properties(passgen-static PROPERTIES OUTPUT_NAME passgen)
+passgen_target_defaults(passgen-static)
 passgen_check_symbols(passgen-static)
 
-add_library(passgen-shared SHARED $<TARGET_OBJECTS:passgen-objects>)
-target_link_libraries(passgen-shared PRIVATE utf8proc m ${libjansson})
+add_library(passgen-shared SHARED ${SOURCE_LIST} ${HEADER_LIST})
+target_link_libraries(passgen-shared PUBLIC utf8proc m jansson::jansson)
 set_target_properties(passgen-shared PROPERTIES OUTPUT_NAME passgen)
+passgen_target_defaults(passgen-shared)
 
-target_include_directories(passgen-static PUBLIC ../include /usr/local/include)
-target_include_directories(passgen-shared PUBLIC ../include /usr/local/include)
+target_include_directories(passgen-static PUBLIC ../include)
+target_include_directories(passgen-shared PUBLIC ../include)
 
 # add_library(passgen ${SOURCE_LIST} ${HEADER_LIST})
 
@@ -143,7 +145,7 @@ target_include_directories(passgen-shared PUBLIC ../include /usr/local/include)
 # utf8proc m ${libjansson})
 
 install(
-  TARGETS passgen-static passgen-shared
+  TARGETS passgen-static #passgen-shared
   DESTINATION lib
   COMPONENT Libraries)
 
@@ -154,5 +156,5 @@ install(
 
 if(USE_LIBEXECINFO)
   target_link_libraries(passgen-static PRIVATE execinfo)
-  target_link_libraries(passgen-shared PRIVATE execinfo)
+  #target_link_libraries(passgen-shared PRIVATE execinfo)
 endif(USE_LIBEXECINFO)
