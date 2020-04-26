@@ -2,7 +2,7 @@
 
 ## Current
 
-- [ ] investigate building and running on alpine without libexecinfo
+- [ ] add osx build to build system using osxbuild docker image
 - [ ] work on memory subsystem, moving things into data/
 - [ ] implement static memory methods
 - [ ] fix header installation paths
@@ -41,6 +41,8 @@
     - [ ] `reader_*`
     - [ ] `unicode_*`
     - [ ] `utf8_*`
+- [x] investigate building and running on alpine without libexecinfo
+- [x] fix git info issue in CI
 - [x] rename pronounceable to markov
     - [x] `markov_language_autogen.c`
     - [x] api
