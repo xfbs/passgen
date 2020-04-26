@@ -48,7 +48,7 @@ struct enum_mapping_info {
   struct passgen_enum_mapping *by_value;
 };
 
-const static struct enum_mapping_info enum_mappings[] = {
+static const struct enum_mapping_info enum_mappings[] = {
     add_enum_mapping(passgen_pattern_special_kind),
     add_enum_mapping(passgen_pattern_kind),
     add_enum_mapping(passgen_token_state),
@@ -56,12 +56,12 @@ const static struct enum_mapping_info enum_mappings[] = {
     add_enum_mapping(passgen_pronounceable_type),
     enum_mapping_info_end()};
 
-const static struct size_info type_sizes[] = {
+static const struct size_info type_sizes[] = {
     add_type(size_t),
     add_type(void *),
     size_info_end()};
 
-const static struct size_info struct_sizes[] = {
+static const struct size_info struct_sizes[] = {
     add_struct(passgen_parser),
     add_struct(passgen_parser_state),
     add_struct(passgen_pattern),
