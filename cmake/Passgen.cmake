@@ -33,6 +33,11 @@ function(passgen_target_defaults target)
   target_compile_features(${target}
     PUBLIC c_std_99)
 
+  if(USE_BACKTRACE)
+    target_compile_definitions(${target}
+      PRIVATE PASSGEN_BACKTRACE)
+  endif()
+
   target_code_coverage(${target})
 
   target_iwyu_setup(${target})

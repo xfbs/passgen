@@ -137,7 +137,7 @@ void passgen_mem_accounting_error(
   fprintf(stderr, "Fatal error: %s\n", errstr);
   fprintf(stderr, "Pointer %p\n", pointer);
 
-#ifdef PASSGEN_DEBUG
+#if defined(PASSGEN_DEBUG) && defined(PASSGEN_BACKTRACE)
   // print backtrace
   fprintf(stderr, "\nBacktrace:\n");
   void *callstack[255];
@@ -194,7 +194,7 @@ static void *passgen_malloc_accounting(void *state, size_t size) {
   }
 
   // keep track of where in the code this allocation happened.
-#ifdef PASSGEN_DEBUG
+#if defined(PASSGEN_DEBUG) && defined(PASSGEN_BACKTRACE)
   node->alloc_frames = backtrace(node->alloc_bt, sizeof(node->alloc_bt));
 #endif
 
@@ -230,7 +230,7 @@ static void *passgen_calloc_accounting(void *state, size_t count, size_t size) {
   }
 
   // keep track of where in the code this allocation happened.
-#ifdef PASSGEN_DEBUG
+#if defined(PASSGEN_DEBUG) && defined(PASSGEN_BACKTRACE)
   node->alloc_frames = backtrace(node->alloc_bt, sizeof(node->alloc_bt));
 #endif
 
@@ -286,7 +286,7 @@ static void *passgen_realloc_accounting(void *state, void *ptr, size_t size) {
   }
 
   // keep track of where in the code this allocation happened.
-#ifdef PASSGEN_DEBUG
+#if defined(PASSGEN_DEBUG) && defined(PASSGEN_BACKTRACE)
   node->alloc_frames = backtrace(node->alloc_bt, sizeof(node->alloc_bt));
 #endif
 
@@ -297,7 +297,7 @@ static void *passgen_realloc_accounting(void *state, void *ptr, size_t size) {
   if(ptr_node) {
     ptr_node->freed = true;
 
-#ifdef PASSGEN_DEBUG
+#if defined(PASSGEN_DEBUG) && defined(PASSGEN_BACKTRACE)
     ptr_node->free_frames =
         backtrace(ptr_node->free_bt, sizeof(ptr_node->free_bt));
 #endif
@@ -323,7 +323,7 @@ static void passgen_free_accounting(void *state, void *ptr) {
       passgen_free(acc->mem, ptr);
 
       // keep track of where this was freed
-#ifdef PASSGEN_DEBUG
+#if defined(PASSGEN_DEBUG) && defined(PASSGEN_BACKTRACE)
       node->free_frames = backtrace(node->free_bt, sizeof(node->free_bt));
 #endif
 
@@ -381,7 +381,7 @@ void passgen_mem_accounting_cleanup(passgen_mem_accounting_t *acc) {
     if(!node->freed) {
       fprintf(stderr, "Cleanup: freeing %p\n", node->pointer);
 
-#ifdef PASSGEN_DEBUG
+#if defined(PASSGEN_DEBUG) && defined(PASSGEN_BACKTRACE)
       // print allocation backtrace
       fprintf(stderr, "\nBacktrace (allocation):\n");
       char **symbols = backtrace_symbols(node->alloc_bt, node->alloc_frames);

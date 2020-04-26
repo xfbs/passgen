@@ -13,6 +13,7 @@ option(BUILD_BENCH "Build benchmark utilities." YES)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
 option(BUILD_STATIC "Built targets statically." OFF)
 
+option(USE_BACKTRACE "Use backtrace() for debug builds (not always available)." ON)
 option(USE_LIBEXECINFO
        "Use libexecinfo. For systems that don't have backtrace in libc." OFF)
 
