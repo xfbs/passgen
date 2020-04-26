@@ -8,9 +8,8 @@ project(
 
 # project build options.
 option(BUILD_UTF8PROC "Build utf8proc, a dependency." YES)
-option(BUILD_UTILS "Build utility binaries." OFF)
-option(BUILD_FUZZER
-       "Build fuzzer using afl (requires setting compiler to afl-gcc)." OFF)
+option(BUILD_TOOLS "Build utility binaries." YES)
+option(BUILD_BENCH "Build benchmark utilities." YES)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
 option(BUILD_STATIC "Built targets statically." OFF)
 
@@ -55,14 +54,19 @@ endif(USE_LIBEXECINFO)
 
 find_library(libjansson jansson)
 
-add_subdirectory(bench)
+if(BUILD_BENCH)
+  add_subdirectory(bench)
+endif()
 
 # build libpassgen
 add_subdirectory(libpassgen)
 
 # build passgen binary and perhaps utils
 add_subdirectory(bin)
-add_subdirectory(tools)
+
+if(BUILD_TOOLS)
+  add_subdirectory(tools)
+endif()
 
 # unit tests
 if(BUILD_TESTING)
