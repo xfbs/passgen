@@ -43,6 +43,23 @@ static inline void filter(bool *enabled, const char *name) {
   }
 }
 
+static void show_help(const char *name) {
+  fprintf(stderr, "%s%s", name,
+      " [OPTIONS] [FILTERS...]\n"
+      "Runs unit tests for passgen and reports results.\n\n"
+      "Options\n"
+      "  -h, --help\n"
+      "    Shows this help text\n"
+      "  -v, --verbose\n"
+      "    Shows more verbose information\n"
+      "  -s, --shuffle\n"
+      "    Randomises the order in which tests are run\n\n"
+      "Filters\n"
+      "  Match based on prefix. A filter such as 'random' would match any test case\n"
+      "  beginning with random, such as random_init, random_u8, etc.\n"
+      );
+}
+
 int main(int argc, char *argv[]) {
   // initialise shitty pseudorandom number generator
   srand(time(NULL));
@@ -50,14 +67,14 @@ int main(int argc, char *argv[]) {
 
   static struct option long_options[] = {
       {"verbose", no_argument, 0, 'v'},
-      {"brief", no_argument, 0, 'b'},
       {"shuffle", no_argument, 0, 's'},
+      {"help",    no_argument, 0, 'h'},
       {0, 0, 0, 0}};
 
   while(1) {
     int option_index = 0;
 
-    int c = getopt_long(argc, argv, "vbs", long_options, &option_index);
+    int c = getopt_long(argc, argv, "vsh", long_options, &option_index);
 
     /* Detect the end of the options. */
     if(c == -1) break;
@@ -75,12 +92,17 @@ int main(int argc, char *argv[]) {
         shuffle(tests);
         break;
 
-      case 'b':
-        verbosity = 0;
+      case 'v':
+        verbosity = 1;
         break;
 
+      case 'h':
+        show_help(argv[0]);
+        return EXIT_SUCCESS;
+
       case '?':
-        break;
+        show_help(argv[0]);
+        return EXIT_FAILURE;
 
       default:
         abort();
