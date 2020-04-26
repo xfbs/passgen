@@ -13,7 +13,7 @@ test_result test_utf8_decode_simple(void) {
   size_t in_pos = 0;
   size_t out_pos = 0;
 
-  int ret = utf8_decode(
+  int ret = passgen_utf8_decode(
       output,
       sizeof(output) / sizeof(output[0]),
       &out_pos,
@@ -45,7 +45,7 @@ test_result test_utf8_decode_short_output(void) {
   size_t in_pos = 0;
   size_t out_pos = 0;
 
-  int ret = utf8_decode(
+  int ret = passgen_utf8_decode(
       output,
       sizeof(output) / sizeof(output[0]),
       &out_pos,
@@ -65,7 +65,7 @@ test_result test_utf8_decode_short_output(void) {
 
   out_pos = 0;
 
-  ret = utf8_decode(
+  ret = passgen_utf8_decode(
       output,
       sizeof(output) / sizeof(output[0]),
       &out_pos,
@@ -96,7 +96,7 @@ test_result test_utf8_encode_simple(void) {
   size_t in_pos = 0;
   size_t out_pos = 0;
 
-  int ret = utf8_encode(
+  int ret = passgen_utf8_encode(
       output,
       sizeof(output) / sizeof(output[0]),
       &out_pos,

@@ -8,6 +8,7 @@ project(
 
 # project build options.
 option(BUILD_UTF8PROC "Build utf8proc, a dependency." YES)
+option(BUILD_JANSSON "Build jansson, a dependecy." OFF)
 option(BUILD_TOOLS "Build utility binaries." YES)
 option(BUILD_BENCH "Build benchmark utilities." YES)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
@@ -48,12 +49,21 @@ else()
   find_package(utf8proc)
 endif()
 
+if(BUILD_JANSSON)
+  set(JANSSON_BUILD_DOCS OFF CACHE BOOL "")
+  set(JANSSON_EXAMPLES OFF CACHE BOOL "")
+  set(JANSSON_WITHOUT_TESTS ON CACHE BOOL "")
+  add_subdirectory(extern/jansson)
+  set(libjansson jansson)
+else()
+  find_library(libjansson jansson)
+endif()
+
 # dependency (only on alpine): libexecinfo-dev
 if(USE_LIBEXECINFO)
   find_library(libexecinfo execinfo)
 endif(USE_LIBEXECINFO)
 
-find_library(libjansson jansson)
 
 if(BUILD_BENCH)
   add_subdirectory(bench)

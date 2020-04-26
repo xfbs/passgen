@@ -1,7 +1,7 @@
 #include "passgen/utf8.h"
 #include <utf8proc.h>
 
-int utf8_decode(
+int passgen_utf8_decode(
     uint32_t *out,
     size_t out_len,
     size_t *out_pos,
@@ -22,7 +22,7 @@ int utf8_decode(
   return n;
 }
 
-int utf8_encode(
+int passgen_utf8_encode(
     uint8_t *out,
     size_t out_len,
     size_t *out_pos,

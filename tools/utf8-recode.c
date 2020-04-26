@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 
     printf("read %zu bytes\n", utf8_input_end);
 
-    ret = utf8_decode(
+    ret = passgen_utf8_decode(
         decoded,
         sizeof(decoded),
         &decoded_pos,
