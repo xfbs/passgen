@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
 
 bool run(test_run test) {
   if(test.verbosity == 0) {
-    printf("\r[%i/%i] running %-35s", test.number + 1, test.amount, test.entry.name);
+    printf("\033[1K\r[%i/%i] running %s", test.number + 1, test.amount, test.entry.name);
     fflush(stdout);
   }
 
