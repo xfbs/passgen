@@ -47,7 +47,7 @@ test:bionic:
     expire_in: 1 week
 
 test:alpine:
-  image: registry.gitlab.com/xfbs/passgen:bionic
+  image: registry.gitlab.com/xfbs/passgen:alpine
   stage: test
   script:
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DUSE_BACKTRACE=NO -GNinja
