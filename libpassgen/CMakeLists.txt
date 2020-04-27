@@ -124,19 +124,21 @@ passgen_generate_markov(latin)
 #target_include_directories(passgen-objects PUBLIC ../include)
 #target_compile_features(passgen-objects PUBLIC c_std_99)
 
+
 add_library(passgen-static ${SOURCE_LIST} ${HEADER_LIST})
 target_link_libraries(passgen-static PUBLIC utf8proc m jansson::jansson)
 set_target_properties(passgen-static PROPERTIES OUTPUT_NAME passgen)
+target_include_directories(passgen-static PUBLIC ../include)
 passgen_target_defaults(passgen-static)
 passgen_check_symbols(passgen-static)
 
-add_library(passgen-shared SHARED ${SOURCE_LIST} ${HEADER_LIST})
-target_link_libraries(passgen-shared PUBLIC utf8proc m jansson::jansson)
-set_target_properties(passgen-shared PROPERTIES OUTPUT_NAME passgen)
-passgen_target_defaults(passgen-shared)
-
-target_include_directories(passgen-static PUBLIC ../include)
-target_include_directories(passgen-shared PUBLIC ../include)
+if(NOT BUILD_STATIC)
+  add_library(passgen-shared SHARED ${SOURCE_LIST} ${HEADER_LIST})
+  target_link_libraries(passgen-shared PUBLIC utf8proc m jansson::jansson)
+  set_target_properties(passgen-shared PROPERTIES OUTPUT_NAME passgen)
+  target_include_directories(passgen-shared PUBLIC ../include)
+  passgen_target_defaults(passgen-shared)
+endif()
 
 # add_library(passgen ${SOURCE_LIST} ${HEADER_LIST})
 
