@@ -19,9 +19,11 @@ docker:
     - docker build . -f scripts/alpine.Dockerfile -t "$CI_REGISTRY_IMAGE:alpine"
     - docker build . -f scripts/bionic.Dockerfile -t "$CI_REGISTRY_IMAGE:bionic"
     - docker build . -f scripts/deploy.Dockerfile -t "$CI_REGISTRY_IMAGE:deploy"
+    - docker build . -f scripts/osxcross.Dockerfile -t "$CI_REGISTRY_IMAGE:osxcross"
     - docker push "$CI_REGISTRY_IMAGE:alpine"
     - docker push "$CI_REGISTRY_IMAGE:bionic"
     - docker push "$CI_REGISTRY_IMAGE:deploy"
+    - docker push "$CI_REGISTRY_IMAGE:osxcross"
   only:
     - docker
 
@@ -83,6 +85,24 @@ build:alpine:
   artifacts:
     paths:
       - build-alpine-release
+    expire_in: 1 week
+
+build:osxcross:
+  image: registry.gitlab.com/xfbs/passgen:osxcross
+  stage: build
+  variables:
+    AR: /opt/osxcross/bin/x86_64-apple-darwin18-ar
+    CC: /opt/osxcross/bin/x86_64h-apple-darwin18-clang
+    RANLIB: /opt/osxcross/bin/x86_64h-apple-darwin18-ranlib
+    CMAKE: /opt/cmake/bin/cmake
+  script:
+    - $CMAKE -S . -B build-osx-release -DBUILD_JANSSON=YES -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_AR=$AR -DCMAKE_RANLIB=${RANLIB}
+    - make
+    - ./tests/passgen-test
+    - cpack -G TXZ
+  artifacts:
+    paths:
+      - build-osx-release
     expire_in: 1 week
 
 pages:
