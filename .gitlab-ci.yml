@@ -95,11 +95,11 @@ build:osxcross:
     CC: /opt/osxcross/bin/x86_64h-apple-darwin18-clang
     RANLIB: /opt/osxcross/bin/x86_64h-apple-darwin18-ranlib
     CMAKE: /opt/cmake/bin/cmake
+    CPACK: /opt/cmake/bin/cpack
   script:
-    - $CMAKE -S . -B build-osx-release -DBUILD_JANSSON=YES -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_AR=$AR -DCMAKE_RANLIB=${RANLIB}
-    - make
-    - ./tests/passgen-test
-    - cpack -G TXZ
+    - $CMAKE -S . -B build-osx-release -DBUILD_JANSSON=YES -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_AR=$AR -DCMAKE_RANLIB=$RANLIB
+    - $CMAKE --build build-osx-release
+    - cd build-osx-release && cpack -G TXZ
   artifacts:
     paths:
       - build-osx-release
