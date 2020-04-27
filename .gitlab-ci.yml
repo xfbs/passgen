@@ -97,7 +97,7 @@ build:osxcross:
     CMAKE: /opt/cmake/bin/cmake
     CPACK: /opt/cmake/bin/cpack
   script:
-    - $CMAKE -S . -B build-osx-release -DBUILD_JANSSON=YES -DBUILD_STATUS=YES -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_AR=$AR -DCMAKE_RANLIB=$RANLIB
+    - $CMAKE -S . -B build-osx-release -DBUILD_JANSSON=YES -DBUILD_STATIC=YES -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_AR=$AR -DCMAKE_RANLIB=$RANLIB
     - $CMAKE --build build-osx-release
     - cd build-osx-release && cpack -G TXZ
   artifacts:
