@@ -46,7 +46,7 @@
                                                                   \
     assert(token_parser_state == PASSGEN_TOKEN_INIT);             \
     assert(0 == passgen_parse_finish(&parser));                   \
-    size_t len = passgen_generate_fill(                           \
+    size_t len = passgen_generate_fill_unicode(                   \
         &parser.pattern,                                          \
         &random,                                                  \
         NULL,                                                     \
@@ -61,7 +61,7 @@
 
 test_result test_generate_empty(void) {
   PREAMBLE();
-  char output[10];
+  int32_t output[10];
 
   pattern = "";
   GENERATE(output, pattern);
@@ -73,7 +73,7 @@ test_result test_generate_empty(void) {
 
 test_result test_generate_chars(void) {
   PREAMBLE();
-  char output[10];
+  int32_t output[10];
 
   // single char
   pattern = "a";
@@ -107,7 +107,7 @@ test_result test_generate_chars(void) {
 
 test_result test_generate_segments(void) {
   PREAMBLE();
-  char output[10];
+  int32_t output[10];
 
   // either a or b
   pattern = "a|b";
@@ -127,7 +127,7 @@ test_result test_generate_segments(void) {
 
 test_result test_generate_group(void) {
   PREAMBLE();
-  char output[10];
+  int32_t output[10];
 
   // "abc"
   pattern = "(abc)";
@@ -156,7 +156,7 @@ test_result test_generate_group(void) {
 
 test_result test_generate_set(void) {
   PREAMBLE();
-  char output[10];
+  int32_t output[10];
 
   // "abc"
   pattern = "[a]";
@@ -205,7 +205,7 @@ test_result test_generate_set(void) {
 
 test_result test_generate_maybe(void) {
   PREAMBLE();
-  char output[10];
+  int32_t output[10];
 
   // char or not?
   pattern = "a?";
@@ -246,7 +246,7 @@ test_result test_generate_maybe(void) {
 
 test_result test_generate_repeat(void) {
   PREAMBLE();
-  char output[10];
+  int32_t output[10];
 
   // char or not?
   pattern = "a{5}";

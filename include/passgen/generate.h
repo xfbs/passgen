@@ -33,7 +33,14 @@ struct pattern_env {
 
 typedef int passgen_generate_cb(void *data, int32_t codepoint);
 
-size_t passgen_generate_fill(
+size_t passgen_generate_fill_unicode(
+    struct passgen_pattern *pattern,
+    passgen_random_t *rand,
+    struct pattern_env *env,
+    int32_t *buffer,
+    size_t len);
+
+size_t passgen_generate_fill_utf8(
     struct passgen_pattern *pattern,
     passgen_random_t *rand,
     struct pattern_env *env,

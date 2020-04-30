@@ -17,7 +17,16 @@
 #include "passgen/data/special_kind.h"
 #include "passgen/markov.h"
 
+#include <string.h>
+#include <utf8proc.h>
+
 struct fillpos {
+  int32_t *buffer;
+  size_t cur;
+  size_t len;
+};
+
+struct fillpos_utf8 {
   char *buffer;
   size_t cur;
   size_t len;
@@ -36,18 +45,57 @@ static int passgen_generate_write_buffer(void *data, int32_t codepoint) {
     return -1;
   }
 
-  // TODO: utf8 generation
   fillpos->buffer[fillpos->cur] = codepoint;
   fillpos->cur++;
 
   return 0;
 }
 
-size_t passgen_generate_fill(
+static int passgen_generate_write_buffer_utf8(void *data, int32_t codepoint) {
+  struct fillpos_utf8 *fillpos = data;
+
+  if(fillpos->cur == fillpos->len) {
+    return -1;
+  }
+
+  if((fillpos->cur + 4) <= fillpos->len) {
+    size_t bytes = utf8proc_encode_char(
+        codepoint,
+        (utf8proc_uint8_t *) &fillpos->buffer[fillpos->cur]);
+
+    if(!bytes) {
+      // error happened during encoding.
+      return -1;
+    }
+
+    fillpos->cur += bytes;
+  } else {
+    char buffer[4];
+    size_t bytes =
+        utf8proc_encode_char(codepoint, (utf8proc_uint8_t *) &buffer[0]);
+
+    if(!bytes) {
+      // error happened during encoding.
+      return -1;
+    }
+
+    if(bytes <= (fillpos->len - fillpos->cur)) {
+      memcpy(&fillpos->buffer[fillpos->cur], &buffer[0], bytes);
+      fillpos->cur += bytes;
+    } else {
+      // error: encoded doesn't fit in buffer.
+      return -1;
+    }
+  }
+
+  return 0;
+}
+
+size_t passgen_generate_fill_unicode(
     struct passgen_pattern *pattern,
     passgen_random_t *rand,
     struct pattern_env *env,
-    char *buffer,
+    int32_t *buffer,
     size_t len) {
   struct fillpos fillpos = {
       .buffer = buffer,
@@ -61,6 +109,32 @@ size_t passgen_generate_fill(
       env,
       &fillpos,
       passgen_generate_write_buffer);
+
+  if(0 != ret) {
+    return 0;
+  }
+
+  return fillpos.cur;
+}
+
+size_t passgen_generate_fill_utf8(
+    struct passgen_pattern *pattern,
+    passgen_random_t *rand,
+    struct pattern_env *env,
+    char *buffer,
+    size_t len) {
+  struct fillpos_utf8 fillpos = {
+      .buffer = buffer,
+      .len = len,
+      .cur = 0,
+  };
+
+  int ret = passgen_generate(
+      pattern,
+      rand,
+      env,
+      &fillpos,
+      passgen_generate_write_buffer_utf8);
 
   if(0 != ret) {
     return 0;
