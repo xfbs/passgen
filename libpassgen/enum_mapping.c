@@ -17,7 +17,7 @@ static int enum_mapping_valuecmp(const void *key, const void *item) {
 }
 
 struct passgen_enum_mapping *passgen_enum_by_name(
-    struct passgen_enum_mapping mapping[],
+    const struct passgen_enum_mapping mapping[],
     size_t count,
     const char *name) {
   return bsearch(
@@ -29,7 +29,7 @@ struct passgen_enum_mapping *passgen_enum_by_name(
 }
 
 struct passgen_enum_mapping *passgen_enum_by_value(
-    struct passgen_enum_mapping mapping[],
+    const struct passgen_enum_mapping mapping[],
     size_t count,
     int value) {
   return bsearch(

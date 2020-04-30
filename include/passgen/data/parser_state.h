@@ -35,5 +35,3 @@ struct passgen_parser_state {
     } special;
   } data;
 };
-
-PASSGEN_ENUM_MAPPING(passgen_parser_state_type);

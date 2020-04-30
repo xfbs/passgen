@@ -7,5 +7,3 @@ enum passgen_pattern_kind {
   PASSGEN_PATTERN_SPECIAL,
   PASSGEN_PATTERN_GROUP,
 };
-
-PASSGEN_ENUM_MAPPING(passgen_pattern_kind);

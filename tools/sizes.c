@@ -43,9 +43,9 @@ struct size_info {
 
 struct enum_mapping_info {
   const char *name;
-  size_t *size;
-  struct passgen_enum_mapping *by_name;
-  struct passgen_enum_mapping *by_value;
+  const size_t *size;
+  const struct passgen_enum_mapping *by_name;
+  const struct passgen_enum_mapping *by_value;
 };
 
 static const struct enum_mapping_info enum_mappings[] = {
