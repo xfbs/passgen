@@ -3,7 +3,7 @@
 
 struct passgen_enum_mapping;
 
-#define PASSGEN_ENUM_MAPPING(name)                          \
+#define PASSGEN_ENUM_MAPPING(name)                                \
   extern const size_t name##_enum_count;                          \
   extern const struct passgen_enum_mapping name##_enum_by_name[]; \
   extern const struct passgen_enum_mapping name##_enum_by_value[]

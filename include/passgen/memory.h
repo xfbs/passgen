@@ -1,9 +1,9 @@
 #pragma once
+#include <passgen/data/memory.h>
+#include <passgen/data/memory_accounting.h>
+#include <passgen/data/memory_limits.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <passgen/data/memory.h>
-#include <passgen/data/memory_limits.h>
-#include <passgen/data/memory_accounting.h>
 
 void *passgen_malloc(struct passgen_mem *mem, size_t size);
 void *passgen_calloc(struct passgen_mem *mem, size_t count, size_t size);
