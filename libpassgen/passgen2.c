@@ -15,6 +15,7 @@
 #include "passgen/pronounceable.h"
 #include "passgen/random.h"
 #include "passgen/token.h"
+#include "passgen/utf8.h"
 #include "passgen/version.h"
 
 #define bail(kind, data) passgen2_bail(PASSGEN_ERROR_##kind, (void *) data)
@@ -26,8 +27,23 @@ void passgen2_run(passgen_opts opts) {
   passgen_parser_init(&parser);
   assert(0 == passgen_parse_start(&parser));
 
-  for(size_t i = 0; opts.format[i]; i++) {
-    int ret = passgen_token_parse(&token_parser, &token, opts.format[i]);
+  uint32_t format_decoded[256];
+  size_t format_decoded_len = 0;
+  size_t format_bytes_read = 0;
+  size_t format_input_len = strlen(opts.format);
+
+  int ret = passgen_utf8_decode(
+      format_decoded,
+      256,
+      &format_decoded_len,
+      (unsigned char *) opts.format,
+      format_input_len,
+      &format_bytes_read);
+
+  assert(ret == 0);
+
+  for(size_t i = 0; i < format_decoded_len; i++) {
+    int ret = passgen_token_parse(&token_parser, &token, format_decoded[i]);
 
     if(ret == PASSGEN_TOKEN_INIT) {
       assert(0 == passgen_parse_token(&parser, &token));
@@ -60,8 +76,12 @@ void passgen2_run(passgen_opts opts) {
     };
 
     // get a NULL-terminated, random pass.
-    size_t written =
-        passgen_generate_fill(&parser.pattern, &random, &env, pass, pass_len);
+    size_t written = passgen_generate_fill_utf8(
+        &parser.pattern,
+        &random,
+        &env,
+        pass,
+        pass_len);
     pass[written] = '\0';
 
     if(opts.complexity) {
