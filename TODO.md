@@ -2,12 +2,8 @@
 
 ## Current
 
-- [ ] add osx build to build system using osxbuild docker image
-- [ ] work on memory subsystem, moving things into data/
+- [ ] document base API
 - [ ] implement static memory methods
-- [ ] fix header installation paths
-- [ ] move enum mappings declarations into own header
-- [ ] make sure german umlauts work with pronounceable generation
 - [ ] expose all enum mappings in their headers
 - [ ] make pronounceable take simple pointer to markov structure
 - [ ] make word list generation work
@@ -41,6 +37,11 @@
     - [ ] `reader_*`
     - [ ] `unicode_*`
     - [ ] `utf8_*`
+- [x] add osx build to build system using osxbuild docker image
+- [x] work on memory subsystem, moving things into data/
+- [x] fix header installation paths
+- [x] move enum mappings declarations into own header
+- [x] make sure german umlauts work with pronounceable generation
 - [x] investigate building and running on alpine without libexecinfo
 - [x] fix git info issue in CI
 - [x] rename pronounceable to markov
