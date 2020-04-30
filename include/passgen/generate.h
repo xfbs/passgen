@@ -31,8 +31,13 @@ struct pattern_env {
   enum passgen_pronounceable_type pronounceable_type;
 };
 
+/// Callback for generation. Takes an arbitrary data pointer and the codepoint
+/// that was generated.
 typedef int passgen_generate_cb(void *data, int32_t codepoint);
 
+/// Generate a password from a pattern, filling the unicode codepoints into the
+/// provided buffer. Will not NULL-terminate anything, returns number of
+/// codepoints written.
 size_t passgen_generate_fill_unicode(
     struct passgen_pattern *pattern,
     passgen_random_t *rand,
@@ -40,6 +45,9 @@ size_t passgen_generate_fill_unicode(
     int32_t *buffer,
     size_t len);
 
+/// Generate a password from a patter, filling the result UTF-8 encoded into
+/// the provided buffer. Will not NULL-terminate the buffer, returns the number
+/// of bytes written.
 size_t passgen_generate_fill_utf8(
     struct passgen_pattern *pattern,
     passgen_random_t *rand,
@@ -47,6 +55,8 @@ size_t passgen_generate_fill_utf8(
     char *buffer,
     size_t len);
 
+/// Generate a password from a pattern, calling the provided callback function
+/// with the provided data pointer as well as each codepoint as it is generated.
 int passgen_generate(
     struct passgen_pattern *pattern,
     passgen_random_t *rand,
