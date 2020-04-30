@@ -119,13 +119,10 @@ pages:
     - mv build-gcc/ccov/passgen-test public/coverage/lcov
     - doxygen Doxyfile
     - mv docs/html public/doxygen
-    - mv build-alpine-release public/
-    - mv build-bionic-release public/
-    - mv build-osx-release public/
     - mkdir public/snapshot
-    - cp public/build-alpine-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-musl-amd64.tar.xz
-    - cp public/build-bionic-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-amd64.tar.xz
-    - cp public/build-osx-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-osx-amd64.tar.xz
+    - cp build-alpine-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-musl-amd64.tar.xz
+    - cp build-bionic-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-amd64.tar.xz
+    - cp build-osx-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-osx-amd64.tar.xz
   artifacts:
     paths:
       - public
