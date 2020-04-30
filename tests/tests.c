@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 test_result test_ok = {.ok = true};
 
@@ -44,7 +45,10 @@ static inline void filter(bool *enabled, const char *name) {
 }
 
 static void show_help(const char *name) {
-  fprintf(stderr, "%s%s", name,
+  fprintf(
+      stderr,
+      "%s%s",
+      name,
       " [OPTIONS] [FILTERS...]\n"
       "Runs unit tests for passgen and reports results.\n\n"
       "Options\n"
@@ -55,20 +59,20 @@ static void show_help(const char *name) {
       "  -s, --shuffle\n"
       "    Randomises the order in which tests are run\n\n"
       "Filters\n"
-      "  Match based on prefix. A filter such as 'random' would match any test case\n"
-      "  beginning with random, such as random_init, random_u8, etc.\n"
-      );
+      "  Match based on prefix. A filter such as 'random' would match any test "
+      "case\n"
+      "  beginning with random, such as random_init, random_u8, etc.\n");
 }
 
 int main(int argc, char *argv[]) {
   // initialise shitty pseudorandom number generator
   srand(time(NULL));
-  int verbosity = 0;
+  int verbosity = isatty(fileno(stdout));
 
   static struct option long_options[] = {
       {"verbose", no_argument, 0, 'v'},
       {"shuffle", no_argument, 0, 's'},
-      {"help",    no_argument, 0, 'h'},
+      {"help", no_argument, 0, 'h'},
       {0, 0, 0, 0}};
 
   while(1) {
@@ -93,7 +97,7 @@ int main(int argc, char *argv[]) {
         break;
 
       case 'v':
-        verbosity = 1;
+        verbosity = 2;
         break;
 
       case 'h':
@@ -130,11 +134,10 @@ int main(int argc, char *argv[]) {
   for(size_t i = 0; tests[i].name; ++i) {
     if(enabled_tests[i]) {
       test_run r = {
-        .entry = tests[i],
-        .verbosity = verbosity,
-        .number = success + failures,
-        .amount = enabled_count
-      };
+          .entry = tests[i],
+          .verbosity = verbosity,
+          .number = success + failures,
+          .amount = enabled_count};
 
       if(run(r)) {
         success += 1;
@@ -145,17 +148,37 @@ int main(int argc, char *argv[]) {
   }
 
   if(success == enabled_count) {
-    printf(
-        "\033[1;34m=>\033[0m %zi/%zi tests \033[32mpassed\033[0m.\n",
-        success,
-        enabled_count);
+    switch(verbosity) {
+      case 0:
+        printf("=> %zi/%zi tests passed.\n", success, enabled_count);
+        break;
+      case 1:
+      case 2:
+        printf(
+            "\033[1;34m=>\033[0m %zi/%zi tests \033[32mpassed\033[0m.\n",
+            success,
+            enabled_count);
+        break;
+    }
   } else {
-    printf(
-        "\033[1;34m=>\033[0m %zi/%zi tests \033[32mpassed\033[0m, "
-        "%zi \033[31mfailure\033[0m.\n",
-        success,
-        enabled_count,
-        failures);
+    switch(verbosity) {
+      case 0:
+        printf(
+            "=> %zi/%zi tests passed, %zi failures.\n",
+            success,
+            enabled_count,
+            failures);
+        break;
+      case 1:
+      case 2:
+        printf(
+            "\033[1;34m=>\033[0m %zi/%zi tests \033[32mpassed\033[0m, "
+            "%zi \033[31mfailure\033[0m.\n",
+            success,
+            enabled_count,
+            failures);
+        break;
+    }
   }
 
   if(failures) {
@@ -166,9 +189,27 @@ int main(int argc, char *argv[]) {
 }
 
 bool run(test_run test) {
-  if(test.verbosity == 0) {
-    printf("\033[1K\r[%i/%i] running %s", test.number + 1, test.amount, test.entry.name);
-    fflush(stdout);
+  switch(test.verbosity) {
+    case 0:
+      // not a tty, regular
+      printf(
+          "[%i/%i] running %s\n",
+          test.number + 1,
+          test.amount,
+          test.entry.name);
+      fflush(stdout);
+      break;
+    case 1:
+      // tty, regular
+      printf(
+          "\033[1K\r[%i/%i] running %s",
+          test.number + 1,
+          test.amount,
+          test.entry.name);
+      fflush(stdout);
+      break;
+    default:
+      break;
   }
 
   clock_t before = clock();
@@ -177,28 +218,47 @@ bool run(test_run test) {
 
   double time = total / (CLOCKS_PER_SEC * 1.0);
 
-  if(test.verbosity == 1) {
-    if(ret.ok) {
-      printf("%-30s \033[0;32mpassed\033[0m in %4.3lfs.\n", test.entry.name, time);
-    } else {
-      printf("%-30s \033[0;31mfailed\033[0m in %4.3lfs.\n", test.entry.name, time);
-      printf(
-          "    \033[0;31m%s\033[0m failed at %s:%zi\n",
-          ret.assertion,
-          ret.func,
-          ret.line);
-    }
-  } else if(test.verbosity == 0) {
-    if(!ret.ok) {
-      printf("\n  \033[0;33m%s\033[0m \033[0;31mfailed\033[0m at %s:%zi\n",
-          ret.assertion,
-          ret.func,
-          ret.line);
-    } else if(time > 0.1) {
-      printf("\n  \033[0;33mtest run took %4.3lfs.\033[0m\n", time);
-    } else if((test.number + 1) == test.amount) {
-      printf("\n");
-    }
+  switch(test.verbosity) {
+    case 0:
+      if(!ret.ok) {
+        printf("  %s failed at %s:%zi\n", ret.assertion, ret.func, ret.line);
+      } else if(time > 0.1) {
+        printf("=> test run took too long (%4.3lfs).\n", time);
+      }
+      break;
+    case 1:
+      if(!ret.ok) {
+        printf(
+            "\n  \033[0;33m%s\033[0m \033[0;31mfailed\033[0m at %s:%zi\n",
+            ret.assertion,
+            ret.func,
+            ret.line);
+      } else if(time > 0.1) {
+        printf("\n  \033[0;33mtest run took %4.3lfs.\033[0m\n", time);
+      } else if((test.number + 1) == test.amount) {
+        printf("\n");
+      }
+      break;
+    case 2:
+      if(ret.ok) {
+        printf(
+            "%-30s \033[0;32mpassed\033[0m in %4.3lfs.\n",
+            test.entry.name,
+            time);
+      } else {
+        printf(
+            "%-30s \033[0;31mfailed\033[0m in %4.3lfs.\n",
+            test.entry.name,
+            time);
+        printf(
+            "    \033[0;31m%s\033[0m failed at %s:%zi\n",
+            ret.assertion,
+            ret.func,
+            ret.line);
+      }
+      break;
+    default:
+      break;
   }
 
   return ret.ok;
