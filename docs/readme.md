@@ -39,3 +39,5 @@ The project is laid out into different parts.
 For information on the grammar that passgen accepts, see [Grammar](grammar.md).
 
 For information on how to build the project, see [Building](building.md).
+
+For information on how the testing works, see [Testing](testing.md).
