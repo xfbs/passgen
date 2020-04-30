@@ -10,16 +10,21 @@ int passgen_utf8_decode(
     size_t *in_pos) {
   utf8proc_ssize_t n;
 
-  while((out_len - *out_pos) > 0 &&
-        (n = utf8proc_iterate(
-             in + *in_pos,
-             in_len - *in_pos,
-             (utf8proc_int32_t *) (out) + *out_pos)) > 0) {
-    *out_pos += 1;
+  while((out_len > *out_pos) && (in_len > *in_pos)) {
+    n = utf8proc_iterate(
+        in + *in_pos,
+        in_len - *in_pos,
+        (utf8proc_int32_t *) (out) + *out_pos);
+
+    if(n < 0) {
+      return n;
+    }
+
     *in_pos += n;
+    *out_pos += 1;
   }
 
-  return n;
+  return in_len - *in_pos;
 }
 
 int passgen_utf8_encode(
