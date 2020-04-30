@@ -112,6 +112,7 @@ pages:
     - test:bionic
     - build:alpine
     - build:bionic
+    - build:osxcross
   script:
     - mkdir -p public/coverage
     - mv build-clang/ccov/passgen-test public/coverage/llvm-cov
