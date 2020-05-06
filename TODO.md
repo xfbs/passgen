@@ -2,6 +2,7 @@
 
 ## Current
 
+- [ ] improve const-correctness (mark everything as const that is const).
 - [ ] implement markov chain selection for parser and generator! major blocker
     for feature-parity with legacy parser.
 - [ ] write more documentation (in docs/, manual, paper, update man page).
