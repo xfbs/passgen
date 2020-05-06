@@ -119,6 +119,8 @@ pages:
     - mv build-gcc/ccov/passgen-test public/coverage/lcov
     - doxygen Doxyfile
     - mv docs/html public/doxygen
+    - mkdir public/badges
+    - python3 scripts/docs_coverage.py docs/xml/ --badge public/badges/docs.svg
     - mkdir public/snapshot
     - cp build-alpine-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-musl-amd64.tar.xz
     - cp build-bionic-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-amd64.tar.xz
