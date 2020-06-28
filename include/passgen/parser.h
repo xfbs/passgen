@@ -14,6 +14,9 @@ int passgen_parse_token(
     struct passgen_parser *parser,
     struct passgen_token *token);
 
+int passgen_parse_backtrace(
+    struct passgen_parser *parser);
+
 int passgen_parse_group(
     struct passgen_parser *parser,
     struct passgen_token *token,

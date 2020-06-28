@@ -46,7 +46,10 @@ void passgen2_run(passgen_opts opts) {
     int ret = passgen_token_parse(&token_parser, &token, format_decoded[i]);
 
     if(ret == PASSGEN_TOKEN_INIT) {
-      assert(0 == passgen_parse_token(&parser, &token));
+      if(0 != passgen_parse_token(&parser, &token)) {
+        passgen_parse_backtrace(&parser);
+        assert(0);
+      }
     }
   }
 

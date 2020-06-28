@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "passgen/container/stack/range.h"
 #include "passgen/container/stack/segment_item.h"
@@ -90,6 +91,49 @@ int passgen_parse_token(
   }
 }
 
+int passgen_parse_backtrace(
+    struct passgen_parser *parser) {
+  for(size_t pos = 0; pos < parser->state.len; pos++) {
+    size_t index = parser->state.len - pos - 1;
+    struct passgen_parser_state *state = passgen_parser_get_state(parser, index);
+
+
+    switch(state->type) {
+      case PASSGEN_PARSER_GROUP:
+        printf("group item %zu\n", state->data.group.group->segments.len);
+        break;
+      case PASSGEN_PARSER_SET:
+        printf("set item %zu\n", state->data.set.set->items.len);
+        break;
+      case PASSGEN_PARSER_SET_RANGE:
+        printf("set range\n");
+        break;
+      case PASSGEN_PARSER_REPEAT:
+        printf("repeat\n");
+        break;
+      case PASSGEN_PARSER_REPEAT_RANGE:
+        printf("repeat range\n");
+        break;
+      case PASSGEN_PARSER_SPECIAL:
+        printf("special\n");
+        break;
+      case PASSGEN_PARSER_SPECIAL_NAME:
+        printf("special name\n");
+        break;
+      case PASSGEN_PARSER_SPECIAL_NAME_END:
+        printf("special name end\n");
+        break;
+      case PASSGEN_PARSER_DONE:
+        printf("done\n");
+        break;
+      default:
+        printf("unknown %i\n", state->type);
+    }
+  }
+
+  return 0;
+}
+
 int passgen_parse_group(
     struct passgen_parser *parser,
     struct passgen_token *token,
@@ -156,6 +200,9 @@ int passgen_parse_group(
         item = last_single_item_taint(state->data.group.segment);
         item->maybe = true;
         return 0;
+      case ']':
+      case '}':
+        return -1;
       default:
         break;
     }
