@@ -6,6 +6,7 @@
 - [ ] optional features: gzip wordlist, json, debug
 - [ ] add building support for meson/makefile/other build systems
 - [ ] lazy-load word lists
+- [ ] remove any use of globals
 - [ ] parsing error backtrace (using parsing stack)
 - [ ] AST to JSON output (for debugging purposes)
 - [ ] internationalisation (maybe)
