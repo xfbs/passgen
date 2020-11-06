@@ -2,7 +2,13 @@
 
 ## Current
 
-- [ ] add character classes like `[::emoji::]` or `[::english::]`, parsed from `unicode-data`
+- [ ] character class subtraction <https://www.regular-expressions.info/charclasssubtract.html>
+- [ ] character class intersection <https://www.regular-expressions.info/charclassintersect.html>
+- [ ] add character classes like `[::emoji::]` or `[::english::]`, parsed from `unicode-data` <https://www.regular-expressions.info/posixbrackets.html>, or `(:english:)` for wordlists?
+- [ ] add regex subroutines <https://www.regular-expressions.info/subroutine.html>, maybe recursion?
+- [ ] add randomness distribution options (normal distribution as `a{normal(4, 2)}`, give probabilities for each option `a{0:0.2;1:0.3;2:0.5}`).
+- [ ] add parse tree conversion to regex for testing?
+- [ ] add backreference support (with `\k` or to group)
 - [ ] optional features: gzip wordlist, json, debug
 - [ ] add building support for meson/makefile/other build systems
 - [ ] lazy-load word lists
