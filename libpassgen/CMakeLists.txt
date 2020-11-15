@@ -76,7 +76,8 @@ set(SOURCE_LIST
     "token.c"
     "token_old.c"
     "unicode.c"
-    "utf8.c")
+    "utf8.c"
+    "wordlist.c")
 
 configure_file(version.c.in version.c)
 
