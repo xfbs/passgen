@@ -11,11 +11,14 @@ test_result test_wordlist_load(void) {
 
   passgen_wordlist_t wordlist;
   passgen_wordlist_load(&wordlist, file);
+  fclose(file);
 
   assert(wordlist.count == 3);
   assert(0 == strcmp(wordlist.words[0], "abacus"));
   assert(0 == strcmp(wordlist.words[1], "brother"));
   assert(0 == strcmp(wordlist.words[2], "culling"));
+
+  passgen_wordlist_free(&wordlist);
 
   return test_ok;
 }
@@ -26,6 +29,7 @@ test_result test_wordlist_random(void) {
 
   passgen_wordlist_t wordlist;
   passgen_wordlist_load(&wordlist, file);
+  fclose(file);
 
   passgen_random_t random;
   passgen_random_open(&random);
@@ -43,6 +47,9 @@ test_result test_wordlist_random(void) {
     }
     assert(found);
   }
+
+  passgen_wordlist_free(&wordlist);
+  passgen_random_close(&random);
 
   return test_ok;
 }
