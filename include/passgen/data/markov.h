@@ -25,3 +25,21 @@ struct passgen_markov3 {
   const struct passgen_markov2 *list;
   size_t list_len;
 };
+
+struct passgen_markov_leaf {
+  uint32_t codepoint;
+  size_t frequency;
+};
+
+struct passgen_markov;
+struct passgen_markov {
+  uint8_t level;
+
+  size_t cumulative;
+  uint32_t codepoint;
+  union {
+    struct passgen_markov *node;
+    struct passgen_markov_leaf *leaf;
+  } children;
+  uint32_t children_len;
+};

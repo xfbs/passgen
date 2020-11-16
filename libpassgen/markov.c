@@ -115,3 +115,19 @@ passgen_markov1_find(const struct passgen_markov1 *list, size_t choice) {
 
   return NULL;
 }
+
+#define MARKOV_LIST_INITIAL 32
+#define MARKOV_LIST_MULTIPLIER 2
+
+// Initialize new markov chain with a given level
+void passgen_markov_init(struct passgen_markov *markov, uint8_t level) {
+  memset(markov, 0, sizeof(*markov));
+  markov->level = level;
+}
+
+// Add a word to a markov chain
+void passgen_markov_add(struct passgen_markov *markov, const uint32_t *word, size_t word_len, size_t weight) {
+}
+
+// Free a markov chain
+void passgen_markov_free(struct passgen_markov *markov);

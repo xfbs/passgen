@@ -30,3 +30,12 @@ passgen_markov2_find(const struct passgen_markov2 *list, int32_t codepoint);
 // error.
 const struct passgen_markov2 *
 passgen_markov3_find(const struct passgen_markov3 *list, int32_t codepoint);
+
+// Initialize new markov chain with a given level
+void passgen_markov_init(struct passgen_markov *markov, uint8_t level);
+
+// Add a word to a markov chain
+void passgen_markov_add(struct passgen_markov *markov, const uint32_t *word, size_t word_len, size_t weight);
+
+// Free a markov chain
+void passgen_markov_free(struct passgen_markov *markov);
