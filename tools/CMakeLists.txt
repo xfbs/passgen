@@ -13,3 +13,7 @@ passgen_target_defaults(sizes)
 add_executable(assertion assertion.c)
 target_link_libraries(assertion PUBLIC passgen-static)
 passgen_target_defaults(assertion)
+
+add_executable(wordlist wordlist.c)
+target_link_libraries(wordlist PUBLIC passgen-static)
+passgen_target_defaults(wordlist)
