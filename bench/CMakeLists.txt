@@ -4,6 +4,7 @@ target_link_libraries(passgen-bench-lib PUBLIC jansson::jansson)
 passgen_target_defaults(passgen-bench-lib)
 
 set(SOURCE_FILES
+  dummy.c
   parse.c
   all.c)
 

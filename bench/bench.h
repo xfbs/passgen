@@ -31,4 +31,11 @@ struct bench_item {
   bench_free_func *free;
 };
 
+struct bench_run {
+  struct bench_item *item;
+  size_t batch;
+  const char *data;
+};
+
 extern struct bench_item items[];
+extern struct bench_run bench_runs[];
