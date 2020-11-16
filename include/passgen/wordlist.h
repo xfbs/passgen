@@ -28,3 +28,5 @@ void passgen_wordlist_read(passgen_wordlist_t *wordlist, FILE *file);
 
 /* scan a read wordlist for words */
 void passgen_wordlist_scan(passgen_wordlist_t *wordlist);
+
+void passgen_wordlist_free(passgen_wordlist_t *wordlist);

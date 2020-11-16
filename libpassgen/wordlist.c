@@ -59,3 +59,8 @@ const char *passgen_wordlist_random(
   size_t index = passgen_random_u64_max(random, wordlist->count);
   return wordlist->words[index];
 }
+
+void passgen_wordlist_free(passgen_wordlist_t *wordlist) {
+  free(wordlist->words);
+  free(wordlist->data);
+}
