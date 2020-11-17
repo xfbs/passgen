@@ -2,6 +2,10 @@
 
 ## Current
 
+- [ ] version releases with signed tags, generate versions from that
+- [ ] generate changelog page
+- [ ] extensive benchmarks
+- [ ] simplify data structures
 - [ ] character class subtraction <https://www.regular-expressions.info/charclasssubtract.html>
 - [ ] character class intersection <https://www.regular-expressions.info/charclassintersect.html>
 - [ ] add character classes like `[::emoji::]` or `[::english::]`, parsed from `unicode-data` <https://www.regular-expressions.info/posixbrackets.html>, or `(:english:)` for wordlists?
