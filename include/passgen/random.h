@@ -18,17 +18,17 @@ typedef void passgen_random_close_func(void *data);
 
 /// Random object. Caches some random data to reduce read() syscalls.
 typedef struct passgen_random_t {
-  /// Ring buffer to hold random data in.
-  uint8_t buffer[RANDOM_H_BUFEN];
+     /// Ring buffer to hold random data in.
+     uint8_t buffer[RANDOM_H_BUFEN];
 
-  /// Current position in the ring buffer.
-  size_t pos;
+     /// Current position in the ring buffer.
+     size_t pos;
 
-  /// Device to read random data from.
-  void *data;
+     /// Device to read random data from.
+     void *data;
 
-  passgen_random_read_func *read;
-  passgen_random_close_func *close;
+     passgen_random_read_func *read;
+     passgen_random_close_func *close;
 } passgen_random_t;
 
 /// Allocates and opens new random object. Returns `NULL` on error. Uses

@@ -12,22 +12,22 @@
 /// The kinds of errors that cause the binary to exit early and with a nonzero
 /// return code.
 typedef enum {
-  PASSGEN_ERROR_NONE,
-  PASSGEN_ERROR_HELP,
-  PASSGEN_ERROR_VERSION,
-  PASSGEN_ERROR_MULTIPLE_FORMATS,
-  PASSGEN_ERROR_RANDOM_ALLOC,
-  PASSGEN_ERROR_PATTERN_PARSE,
-  PASSGEN_ERROR_ALLOC,
-  PASSGEN_ERROR_ILLEGAL_AMOUNT,
+     PASSGEN_ERROR_NONE,
+     PASSGEN_ERROR_HELP,
+     PASSGEN_ERROR_VERSION,
+     PASSGEN_ERROR_MULTIPLE_FORMATS,
+     PASSGEN_ERROR_RANDOM_ALLOC,
+     PASSGEN_ERROR_PATTERN_PARSE,
+     PASSGEN_ERROR_ALLOC,
+     PASSGEN_ERROR_ILLEGAL_AMOUNT,
 } passgen_error;
 
 /// Type used to encode a pattern preset.
 typedef struct pattern_preset {
-  /// The name that is specified on the command line.
-  const char *name;
-  /// The format of this preset.
-  const char *format;
+     /// The name that is specified on the command line.
+     const char *name;
+     /// The format of this preset.
+     const char *format;
 } pattern_preset;
 
 /// List of pattern presets.
@@ -35,13 +35,13 @@ extern pattern_preset pattern_presets[];
 
 /// Options parsed from the command line.
 typedef struct {
-  /// How many passwords to generate.
-  size_t amount;
-  /// The format to use when generating passwords.
-  const char *format;
-  bool null;
-  size_t depth;
-  bool complexity;
+     /// How many passwords to generate.
+     size_t amount;
+     /// The format to use when generating passwords.
+     const char *format;
+     bool null;
+     size_t depth;
+     bool complexity;
 } passgen_opts;
 
 /// Print usage (help text) using @p executable as the name of the program.

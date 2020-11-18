@@ -12,12 +12,12 @@ struct passgen_mem;
 typedef struct passgen_mem passgen_mem_t;
 
 struct passgen_array {
-  void **data;
-  size_t len;
-  size_t bins;
+     void **data;
+     size_t len;
+     size_t bins;
 #ifdef PASSGEN_DEBUG
-  passgen_mem_t *mem;
-  size_t size;
+     passgen_mem_t *mem;
+     size_t size;
 #endif
 };
 
@@ -38,6 +38,6 @@ void passgen_array_pop(passgen_array_t *array, size_t size, passgen_mem_t *mem);
 
 /* enable this for more optimised lookups. */
 #if 0
-#  define passgen_array_get(array, size, pos) \
-    ((array)->data[pos / (1024 / size)] + (pos % (1024 / size)) * size)
+#     define passgen_array_get(array, size, pos) \
+          ((array)->data[pos / (1024 / size)] + (pos % (1024 / size)) * size)
 #endif

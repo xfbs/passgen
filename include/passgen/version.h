@@ -3,9 +3,9 @@
 #include <stdint.h>
 
 typedef struct passgen_version_t {
-  uint8_t maj;
-  uint8_t min;
-  uint8_t rev;
+     uint8_t maj;
+     uint8_t min;
+     uint8_t rev;
 } passgen_version_t;
 
 /// Returns the version of passgen.

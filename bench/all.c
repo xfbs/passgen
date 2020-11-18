@@ -14,6 +14,6 @@ struct bench_item items[] = {
     {NULL}};
 
 struct bench_run bench_runs[] = {
-  {.item = &bench_dummy, .batch = 1, .data = NULL},
-  {.item = NULL},
+    {.item = &bench_dummy, .batch = 1, .data = NULL},
+    {.item = NULL},
 };

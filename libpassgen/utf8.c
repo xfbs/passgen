@@ -8,23 +8,23 @@ int passgen_utf8_decode(
     const uint8_t *in,
     size_t in_len,
     size_t *in_pos) {
-  utf8proc_ssize_t n;
+     utf8proc_ssize_t n;
 
-  while((out_len > *out_pos) && (in_len > *in_pos)) {
-    n = utf8proc_iterate(
-        in + *in_pos,
-        in_len - *in_pos,
-        (utf8proc_int32_t *) (out) + *out_pos);
+     while((out_len > *out_pos) && (in_len > *in_pos)) {
+          n = utf8proc_iterate(
+              in + *in_pos,
+              in_len - *in_pos,
+              (utf8proc_int32_t *) (out) + *out_pos);
 
-    if(n < 0) {
-      return n;
-    }
+          if(n < 0) {
+               return n;
+          }
 
-    *in_pos += n;
-    *out_pos += 1;
-  }
+          *in_pos += n;
+          *out_pos += 1;
+     }
 
-  return in_len - *in_pos;
+     return in_len - *in_pos;
 }
 
 int passgen_utf8_encode(
@@ -34,16 +34,16 @@ int passgen_utf8_encode(
     const uint32_t *in,
     size_t in_len,
     size_t *in_pos) {
-  utf8proc_ssize_t n;
+     utf8proc_ssize_t n;
 
-  // TODO: fixeme. what?
-  (void) in_len;
+     // TODO: fixeme. what?
+     (void) in_len;
 
-  while((out_len - *out_pos) > 0 &&
-        (n = utf8proc_encode_char(in[*in_pos], &out[*out_pos])) > 0) {
-    *in_pos += 1;
-    *out_pos += n;
-  }
+     while((out_len - *out_pos) > 0 &&
+           (n = utf8proc_encode_char(in[*in_pos], &out[*out_pos])) > 0) {
+          *in_pos += 1;
+          *out_pos += n;
+     }
 
-  return n;
+     return n;
 }

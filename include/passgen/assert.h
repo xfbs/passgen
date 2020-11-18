@@ -4,12 +4,12 @@
 
 #ifdef PASSGEN_DEBUG
 
-#  define assert(cond) \
-    if(!(cond)) passgen_assert_fail(#cond, __FILE__, __func__, __LINE__)
+#     define assert(cond) \
+          if(!(cond)) passgen_assert_fail(#cond, __FILE__, __func__, __LINE__)
 
 #else
 
-#  define assert(cond)
+#     define assert(cond)
 
 #endif
 

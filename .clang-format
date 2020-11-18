@@ -19,6 +19,7 @@ BreakStringLiterals: 'true'
 ColumnLimit: '80'
 IndentCaseLabels: 'true'
 IndentPPDirectives: AfterHash
+IndentWidth: 5
 IndentWrappedFunctionNames: 'false'
 KeepEmptyLinesAtTheStartOfBlocks: 'false'
 Language: Cpp

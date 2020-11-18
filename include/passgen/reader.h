@@ -13,26 +13,26 @@ struct reader_t;
 struct bufreader_t;
 
 struct read_result {
-  size_t read;
-  bool ok;
-  bool eof;
-  int errno;
+     size_t read;
+     bool ok;
+     bool eof;
+     int errno;
 };
 
 typedef struct read_result
 read_function(struct reader_t *reader, void *dest, size_t size);
 
 struct reader_t {
-  read_function *read;
-  void *data;
-  size_t pos;
-  size_t len;
-  int status;
+     read_function *read;
+     void *data;
+     size_t pos;
+     size_t len;
+     int status;
 };
 
 struct bufreader_t {
-  struct reader_t reader;
-  char buffer[256];
+     struct reader_t reader;
+     char buffer[256];
 };
 
 typedef struct reader_t reader_t;
