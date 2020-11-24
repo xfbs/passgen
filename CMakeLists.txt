@@ -18,6 +18,12 @@ option(USE_BACKTRACE "Use backtrace() for debug builds (not always available)." 
 option(USE_LIBEXECINFO
        "Use libexecinfo. For systems that don't have backtrace in libc." OFF)
 
+option(PASSGEN_CLDR "Include code for parsing the CLDR" OFF)
+
+if(PASSGEN_CLDR)
+    include(FindEXPAT)
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 #include(ExternalProject)
