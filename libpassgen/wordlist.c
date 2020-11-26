@@ -18,12 +18,15 @@ void passgen_wordlist_read(passgen_wordlist_t *wordlist, FILE *file) {
      wordlist->size = ftell(file);
      fseek(file, 0, SEEK_SET);
 
-     // allocate buffer to hold entire file and read in
-     wordlist->data = malloc(wordlist->size);
+     // allocate buffer to hold entire file and read in (plus zero termination)
+     wordlist->data = malloc(wordlist->size + 1);
      assert(wordlist->data);
 
      // read in entire wordlist
      assert(wordlist->size == fread(wordlist->data, 1, wordlist->size, file));
+
+     // null-terminate wordlist
+     wordlist->data[wordlist->size] = 0;
 }
 
 void passgen_wordlist_scan(passgen_wordlist_t *wordlist) {
