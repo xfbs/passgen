@@ -13,7 +13,7 @@ if(NOT "${ret}" STREQUAL "0")
 endif()
 
 execute_process(
-    COMMAND "${GIT_EXECUTABLE}" describe --tags --long
+    COMMAND "${GIT_EXECUTABLE}" describe --tags --long --always
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     RESULT_VARIABLE ret
     OUTPUT_VARIABLE PROJECT_GIT_DESCRIBE
