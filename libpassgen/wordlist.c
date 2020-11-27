@@ -23,7 +23,8 @@ void passgen_wordlist_read(passgen_wordlist_t *wordlist, FILE *file) {
      assert(wordlist->data);
 
      // read in entire wordlist
-     assert(wordlist->size == fread(wordlist->data, 1, wordlist->size, file));
+     size_t read = fread(wordlist->data, 1, wordlist->size, file);
+     assert(wordlist->size == read);
 
      // null-terminate wordlist
      wordlist->data[wordlist->size] = 0;
