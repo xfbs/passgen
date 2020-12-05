@@ -19,7 +19,6 @@ set(HEADER_LIST
     "../../include/passgen/data/substring.h"
     "../../include/passgen/data/token.h"
     "../../include/passgen/debug.h"
-    "../../include/passgen/enum_mapping.h"
     "../../include/passgen/memory.h"
     "../../include/passgen/memory_private.h"
     "../../include/passgen/parser.h"
