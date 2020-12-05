@@ -118,7 +118,7 @@ install(
   COMPONENT Libraries)
 
 install(
-  DIRECTORY ../include/passgen
+  DIRECTORY ../../include/passgen
   DESTINATION include
   COMPONENT Headers)
 
