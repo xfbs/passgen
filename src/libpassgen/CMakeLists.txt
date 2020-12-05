@@ -23,13 +23,9 @@ set(HEADER_LIST
     "../../include/passgen/memory.h"
     "../../include/passgen/memory_private.h"
     "../../include/passgen/parser.h"
-    "../../include/passgen/pronounceable.h"
     "../../include/passgen/markov.h"
     "../../include/passgen/random.h"
-    "../../include/passgen/reader.h"
     "../../include/passgen/token.h"
-    "../../include/passgen/token_old.h"
-    "../../include/passgen/unicode.h"
     "../../include/passgen/utf8.h"
     "../../include/passgen/util.h"
     "../../include/passgen/version.h"
@@ -37,7 +33,6 @@ set(HEADER_LIST
 
 set(SOURCE_LIST
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
-    "${CMAKE_CURRENT_BINARY_DIR}/enum_mapping_autogen.c"
     "assert.c"
     "container/stack/parser_state.c"
     "container/stack/range.c"
@@ -52,33 +47,16 @@ set(SOURCE_LIST
     "data/set.c"
     "data/special.c"
     "data/token.c"
-    "enum_mapping.c"
     "generate.c"
-    "json/token.c"
     "markov.c"
     "memory.c"
     "parser.c"
-    "pronounceable.c"
     "random.c"
-    "reader.c"
     "token.c"
-    "token_old.c"
-    "unicode.c"
     "utf8.c"
     "wordlist.c")
 
 configure_file(version.c.in version.c)
-
-# this automatically generates enum mappings (mappings from enum integer to
-# string and back) from the header files.
-add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/enum_mapping_autogen.c
-  COMMAND ${PROJECT_SOURCE_DIR}/scripts/generate_enum_mapping.rb
-          ${CMAKE_CURRENT_BINARY_DIR}/enum_mapping_autogen.c ${HEADER_LIST}
-  DEPENDS ${PROJECT_SOURCE_DIR}/scripts/generate_enum_mapping.rb ${HEADER_LIST}
-  COMMENT "Generating enum mapping"
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  VERBATIM)
 
 #add_library(passgen-objects OBJECT ${SOURCE_LIST} ${HEADER_LIST})
 #target_include_directories(

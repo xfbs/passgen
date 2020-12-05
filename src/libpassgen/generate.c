@@ -242,6 +242,7 @@ int passgen_generate_special_pronounceable(
     int32_t buffer[max];
 
     /* TODO: get tries and default from env! */
+    /*
     size_t count = passgen_pronounceable_len(
         PASSGEN_PRONOUNCEABLE_ENGLISH,
         rand,
@@ -249,6 +250,8 @@ int passgen_generate_special_pronounceable(
         special->length.min,
         max,
         env->pronounceable_limit);
+        */
+    size_t count = 0;
 
     /* TODO error handling */
     if(!count) {

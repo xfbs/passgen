@@ -6,14 +6,10 @@ passgen_target_defaults(passgen-test-lib)
 # list of test sources.
 set(TEST_LIST
     "array.c"
-    "enum_mapping.c"
     "memory.c"
     "parser.c"
     "random.c"
-    "reader.c"
     "token.c"
-    "token_new.c"
-    "unicode.c"
     "generate.c"
     "utf8.c"
     "wordlist.c")

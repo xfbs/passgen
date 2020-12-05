@@ -1,7 +1,3 @@
-add_executable(passgen-tokens passgen-tokens.c)
-target_link_libraries(passgen-tokens PUBLIC passgen-static ${libjansson})
-passgen_target_defaults(passgen-tokens)
-
 add_executable(utf8-recode utf8-recode.c)
 target_link_libraries(utf8-recode PUBLIC passgen-static utf8proc)
 passgen_target_defaults(utf8-recode)

@@ -13,6 +13,10 @@ add_executable(passgen-bench ${SOURCE_FILES})
 passgen_target_defaults(passgen-bench)
 target_link_libraries(passgen-bench PUBLIC passgen-static passgen-bench-lib Threads::Threads)
 
+add_executable(passgen-parse-bench passgen.c)
+passgen_target_defaults(passgen-parse-bench)
+target_link_libraries(passgen-parse-bench PUBLIC passgen-static)
+
 add_executable(passgen-random-bench "random.c")
 passgen_target_defaults(passgen-random-bench)
 target_link_libraries(passgen-random-bench PUBLIC passgen-static)
