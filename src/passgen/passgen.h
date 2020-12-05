@@ -49,17 +49,17 @@ typedef struct {
 /// Print usage (help text) using @p executable as the name of the program.
 ///
 /// @param executable Name of the program, typically `argv[0]`.
-void passgen2_usage(const char *executable);
+void passgen_usage(const char *executable);
 
 /// Print the version of the program.
-void passgen2_show_version(void);
+void passgen_show_version(void);
 
 /// Exit the program early using the specified error and data.
-void passgen2_bail(passgen_error error, void *data);
+void passgen_bail(passgen_error error, void *data);
 
 /// Parse the options passed on the command line, @p argc and @p argv, and
 /// return the parsed result.
-passgen_opts passgen2_optparse(int argc, char *argv[]);
+passgen_opts passgen_optparse(int argc, char *argv[]);
 
 /// Run passgen with @p opts.
-void passgen2_run(passgen_opts opts);
+void passgen_run(passgen_opts opts);

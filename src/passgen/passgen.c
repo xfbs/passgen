@@ -18,9 +18,9 @@
 #include "passgen/utf8.h"
 #include "passgen/version.h"
 
-#define bail(kind, data) passgen2_bail(PASSGEN_ERROR_##kind, (void *) data)
+#define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *) data)
 
-void passgen2_run(passgen_opts opts) {
+void passgen_run(passgen_opts opts) {
     struct passgen_parser parser;
     struct passgen_token_parser token_parser = {0};
     struct passgen_token token = {0};
@@ -104,7 +104,7 @@ void passgen2_run(passgen_opts opts) {
     passgen_random_close(&random);
 }
 
-passgen_opts passgen2_optparse(int argc, char *argv[]) {
+passgen_opts passgen_optparse(int argc, char *argv[]) {
     passgen_opts opts = {
         .format = NULL,
         .amount = 1,
@@ -202,7 +202,7 @@ passgen_opts passgen2_optparse(int argc, char *argv[]) {
     return opts;
 }
 
-void passgen2_usage(const char *executable) {
+void passgen_usage(const char *executable) {
     fprintf(
         stderr,
         "passgen version %s\n"
@@ -234,7 +234,7 @@ void passgen2_usage(const char *executable) {
         executable);
 }
 
-void passgen2_show_version(void) {
+void passgen_show_version(void) {
     fprintf(stderr, "passgen, version %s\n", passgen_version_str());
 
     if(passgen_is_debug()) {
@@ -244,13 +244,13 @@ void passgen2_show_version(void) {
     }
 }
 
-void passgen2_bail(passgen_error error, void *data) {
+void passgen_bail(passgen_error error, void *data) {
     switch(error) {
         case PASSGEN_ERROR_HELP:
-            passgen2_usage(data);
+            passgen_usage(data);
             exit(-1);
         case PASSGEN_ERROR_VERSION:
-            passgen2_show_version();
+            passgen_show_version();
             exit(-1);
         case PASSGEN_ERROR_MULTIPLE_FORMATS:
             printf(
