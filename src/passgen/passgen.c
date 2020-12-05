@@ -1,4 +1,4 @@
-#include "passgen/passgen2.h"
+#include "passgen.h"
 
 #include <assert.h>
 #include <getopt.h>

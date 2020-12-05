@@ -1,6 +1,6 @@
 #include <stddef.h>
 
-#include "passgen/passgen.h"
+#include "passgen.h"
 
 pattern_preset pattern_presets[] = {
     {"apple1", "[a-zA-Z0-9]{3}(-[a-zA-Z0-9]{3}){3}"},

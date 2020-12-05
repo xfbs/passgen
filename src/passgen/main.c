@@ -1,4 +1,4 @@
-#include "passgen/passgen2.h"
+#include "passgen.h"
 
 int main(int argc, char *argv[]) {
      passgen_opts opts = passgen2_optparse(argc, argv);

@@ -58,7 +58,7 @@ endif()
 add_subdirectory(src/libpassgen)
 
 # build passgen binary and perhaps utils
-add_subdirectory(src/bin)
+add_subdirectory(src/passgen)
 
 if(BUILD_TOOLS)
   add_subdirectory(src/tools)
