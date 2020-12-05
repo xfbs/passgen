@@ -51,22 +51,22 @@ endif()
 add_subdirectory(extern)
 
 if(BUILD_BENCH)
-  add_subdirectory(bench)
+  add_subdirectory(src/bench)
 endif()
 
 # build libpassgen
-add_subdirectory(libpassgen)
+add_subdirectory(src/libpassgen)
 
 # build passgen binary and perhaps utils
-add_subdirectory(bin)
+add_subdirectory(src/bin)
 
 if(BUILD_TOOLS)
-  add_subdirectory(tools)
+  add_subdirectory(src/tools)
 endif()
 
 # unit tests
 if(BUILD_TESTING)
-  add_subdirectory(tests)
+  add_subdirectory(src/tests)
 endif()
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Passgen")

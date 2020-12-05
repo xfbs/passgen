@@ -1,43 +1,43 @@
 set(HEADER_LIST
-    "../include/passgen/assert.h"
-    "../include/passgen/container/stack.h"
-    "../include/passgen/container/stack_impl.h"
-    "../include/passgen/data/array.h"
-    "../include/passgen/data/char.h"
-    "../include/passgen/data/group.h"
-    "../include/passgen/data/parser.h"
-    "../include/passgen/data/parser_state.h"
-    "../include/passgen/data/pattern.h"
-    "../include/passgen/data/pattern_kind.h"
-    "../include/passgen/data/range.h"
-    "../include/passgen/data/repeat.h"
-    "../include/passgen/data/segment.h"
-    "../include/passgen/data/segment_item.h"
-    "../include/passgen/data/set.h"
-    "../include/passgen/data/special.h"
-    "../include/passgen/data/special_kind.h"
-    "../include/passgen/data/substring.h"
-    "../include/passgen/data/token.h"
-    "../include/passgen/debug.h"
-    "../include/passgen/enum_mapping.h"
-    "../include/passgen/memory.h"
-    "../include/passgen/memory_private.h"
-    "../include/passgen/parser.h"
-    "../include/passgen/passgen.h"
-    "../include/passgen/passgen2.h"
-    "../include/passgen/pattern.h"
-    "../include/passgen/pattern_private.h"
-    "../include/passgen/pronounceable.h"
-    "../include/passgen/markov.h"
-    "../include/passgen/random.h"
-    "../include/passgen/reader.h"
-    "../include/passgen/token.h"
-    "../include/passgen/token_old.h"
-    "../include/passgen/unicode.h"
-    "../include/passgen/utf8.h"
-    "../include/passgen/util.h"
-    "../include/passgen/version.h"
-    "../include/passgen/wordlist.h")
+    "../../include/passgen/assert.h"
+    "../../include/passgen/container/stack.h"
+    "../../include/passgen/container/stack_impl.h"
+    "../../include/passgen/data/array.h"
+    "../../include/passgen/data/char.h"
+    "../../include/passgen/data/group.h"
+    "../../include/passgen/data/parser.h"
+    "../../include/passgen/data/parser_state.h"
+    "../../include/passgen/data/pattern.h"
+    "../../include/passgen/data/pattern_kind.h"
+    "../../include/passgen/data/range.h"
+    "../../include/passgen/data/repeat.h"
+    "../../include/passgen/data/segment.h"
+    "../../include/passgen/data/segment_item.h"
+    "../../include/passgen/data/set.h"
+    "../../include/passgen/data/special.h"
+    "../../include/passgen/data/special_kind.h"
+    "../../include/passgen/data/substring.h"
+    "../../include/passgen/data/token.h"
+    "../../include/passgen/debug.h"
+    "../../include/passgen/enum_mapping.h"
+    "../../include/passgen/memory.h"
+    "../../include/passgen/memory_private.h"
+    "../../include/passgen/parser.h"
+    "../../include/passgen/passgen.h"
+    "../../include/passgen/passgen2.h"
+    "../../include/passgen/pattern.h"
+    "../../include/passgen/pattern_private.h"
+    "../../include/passgen/pronounceable.h"
+    "../../include/passgen/markov.h"
+    "../../include/passgen/random.h"
+    "../../include/passgen/reader.h"
+    "../../include/passgen/token.h"
+    "../../include/passgen/token_old.h"
+    "../../include/passgen/unicode.h"
+    "../../include/passgen/utf8.h"
+    "../../include/passgen/util.h"
+    "../../include/passgen/version.h"
+    "../../include/passgen/wordlist.h")
 
 set(SOURCE_LIST
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
@@ -129,7 +129,7 @@ passgen_generate_markov(latin)
 add_library(passgen-static ${SOURCE_LIST} ${HEADER_LIST})
 target_link_libraries(passgen-static PUBLIC utf8proc m jansson::jansson)
 set_target_properties(passgen-static PROPERTIES OUTPUT_NAME passgen)
-target_include_directories(passgen-static PUBLIC ../include)
+target_include_directories(passgen-static PUBLIC ../../include)
 passgen_target_defaults(passgen-static)
 passgen_check_symbols(passgen-static)
 
@@ -137,7 +137,7 @@ if(NOT BUILD_STATIC)
   add_library(passgen-shared SHARED ${SOURCE_LIST} ${HEADER_LIST})
   target_link_libraries(passgen-shared PUBLIC utf8proc m jansson::jansson)
   set_target_properties(passgen-shared PROPERTIES OUTPUT_NAME passgen)
-  target_include_directories(passgen-shared PUBLIC ../include)
+  target_include_directories(passgen-shared PUBLIC ../../include)
   passgen_target_defaults(passgen-shared)
 endif()
 
