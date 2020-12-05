@@ -54,8 +54,8 @@ test:alpine:
   script:
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DUSE_BACKTRACE=NO -GNinja
     - cmake --build build
-    - ./build/tests/passgen-test
-    - valgrind ./build/tests/passgen-test
+    - ./build/src/tests/passgen-test -v
+    - valgrind ./build/src/tests/passgen-test -v
 
 # build stuff on ubuntu.
 build:bionic:
