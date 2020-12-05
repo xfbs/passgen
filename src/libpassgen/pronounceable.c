@@ -8,15 +8,9 @@
 #include "passgen/markov_data.h"
 
 const struct passgen_markov3 *markov_pronounceable_all[] = {
-    &passgen_markov_english,
-    &passgen_markov_german,
-    &passgen_markov_latin,
     NULL};
 
 passgen_pronounceable_map_t passgen_pronounceable_map[] = {
-    {"english", PASSGEN_PRONOUNCEABLE_ENGLISH},
-    {"german", PASSGEN_PRONOUNCEABLE_GERMAN},
-    {"latin", PASSGEN_PRONOUNCEABLE_LATIN},
     {NULL, 0},
 };
 

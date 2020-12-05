@@ -7,12 +7,10 @@ passgen_target_defaults(passgen-test-lib)
 set(TEST_LIST
     "array.c"
     "enum_mapping.c"
-    "markov.c"
     "memory.c"
     "parser.c"
     "pattern.c"
     "pattern_random.c"
-    "pronounceable.c"
     "random.c"
     "reader.c"
     "token.c"
