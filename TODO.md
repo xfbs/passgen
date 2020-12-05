@@ -2,6 +2,8 @@
 
 ## Current
 
+- [x] throw out old code
+- [ ] remove special character handling in favour of (:english:) and [:english:] type syntax.
 - [ ] version releases with signed tags, generate versions from that
 - [ ] generate changelog page
 - [ ] extensive benchmarks
