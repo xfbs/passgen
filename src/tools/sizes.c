@@ -17,7 +17,6 @@
 #include "passgen/data/special_kind.h"
 #include "passgen/data/substring.h"
 #include "passgen/data/token.h"
-#include "passgen/enum_mapping.h"
 #include "passgen/markov.h"
 #include "passgen/pronounceable.h"
 
@@ -34,22 +33,6 @@ struct size_info {
     const char *name;
     size_t size;
 };
-
-#define add_enum_mapping(name) \
-    { #name, &name##_enum_count, name##_enum_by_value, name##_enum_by_name }
-
-#define enum_mapping_info_end() \
-    { NULL, NULL, NULL, NULL }
-
-struct enum_mapping_info {
-    const char *name;
-    const size_t *size;
-    const struct passgen_enum_mapping *by_name;
-    const struct passgen_enum_mapping *by_value;
-};
-
-static const struct enum_mapping_info enum_mappings[] = {
-    enum_mapping_info_end()};
 
 static const struct size_info type_sizes[] = {add_type(size_t),
                                               add_type(void *),
@@ -69,7 +52,6 @@ static const struct size_info struct_sizes[] = {
     add_struct(passgen_pattern_special),
     add_struct(passgen_token),
     add_struct(passgen_token_parser),
-    add_struct(passgen_enum_mapping),
     add_struct(passgen_markov3),
     add_struct(passgen_markov0),
     add_struct(passgen_markov1),
@@ -99,35 +81,6 @@ void show_size_info(const struct size_info size_info[]) {
     }
 }
 
-void show_enum_mapping_info(const struct enum_mapping_info *enum_info) {
-    size_t max_len = 0;
-    for(size_t i = 0; enum_info[i].name; i++) {
-        size_t len = strlen(enum_info[i].name);
-
-        if(len > max_len) {
-            max_len = len;
-        }
-    }
-
-    size_t total_size = 0;
-    for(size_t i = 0; enum_info[i].name; i++) {
-        size_t len = strlen(enum_info[i].name);
-        int padding = 1 + max_len - len;
-        size_t size = sizeof(*enum_info[i].size) +
-                      2 * *enum_info[i].size * sizeof(*enum_info[i].by_value);
-
-        for(size_t n = 0; n < *enum_info[i].size; n++) {
-            size += strlen(enum_info[i].by_value[n].name) + 1;
-            size += strlen(enum_info[i].by_name[n].name) + 1;
-        }
-
-        printf("sizeof(%s)%*c= %zu\n", enum_info[i].name, padding, ' ', size);
-        total_size += size;
-    }
-
-    printf("total size%*c= %zu\n", (int) (max_len - 1), ' ', total_size);
-}
-
 int main(int argc, char *argv[]) {
     (void) argc;
     (void) argv;
@@ -137,9 +90,6 @@ int main(int argc, char *argv[]) {
 
     printf("\nsize of data structures:\n");
     show_size_info(struct_sizes);
-
-    printf("\nsize of enum mappings:\n");
-    show_enum_mapping_info(enum_mappings);
 
     printf("\nsize of markov chains:\n");
     // TODO

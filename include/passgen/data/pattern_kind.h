@@ -1,5 +1,4 @@
 #pragma once
-#include "passgen/enum_mapping.h"
 
 enum passgen_pattern_kind {
     PASSGEN_PATTERN_SET,

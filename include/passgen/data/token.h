@@ -3,8 +3,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "passgen/enum_mapping.h"
-
 #define PASSGEN_TOKEN_ESCAPED_BIT  (1 << 30)
 #define PASSGEN_TOKEN_UNICODE_MASK (1 << 21 - 1)
 

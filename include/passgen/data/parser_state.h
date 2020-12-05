@@ -2,7 +2,6 @@
 #include "passgen/container/stack/parser_state.h"
 
 #include "passgen/data/pattern.h"
-#include "passgen/enum_mapping.h"
 
 enum passgen_parser_state_type {
     PASSGEN_PARSER_GROUP,
