@@ -9,8 +9,8 @@
 #include "passgen/token.h"
 
 struct passgen_parser {
-     struct passgen_parser_state_stack state;
-     passgen_pattern_t pattern;
+    struct passgen_parser_state_stack state;
+    passgen_pattern_t pattern;
 };
 
 struct passgen_parser_state *

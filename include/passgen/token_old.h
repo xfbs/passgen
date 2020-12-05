@@ -7,31 +7,31 @@
 
 /// Represents a valid substring of a string.
 struct passgen_substring {
-     size_t offset;
-     size_t length;
+    size_t offset;
+    size_t length;
 };
 
 enum passgen_token_type {
-     PATTERN_TOKEN_EOF,
-     PATTERN_TOKEN_REGULAR,
-     PATTERN_TOKEN_SPECIAL,
-     PATTERN_TOKEN_UNICODE,
-     PATTERN_TOKEN_ESCAPED,
-     PASSGEN_TOKEN_ERROR,
-     PASSGEN_TOKEN_ERROR_ESCAPE,
-     PASSGEN_TOKEN_ERROR_LBRACE,
-     PASSGEN_TOKEN_ERROR_UNICODE_HEX,
-     PASSGEN_TOKEN_ERROR_UNICODE_CHAR,
-     PASSGEN_TOKEN_ERROR_UNICODE_EMPTY,
-     PASSGEN_TOKEN_ERROR_UTF8 = (1 << 10),
+    PATTERN_TOKEN_EOF,
+    PATTERN_TOKEN_REGULAR,
+    PATTERN_TOKEN_SPECIAL,
+    PATTERN_TOKEN_UNICODE,
+    PATTERN_TOKEN_ESCAPED,
+    PASSGEN_TOKEN_ERROR,
+    PASSGEN_TOKEN_ERROR_ESCAPE,
+    PASSGEN_TOKEN_ERROR_LBRACE,
+    PASSGEN_TOKEN_ERROR_UNICODE_HEX,
+    PASSGEN_TOKEN_ERROR_UNICODE_CHAR,
+    PASSGEN_TOKEN_ERROR_UNICODE_EMPTY,
+    PASSGEN_TOKEN_ERROR_UTF8 = (1 << 10),
 };
 
 struct passgen_token {
-     enum passgen_token_type type;
-     struct passgen_substring pos;
-     struct passgen_substring data;
-     size_t error;
-     int32_t codepoint;
+    enum passgen_token_type type;
+    struct passgen_substring pos;
+    struct passgen_substring data;
+    size_t error;
+    int32_t codepoint;
 };
 
 typedef struct passgen_token passgen_token_t;

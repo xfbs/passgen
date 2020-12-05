@@ -7,7 +7,7 @@
 // union inside passgen_pattern_item, and there's enough space in there to
 // store seven codepoints and a count variable, so why not.
 struct passgen_pattern_char {
-     uint8_t count;
-     uint8_t tainted;
-     int32_t codepoints[7];
+    uint8_t count;
+    uint8_t tainted;
+    int32_t codepoints[7];
 };

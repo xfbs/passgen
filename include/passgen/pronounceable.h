@@ -7,17 +7,17 @@
 
 /* list of pronounceable word types that can be generated. */
 enum passgen_pronounceable_type {
-     PASSGEN_PRONOUNCEABLE_ENGLISH,
-     PASSGEN_PRONOUNCEABLE_GERMAN,
-     PASSGEN_PRONOUNCEABLE_LATIN,
-     PASSGEN_PRONOUNCEABLE_LAST,
+    PASSGEN_PRONOUNCEABLE_ENGLISH,
+    PASSGEN_PRONOUNCEABLE_GERMAN,
+    PASSGEN_PRONOUNCEABLE_LATIN,
+    PASSGEN_PRONOUNCEABLE_LAST,
 };
 
 PASSGEN_ENUM_MAPPING(passgen_pronounceable_type);
 
 typedef struct {
-     const char *name;
-     enum passgen_pronounceable_type type;
+    const char *name;
+    enum passgen_pronounceable_type type;
 } passgen_pronounceable_map_t;
 
 extern passgen_pronounceable_map_t passgen_pronounceable_map[];

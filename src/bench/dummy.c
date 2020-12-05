@@ -3,15 +3,15 @@
 bench_new(dummy_bench, "Parses a pattern using pattern_parse().");
 
 void *bench_dummy_bench_setup(const char *data) {
-     return (void *) data;
+    return (void *) data;
 }
 
 void bench_dummy_bench_func(void *data) {
-     (void) data;
+    (void) data;
 }
 
 void bench_dummy_bench_free(void *state) {
-     (void) state;
+    (void) state;
 }
 
 struct bench_item bench_dummy = {

@@ -6,8 +6,8 @@
 #include "passgen/data/substring.h"
 
 typedef struct passgen_pattern_group {
-     // array of segments
-     struct passgen_pattern_segment_stack segments;
+    // array of segments
+    struct passgen_pattern_segment_stack segments;
 } passgen_pattern_group_t;
 
 void passgen_pattern_group_init(passgen_pattern_group_t *group);

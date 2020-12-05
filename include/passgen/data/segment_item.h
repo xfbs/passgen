@@ -10,17 +10,17 @@
 #include "passgen/data/special.h"
 
 typedef struct passgen_pattern_item {
-     enum passgen_pattern_kind kind;
+    enum passgen_pattern_kind kind;
 
-     union {
-          struct passgen_pattern_set set;
-          struct passgen_pattern_group group;
-          struct passgen_pattern_char character;
-          struct passgen_pattern_special special;
-     } data;
+    union {
+        struct passgen_pattern_set set;
+        struct passgen_pattern_group group;
+        struct passgen_pattern_char character;
+        struct passgen_pattern_special special;
+    } data;
 
-     struct passgen_pattern_repeat repeat;
-     bool maybe;
+    struct passgen_pattern_repeat repeat;
+    bool maybe;
 } passgen_pattern_item_t;
 
 void passgen_pattern_item_init(struct passgen_pattern_item *item);

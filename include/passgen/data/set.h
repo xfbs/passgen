@@ -9,12 +9,12 @@
 struct passgen_pattern_range;
 
 struct passgen_pattern_set {
-     // array of range_items
-     struct passgen_pattern_range_stack items;
+    // array of range_items
+    struct passgen_pattern_range_stack items;
 
-     // how many choices to choose from. for efficient generation. improved
-     // locality.
-     size_t *choices_list;
+    // how many choices to choose from. for efficient generation. improved
+    // locality.
+    size_t *choices_list;
 };
 
 void passgen_pattern_set_init(struct passgen_pattern_set *set);

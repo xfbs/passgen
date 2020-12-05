@@ -3,11 +3,11 @@
 
 const char *passgen_error_str[PATTERN_ERROR_LAST];
 
-#define accept_regular(chr, error_kind, start)                      \
-     token = pattern_token_peek(iter);                              \
-     if(!passgen_token_regular(&token)) {                           \
-          return pattern_token_error(start, iter->pos, error_kind); \
-     }
+#define accept_regular(chr, error_kind, start)                    \
+    token = pattern_token_peek(iter);                             \
+    if(!passgen_token_regular(&token)) {                          \
+        return pattern_token_error(start, iter->pos, error_kind); \
+    }
 
 bool pattern_group_is_separator(passgen_token_t token);
 bool pattern_group_is_start(passgen_token_t token);
