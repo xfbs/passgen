@@ -9,8 +9,6 @@ set(TEST_LIST
     "enum_mapping.c"
     "memory.c"
     "parser.c"
-    "pattern.c"
-    "pattern_random.c"
     "random.c"
     "reader.c"
     "token.c"
