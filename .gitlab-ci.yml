@@ -65,7 +65,7 @@ build:bionic:
     - mkdir build-bionic-release && cd build-bionic-release
     - cmake -GNinja -DCMAKE_BUILD_TYPE=Release ..
     - ninja
-    - ./tests/passgen-test
+    - ./src/tests/passgen-test
     - cpack -G TXZ
   artifacts:
     paths:
@@ -80,7 +80,7 @@ build:alpine:
     - mkdir -p build-alpine-release && cd build-alpine-release
     - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC=y ..
     - ninja
-    - ./tests/passgen-test
+    - ./src/tests/passgen-test
     - cpack -G TXZ
   artifacts:
     paths:
