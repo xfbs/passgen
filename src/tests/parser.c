@@ -715,3 +715,6 @@ test_result test_parser_char_repeat_tainted(void) {
 
     return test_ok;
 }
+
+#undef PREAMBLE
+#undef POSTAMBLE

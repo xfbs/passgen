@@ -289,3 +289,7 @@ test_result test_generate_repeat(void) {
     POSTAMBLE();
     return test_ok;
 }
+
+#undef SEED
+#undef PREAMBLE
+#undef POSTAMBLE

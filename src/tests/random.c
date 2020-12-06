@@ -281,3 +281,5 @@ test_result test_passgen_random_xorshift(void) {
 
     return test_ok;
 }
+
+#undef SEED

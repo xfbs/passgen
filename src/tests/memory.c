@@ -133,7 +133,7 @@ test_result test_memory_accounting(void) {
     assert(data2);
 
     // this assertion might not hold true.
-    assert(data2 != data1);
+    // assert(data2 != data1);
 
     list = acc.list;
     assert(list->pointer == data2);
