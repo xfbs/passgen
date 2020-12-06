@@ -63,7 +63,7 @@ build:bionic:
   stage: build
   script:
     - mkdir build-bionic-release && cd build-bionic-release
-    - cmake -GNinja -DCMAKE_BUILD_TYPE=Release ..
+    - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release ..
     - ninja
     - ./src/tests/passgen-test
     - cpack -G TXZ
@@ -78,7 +78,7 @@ build:alpine:
   stage: build
   script:
     - mkdir -p build-alpine-release && cd build-alpine-release
-    - cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC=y ..
+    - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC=y ..
     - ninja
     - ./src/tests/passgen-test
     - cpack -G TXZ
