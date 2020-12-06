@@ -14,11 +14,21 @@ option(BUILD_BENCH "Build benchmark utilities." YES)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
 option(BUILD_STATIC "Built targets statically." OFF)
 
+option(LIBPASSGEN_STATIC "Build libpassgen.a" ON)
+option(LIBPASSGEN_SHARED "Build libpassgen.so" ON)
+option(PASSGEN_STATIC "Link passgen statically" OFF)
+
 option(USE_BACKTRACE "Use backtrace() for debug builds (not always available)." ON)
 option(USE_LIBEXECINFO
        "Use libexecinfo. For systems that don't have backtrace in libc." OFF)
 
 option(PASSGEN_CLDR "Include code for parsing the CLDR" OFF)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    option(PASSGEN_DEBUG "Include debugging features for passgen" ON)
+else()
+    option(PASSGEN_DEBUG "Include debugging features for passgen" OFF)
+endif()
 
 if(PASSGEN_CLDR)
     include(FindEXPAT)

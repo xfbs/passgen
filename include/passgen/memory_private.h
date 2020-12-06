@@ -1,6 +1,6 @@
 #pragma once
-#include "passgen/debug.h"
-#include "passgen/memory.h"
+#include <passgen/config.h>
+#include <passgen/memory.h>
 
 struct passgen_mem_accounting_list {
     void *pointer;

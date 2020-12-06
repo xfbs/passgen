@@ -1,5 +1,5 @@
-#include "passgen/debug.h"
-#include "passgen/version.h"
+#include <passgen/config.h>
+#include <passgen/version.h>
 
 passgen_version_t passgen_version() {
   return (passgen_version_t) {

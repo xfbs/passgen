@@ -1,6 +1,6 @@
-#include "passgen/memory.h"
-#include "passgen/debug.h"
-#include "passgen/memory_private.h"
+#include <passgen/memory.h>
+#include <passgen/config.h>
+#include <passgen/memory_private.h>
 #include <passgen/data/memory.h>
 #include <stdio.h>
 #include <stdlib.h>

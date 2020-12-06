@@ -1,7 +1,7 @@
-#include "passgen/data/array.h"
-#include "passgen/assert.h"
-#include "passgen/debug.h"
-#include "passgen/memory.h"
+#include <passgen/data/array.h>
+#include <passgen/assert.h>
+#include <passgen/config.h>
+#include <passgen/memory.h>
 
 #define BINS_INITIAL        4
 #define BINS_MULTIPLIER     2

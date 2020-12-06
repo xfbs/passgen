@@ -1,5 +1,5 @@
 #pragma once
-#include "passgen/debug.h"
+#include <passgen/config.h>
 #include <stddef.h>
 
 #ifdef PASSGEN_DEBUG
