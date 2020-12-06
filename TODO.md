@@ -6,6 +6,7 @@
 - [ ] move building instructions into docs, document new options
 - [ ] add optional wordlist support
 - [ ] add optional markov support
+- [ ] document `CMAKE_UNITY_BUILD` and adds to CI build
 - [ ] remove special character handling in favour of (:english:) and [:english:] type syntax.
 - [ ] version releases with signed tags, generate versions from that
 - [ ] generate changelog page
