@@ -8,7 +8,6 @@ project(
 
 # project build options.
 option(BUILD_UTF8PROC "Build utf8proc, a dependency." YES)
-option(BUILD_JANSSON "Build jansson, a dependecy." OFF)
 option(BUILD_TOOLS "Build utility binaries." YES)
 option(BUILD_BENCH "Build benchmark utilities." YES)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)

@@ -7,25 +7,6 @@ else()
   find_package(utf8proc)
 endif()
 
-if(BUILD_JANSSON)
-  set(JANSSON_BUILD_DOCS OFF CACHE BOOL "")
-  set(JANSSON_EXAMPLES OFF CACHE BOOL "")
-  set(JANSSON_WITHOUT_TESTS ON CACHE BOOL "")
-  add_subdirectory(jansson)
-  set(libjansson jansson CACHE STRING "Jansson library")
-  add_library(jansson::jansson INTERFACE IMPORTED GLOBAL)
-  target_include_directories(jansson::jansson
-    INTERFACE "${CMAKE_CURRENT_BINARY_DIR}/jansson/include")
-  target_link_libraries(jansson::jansson INTERFACE ${JANSSON_LIBRARIES})
-else()
-  pkg_check_modules(JANSSON REQUIRED jansson>=2)
-  find_library(libjansson ${JANSSON_LIBRARIES})
-  add_library(jansson::jansson UNKNOWN IMPORTED GLOBAL)
-  set_target_properties(jansson::jansson PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${JANSSON_INCLUDE_DIRS}"
-    IMPORTED_LOCATION "${libjansson}")
-endif()
-
 # dependency (only on alpine): libexecinfo-dev
 if(USE_LIBEXECINFO)
   find_library(libexecinfo execinfo)
