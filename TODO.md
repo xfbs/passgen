@@ -2,7 +2,10 @@
 
 ## Current
 
-- [x] throw out old code
+- [ ] make symbols check work for shared library
+- [ ] move building instructions into docs, document new options
+- [ ] add optional wordlist support
+- [ ] add optional markov support
 - [ ] remove special character handling in favour of (:english:) and [:english:] type syntax.
 - [ ] version releases with signed tags, generate versions from that
 - [ ] generate changelog page
