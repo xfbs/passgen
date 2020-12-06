@@ -11,7 +11,6 @@ option(BUILD_UTF8PROC "Build utf8proc, a dependency." YES)
 option(BUILD_TOOLS "Build utility binaries." YES)
 option(BUILD_BENCH "Build benchmark utilities." YES)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
-option(BUILD_STATIC "Built targets statically." OFF)
 
 option(LIBPASSGEN_STATIC "Build libpassgen.a" ON)
 option(LIBPASSGEN_SHARED "Build libpassgen.so" ON)
@@ -31,6 +30,13 @@ endif()
 
 if(PASSGEN_CLDR)
     include(FindEXPAT)
+endif()
+
+# against what do we link tools?
+if(PASSGEN_STATIC OR NOT LIBPASSGEN_SHARED)
+    set(PASSGEN_LIB passgen-static)
+else()
+    set(PASSGEN_LIB passgen-shared)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
@@ -59,12 +65,12 @@ endif()
 
 add_subdirectory(extern)
 
+# build libpassgen
+add_subdirectory(src/libpassgen)
+
 if(BUILD_BENCH)
   add_subdirectory(src/bench)
 endif()
-
-# build libpassgen
-add_subdirectory(src/libpassgen)
 
 # build passgen binary and perhaps utils
 add_subdirectory(src/passgen)
