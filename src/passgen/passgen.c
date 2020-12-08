@@ -69,7 +69,7 @@ void passgen_run(passgen_opts opts) {
     }
 
     for(size_t i = 0; i < opts.amount; ++i) {
-        struct pattern_env env = {
+        struct passgen_env env = {
             .find_complexity = opts.complexity,
             .pronounceable_limit = 1000,
             .pronounceable_type = PASSGEN_PRONOUNCEABLE_ENGLISH,

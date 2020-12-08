@@ -32,7 +32,7 @@ struct fillpos_utf8 {
     size_t len;
 };
 
-static struct pattern_env pattern_env_default = {
+static struct passgen_env passgen_env_default = {
     .find_complexity = false,
     .pronounceable_limit = 1000,
     .pronounceable_type = PASSGEN_PRONOUNCEABLE_ENGLISH,
@@ -94,7 +94,7 @@ static int passgen_generate_write_buffer_utf8(void *data, int32_t codepoint) {
 size_t passgen_generate_fill_unicode(
     struct passgen_pattern *pattern,
     passgen_random_t *rand,
-    struct pattern_env *env,
+    struct passgen_env *env,
     int32_t *buffer,
     size_t len) {
     struct fillpos fillpos = {
@@ -120,7 +120,7 @@ size_t passgen_generate_fill_unicode(
 size_t passgen_generate_fill_utf8(
     struct passgen_pattern *pattern,
     passgen_random_t *rand,
-    struct pattern_env *env,
+    struct passgen_env *env,
     char *buffer,
     size_t len) {
     struct fillpos_utf8 fillpos = {
@@ -145,7 +145,7 @@ size_t passgen_generate_fill_utf8(
 
 size_t passgen_generate_repeat(
     passgen_random_t *rand,
-    struct pattern_env *env,
+    struct passgen_env *env,
     struct passgen_pattern_repeat *repeat) {
     size_t difference = repeat->max - repeat->min;
 
@@ -168,7 +168,7 @@ size_t passgen_generate_repeat(
 int passgen_generate_set(
     struct passgen_pattern_set *set,
     passgen_random_t *rand,
-    struct pattern_env *env,
+    struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     // compute number of possible codepoints
@@ -209,7 +209,7 @@ int passgen_generate_set(
 int passgen_generate_character(
     struct passgen_pattern_char *character,
     passgen_random_t *rand,
-    struct pattern_env *env,
+    struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     (void) rand;
@@ -232,7 +232,7 @@ int passgen_generate_character(
 int passgen_generate_special_pronounceable(
     struct passgen_pattern_special *special,
     passgen_random_t *rand,
-    struct pattern_env *env,
+    struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     /* limit length to 64, that should be plenty. */
@@ -272,7 +272,7 @@ int passgen_generate_special_pronounceable(
 int passgen_generate_special_wordlist(
     struct passgen_pattern_special *special,
     passgen_random_t *rand,
-    struct pattern_env *env,
+    struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     // TODO: implement
@@ -288,7 +288,7 @@ int passgen_generate_special_wordlist(
 int passgen_generate_special(
     struct passgen_pattern_special *special,
     passgen_random_t *rand,
-    struct pattern_env *env,
+    struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     switch(special->kind) {
@@ -318,7 +318,7 @@ int passgen_generate_special(
 int passgen_generate_item(
     struct passgen_pattern_item *item,
     passgen_random_t *rand,
-    struct pattern_env *env,
+    struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     // if it is a maybe (has a question mark following it), decide first if we
@@ -383,7 +383,7 @@ int passgen_generate_item(
 int passgen_generate_segment(
     struct passgen_pattern_segment *segment,
     passgen_random_t *rand,
-    struct pattern_env *env,
+    struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     for(size_t i = 0; i < segment->items.len; i++) {
@@ -403,7 +403,7 @@ int passgen_generate_segment(
 int passgen_generate_group(
     struct passgen_pattern_group *group,
     passgen_random_t *rand,
-    struct pattern_env *env,
+    struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     // choose random segment from segments
@@ -424,12 +424,12 @@ int passgen_generate_group(
 int passgen_generate(
     struct passgen_pattern *pattern,
     passgen_random_t *rand,
-    struct pattern_env *env,
+    struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     /* use default env if none was supplied. this should be relatively sane. */
     if(!env) {
-        env = &pattern_env_default;
+        env = &passgen_env_default;
     }
 
     if(env->find_complexity) {
