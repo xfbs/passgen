@@ -28,31 +28,32 @@ set(SOURCE_LIST
 configure_file(version.c.in version.c)
 configure_file(../../include/passgen/config.h.in passgen/config.h)
 
-if(LIBPASSGEN_STATIC)
-    add_library(passgen-static ${SOURCE_LIST} ${HEADER_LIST})
-    target_link_libraries(passgen-static PUBLIC utf8proc m)
-    set_target_properties(passgen-static PROPERTIES OUTPUT_NAME passgen)
-    target_include_directories(passgen-static PUBLIC ../../include ${CMAKE_CURRENT_BINARY_DIR})
-    passgen_target_defaults(passgen-static)
-    passgen_check_symbols(passgen-static)
+add_library(passgen-static ${SOURCE_LIST} ${HEADER_LIST})
+target_link_libraries(passgen-static PUBLIC utf8proc m)
+set_target_properties(passgen-static PROPERTIES OUTPUT_NAME passgen)
+target_include_directories(passgen-static PUBLIC ../../include ${CMAKE_CURRENT_BINARY_DIR})
+passgen_target_defaults(passgen-static)
+passgen_check_symbols(passgen-static)
 
-    install(
-      TARGETS passgen-static
-      DESTINATION lib
-      COMPONENT Libraries)
+add_library(passgen-shared SHARED ${SOURCE_LIST} ${HEADER_LIST})
+target_link_libraries(passgen-shared PUBLIC utf8proc m)
+set_target_properties(passgen-shared PROPERTIES OUTPUT_NAME passgen)
+target_include_directories(passgen-shared PUBLIC ../../include ${CMAKE_CURRENT_BINARY_DIR})
+passgen_target_defaults(passgen-shared)
+passgen_check_symbols(passgen-shared)
+
+install(
+  TARGETS passgen-static passgen-shared
+  DESTINATION lib
+  COMPONENT lib
+  OPTIONAL)
+
+if(NOT LIBPASSGEN_STATIC)
+    set_target_properties(passgen-static PROPERTIES EXCLUDE_FROM_ALL TRUE)
 endif()
 
-if(LIBPASSGEN_SHARED)
-    add_library(passgen-shared SHARED ${SOURCE_LIST} ${HEADER_LIST})
-    target_link_libraries(passgen-shared PUBLIC utf8proc m)
-    set_target_properties(passgen-shared PROPERTIES OUTPUT_NAME passgen)
-    target_include_directories(passgen-shared PUBLIC ../../include ${CMAKE_CURRENT_BINARY_DIR})
-    passgen_target_defaults(passgen-shared)
-
-    install(
-      TARGETS passgen-shared
-      DESTINATION lib
-      COMPONENT Libraries)
+if(NOT LIBPASSGEN_SHARED)
+    set_target_properties(passgen-shared PROPERTIES EXCLUDE_FROM_ALL TRUE)
 endif()
 
 message(INFO "PASSGEN_LIB is ${PASSGEN_LIB}")
@@ -60,12 +61,12 @@ message(INFO "PASSGEN_LIB is ${PASSGEN_LIB}")
 install(
   DIRECTORY ../../include/passgen
   DESTINATION include
-  COMPONENT Headers)
+  COMPONENT dev)
 
 install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/passgen/config.h"
     DESTINATION include/passgen
-    COMPONENT Headers)
+    COMPONENT dev)
 
 if(USE_LIBEXECINFO)
   target_link_libraries(passgen-static PRIVATE execinfo)

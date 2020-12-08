@@ -1,7 +1,7 @@
 
 # dependency: utf8proc
 if(BUILD_UTF8PROC)
-  add_subdirectory(utf8proc)
+    add_subdirectory(utf8proc EXCLUDE_FROM_ALL)
   # target_code_coverage(utf8proc)
 else()
   find_package(utf8proc)

@@ -13,6 +13,11 @@ target_link_libraries(passgen-bin PUBLIC ${PASSGEN_LIB})
 set_target_properties(passgen-bin PROPERTIES OUTPUT_NAME passgen)
 passgen_target_defaults(passgen-bin)
 
+install(TARGETS passgen-bin
+    DESTINATION bin
+    COMPONENT bin
+    OPTIONAL)
+
 if(USE_LIBEXECINFO)
   # target_link_libraries(passgen execinfo)
 endif(USE_LIBEXECINFO)
