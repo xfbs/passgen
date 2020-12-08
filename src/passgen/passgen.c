@@ -113,7 +113,7 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
         .complexity = false,
     };
 
-    const char *short_opts = "a:p:d:czhv";
+    const char *short_opts = "a:p:d:w:czhv";
     const char *preset = NULL;
 
     // clang-format off
@@ -125,6 +125,7 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
         {"version", no_argument, NULL, 'v'},
         {"null", no_argument, NULL, 'z'},
         {"complexity", no_argument, NULL, 'c'},
+        {"wordlist", required_argument, NULL, 'w'},
         {NULL, no_argument, NULL, 0}
     };
     // clang-format on
@@ -162,6 +163,9 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
                 break;
             case 'v':
                 bail(VERSION, NULL);
+            case 'w':
+                printf("wordlist: %s\n", optarg);
+                break;
             case '?':
             default:
                 fprintf(stderr, "Error unrecognised: %s\n", argv[optind]);
