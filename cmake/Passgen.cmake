@@ -27,7 +27,7 @@ function(passgen_target_defaults target)
 
   # enable compiler warnings
   target_compile_options(${target}
-    PUBLIC -Wall -Wextra)
+    PUBLIC -Wall -Wextra -g)
 
   # use c99 standard
   target_compile_features(${target}
