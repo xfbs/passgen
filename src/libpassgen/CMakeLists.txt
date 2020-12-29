@@ -3,6 +3,7 @@ file(GLOB_RECURSE HEADER_LIST "../../include")
 set(SOURCE_LIST
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
     "assert.c"
+    "container/hashmap.c"
     "container/stack/parser_state.c"
     "container/stack/range.c"
     "container/stack/segment.c"
@@ -55,8 +56,6 @@ endif()
 if(NOT LIBPASSGEN_SHARED)
     set_target_properties(passgen-shared PROPERTIES EXCLUDE_FROM_ALL TRUE)
 endif()
-
-message(INFO "PASSGEN_LIB is ${PASSGEN_LIB}")
 
 install(
   DIRECTORY ../../include/passgen
