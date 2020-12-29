@@ -3,6 +3,7 @@
 
 #include "passgen/container/stack/segment_item.h"
 #include "passgen/data/substring.h"
+#include "passgen/debug.h"
 
 struct passgen_pattern_item;
 struct passgen_pattern_set;
@@ -33,3 +34,5 @@ passgen_pattern_segment_new_special(struct passgen_pattern_segment *segment);
 struct passgen_pattern_item *passgen_pattern_segment_get_item(
     struct passgen_pattern_segment *segment,
     size_t n);
+
+void passgen_pattern_segment_debug(passgen_pattern_segment_t *segment, passgen_debug_t *debug);

@@ -17,6 +17,7 @@ set(SOURCE_LIST
     "data/set.c"
     "data/special.c"
     "data/token.c"
+    "debug.c"
     "generate.c"
     "markov.c"
     "memory.c"

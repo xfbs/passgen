@@ -2,6 +2,7 @@
 
 #include "passgen/data/group.h"
 #include "passgen/memory.h"
+#include "passgen/debug.h"
 
 typedef struct passgen_pattern {
     passgen_mem_t *mem;
@@ -10,3 +11,5 @@ typedef struct passgen_pattern {
 
 void passgen_pattern_init(passgen_pattern_t *pattern);
 void passgen_pattern_free(passgen_pattern_t *pattern);
+
+void passgen_pattern_debug(passgen_pattern_t *pattern, passgen_debug_t *debug);
