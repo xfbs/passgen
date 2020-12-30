@@ -44,8 +44,10 @@ void passgen_pattern_item_debug(passgen_pattern_item_t *item, passgen_debug_t *d
     debug->member_start(debug->data, "data");
     switch(item->kind) {
         case PASSGEN_PATTERN_SET:
+            passgen_pattern_set_debug(&item->data.set, debug);
             break;
         case PASSGEN_PATTERN_GROUP:
+            passgen_pattern_group_debug(&item->data.group, debug);
             break;
         case PASSGEN_PATTERN_CHAR:
             passgen_pattern_char_debug(&item->data.character, debug);
