@@ -148,7 +148,7 @@ void passgen_random_read(passgen_random_t *random, void *data, size_t bytes) {
             }
         }
     } else {
-        int ret = random->read(data, bytes, random->data);
+        size_t ret = random->read(data, bytes, random->data);
         passgen_assert(ret == bytes);
     }
 }
