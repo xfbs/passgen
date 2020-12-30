@@ -15,7 +15,6 @@
 #include "passgen/data/set.h"
 #include "passgen/data/special.h"
 #include "passgen/data/special_kind.h"
-#include "passgen/data/substring.h"
 #include "passgen/data/token.h"
 #include "passgen/markov.h"
 #include "passgen/pronounceable.h"
@@ -42,7 +41,6 @@ static const struct size_info struct_sizes[] = {
     add_struct(passgen_parser),
     add_struct(passgen_parser_state),
     add_struct(passgen_pattern),
-    add_struct(passgen_pattern_substring),
     add_struct(passgen_pattern_repeat),
     add_struct(passgen_pattern_group),
     add_struct(passgen_pattern_segment),

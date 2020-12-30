@@ -5,7 +5,6 @@
 #include "passgen/container/stack/range.h"
 #include "passgen/data/array.h"
 #include "passgen/data/repeat.h"
-#include "passgen/data/substring.h"
 
 struct passgen_pattern_range;
 

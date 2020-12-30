@@ -2,7 +2,6 @@
 #include <stddef.h>
 
 #include "passgen/container/stack/segment_item.h"
-#include "passgen/data/substring.h"
 #include "passgen/debug.h"
 
 struct passgen_pattern_item;

@@ -3,7 +3,6 @@
 
 #include "passgen/container/stack/segment.h"
 #include "passgen/data/repeat.h"
-#include "passgen/data/substring.h"
 #include "passgen/debug.h"
 
 typedef struct passgen_pattern_group {
