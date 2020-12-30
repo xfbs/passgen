@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static void struct_start(void *data, const char *name) {
     fprintf(data, "%s {", name);
