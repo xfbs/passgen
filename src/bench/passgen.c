@@ -9,13 +9,13 @@
 #define GENERATIONS 10
 
 int main(int argc, char *argv[]) {
-    assert(argc == 2);
+    passgen_assert(argc == 2);
 
     const char *patterns_path = argv[1];
-    assert(patterns_path);
+    passgen_assert(patterns_path);
 
     FILE *patterns_file = fopen(patterns_path, "r");
-    assert(patterns_file);
+    passgen_assert(patterns_file);
 
     passgen_wordlist_t patterns;
     passgen_wordlist_load(&patterns, patterns_file);
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 
     for(size_t i = 0; i < patterns.count; i++) {
         const char *pattern = patterns.words[i];
-        assert(pattern);
+        passgen_assert(pattern);
         printf("%s\n", pattern);
 
         for(size_t r = 0; r < REPETITIONS; r++) {
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
                 format_input_len,
                 &format_bytes_read);
 
-            assert(ret == 0);
+            passgen_assert(ret == 0);
         }
     }
 

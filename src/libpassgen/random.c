@@ -1,5 +1,5 @@
 #include "passgen/random.h"
-#include <assert.h>
+#include "passgen/assert.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -80,7 +80,7 @@ passgen_random_t *passgen_random_new_xorshift(uint64_t seed) {
 }
 
 void passgen_random_reload(passgen_random_t *random) {
-    assert(random != NULL);
+    passgen_assert(random != NULL);
 
     // read random data.
     size_t bytes =
@@ -88,7 +88,7 @@ void passgen_random_reload(passgen_random_t *random) {
     (void) bytes;
 
     // make sure we've read enough.
-    assert(bytes == sizeof(random->buffer));
+    passgen_assert(bytes == sizeof(random->buffer));
 
     // reset position in ring buffer.
     random->pos = 0;
@@ -148,13 +148,14 @@ void passgen_random_read(passgen_random_t *random, void *data, size_t bytes) {
             }
         }
     } else {
-        assert(random->read(data, bytes, random->data) == bytes);
+        int ret = random->read(data, bytes, random->data);
+        passgen_assert(ret == bytes);
     }
 }
 
 passgen_random_t *passgen_random_new() {
     passgen_random_t *random = malloc(sizeof(passgen_random_t));
-    assert(random);
+    passgen_assert(random);
 
     return passgen_random_open(random);
 }
@@ -254,6 +255,8 @@ inline bool passgen_random_bool(passgen_random_t *random) {
 }
 
 inline uint8_t passgen_random_u8_max(passgen_random_t *random, uint8_t max) {
+    passgen_assert(max);
+
     uint8_t mask = max;
     mask |= mask >> 4;
     mask |= mask >> 2;
@@ -268,6 +271,8 @@ inline uint8_t passgen_random_u8_max(passgen_random_t *random, uint8_t max) {
 }
 
 inline uint16_t passgen_random_u16_max(passgen_random_t *random, uint16_t max) {
+    passgen_assert(max);
+
     if(max <= UINT8_MAX) {
         return passgen_random_u8_max(random, max);
     }
@@ -288,6 +293,8 @@ inline uint16_t passgen_random_u16_max(passgen_random_t *random, uint16_t max) {
 }
 
 inline uint32_t passgen_random_u32_max(passgen_random_t *random, uint32_t max) {
+    passgen_assert(max);
+
     if(max < UINT16_MAX) {
         return passgen_random_u16_max(random, max);
     }
@@ -309,6 +316,8 @@ inline uint32_t passgen_random_u32_max(passgen_random_t *random, uint32_t max) {
 }
 
 inline uint64_t passgen_random_u64_max(passgen_random_t *random, uint64_t max) {
+    passgen_assert(max);
+
     if(max < UINT32_MAX) {
         return passgen_random_u32_max(random, max);
     }

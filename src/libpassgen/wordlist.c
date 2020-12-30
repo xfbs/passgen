@@ -20,11 +20,11 @@ void passgen_wordlist_read(passgen_wordlist_t *wordlist, FILE *file) {
 
     // allocate buffer to hold entire file and read in (plus zero termination)
     wordlist->data = malloc(wordlist->size + 1);
-    assert(wordlist->data);
+    passgen_assert(wordlist->data);
 
     // read in entire wordlist
     size_t read = fread(wordlist->data, 1, wordlist->size, file);
-    assert(wordlist->size == read);
+    passgen_assert(wordlist->size == read);
 
     // null-terminate wordlist
     wordlist->data[wordlist->size] = 0;

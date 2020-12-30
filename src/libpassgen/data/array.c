@@ -2,6 +2,8 @@
 #include <passgen/assert.h>
 #include <passgen/config.h>
 #include <passgen/memory.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define SIZE_INITIAL 4
 
@@ -46,7 +48,7 @@ void *passgen_array_get(
     size_t pos) {
 
 #ifdef PASSGEN_DEBUG
-    assert(pos <= array->items);
+    passgen_assert(pos <= array->items);
 #endif
 
     return array->data[pos];

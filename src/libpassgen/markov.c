@@ -35,7 +35,7 @@ size_t passgen_markov2_generate(
     do {
         const struct passgen_markov0 *choice =
             passgen_markov2_choose(list, rand, p1, p2);
-        assert(choice);
+        passgen_assert(choice);
 
         /* save codepoint */
         if(choice->codepoint) {

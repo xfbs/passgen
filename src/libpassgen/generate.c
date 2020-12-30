@@ -180,7 +180,7 @@ int passgen_generate_set(
     // TODO: generate this on the fly or on demand?
     size_t possible = set->choices_list[set->items.len - 1];
 
-    assert(possible != 0);
+    passgen_assert(possible != 0);
 
     size_t choice = passgen_random_u64_max(rand, possible);
 
@@ -198,7 +198,7 @@ int passgen_generate_set(
         }
     }
 
-    assert(num != set->items.len);
+    passgen_assert(num != set->items.len);
 
     /* adjust choice to be relative offset */
     if(num) {
@@ -220,8 +220,8 @@ int passgen_generate_character(
     (void) rand;
     (void) env;
 
-    assert(character->count > 0);
-    assert(character->count < 8);
+    passgen_assert(character->count > 0);
+    passgen_assert(character->count < 8);
 
     for(size_t i = 0; i < character->count; i++) {
         int ret = func(data, character->codepoints[i]);
@@ -314,7 +314,7 @@ int passgen_generate_special(
                 func);
             break;
         default:
-            assert(false);
+            passgen_assert(false);
             break;
     }
     return 0;
@@ -373,7 +373,7 @@ int passgen_generate_item(
                     func);
                 break;
             default:
-                assert(false);
+                passgen_assert(false);
                 break;
         }
 

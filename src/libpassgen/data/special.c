@@ -17,7 +17,7 @@ void passgen_pattern_special_init_char(
             special->kind = PASSGEN_PATTERN_SPECIAL_WORDLIST;
             break;
         default:
-            assert(false);
+            passgen_assert(false);
             break;
     }
 }

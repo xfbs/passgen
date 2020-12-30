@@ -10,16 +10,16 @@ void help(const char **args, size_t args_len) {
 
 void load(passgen_wordlist_t *wordlist, const char *filename) {
     FILE *file = fopen(filename, "r");
-    assert(file);
+    passgen_assert(file);
 
     passgen_wordlist_load(wordlist, file);
     fclose(file);
 }
 
 void dump(const char **args, size_t args_len) {
-    assert(args_len == 3);
+    passgen_assert(args_len == 3);
     const char *filename = args[2];
-    assert(filename);
+    passgen_assert(filename);
 
     passgen_wordlist_t wordlist;
     load(&wordlist, filename);
@@ -35,9 +35,9 @@ void dump(const char **args, size_t args_len) {
 }
 
 void random_word(const char **args, size_t args_len) {
-    assert(args_len == 3);
+    passgen_assert(args_len == 3);
     const char *filename = args[2];
-    assert(filename);
+    passgen_assert(filename);
 
     passgen_random_t random;
     passgen_random_open(&random);
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
         return EXIT_SUCCESS;
     }
 
-    assert(argc > 1);
+    passgen_assert(argc > 1);
 
     for(size_t i = 0; subcommands[i].name; i++) {
         if(0 == strcmp(subcommands[i].name, argv[1])) {
