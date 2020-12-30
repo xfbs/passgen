@@ -8,6 +8,7 @@
 #include "passgen/data/repeat.h"
 #include "passgen/data/set.h"
 #include "passgen/data/special.h"
+#include "passgen/debug.h"
 
 typedef struct passgen_pattern_item {
     enum passgen_pattern_kind kind;
@@ -25,3 +26,5 @@ typedef struct passgen_pattern_item {
 
 void passgen_pattern_item_init(struct passgen_pattern_item *item);
 void passgen_pattern_item_free(struct passgen_pattern_item *item);
+
+void passgen_pattern_item_debug(passgen_pattern_item_t *item, passgen_debug_t *debug);

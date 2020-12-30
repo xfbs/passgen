@@ -80,20 +80,22 @@ struct passgen_pattern_item *passgen_pattern_segment_get_item(
 void passgen_pattern_segment_debug(passgen_pattern_segment_t *segment, passgen_debug_t *debug) {
     debug->struct_start(debug->data, "passgen_pattern_segment");
 
-    /*
-    debug->member_start(debug->data, "segments");
+    debug->member_start(debug->data, "items");
     debug->array_start(debug->data);
 
-    for(size_t i = 0; i < group->segments.len; i++) {
-        passgen_pattern_segment_t *segment =
-            passgen_pattern_segment_stack_get(&group->segments, i);
+    for(size_t i = 0; i < segment->items.len; i++) {
+        if(i != 0) {
+            debug->array_sep(debug->data);
+        }
 
-        passgen_pattern_segment_debug(segment, debug);
+        struct passgen_pattern_item *item =
+            passgen_pattern_item_stack_get(&segment->items, i);
+
+        passgen_pattern_item_debug(item, debug);
     }
 
     debug->array_end(debug->data);
-    debug->member_end(debug->data, "segments");
-    */
+    debug->member_end(debug->data, "items");
 
     debug->struct_end(debug->data, "passgen_pattern_segment");
 }

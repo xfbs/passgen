@@ -38,6 +38,10 @@ void passgen_pattern_group_debug(passgen_pattern_group_t *group, passgen_debug_t
     debug->array_start(debug->data);
 
     for(size_t i = 0; i < group->segments.len; i++) {
+        if(i != 0) {
+            debug->array_sep(debug->data);
+        }
+
         passgen_pattern_segment_t *segment =
             passgen_pattern_segment_stack_get(&group->segments, i);
 
