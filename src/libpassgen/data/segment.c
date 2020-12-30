@@ -31,7 +31,7 @@ passgen_pattern_segment_new_item(struct passgen_pattern_segment *segment) {
     return item;
 }
 
-struct passgen_pattern_char *
+struct passgen_chars *
 passgen_pattern_segment_new_char(struct passgen_pattern_segment *segment) {
     struct passgen_pattern_item *item =
         passgen_pattern_segment_new_item(segment);

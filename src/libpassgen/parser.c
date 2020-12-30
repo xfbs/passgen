@@ -6,7 +6,7 @@
 
 #include "passgen/container/stack/range.h"
 #include "passgen/container/stack/segment_item.h"
-#include "passgen/data/char.h"
+#include "passgen/data/chars.h"
 #include "passgen/data/group.h"
 #include "passgen/data/parser.h"
 #include "passgen/data/parser_state.h"
@@ -179,7 +179,7 @@ int passgen_parse_group(
         }
     }
 
-    struct passgen_pattern_char *chr =
+    struct passgen_chars *chr =
         passgen_pattern_segment_new_char(state->data.group.segment);
     chr->count = 1;
     chr->tainted = 0;

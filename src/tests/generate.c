@@ -3,7 +3,7 @@
 #include "passgen/container/stack/range.h"
 #include "passgen/container/stack/segment.h"
 #include "passgen/container/stack/segment_item.h"
-#include "passgen/data/char.h"
+#include "passgen/data/chars.h"
 #include "passgen/data/group.h"
 #include "passgen/data/parser.h"
 #include "passgen/data/pattern.h"

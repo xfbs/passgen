@@ -4,7 +4,7 @@
 #include "passgen/container/stack/range.h"
 #include "passgen/container/stack/segment.h"
 #include "passgen/container/stack/segment_item.h"
-#include "passgen/data/char.h"
+#include "passgen/data/chars.h"
 #include "passgen/data/group.h"
 #include "passgen/data/pattern.h"
 #include "passgen/data/pattern_kind.h"
@@ -212,7 +212,7 @@ int passgen_generate_set(
 }
 
 int passgen_generate_character(
-    struct passgen_pattern_char *character,
+    passgen_chars_t *character,
     passgen_random_t *rand,
     struct passgen_env *env,
     void *data,

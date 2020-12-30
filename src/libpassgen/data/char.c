@@ -1,6 +1,6 @@
-#include "passgen/data/char.h"
+#include "passgen/data/chars.h"
 
-void passgen_pattern_char_debug(passgen_pattern_char_t *character, passgen_debug_t *debug) {
+void passgen_pattern_char_debug(passgen_chars_t *character, passgen_debug_t *debug) {
     debug->struct_start(debug->data, "passgen_pattern_char");
 
     debug->member_start(debug->data, "count");

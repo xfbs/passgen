@@ -7,10 +7,10 @@
 // stores a bunch of character - up to seven. why seven? this is stored in an
 // union inside passgen_pattern_item, and there's enough space in there to
 // store seven codepoints and a count variable, so why not.
-typedef struct passgen_pattern_char {
+typedef struct passgen_chars {
     uint8_t count;
     uint8_t tainted;
     int32_t codepoints[7];
-} passgen_pattern_char_t;
+} passgen_chars_t;
 
-void passgen_pattern_char_debug(passgen_pattern_char_t *chr, passgen_debug_t *debug);
+void passgen_pattern_char_debug(passgen_chars_t *chr, passgen_debug_t *debug);

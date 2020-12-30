@@ -8,7 +8,7 @@
 #include "passgen/random.h"
 
 struct passgen_pattern;
-struct passgen_pattern_char;
+struct passgen_chars;
 struct passgen_pattern_group;
 struct passgen_pattern_item;
 struct passgen_pattern_repeat;
@@ -16,13 +16,7 @@ struct passgen_pattern_segment;
 struct passgen_pattern_set;
 struct passgen_pattern_special;
 
-struct passgen_pattern_repeat;
-struct passgen_pattern_set;
-struct passgen_pattern_char;
-struct passgen_pattern_group;
-struct passgen_pattern_item;
-struct passgen_pattern_segment;
-struct passgen_pattern_special;
+typedef struct passgen_chars passgen_chars_t;
 
 /// Callback for generation. Takes an arbitrary data pointer and the codepoint
 /// that was generated.
@@ -70,7 +64,7 @@ int passgen_generate_set(
     passgen_generate_cb *func);
 
 int passgen_generate_character(
-    struct passgen_pattern_char *character,
+    passgen_chars_t *character,
     passgen_random_t *rand,
     struct passgen_env *env,
     void *data,

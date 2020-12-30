@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "passgen/data/array.h"
-#include "passgen/data/char.h"
+#include "passgen/data/chars.h"
 #include "passgen/data/group.h"
 #include "passgen/data/parser.h"
 #include "passgen/data/parser_state.h"
@@ -47,7 +47,7 @@ static const struct size_info struct_sizes[] = {
     add_struct(passgen_pattern_group),
     add_struct(passgen_pattern_segment),
     add_struct(passgen_pattern_item),
-    add_struct(passgen_pattern_char),
+    add_struct(passgen_chars),
     add_struct(passgen_pattern_set),
     add_struct(passgen_pattern_special),
     add_struct(passgen_token),
