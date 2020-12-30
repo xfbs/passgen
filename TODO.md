@@ -2,6 +2,10 @@
 
 ## Current
 
+- [ ] fix `abc|def[]()` parsing
+- [ ] autogenerate debug methods
+- [ ] write ast to string encoder (for easy testing)
+- [ ] rename passgen pattern segment to passgen segment
 - [ ] make symbols check work for shared library
 - [ ] move building instructions into docs, document new options
 - [ ] add optional wordlist support
