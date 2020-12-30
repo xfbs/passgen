@@ -1,9 +1,11 @@
 #include <passgen/parser.h>
 #include <passgen/assert.h>
 #include <passgen/wordlist.h>
+#include <passgen/utf8.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 
 #define REPETITIONS 100
 #define GENERATIONS 10
