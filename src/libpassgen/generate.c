@@ -171,6 +171,11 @@ int passgen_generate_set(
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
+    // if this set is empty, we're done.
+    if(set->items.len == 0) {
+        return 0;
+    }
+
     // compute number of possible codepoints
     // TODO: generate this on the fly or on demand?
     size_t possible = set->choices_list[set->items.len - 1];
