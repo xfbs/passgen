@@ -17,6 +17,7 @@
 #include "passgen/token.h"
 #include "passgen/utf8.h"
 #include "passgen/version.h"
+#include "passgen/debug.h"
 
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *) data)
 
@@ -25,7 +26,7 @@ void passgen_run(passgen_opts opts) {
     struct passgen_token_parser token_parser = {0};
     struct passgen_token token = {0};
     passgen_parser_init(&parser);
-    assert(0 == passgen_parse_start(&parser));
+    passgen_parse_start(&parser);
 
     uint32_t format_decoded[256];
     size_t format_decoded_len = 0;
@@ -46,7 +47,8 @@ void passgen_run(passgen_opts opts) {
         int ret = passgen_token_parse(&token_parser, &token, format_decoded[i]);
 
         if(ret == PASSGEN_TOKEN_INIT) {
-            assert(0 == passgen_parse_token(&parser, &token));
+            ret = passgen_parse_token(&parser, &token);
+            assert(ret == 0);
         }
     }
 
