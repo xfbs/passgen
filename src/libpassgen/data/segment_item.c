@@ -58,7 +58,7 @@ void passgen_pattern_item_debug(passgen_pattern_item_t *item, passgen_debug_t *d
     debug->member_end(debug->data, "data");
 
     debug->member_start(debug->data, "repeat");
-    //passgen_pattern_repeat_debug(item->repeat, debug);
+    passgen_pattern_repeat_debug(&item->repeat, debug);
     debug->member_end(debug->data, "repeat");
 
     debug->member_start(debug->data, "maybe");

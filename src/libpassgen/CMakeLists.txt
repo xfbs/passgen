@@ -12,6 +12,7 @@ set(SOURCE_LIST
     "data/char.c"
     "data/group.c"
     "data/range.c"
+    "data/repeat.c"
     "data/parser.c"
     "data/pattern.c"
     "data/segment.c"
