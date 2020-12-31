@@ -11,6 +11,7 @@ option(BUILD_UTF8PROC "Build utf8proc, a dependency." YES)
 option(BUILD_TOOLS "Build utility binaries." YES)
 option(BUILD_BENCH "Build benchmark utilities." YES)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
+option(BUILD_CRITERION_TESTING "Build tests with criterion." OFF)
 
 option(LIBPASSGEN_STATIC "Build libpassgen.a" ON)
 option(LIBPASSGEN_SHARED "Build libpassgen.so" ON)
@@ -43,6 +44,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 #include(ExternalProject)
 include(FindPkgConfig)
+include(FindCriterion)
 include(ClangFormat)
 include(CMakeFormat)
 include(CTest)
@@ -83,6 +85,10 @@ endif()
 # unit tests
 if(BUILD_TESTING)
   add_subdirectory(src/tests)
+endif()
+
+if(BUILD_CRITERION_TESTING)
+    add_subdirectory(src/criterion-tests)
 endif()
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Passgen")

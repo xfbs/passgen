@@ -11,3 +11,7 @@ endif()
 if(USE_LIBEXECINFO)
   find_library(libexecinfo execinfo)
 endif(USE_LIBEXECINFO)
+
+add_library(criterion INTERFACE)
+target_link_libraries(criterion INTERFACE ${CRITERION_LIBRARIES})
+target_include_directories(criterion INTERFACE ${CRITERION_INCLUDE_DIRS})
