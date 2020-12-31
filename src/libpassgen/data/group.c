@@ -53,3 +53,24 @@ void passgen_pattern_group_debug(passgen_pattern_group_t *group, passgen_debug_t
 
     debug->struct_end(debug->data, "passgen_pattern_group");
 }
+
+int passgen_group_export(passgen_pattern_group_t *group, void *data, passgen_export_cb *fn) {
+    fn(data, '(');
+
+    for(size_t i = 0; i < group->segments.len; i++) {
+        if(i != 0) {
+            fn(data, '|');
+        }
+
+        passgen_pattern_segment_t *segment =
+            passgen_pattern_segment_stack_get(&group->segments, i);
+
+        int export_return = passgen_segment_export(segment, data, fn);
+        if(export_return != PASSGEN_EXPORT_SUCCESS) {
+            return export_return;
+        }
+    }
+
+    fn(data, ')');
+    return PASSGEN_EXPORT_SUCCESS;
+}

@@ -46,3 +46,16 @@ void passgen_pattern_set_debug(passgen_pattern_set_t *set, passgen_debug_t *debu
 
     debug->struct_end(debug->data, "passgen_pattern_set");
 }
+
+int passgen_charset_export(passgen_pattern_set_t *set, void *data, passgen_export_cb *fn) {
+    fn(data, '[');
+
+    for(size_t i = 0; i < set->items.len; i++) {
+        struct passgen_pattern_range *range = passgen_pattern_set_get_range(set, i);
+        passgen_pattern_range_export(range, data, fn);
+    }
+
+    fn(data, ']');
+
+    return PASSGEN_EXPORT_SUCCESS;
+}

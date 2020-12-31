@@ -99,3 +99,19 @@ void passgen_pattern_segment_debug(passgen_pattern_segment_t *segment, passgen_d
 
     debug->struct_end(debug->data, "passgen_pattern_segment");
 }
+
+int passgen_segment_export(passgen_pattern_segment_t *segment, void *data, passgen_export_cb *fn) {
+    for(size_t i = 0; i < segment->items.len; i++) {
+        struct passgen_pattern_item *item =
+            passgen_pattern_item_stack_get(&segment->items, i);
+
+        int export_return = passgen_item_export(item, data, fn);
+
+        // return early on error
+        if(export_return != PASSGEN_EXPORT_SUCCESS) {
+            return export_return;
+        }
+    }
+
+    return PASSGEN_EXPORT_SUCCESS;
+}

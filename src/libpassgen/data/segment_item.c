@@ -67,3 +67,18 @@ void passgen_pattern_item_debug(passgen_pattern_item_t *item, passgen_debug_t *d
 
     debug->struct_end(debug->data, "passgen_pattern_item");
 }
+
+int passgen_item_export(passgen_pattern_item_t *item, void *data, passgen_export_cb *fn) {
+    switch(item->kind) {
+        case PASSGEN_PATTERN_SET:
+            return passgen_charset_export(&item->data.set, data, fn);
+        case PASSGEN_PATTERN_GROUP:
+            return passgen_group_export(&item->data.group, data, fn);
+        case PASSGEN_PATTERN_CHAR:
+            return passgen_chars_export(&item->data.character, data, fn);
+        case PASSGEN_PATTERN_SPECIAL:
+            break;
+    }
+
+    return PASSGEN_EXPORT_FAILURE;
+}
