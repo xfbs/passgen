@@ -67,6 +67,7 @@ build:bionic:
     - ninja
     - ./src/tests/passgen-test
     - cpack -G TXZ
+    - cpack -G DEB
   artifacts:
     paths:
       - build-bionic-release
