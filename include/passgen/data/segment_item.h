@@ -16,7 +16,7 @@ typedef struct passgen_pattern_item {
     union {
         struct passgen_pattern_set set;
         struct passgen_pattern_group group;
-        passgen_chars_t character;
+        passgen_chars_t chars;
         struct passgen_pattern_special special;
     } data;
 

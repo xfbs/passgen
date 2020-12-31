@@ -72,8 +72,8 @@ test_result test_parser_single_char(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == 'a');
-    assert(item->data.character.count == 1);
+    assert(item->data.chars.codepoints[0] == 'a');
+    assert(item->data.chars.count == 1);
 
     POSTAMBLE();
 
@@ -95,9 +95,9 @@ test_result test_parser_multi_char(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == 'a');
-    assert(item->data.character.codepoints[1] == 'b');
-    assert(item->data.character.count == 2);
+    assert(item->data.chars.codepoints[0] == 'a');
+    assert(item->data.chars.codepoints[1] == 'b');
+    assert(item->data.chars.count == 2);
 
     POSTAMBLE();
 
@@ -118,8 +118,8 @@ test_result test_parser_multi_groups(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == 'a');
-    assert(item->data.character.count == 1);
+    assert(item->data.chars.codepoints[0] == 'a');
+    assert(item->data.chars.count == 1);
 
     segment = passgen_pattern_group_get_segment(&parser.pattern.group, 1);
     assert(1 == segment->items.len);
@@ -127,8 +127,8 @@ test_result test_parser_multi_groups(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == 'b');
-    assert(item->data.character.count == 1);
+    assert(item->data.chars.codepoints[0] == 'b');
+    assert(item->data.chars.count == 1);
 
     POSTAMBLE();
 
@@ -158,8 +158,8 @@ test_result test_parser_nested_groups(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == 'a');
-    assert(item->data.character.count == 1);
+    assert(item->data.chars.codepoints[0] == 'a');
+    assert(item->data.chars.count == 1);
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
 
@@ -194,8 +194,8 @@ test_result test_parser_multi_nested_groups(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == 'a');
-    assert(item->data.character.count == 1);
+    assert(item->data.chars.codepoints[0] == 'a');
+    assert(item->data.chars.count == 1);
 
     segment = passgen_pattern_group_get_segment(&parser.pattern.group, 0);
     item = passgen_pattern_segment_get_item(segment, 1);
@@ -210,8 +210,8 @@ test_result test_parser_multi_nested_groups(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == 'b');
-    assert(item->data.character.count == 1);
+    assert(item->data.chars.codepoints[0] == 'b');
+    assert(item->data.chars.count == 1);
 
     POSTAMBLE();
 
@@ -343,8 +343,8 @@ test_result test_parser_char_repeat(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == 'a');
-    assert(item->data.character.count == 1);
+    assert(item->data.chars.codepoints[0] == 'a');
+    assert(item->data.chars.count == 1);
     assert(item->repeat.min == 2);
     assert(item->repeat.max == 2);
 
@@ -372,8 +372,8 @@ test_result test_parser_char_repeat_range(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == 'a');
-    assert(item->data.character.count == 1);
+    assert(item->data.chars.codepoints[0] == 'a');
+    assert(item->data.chars.count == 1);
     assert(item->repeat.min == 2);
     assert(item->repeat.max == 4);
 
@@ -398,11 +398,11 @@ test_result test_parser_group_ignore_escaped(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == '(');
-    assert(item->data.character.codepoints[1] == '{');
-    assert(item->data.character.codepoints[2] == '[');
-    assert(item->data.character.codepoints[3] == '|');
-    assert(item->data.character.count == 4);
+    assert(item->data.chars.codepoints[0] == '(');
+    assert(item->data.chars.codepoints[1] == '{');
+    assert(item->data.chars.codepoints[2] == '[');
+    assert(item->data.chars.codepoints[3] == '|');
+    assert(item->data.chars.count == 4);
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
 
@@ -432,8 +432,8 @@ test_result test_parser_item_maybe(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == 'a');
-    assert(item->data.character.count == 1);
+    assert(item->data.chars.codepoints[0] == 'a');
+    assert(item->data.chars.count == 1);
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
     assert(item->maybe == false);
@@ -441,8 +441,8 @@ test_result test_parser_item_maybe(void) {
     item = passgen_pattern_segment_get_item(segment, 1);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == 'a');
-    assert(item->data.character.count == 1);
+    assert(item->data.chars.codepoints[0] == 'a');
+    assert(item->data.chars.count == 1);
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
     assert(item->maybe == true);
@@ -540,8 +540,8 @@ test_result test_parser_mixed_special(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == 'a');
-    assert(item->data.character.count == 1);
+    assert(item->data.chars.codepoints[0] == 'a');
+    assert(item->data.chars.count == 1);
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
     assert(item->maybe == false);
@@ -559,8 +559,8 @@ test_result test_parser_mixed_special(void) {
     item = passgen_pattern_segment_get_item(segment, 2);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.codepoints[0] == 'x');
-    assert(item->data.character.count == 1);
+    assert(item->data.chars.codepoints[0] == 'x');
+    assert(item->data.chars.count == 1);
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
     assert(item->maybe == false);
@@ -589,10 +589,10 @@ test_result test_parser_char_maybe_char(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.count == 2);
-    assert(item->data.character.codepoints[0] == 'a');
-    assert(item->data.character.codepoints[1] == 'b');
-    assert(item->data.character.tainted == false);
+    assert(item->data.chars.count == 2);
+    assert(item->data.chars.codepoints[0] == 'a');
+    assert(item->data.chars.codepoints[1] == 'b');
+    assert(item->data.chars.tainted == false);
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
     assert(item->maybe == false);
@@ -600,9 +600,9 @@ test_result test_parser_char_maybe_char(void) {
     item = passgen_pattern_segment_get_item(segment, 1);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.count == 1);
-    assert(item->data.character.codepoints[0] == 'c');
-    assert(item->data.character.tainted == true);
+    assert(item->data.chars.count == 1);
+    assert(item->data.chars.codepoints[0] == 'c');
+    assert(item->data.chars.tainted == true);
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
     assert(item->maybe == true);
@@ -610,9 +610,9 @@ test_result test_parser_char_maybe_char(void) {
     item = passgen_pattern_segment_get_item(segment, 2);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.count == 1);
-    assert(item->data.character.codepoints[0] == 'd');
-    assert(item->data.character.tainted == false);
+    assert(item->data.chars.count == 1);
+    assert(item->data.chars.codepoints[0] == 'd');
+    assert(item->data.chars.tainted == false);
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
     assert(item->maybe == false);
@@ -656,9 +656,9 @@ test_result test_parser_char_repeat_tainted(void) {
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.count == 1);
-    assert(item->data.character.codepoints[0] == 'a');
-    assert(item->data.character.tainted == true);
+    assert(item->data.chars.count == 1);
+    assert(item->data.chars.codepoints[0] == 'a');
+    assert(item->data.chars.tainted == true);
     assert(item->repeat.min == 3);
     assert(item->repeat.max == 3);
     assert(item->maybe == false);
@@ -666,15 +666,15 @@ test_result test_parser_char_repeat_tainted(void) {
     item = passgen_pattern_segment_get_item(segment, 1);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.count == 7);
-    assert(item->data.character.codepoints[0] == 'b');
-    assert(item->data.character.codepoints[1] == 'c');
-    assert(item->data.character.codepoints[2] == 'd');
-    assert(item->data.character.codepoints[3] == 'e');
-    assert(item->data.character.codepoints[4] == 'f');
-    assert(item->data.character.codepoints[5] == 'g');
-    assert(item->data.character.codepoints[6] == 'h');
-    assert(item->data.character.tainted == false);
+    assert(item->data.chars.count == 7);
+    assert(item->data.chars.codepoints[0] == 'b');
+    assert(item->data.chars.codepoints[1] == 'c');
+    assert(item->data.chars.codepoints[2] == 'd');
+    assert(item->data.chars.codepoints[3] == 'e');
+    assert(item->data.chars.codepoints[4] == 'f');
+    assert(item->data.chars.codepoints[5] == 'g');
+    assert(item->data.chars.codepoints[6] == 'h');
+    assert(item->data.chars.tainted == false);
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
     assert(item->maybe == false);
@@ -682,10 +682,10 @@ test_result test_parser_char_repeat_tainted(void) {
     item = passgen_pattern_segment_get_item(segment, 2);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.count == 2);
-    assert(item->data.character.codepoints[0] == 'i');
-    assert(item->data.character.codepoints[1] == 'j');
-    assert(item->data.character.tainted == false);
+    assert(item->data.chars.count == 2);
+    assert(item->data.chars.codepoints[0] == 'i');
+    assert(item->data.chars.codepoints[1] == 'j');
+    assert(item->data.chars.tainted == false);
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
     assert(item->maybe == false);
@@ -693,9 +693,9 @@ test_result test_parser_char_repeat_tainted(void) {
     item = passgen_pattern_segment_get_item(segment, 3);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.count == 1);
-    assert(item->data.character.codepoints[0] == 'k');
-    assert(item->data.character.tainted == true);
+    assert(item->data.chars.count == 1);
+    assert(item->data.chars.codepoints[0] == 'k');
+    assert(item->data.chars.tainted == true);
     assert(item->repeat.min == 2);
     assert(item->repeat.max == 2);
     assert(item->maybe == true);
@@ -703,10 +703,10 @@ test_result test_parser_char_repeat_tainted(void) {
     item = passgen_pattern_segment_get_item(segment, 4);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.character.count == 2);
-    assert(item->data.character.codepoints[0] == 'a');
-    assert(item->data.character.codepoints[1] == 'b');
-    assert(item->data.character.tainted == false);
+    assert(item->data.chars.count == 2);
+    assert(item->data.chars.codepoints[0] == 'a');
+    assert(item->data.chars.codepoints[1] == 'b');
+    assert(item->data.chars.tainted == false);
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
     assert(item->maybe == false);

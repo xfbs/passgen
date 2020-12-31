@@ -50,7 +50,7 @@ void passgen_pattern_item_debug(passgen_pattern_item_t *item, passgen_debug_t *d
             passgen_pattern_group_debug(&item->data.group, debug);
             break;
         case PASSGEN_PATTERN_CHAR:
-            passgen_pattern_char_debug(&item->data.character, debug);
+            passgen_pattern_char_debug(&item->data.chars, debug);
             break;
         case PASSGEN_PATTERN_SPECIAL:
             break;
@@ -75,7 +75,7 @@ int passgen_item_export(passgen_pattern_item_t *item, void *data, passgen_export
         case PASSGEN_PATTERN_GROUP:
             return passgen_group_export(&item->data.group, data, fn);
         case PASSGEN_PATTERN_CHAR:
-            return passgen_chars_export(&item->data.character, data, fn);
+            return passgen_chars_export(&item->data.chars, data, fn);
         case PASSGEN_PATTERN_SPECIAL:
             break;
     }

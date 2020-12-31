@@ -41,23 +41,23 @@ last_single_item_taint(struct passgen_pattern_segment *segment) {
         passgen_pattern_item_stack_top(&segment->items);
 
     if(item->kind == PASSGEN_PATTERN_CHAR) {
-        if(item->data.character.count > 1) {
+        if(item->data.chars.count > 1) {
             // save last codepoint
             int32_t codepoint =
-                item->data.character.codepoints[item->data.character.count - 1];
+                item->data.chars.codepoints[item->data.chars.count - 1];
 
             // trim codepoints
-            item->data.character.count -= 1;
+            item->data.chars.count -= 1;
 
             // create new item
             item = passgen_pattern_segment_new_item(segment);
             item->kind = PASSGEN_PATTERN_CHAR;
-            item->data.character.count = 1;
-            item->data.character.codepoints[0] = codepoint;
+            item->data.chars.count = 1;
+            item->data.chars.codepoints[0] = codepoint;
         }
 
         // characters are always marked as tainted.
-        item->data.character.tainted = true;
+        item->data.chars.tainted = true;
     }
 
     return item;
@@ -168,11 +168,11 @@ int passgen_parse_group(
             passgen_pattern_item_stack_top(&state->data.group.segment->items);
 
         if(last->kind == PASSGEN_PATTERN_CHAR) {
-            if(last->data.character.count < 7 &&
-               !last->data.character.tainted) {
-                last->data.character.codepoints[last->data.character.count] =
+            if(last->data.chars.count < 7 &&
+               !last->data.chars.tainted) {
+                last->data.chars.codepoints[last->data.chars.count] =
                     codepoint;
-                last->data.character.count += 1;
+                last->data.chars.count += 1;
 
                 return 0;
             }

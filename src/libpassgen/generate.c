@@ -350,7 +350,7 @@ int passgen_generate_item(
                 break;
             case PASSGEN_PATTERN_CHAR:
                 ret = passgen_generate_character(
-                    &item->data.character,
+                    &item->data.chars,
                     rand,
                     env,
                     data,
