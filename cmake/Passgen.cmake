@@ -3,6 +3,20 @@ function(passgen_check_symbols_setup)
   find_program(NM_PATH nm)
 endfunction()
 
+function(passgen_metrics_setup)
+    add_custom_target(metrics)
+endfunction()
+
+function(passgen_metrics target)
+    add_custom_command(
+        OUTPUT ${target}.symbols.txt
+        COMMAND ${NM_PATH} -D --defined-only $<TARGET_FILE:${target}> > ${target}.symbols.txt
+        DEPENDS ${target})
+    add_custom_target(${target}-metrics
+        DEPENDS ${target}.symbols.txt)
+    add_dependencies(metrics ${target}-metrics)
+endfunction()
+
 # TODO: limit exported symbols to passgen_*
 function(passgen_check_symbols target)
   add_custom_target(${target}-symbols-check

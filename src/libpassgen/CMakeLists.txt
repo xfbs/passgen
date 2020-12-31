@@ -41,11 +41,12 @@ passgen_target_defaults(passgen-static)
 passgen_check_symbols(passgen-static)
 
 add_library(passgen-shared SHARED ${SOURCE_LIST} ${HEADER_LIST})
-target_link_libraries(passgen-shared PUBLIC utf8proc m)
+target_link_libraries(passgen-shared PRIVATE utf8proc m)
 set_target_properties(passgen-shared PROPERTIES OUTPUT_NAME passgen)
 target_include_directories(passgen-shared PUBLIC ../../include ${CMAKE_CURRENT_BINARY_DIR})
 passgen_target_defaults(passgen-shared)
 passgen_check_symbols(passgen-shared)
+passgen_metrics(passgen-shared)
 
 install(
   TARGETS passgen-static passgen-shared
