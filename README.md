@@ -71,6 +71,7 @@ See the [BUILDING.md](BUILDING.md) for more information about building the proje
 
 * [pwgen](https://linux.die.net/man/1/pwgen).
 * [apg](https://linux.die.net/man/1/apg).
+- apg
 
 ## License
 
