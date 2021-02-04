@@ -2,6 +2,7 @@
 
 ## Current
 
+- [ ] introduce `passgen_context` with wordlists, markov chains, allocation functions, etc.
 - [ ] fix `abc|def[]()` parsing
 - [ ] autogenerate debug methods
 - [ ] write ast to string encoder (for easy testing)
