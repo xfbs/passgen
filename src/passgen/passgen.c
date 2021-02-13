@@ -20,6 +20,23 @@
 #include "passgen/version.h"
 
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *) data)
+#define strprefix(prefix, str) memcmp(prefix, str, strlen(prefix))
+
+passgen_random_t *parse_random(const char *random) {
+    if(!random) {
+        return passgen_random_new();
+    }
+
+    if(strprefix("file:", random) == 0) {
+        return passgen_random_new_path(&random[5]);
+    }
+
+    if(strprefix("xor:", random) == 0) {
+        return passgen_random_new_xorshift(atoi(&random[4]));
+    }
+
+    return NULL;
+}
 
 void passgen_run(passgen_opts opts) {
     struct passgen_parser parser;
@@ -52,16 +69,11 @@ void passgen_run(passgen_opts opts) {
         }
     }
 
-    // initialize source of random numbers
-    passgen_random_t random;
-    if(!passgen_random_open(&random)) bail(RANDOM_ALLOC, NULL);
-
     // allocate some space for pass.
     // size_t pass_len = pattern_maxlen(pattern);
     size_t pass_len = 256;
     char *pass = malloc(pass_len + 1);
     if(!pass) {
-        passgen_random_close(&random);
         bail(ALLOC, NULL);
     }
 
@@ -80,7 +92,7 @@ void passgen_run(passgen_opts opts) {
         // get a NULL-terminated, random pass.
         size_t written = passgen_generate_fill_utf8(
             &parser.pattern,
-            &random,
+            opts.random,
             &env,
             pass,
             pass_len);
@@ -103,20 +115,21 @@ void passgen_run(passgen_opts opts) {
     printf("\n");
     free(pass);
     passgen_parser_free(&parser);
-    passgen_random_close(&random);
 }
 
-passgen_opts passgen_optparse(int argc, char *argv[]) {
+int passgen_opts_parse(passgen_opts *popts, int argc, char *argv[]) {
     passgen_opts opts = {
         .format = NULL,
         .amount = 1,
         .depth = 100,
         .null = false,
         .complexity = false,
+        .random = NULL,
     };
 
-    const char *short_opts = "a:p:d:w:czhv";
+    const char *short_opts = "a:p:d:w:r:czhv";
     const char *preset = NULL;
+    const char *random = NULL;
 
     // clang-format off
     static struct option long_opts[] = {
@@ -128,6 +141,7 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
         {"null", no_argument, NULL, 'z'},
         {"complexity", no_argument, NULL, 'c'},
         {"wordlist", required_argument, NULL, 'w'},
+        {"random", required_argument, NULL, 'r'},
         {NULL, no_argument, NULL, 0}
     };
     // clang-format on
@@ -168,6 +182,9 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
             case 'w':
                 printf("wordlist: %s\n", optarg);
                 break;
+            case 'r':
+                random = optarg;
+                break;
             case '?':
             default:
                 fprintf(stderr, "Error unrecognised: %s\n", argv[optind]);
@@ -205,7 +222,11 @@ passgen_opts passgen_optparse(int argc, char *argv[]) {
         bail(HELP, argv[0]);
     }
 
-    return opts;
+    opts.random = parse_random(random);
+    assert(opts.random);
+
+    *popts = opts;
+    return 0;
 }
 
 void passgen_usage(const char *executable) {
@@ -277,4 +298,8 @@ void passgen_bail(passgen_error error, void *data) {
             printf("Error: unknown error.\n");
             exit(-100);
     }
+}
+
+void passgen_opts_free(passgen_opts *opts) {
+    passgen_random_free(opts->random);
 }

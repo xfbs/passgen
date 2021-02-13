@@ -8,6 +8,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stdlib.h>
+#include <passgen/random.h>
 
 /// The kinds of errors that cause the binary to exit early and with a nonzero
 /// return code.
@@ -41,6 +42,8 @@ typedef struct {
      size_t amount;
      /// The format to use when generating passwords.
      const char *format;
+     /// The source of randomness to use.
+     passgen_random_t *random;
      bool null;
      size_t depth;
      bool complexity;
@@ -59,7 +62,10 @@ void passgen_bail(passgen_error error, void *data);
 
 /// Parse the options passed on the command line, @p argc and @p argv, and
 /// return the parsed result.
-passgen_opts passgen_optparse(int argc, char *argv[]);
+int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]);
 
 /// Run passgen with @p opts.
 void passgen_run(passgen_opts opts);
+
+/// Free data from passgen ops.
+void passgen_opts_free(passgen_opts *opts);
