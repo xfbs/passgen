@@ -21,7 +21,9 @@ void passgen_pattern_item_init(struct passgen_pattern_item *item) {
     item->maybe = 0;
 }
 
-void passgen_pattern_item_debug(passgen_pattern_item_t *item, passgen_debug_t *debug) {
+void passgen_pattern_item_debug(
+    passgen_pattern_item_t *item,
+    passgen_debug_t *debug) {
     debug->struct_start(debug->data, "passgen_pattern_item");
 
     debug->member_start(debug->data, "kind");
@@ -68,7 +70,10 @@ void passgen_pattern_item_debug(passgen_pattern_item_t *item, passgen_debug_t *d
     debug->struct_end(debug->data, "passgen_pattern_item");
 }
 
-int passgen_item_export(passgen_pattern_item_t *item, void *data, passgen_export_cb *fn) {
+int passgen_item_export(
+    passgen_pattern_item_t *item,
+    void *data,
+    passgen_export_cb *fn) {
     switch(item->kind) {
         case PASSGEN_PATTERN_SET:
             return passgen_charset_export(&item->data.set, data, fn);

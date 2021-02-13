@@ -70,10 +70,11 @@ int main(int argc, char *argv[]) {
     srand(time(NULL));
     int verbosity = isatty(fileno(stdout));
 
-    static struct option long_options[] = {{"verbose", no_argument, 0, 'v'},
-                                           {"shuffle", no_argument, 0, 's'},
-                                           {"help", no_argument, 0, 'h'},
-                                           {0, 0, 0, 0}};
+    static struct option long_options[] = {
+        {"verbose", no_argument, 0, 'v'},
+        {"shuffle", no_argument, 0, 's'},
+        {"help", no_argument, 0, 'h'},
+        {0, 0, 0, 0}};
 
     while(1) {
         int option_index = 0;
@@ -133,10 +134,11 @@ int main(int argc, char *argv[]) {
     size_t success = 0;
     for(size_t i = 0; tests[i].name; ++i) {
         if(enabled_tests[i]) {
-            test_run r = {.entry = tests[i],
-                          .verbosity = verbosity,
-                          .number = success + failures,
-                          .amount = enabled_count};
+            test_run r = {
+                .entry = tests[i],
+                .verbosity = verbosity,
+                .number = success + failures,
+                .amount = enabled_count};
 
             if(run(r)) {
                 success += 1;

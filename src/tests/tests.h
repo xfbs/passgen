@@ -41,12 +41,13 @@ bool run(test_run test);
 #define test(id) \
     { .name = #id, .func = test_##id }
 
-#define assert(some)                             \
-    if(!(some))                                  \
-        return (test_result){.ok = false,        \
-                             .assertion = #some, \
-                             .line = __LINE__,   \
-                             .func = __func__};
+#define assert(some)            \
+    if(!(some))                 \
+        return (test_result){   \
+            .ok = false,        \
+            .assertion = #some, \
+            .line = __LINE__,   \
+            .func = __func__};
 
 extern test_entry tests[];
 extern size_t tests_len;

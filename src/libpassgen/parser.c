@@ -168,10 +168,8 @@ int passgen_parse_group(
             passgen_pattern_item_stack_top(&state->data.group.segment->items);
 
         if(last->kind == PASSGEN_PATTERN_CHAR) {
-            if(last->data.chars.count < 7 &&
-               !last->data.chars.tainted) {
-                last->data.chars.codepoints[last->data.chars.count] =
-                    codepoint;
+            if(last->data.chars.count < 7 && !last->data.chars.tainted) {
+                last->data.chars.codepoints[last->data.chars.count] = codepoint;
                 last->data.chars.count += 1;
 
                 return 0;

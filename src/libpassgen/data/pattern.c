@@ -27,6 +27,9 @@ void passgen_pattern_debug(passgen_pattern_t *pattern, passgen_debug_t *debug) {
     debug->struct_end(debug->data, "passgen_pattern");
 }
 
-int passgen_pattern_export(passgen_pattern_t *pattern, void *data, passgen_export_cb *export) {
+int passgen_pattern_export(
+    passgen_pattern_t *pattern,
+    void *data,
+    passgen_export_cb *export) {
     return passgen_group_export(&pattern->group, data, export);
 }

@@ -1,6 +1,8 @@
 #include "passgen/data/repeat.h"
 
-void passgen_pattern_repeat_debug(passgen_repeat_t *repeat, passgen_debug_t *debug) {
+void passgen_pattern_repeat_debug(
+    passgen_repeat_t *repeat,
+    passgen_debug_t *debug) {
     debug->struct_start(debug->data, "passgen_repeat");
 
     debug->member_start(debug->data, "min");

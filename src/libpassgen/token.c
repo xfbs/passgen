@@ -17,16 +17,17 @@ static inline void token_parse_init(
 
 // Simple ASCII escape map. Don't use this for large (unicode) codepoints.
 // Provides efficient O(1) lookup.
-static const char simple_escaped[] = {0,
-                                      ['a'] = '\a',
-                                      ['b'] = '\b',
-                                      ['e'] = '\033',
-                                      ['f'] = '\f',
-                                      ['n'] = '\n',
-                                      ['r'] = '\r',
-                                      ['t'] = '\t',
-                                      ['v'] = '\v',
-                                      ['\\'] = '\\'};
+static const char simple_escaped[] = {
+    0,
+    ['a'] = '\a',
+    ['b'] = '\b',
+    ['e'] = '\033',
+    ['f'] = '\f',
+    ['n'] = '\n',
+    ['r'] = '\r',
+    ['t'] = '\t',
+    ['v'] = '\v',
+    ['\\'] = '\\'};
 
 static inline void token_parse_escaped(
     struct passgen_token_parser *parser,

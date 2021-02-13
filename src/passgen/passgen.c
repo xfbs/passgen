@@ -10,6 +10,7 @@
 
 #include "passgen/data/parser.h"
 #include "passgen/data/token.h"
+#include "passgen/debug.h"
 #include "passgen/generate.h"
 #include "passgen/parser.h"
 #include "passgen/pronounceable.h"
@@ -17,7 +18,6 @@
 #include "passgen/token.h"
 #include "passgen/utf8.h"
 #include "passgen/version.h"
-#include "passgen/debug.h"
 
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *) data)
 

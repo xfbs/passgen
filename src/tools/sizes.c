@@ -33,9 +33,10 @@ struct size_info {
     size_t size;
 };
 
-static const struct size_info type_sizes[] = {add_type(size_t),
-                                              add_type(void *),
-                                              size_info_end()};
+static const struct size_info type_sizes[] = {
+    add_type(size_t),
+    add_type(void *),
+    size_info_end()};
 
 static const struct size_info struct_sizes[] = {
     add_struct(passgen_parser),

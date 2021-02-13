@@ -24,7 +24,9 @@ passgen_pattern_set_get_range(struct passgen_pattern_set *set, size_t n) {
     return passgen_pattern_range_stack_get(&set->items, n);
 }
 
-void passgen_pattern_set_debug(passgen_pattern_set_t *set, passgen_debug_t *debug) {
+void passgen_pattern_set_debug(
+    passgen_pattern_set_t *set,
+    passgen_debug_t *debug) {
     debug->struct_start(debug->data, "passgen_pattern_set");
 
     debug->member_start(debug->data, "items");
@@ -34,7 +36,8 @@ void passgen_pattern_set_debug(passgen_pattern_set_t *set, passgen_debug_t *debu
             debug->array_sep(debug->data);
         }
 
-        struct passgen_pattern_range *range = passgen_pattern_set_get_range(set, i);
+        struct passgen_pattern_range *range =
+            passgen_pattern_set_get_range(set, i);
         passgen_pattern_range_debug(range, debug);
     }
     debug->array_end(debug->data);
@@ -47,11 +50,15 @@ void passgen_pattern_set_debug(passgen_pattern_set_t *set, passgen_debug_t *debu
     debug->struct_end(debug->data, "passgen_pattern_set");
 }
 
-int passgen_charset_export(passgen_pattern_set_t *set, void *data, passgen_export_cb *fn) {
+int passgen_charset_export(
+    passgen_pattern_set_t *set,
+    void *data,
+    passgen_export_cb *fn) {
     fn(data, '[');
 
     for(size_t i = 0; i < set->items.len; i++) {
-        struct passgen_pattern_range *range = passgen_pattern_set_get_range(set, i);
+        struct passgen_pattern_range *range =
+            passgen_pattern_set_get_range(set, i);
         passgen_pattern_range_export(range, data, fn);
     }
 

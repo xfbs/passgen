@@ -1,7 +1,7 @@
-#include <passgen/memory.h>
 #include <passgen/config.h>
-#include <passgen/memory_private.h>
 #include <passgen/data/memory.h>
+#include <passgen/memory.h>
+#include <passgen/memory_private.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -370,11 +370,12 @@ passgen_mem_accounting_t passgen_mem_accounting_new(passgen_mem_t *mem) {
 }
 
 passgen_mem_t passgen_mem_accounting(passgen_mem_accounting_t *acc) {
-    return (passgen_mem_t){.malloc = passgen_malloc_accounting,
-                           .realloc = passgen_realloc_accounting,
-                           .calloc = passgen_calloc_accounting,
-                           .free = passgen_free_accounting,
-                           .state = acc};
+    return (passgen_mem_t){
+        .malloc = passgen_malloc_accounting,
+        .realloc = passgen_realloc_accounting,
+        .calloc = passgen_calloc_accounting,
+        .free = passgen_free_accounting,
+        .state = acc};
 }
 
 void passgen_mem_accounting_cleanup(passgen_mem_accounting_t *acc) {

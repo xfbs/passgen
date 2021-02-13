@@ -75,25 +75,26 @@ test_result test_passgen_random_u16_max(void) {
     passgen_random_t *rand = passgen_random_new_xorshift(SEED);
     assert(rand);
 
-    size_t max[] = {1,
-                    2,
-                    3,
-                    4,
-                    5,
-                    100,
-                    200,
-                    500,
-                    1000,
-                    1500,
-                    2000,
-                    5000,
-                    10000,
-                    15000,
-                    20000,
-                    30000,
-                    45000,
-                    60000,
-                    0};
+    size_t max[] = {
+        1,
+        2,
+        3,
+        4,
+        5,
+        100,
+        200,
+        500,
+        1000,
+        1500,
+        2000,
+        5000,
+        10000,
+        15000,
+        20000,
+        30000,
+        45000,
+        60000,
+        0};
 
     for(size_t n = 1; max[n]; ++n) {
         bool gotten[UINT16_MAX] = {false};
