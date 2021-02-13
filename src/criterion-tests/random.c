@@ -1,5 +1,5 @@
 #include <criterion/criterion.h>
-#include <criterion/new/assert.h>
+//#include <criterion/new/assert.h>
 #include "passgen/random.h"
 
 #include <stdbool.h>
