@@ -23,6 +23,8 @@ option(USE_LIBEXECINFO
 
 option(PASSGEN_CLDR "Include code for parsing the CLDR" OFF)
 
+option(PASSGEN_MEMORY "Build with option to override memory management" ON)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     option(PASSGEN_DEBUG "Include debugging features for passgen" ON)
 else()

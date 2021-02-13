@@ -1,3 +1,4 @@
 #pragma once
 
 #cmakedefine PASSGEN_DEBUG
+#cmakedefine PASSGEN_MEMORY
