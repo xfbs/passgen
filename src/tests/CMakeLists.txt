@@ -6,7 +6,6 @@ passgen_target_defaults(passgen-test-lib)
 # list of test sources.
 set(TEST_LIST
     "array.c"
-    "memory.c"
     "parser.c"
     "random.c"
     "token.c"

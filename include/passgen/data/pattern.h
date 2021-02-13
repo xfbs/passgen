@@ -1,12 +1,10 @@
 #pragma once
 
 #include "passgen/data/group.h"
-#include "passgen/memory.h"
 #include "passgen/debug.h"
 #include "passgen/export.h"
 
 typedef struct passgen_pattern {
-    passgen_mem_t *mem;
     struct passgen_pattern_group group;
 } passgen_pattern_t;
 

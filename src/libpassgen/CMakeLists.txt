@@ -24,7 +24,6 @@ set(SOURCE_LIST
     "debug.c"
     "generate.c"
     "markov.c"
-    "memory.c"
     "parser.c"
     "random.c"
     "token.c"

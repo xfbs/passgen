@@ -1,7 +1,7 @@
 #pragma once
 #include "passgen/assert.h"
 #include "passgen/container/stack.h"
-#include "passgen/memory.h"
+#include <stdlib.h>
 
 #define BINS_INITIAL        4
 #define BINS_MULTIPLIER     2
@@ -22,7 +22,7 @@
         passgen_mem_t *mem) {                                                \
         if(!stack->bins) {                                                   \
             stack->data =                                                    \
-                passgen_malloc(mem, BINS_INITIAL * sizeof(data_type *));     \
+                malloc(BINS_INITIAL * sizeof(data_type *));     \
             if(!stack->data) {                                               \
                 return NULL;                                                 \
             } else {                                                         \
@@ -32,8 +32,7 @@
                                                                              \
         if(stack->len == (stack->bins * ITEMS_PER_BIN(sizeof(data_type)))) { \
             size_t new_bins = stack->bins * BINS_MULTIPLIER;                 \
-            data_type **new_data = passgen_realloc(                          \
-                mem,                                                         \
+            data_type **new_data = realloc(                          \
                 stack->data,                                                 \
                 new_bins * sizeof(data_type *));                             \
             if(!new_data) {                                                  \
@@ -48,8 +47,7 @@
         size_t offset = stack->len % ITEMS_PER_BIN(sizeof(data_type));       \
                                                                              \
         if(offset == 0) {                                                    \
-            stack->data[bin] = passgen_malloc(                               \
-                mem,                                                         \
+            stack->data[bin] = malloc(                               \
                 ITEMS_PER_BIN(sizeof(data_type)) * sizeof(data_type));       \
             if(!stack->data[bin]) {                                          \
                 return NULL;                                                 \
@@ -72,11 +70,11 @@
                       ITEMS_PER_BIN(sizeof(data_type));                      \
                                                                              \
         for(size_t i = 0; i < bins; i++) {                                   \
-            passgen_free(mem, stack->data[i]);                               \
+            free(stack->data[i]);                               \
         }                                                                    \
                                                                              \
         if(bins) {                                                           \
-            passgen_free(mem, stack->data);                                  \
+            free(stack->data);                                  \
         }                                                                    \
     }                                                                        \
                                                                              \
@@ -86,11 +84,11 @@
         size_t offset = stack->len % ITEMS_PER_BIN(sizeof(data_type));       \
                                                                              \
         if(offset == 1) {                                                    \
-            passgen_free(mem, stack->data[bin]);                             \
+            free(stack->data[bin]);                             \
             stack->data[bin] = NULL;                                         \
                                                                              \
             if(bin == 0) {                                                   \
-                passgen_free(mem, stack->data);                              \
+                free(stack->data);                              \
                 stack->data = NULL;                                          \
                 stack->bins = 0;                                             \
             }                                                                \
