@@ -4,7 +4,6 @@ set(SOURCE_LIST
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
     "assert.c"
     "context.c"
-    "container/hashmap.c"
     "container/stack/parser_state.c"
     "container/stack/range.c"
     "container/stack/segment.c"
@@ -47,6 +46,14 @@ target_include_directories(passgen-shared PUBLIC ../../include ${CMAKE_CURRENT_B
 passgen_target_defaults(passgen-shared)
 passgen_check_symbols(passgen-shared)
 passgen_metrics(passgen-shared)
+
+# limit API to only those functions that are exported.
+#set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+#set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+include(GenerateExportHeader)
+generate_export_header(passgen-shared
+    BASE_NAME passgen)
+target_compile_definitions(passgen-static PUBLIC -DPASSGEN_STATIC_DEFINE)
 
 install(
   TARGETS passgen-static passgen-shared

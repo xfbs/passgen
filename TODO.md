@@ -2,6 +2,7 @@
 
 ## Current
 
+- [ ] limit exported symbols: https://cristianadam.eu/20190501/bundling-together-static-libraries-with-cmake/
 - [ ] introduce `passgen_context` with wordlists, markov chains, allocation functions, etc.
 - [ ] fix `abc|def[]()` parsing
 - [ ] autogenerate debug methods
