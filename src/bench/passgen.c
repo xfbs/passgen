@@ -23,11 +23,11 @@ int main(int argc, char *argv[]) {
     passgen_wordlist_load(&patterns, patterns_file);
     fclose(patterns_file);
 
-    double unicode_time;
-    double tokenize_time;
-    double parse_time;
-    double generate_time;
-    double free_time;
+    // double unicode_time;
+    // double tokenize_time;
+    // double parse_time;
+    // double generate_time;
+    // double free_time;
 
     for(size_t i = 0; i < patterns.count; i++) {
         const char *pattern = patterns.words[i];

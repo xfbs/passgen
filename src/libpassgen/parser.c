@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "passgen/container/stack/range.h"
 #include "passgen/container/stack/segment_item.h"
@@ -328,6 +329,11 @@ int passgen_parser_utf8(
     struct passgen_parser *parser,
     uint8_t *data,
     size_t length) {
+    // FIXME: todo!
+    (void) parser;
+    (void) data;
+    (void) length;
+    return 1;
 }
 
 int passgen_parser_unicode(
@@ -350,4 +356,6 @@ int passgen_parser_unicode(
             }
         }
     }
+
+    return 0;
 }
