@@ -1,5 +1,6 @@
 #pragma once
-#include "passgen/data/parser.h"
+#include <stdint.h>
+#include <stddef.h>
 
 struct passgen_parser;
 struct passgen_parser_state;
