@@ -50,6 +50,7 @@ passgen_metrics(passgen-shared)
 # limit API to only those functions that are exported.
 #set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 #set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+#set_target_properties(passgen-shared PROPERTIES C_VISIBILITY_PRESET hidden)
 include(GenerateExportHeader)
 generate_export_header(passgen-shared
     BASE_NAME passgen)
