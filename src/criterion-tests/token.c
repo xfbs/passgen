@@ -65,6 +65,8 @@ static void token_error(size_t len, int32_t cps[], int ret) {
     cr_assert_eq(parser.state, ret);
 }
 
+TestSuite(token, .description = "Tests for the passgen token parser");
+
 Test(token, normal) {
     token_normal('a');
     token_normal('b');
