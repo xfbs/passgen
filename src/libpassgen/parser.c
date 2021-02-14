@@ -337,3 +337,31 @@ int passgen_parse_finish(struct passgen_parser *parser) {
 
     return 0;
 }
+
+int passgen_parser_utf8(
+    struct passgen_parser *parser,
+    uint8_t *data,
+    size_t length) {
+}
+
+int passgen_parser_unicode(
+    struct passgen_parser *parser,
+    uint32_t *data,
+    size_t length) {
+
+    struct passgen_token_parser token_parser = {0};
+    struct passgen_token token = {0};
+    int ret;
+
+    for(size_t pos = 0; pos < length; pos++) {
+        ret = passgen_token_parse(&token_parser, &token, data[pos]);
+
+        if(ret == PASSGEN_TOKEN_INIT) {
+            ret = passgen_parse_token(parser, &token);
+
+            if(ret != 0) {
+                return ret;
+            }
+        }
+    }
+}

@@ -9,6 +9,16 @@ int passgen_parse_start(struct passgen_parser *parser);
 
 int passgen_parse_finish(struct passgen_parser *parser);
 
+int passgen_parser_utf8(
+    struct passgen_parser *parser,
+    uint8_t *data,
+    size_t length);
+
+int passgen_parser_unicode(
+    struct passgen_parser *parser,
+    uint32_t *data,
+    size_t length);
+
 // parses a single token.
 int passgen_parse_token(
     struct passgen_parser *parser,
