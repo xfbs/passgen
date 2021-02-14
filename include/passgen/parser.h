@@ -1,3 +1,22 @@
+/// @file parser.h
+/// @brief Parsing API
+/// @author Patrick M. Elsen
+///
+/// Parsing API. Needs a `passgen_parser` struct instance, which is defined in @ref data/parser.h.
+///
+/// # Example
+///
+/// ```c
+/// #include <passgen/data/parser.h>
+/// #include <passgen/parser.h>
+///
+/// struct passgen_parser parser = {0};
+/// passgen_parser_init(&parser);
+/// passgen_parser_utf8(&parser, "[a-z]{9}", 0);
+/// assert(0 == passgen_parser_finish(&parser));
+/// // ...
+/// passgen_parser_free(&parser);
+/// ```
 #pragma once
 #include <stdint.h>
 #include <stddef.h>
