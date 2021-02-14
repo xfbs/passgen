@@ -1,11 +1,18 @@
+/// @file generate.h
+/// @author Patrick M. Elsen
+/// @brief Functions for generating passwords using a parsed pattern.
+///
+/// This file contains functions used to generate passwords using a parsed
+/// `passgen_pattern`. These functions all need some sort of source of
+/// randomness, which is a @ref passgen_random_t object. These can use
+/// of the system-specific randomness source, or read from a file, or use a
+/// custom randomness generator. 
 #pragma once
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#include "passgen/data/pattern.h"
 #include "passgen/data/env.h"
-#include "passgen/random.h"
 
 struct passgen_pattern;
 struct passgen_chars;

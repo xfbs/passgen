@@ -178,6 +178,7 @@ int passgen_opts_parse(passgen_opts *popts, int argc, char *argv[]) {
                 break;
             case 'v':
                 bail(VERSION, NULL);
+                break;
             case 'w':
                 printf("wordlist: %s\n", optarg);
                 break;

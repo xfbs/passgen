@@ -240,6 +240,8 @@ int passgen_generate_special_pronounceable(
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
+    (void) rand;
+    (void) env;
     /* limit length to 64, that should be plenty. */
     size_t max = special->length.max;
     if(64 < max) max = 64;
