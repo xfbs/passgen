@@ -32,7 +32,6 @@
 #define GENERATE(output, pattern)                                       \
     do {                                                                \
         passgen_parser_init(&parser);                                   \
-        assert(0 == passgen_parse_start(&parser));                      \
         passgen_token_parser_init(&token_parser);                       \
                                                                         \
         int token_parser_state = PASSGEN_TOKEN_INIT;                    \

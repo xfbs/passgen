@@ -18,20 +18,6 @@
 #include "passgen/data/set.h"
 #include "passgen/data/token.h"
 
-int passgen_parse_start(struct passgen_parser *parser) {
-    if(parser->state.len != 0) {
-        return -1;
-    }
-
-    // set initial group
-    passgen_parser_state_push_group(
-        parser,
-        &parser->pattern.group,
-        passgen_pattern_group_new_segment(&parser->pattern.group));
-
-    return 0;
-}
-
 // get the last item, making sure that it's only a single character.
 // in case of characters, mark it as tainted.
 static inline struct passgen_pattern_item *

@@ -70,6 +70,10 @@ struct passgen_parser_state *passgen_parser_state_push_special(
 void passgen_parser_init(struct passgen_parser *parser) {
     passgen_parser_state_stack_init(&parser->state, NULL);
     passgen_pattern_init(&parser->pattern);
+    passgen_parser_state_push_group(
+        parser,
+        &parser->pattern.group,
+        passgen_pattern_group_new_segment(&parser->pattern.group));
 }
 
 void passgen_parser_free(struct passgen_parser *parser) {

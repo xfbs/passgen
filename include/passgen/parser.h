@@ -6,8 +6,6 @@ struct passgen_parser;
 struct passgen_parser_state;
 struct passgen_token;
 
-int passgen_parse_start(struct passgen_parser *parser);
-
 int passgen_parse_finish(struct passgen_parser *parser);
 
 int passgen_parser_utf8(

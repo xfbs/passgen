@@ -43,7 +43,6 @@ void passgen_run(passgen_opts opts) {
     struct passgen_token_parser token_parser = {0};
     struct passgen_token token = {0};
     passgen_parser_init(&parser);
-    passgen_parse_start(&parser);
 
     uint32_t format_decoded[256];
     size_t format_decoded_len = 0;

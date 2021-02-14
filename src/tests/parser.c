@@ -23,8 +23,7 @@
     struct passgen_token token = {0};               \
     struct passgen_pattern_segment *segment;        \
     struct passgen_pattern_item *item;              \
-    passgen_parser_init(&parser);                   \
-    assert(0 == passgen_parse_start(&parser))
+    passgen_parser_init(&parser);
 
 #define POSTAMBLE()                             \
     assert(0 == passgen_parse_finish(&parser)); \
@@ -46,7 +45,6 @@ test_result test_parser_empty(void) {
     struct passgen_parser parser;
     struct passgen_pattern_segment *segment;
     passgen_parser_init(&parser);
-    assert(0 == passgen_parse_start(&parser));
 
     // single empty segment
     assert(1 == parser.pattern.group.segments.len);
