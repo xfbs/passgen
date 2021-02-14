@@ -6,19 +6,24 @@ struct passgen_parser;
 struct passgen_parser_state;
 struct passgen_token;
 
+/// Finalize parsing.
+///
+/// @return 0 on success, nonzero on failure.
 int passgen_parse_finish(struct passgen_parser *parser);
 
+/// Parse a UTF-8 string.
 int passgen_parser_utf8(
     struct passgen_parser *parser,
     uint8_t *data,
     size_t length);
 
+/// Parse a sequence of unicode codepoints.
 int passgen_parser_unicode(
     struct passgen_parser *parser,
     uint32_t *data,
     size_t length);
 
-// parses a single token.
+/// Parse a single token.
 int passgen_parse_token(
     struct passgen_parser *parser,
     struct passgen_token *token);
