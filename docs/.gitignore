@@ -4,3 +4,7 @@
 *.pdf
 *.synctex.gz
 *.toc
+*.bbl
+*.bcf
+*.blg
+*.run.xml
