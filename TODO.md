@@ -4,6 +4,7 @@
 
 - [ ] limit exported symbols: https://cristianadam.eu/20190501/bundling-together-static-libraries-with-cmake/
 - [ ] introduce `passgen_context` with wordlists, markov chains, allocation functions, etc.
+- [ ] gather `nm -D --defined-only libpassgen.so` output for autorelease scripts
 - [ ] fix `abc|def[]()` parsing
 - [ ] autogenerate debug methods
 - [ ] write ast to string encoder (for easy testing)

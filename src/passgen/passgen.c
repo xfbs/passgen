@@ -38,6 +38,11 @@ passgen_random_t *parse_random(const char *random) {
     return NULL;
 }
 
+int print_char(void *data, uint32_t codepoint) {
+    fprintf(stderr, "%c", codepoint);
+    return 0;
+}
+
 void passgen_run(passgen_opts opts) {
     struct passgen_parser parser;
     struct passgen_token_parser token_parser = {0};
