@@ -39,7 +39,7 @@ void passgen_assert_fail(
     }
 
     free(strs);
-#    endif
+#   endif
 
     exit(EXIT_FAILURE);
 }
