@@ -11,7 +11,8 @@ set(TEST_LIST
     "token.c"
     "generate.c"
     "utf8.c"
-    "wordlist.c")
+    "wordlist.c"
+    "hashmap.c")
 
 # the testing framework wants a list of all test functions to execute, this step
 # generates this list automagically from the test sources with the help of a

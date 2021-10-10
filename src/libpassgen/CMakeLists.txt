@@ -27,7 +27,9 @@ set(SOURCE_LIST
     "random.c"
     "token.c"
     "utf8.c"
-    "wordlist.c")
+    "wordlist.c"
+    "siphash.c"
+    "hashmap.c")
 
 configure_file(version.c.in version.c)
 configure_file(../../include/passgen/config.h.in passgen/config.h)
