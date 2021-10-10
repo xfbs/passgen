@@ -24,6 +24,7 @@ void passgen_hashmap_realloc(passgen_hashmap *map, size_t capacity) {
 
     map->data = calloc(capacity, sizeof(passgen_hashmap_entry));
     map->capacity = capacity;
+    map->len = 0;
 
     // copy data over
     for(size_t i = 0; i < old.capacity; i++) {
