@@ -7,7 +7,7 @@
 
 #define SEED 234720984723
 
-test_result test_passgen_random_u8(void) {
+test_result test_random_u8(void) {
     passgen_random_t *rand = passgen_random_new_xorshift(SEED);
     assert(rand);
 
@@ -27,7 +27,7 @@ test_result test_passgen_random_u8(void) {
     return test_ok;
 }
 
-test_result test_passgen_random_u8_max(void) {
+test_result test_random_u8_max(void) {
     passgen_random_t *rand = passgen_random_new_xorshift(SEED);
     assert(rand);
 
@@ -51,7 +51,7 @@ test_result test_passgen_random_u8_max(void) {
     return test_ok;
 }
 
-test_result test_passgen_random_u16(void) {
+test_result test_random_u16(void) {
     passgen_random_t *rand = passgen_random_new_xorshift(SEED);
     assert(rand);
 
@@ -71,7 +71,7 @@ test_result test_passgen_random_u16(void) {
     return test_ok;
 }
 
-test_result test_passgen_random_u16_max(void) {
+test_result test_random_u16_max(void) {
     passgen_random_t *rand = passgen_random_new_xorshift(SEED);
     assert(rand);
 
@@ -114,7 +114,7 @@ test_result test_passgen_random_u16_max(void) {
     return test_ok;
 }
 
-test_result test_passgen_random_u32_max(void) {
+test_result test_random_u32_max(void) {
     passgen_random_t *rand = passgen_random_new_xorshift(SEED);
     assert(rand);
 
@@ -129,7 +129,7 @@ test_result test_passgen_random_u32_max(void) {
     return test_ok;
 }
 
-test_result test_passgen_random_u64_max(void) {
+test_result test_random_u64_max(void) {
     passgen_random_t *rand = passgen_random_new_xorshift(SEED);
     assert(rand);
 
@@ -144,7 +144,7 @@ test_result test_passgen_random_u64_max(void) {
     return test_ok;
 }
 
-test_result test_passgen_random_new(void) {
+test_result test_random_new(void) {
     passgen_random_t *random = passgen_random_new();
     assert(random);
     assert(random->read);
@@ -154,7 +154,7 @@ test_result test_passgen_random_new(void) {
     return test_ok;
 }
 
-test_result test_passgen_random_new_path(void) {
+test_result test_random_new_path(void) {
     passgen_random_t *random;
     random = passgen_random_new_path("/dev/nonexistent");
     assert(!random);
@@ -172,7 +172,7 @@ test_result test_passgen_random_new_path(void) {
     return test_ok;
 }
 
-test_result test_passgen_random_open(void) {
+test_result test_random_open(void) {
     passgen_random_t random;
     assert(passgen_random_open(&random));
     assert(random.read);
@@ -183,7 +183,7 @@ test_result test_passgen_random_open(void) {
     return test_ok;
 }
 
-test_result test_passgen_random_open_path(void) {
+test_result test_random_open_path(void) {
     passgen_random_t random;
     assert(!passgen_random_open_path(&random, "/dev/nonexistent"));
 
@@ -199,7 +199,7 @@ test_result test_passgen_random_open_path(void) {
     return test_ok;
 }
 
-test_result test_passgen_random_read(void) {
+test_result test_random_read(void) {
     passgen_random_t random;
     assert(passgen_random_open_xorshift(&random, SEED));
 
@@ -261,7 +261,7 @@ test_result test_passgen_random_read(void) {
     return test_ok;
 }
 
-test_result test_passgen_random_xorshift(void) {
+test_result test_random_xorshift(void) {
     passgen_random_t random;
 
     // using a state of zero generates only zeroes.
