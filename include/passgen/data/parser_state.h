@@ -34,3 +34,5 @@ struct passgen_parser_state {
         } special;
     } data;
 };
+
+void passgen_parser_state_free(struct passgen_parser_state *state);

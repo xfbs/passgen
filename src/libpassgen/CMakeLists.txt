@@ -14,6 +14,7 @@ set(SOURCE_LIST
     "data/range.c"
     "data/repeat.c"
     "data/parser.c"
+    "data/parser_state.c"
     "data/pattern.c"
     "data/segment.c"
     "data/segment_item.c"
