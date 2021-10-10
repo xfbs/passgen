@@ -7,12 +7,8 @@
 struct passgen_pattern_special {
     enum passgen_pattern_special_kind kind;
     struct passgen_pattern_repeat length;
+    size_t parameters_len;
     int32_t *parameters;
-    /*
-    union {
-        enum passgen_pronounceable_type pronounceable;
-    } data;
-    */
 };
 
 /// Initialise a pattern special with the given char.

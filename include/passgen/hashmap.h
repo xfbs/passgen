@@ -29,6 +29,7 @@ typedef struct passgen_hashmap_context {
 } passgen_hashmap_context;
 
 const passgen_hashmap_context passgen_hashmap_context_default;
+const passgen_hashmap_context passgen_hashmap_context_unicode;
 
 // Initialize new hashmap. If context is NULL, it uses the default context
 // which assumes that the keys are strings.

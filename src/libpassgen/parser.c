@@ -294,6 +294,8 @@ int passgen_parse_special_name(
 
     if(token->codepoint == ']') {
         state->type = PASSGEN_PARSER_SPECIAL_NAME_END;
+    } else {
+        passgen_pattern_special_add_parameter_cp(state->data.special.special, token->codepoint);
     }
 
     return 0;

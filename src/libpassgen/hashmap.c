@@ -104,3 +104,32 @@ const passgen_hashmap_context passgen_hashmap_context_default = {
     .hash = string_hash,
     .key_equal = string_equal,
 };
+
+size_t unicode_len(const void *data) {
+    const int32_t *unicode = data;
+    size_t len = 0;
+    while(unicode[len]) {
+        len++;
+    }
+    return len;
+}
+
+uint64_t unicode_hash(const passgen_hashmap *map, const void *key) {
+    uint64_t output;
+    passgen_siphash(key, unicode_len(key), "key", &output, sizeof(output));
+    return output;
+}
+
+bool unicode_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
+    size_t rhs_len = unicode_len(rhs);
+    size_t lhs_len = unicode_len(lhs);
+    if(rhs_len != lhs_len) {
+        return false;
+    }
+    return memcmp(lhs, rhs, rhs_len) == 0;
+}
+
+const passgen_hashmap_context passgen_hashmap_context_unicode = {
+    .hash = unicode_hash,
+    .key_equal = unicode_equal,
+};

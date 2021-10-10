@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <passgen/random.h>
+#include <passgen/hashmap.h>
 
 /// The kinds of errors that cause the binary to exit early and with a nonzero
 /// return code.
@@ -47,6 +48,7 @@ typedef struct {
      bool null;
      size_t depth;
      bool complexity;
+     passgen_hashmap wordlists;
 } passgen_opts;
 
 /// Print usage (help text) using @p executable as the name of the program.

@@ -18,6 +18,7 @@
 #include "passgen/token.h"
 #include "passgen/utf8.h"
 #include "passgen/version.h"
+#include "passgen/wordlist.h"
 
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *) data)
 #define strprefix(prefix, str) memcmp(prefix, str, strlen(prefix))
@@ -91,6 +92,7 @@ void passgen_run(passgen_opts opts) {
             .find_complexity = opts.complexity,
             .pronounceable_limit = 1000,
             .pronounceable_type = PASSGEN_PRONOUNCEABLE_ENGLISH,
+            .wordlists = opts.wordlists,
         };
 
         // get a NULL-terminated, random pass.
@@ -121,6 +123,39 @@ void passgen_run(passgen_opts opts) {
     passgen_parser_free(&parser);
 }
 
+static void wordlist_add(passgen_opts *opt, const char *input) {
+    const char *colon = strstr(input, ":");
+    if(!colon) {
+        return;
+    }
+    size_t name_len = colon - input;
+    if(name_len == 0) {
+        return;
+    }
+
+    // copy name
+    int32_t *name = calloc(256, sizeof(int32_t));
+    size_t name_len_out = 0;
+    size_t input_pos = 0;
+    int ret = passgen_utf8_decode(
+        name,
+        256,
+        &name_len_out,
+        (unsigned char *) input,
+        name_len,
+        &input_pos);
+    assert(ret == 0);
+
+    FILE *file = fopen(colon + 1, "r");
+    if(!file) {
+        return;
+    }
+
+    passgen_wordlist_t *wordlist = malloc(sizeof(passgen_wordlist_t));
+    passgen_hashmap_insert(&opt->wordlists, name, wordlist);
+    passgen_wordlist_load(wordlist, file);
+}
+
 int passgen_opts_parse(passgen_opts *popts, int argc, char *argv[]) {
     passgen_opts opts = {
         .format = NULL,
@@ -130,6 +165,8 @@ int passgen_opts_parse(passgen_opts *popts, int argc, char *argv[]) {
         .complexity = false,
         .random = NULL,
     };
+
+    passgen_hashmap_init(&opts.wordlists, &passgen_hashmap_context_unicode);
 
     const char *short_opts = "a:p:d:w:r:czhv";
     const char *preset = NULL;
@@ -185,7 +222,7 @@ int passgen_opts_parse(passgen_opts *popts, int argc, char *argv[]) {
                 bail(VERSION, NULL);
                 break;
             case 'w':
-                printf("wordlist: %s\n", optarg);
+                wordlist_add(&opts, optarg);
                 break;
             case 'r':
                 random = optarg;

@@ -16,6 +16,8 @@
 #include "passgen/data/special.h"
 #include "passgen/data/special_kind.h"
 #include "passgen/markov.h"
+#include "passgen/wordlist.h"
+#include "passgen/hashmap.h"
 
 #include <string.h>
 #include <utf8proc.h>
@@ -288,6 +290,16 @@ int passgen_generate_special_wordlist(
     (void) env;
     (void) data;
     (void) func;
+
+    //passgen_wordlist_t *wordlist;
+    passgen_hashmap_entry *entry = passgen_hashmap_lookup(&env->wordlists, special->parameters);
+    passgen_assert(entry);
+    passgen_wordlist_t *wordlist = entry->data;
+    const char *word = passgen_wordlist_random(wordlist, rand);
+    while(*word) {
+        func(data, *word);
+        word++;
+    }
 
     return 0;
 }
