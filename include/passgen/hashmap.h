@@ -22,8 +22,8 @@ typedef struct passgen_hashmap_entry {
 } passgen_hashmap_entry;
 
 typedef struct passgen_hashmap_context {
-    uint64_t (*hash_one)(const struct passgen_hashmap *map, const void *key);
-    uint64_t (*hash_two)(const struct passgen_hashmap *map, const void *key);
+    // Determine the hash value of the supplied key
+    uint64_t (*hash)(const struct passgen_hashmap *map, const void *key);
     // Determine if two keys are equal
     bool (*key_equal)(const struct passgen_hashmap *map, const void *lhs, const void *rhs);
 } passgen_hashmap_context;

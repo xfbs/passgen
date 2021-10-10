@@ -7,6 +7,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 /// Result of a test.
 typedef struct {
@@ -46,6 +47,24 @@ bool run(test_run test);
         return (test_result){   \
             .ok = false,        \
             .assertion = #some, \
+            .line = __LINE__,   \
+            .func = __func__};
+
+#define assert_eq(lhs, rhs)     \
+    if(lhs != rhs)              \
+        return (test_result){   \
+            .ok = false,        \
+            .assertion =        \
+                #lhs" == "#rhs, \
+            .line = __LINE__,   \
+            .func = __func__};
+
+#define assert_streq(lhs, rhs)  \
+    if(strcmp(lhs, rhs) != 0)   \
+        return (test_result){   \
+            .ok = false,        \
+            .assertion =        \
+                #lhs" == "#rhs, \
             .line = __LINE__,   \
             .func = __func__};
 
