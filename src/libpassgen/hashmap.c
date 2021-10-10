@@ -2,7 +2,8 @@
 #include "passgen/siphash.h"
 #include <stdlib.h>
 
-static const hashmap_sizes[] = {3, 7, 17, 37, 79, 163, 331, 673, 1361, 2729, 5471, 10949, 21911, 43853, 87719, 175447, 350899, 701819};
+static const size_t hashmap_sizes[] = {3, 7, 17, 37, 79, 163, 331, 673, 1361, 2729, 5471, 10949, 21911, 43853, 87719, 175447, 350899, 701819};
+static const char *SIPHASH_KEY = "someverylongpass";
 
 void passgen_hashmap_init(passgen_hashmap *map, const passgen_hashmap_context *context) {
     memset(map, 0, sizeof(*map));
@@ -93,7 +94,7 @@ passgen_hashmap_entry *passgen_hashmap_lookup(passgen_hashmap *map, void *key) {
 
 uint64_t string_hash(const passgen_hashmap *map, const void *key) {
     uint64_t output;
-    passgen_siphash(key, strlen(key), "key", &output, sizeof(output));
+    passgen_siphash(key, strlen(key), SIPHASH_KEY, &output, sizeof(output));
     return output;
 }
 
@@ -117,7 +118,7 @@ size_t unicode_len(const void *data) {
 
 uint64_t unicode_hash(const passgen_hashmap *map, const void *key) {
     uint64_t output;
-    passgen_siphash(key, unicode_len(key), "key", &output, sizeof(output));
+    passgen_siphash(key, unicode_len(key), SIPHASH_KEY, &output, sizeof(output));
     return output;
 }
 
