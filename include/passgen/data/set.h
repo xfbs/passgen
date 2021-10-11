@@ -9,6 +9,10 @@
 
 struct passgen_pattern_range;
 
+/// A set represents a set of possible characters.
+///
+/// For example, `[a-z0-9]` is a set expression that can produce lowercase latin
+/// characters of numbers.
 typedef struct passgen_pattern_set {
     // array of range_items
     passgen_stack items;

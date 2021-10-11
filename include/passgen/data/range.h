@@ -4,6 +4,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/// Represents a single range of characters, such as `a-z`.
+///
+///The range has a start and an end character, both are inclusive.
 typedef struct passgen_pattern_range {
     int32_t start;
     int32_t end;

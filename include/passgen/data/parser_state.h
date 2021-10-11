@@ -15,6 +15,12 @@ enum passgen_parser_state_type {
     PASSGEN_PARSER_DONE,
 };
 
+/// Represents the current state of the parser.
+///
+/// The parser is built as a state machine, with a state stack representing
+/// what it is currently doing. This allows for introspection of the parser,
+/// limiting the depth (by limiting the stack size) and for giving useful error
+/// messages.
 struct passgen_parser_state {
     enum passgen_parser_state_type type;
     union {

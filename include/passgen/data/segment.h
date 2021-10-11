@@ -11,6 +11,12 @@ struct passgen_pattern_char;
 struct passgen_pattern_group;
 struct passgen_pattern_special;
 
+/// Represents a single segment of a pattern. 
+///
+/// For example, in the group
+/// `(word|tree)`, the two segments are `word` and `tree`. Segment are composed
+/// of sequences of segment items, which can be anything (other groups, single
+/// characters, ranges or possible characters).
 typedef struct passgen_pattern_segment {
     // array of segment_items
     passgen_stack items;

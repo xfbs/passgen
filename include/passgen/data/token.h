@@ -19,6 +19,7 @@ enum passgen_token_state {
     PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN = -3
 };
 
+/// Parser state for tokenizer.
 struct passgen_token_parser {
     enum passgen_token_state state;
     union {

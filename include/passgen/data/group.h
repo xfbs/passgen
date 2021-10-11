@@ -6,8 +6,9 @@
 #include "passgen/debug.h"
 #include "passgen/export.h"
 
+/// Represents a group, such as `(day|night)`.
 typedef struct passgen_pattern_group {
-    // array of segments
+    /// Segments that make up this group
     struct passgen_pattern_segment_stack segments;
 } passgen_pattern_group_t;
 
