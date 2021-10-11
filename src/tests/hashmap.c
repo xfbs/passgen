@@ -73,3 +73,14 @@ test_result test_hashmap_remove(void) {
     passgen_hashmap_free(&map);
     return test_ok;
 }
+
+test_result test_hashmap_lookup_empty(void) {
+    passgen_hashmap map;
+    passgen_hashmap_init(&map, NULL);
+
+    passgen_hashmap_entry *entry = passgen_hashmap_lookup(&map, "test");
+    assert(!entry);
+
+    passgen_hashmap_free(&map);
+    return test_ok;
+}

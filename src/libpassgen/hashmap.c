@@ -84,6 +84,11 @@ passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, void *key) {
 }
 
 passgen_hashmap_entry *passgen_hashmap_lookup(passgen_hashmap *map, void *key) {
+    // make sure the hashmap is not empty
+    if(!map->data) {
+        return NULL;
+    }
+
     size_t hash = passgen_hashmap_position(map, key);
     if(map->data[hash].key && map->context->key_equal(map, map->data[hash].key, key)) {
         return &map->data[hash];

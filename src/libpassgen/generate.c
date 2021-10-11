@@ -291,7 +291,9 @@ int passgen_generate_special_wordlist(
 
     //passgen_wordlist_t *wordlist;
     passgen_hashmap_entry *entry = passgen_hashmap_lookup(&env->wordlists, special->parameters);
-    passgen_assert(entry);
+    if(!entry) {
+        return -1;
+    }
     passgen_wordlist_t *wordlist = entry->data;
     const char *word = passgen_wordlist_random(wordlist, rand);
     while(*word) {
