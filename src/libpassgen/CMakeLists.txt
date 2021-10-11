@@ -8,6 +8,7 @@ set(SOURCE_LIST
     "container/stack/range.c"
     "container/stack/segment.c"
     "container/stack/segment_item.c"
+    "container/stack.c"
     "data/array.c"
     "data/char.c"
     "data/group.c"

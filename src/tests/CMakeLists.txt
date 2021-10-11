@@ -12,6 +12,7 @@ set(TEST_LIST
     "generate.c"
     "utf8.c"
     "wordlist.c"
+    "stack.c"
     "hashmap.c")
 
 # the testing framework wants a list of all test functions to execute, this step
