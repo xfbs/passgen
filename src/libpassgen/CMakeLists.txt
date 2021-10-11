@@ -5,7 +5,6 @@ set(SOURCE_LIST
     "assert.c"
     "context.c"
     "container/stack/parser_state.c"
-    "container/stack/segment.c"
     "container/stack.c"
     "data/array.c"
     "data/char.c"

@@ -2,7 +2,6 @@
 
 #include "passgen/assert.h"
 #include "passgen/container/stack_new.h"
-#include "passgen/container/stack/segment.h"
 #include "passgen/data/chars.h"
 #include "passgen/data/group.h"
 #include "passgen/data/pattern.h"
@@ -434,7 +433,7 @@ int passgen_generate_group(
 
     // get segment from array
     struct passgen_pattern_segment *segments;
-    segments = passgen_pattern_segment_stack_get(&group->segments, segment);
+    segments = passgen_stack_get(&group->segments, segment);
 
     return passgen_generate_segment(segments, rand, env, data, func);
 }

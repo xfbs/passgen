@@ -1,6 +1,5 @@
 #include "passgen/parser.h"
 
-#include "passgen/container/stack/segment.h"
 #include "passgen/container/stack_new.h"
 #include "passgen/data/chars.h"
 #include "passgen/data/group.h"

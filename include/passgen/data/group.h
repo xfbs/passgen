@@ -1,7 +1,7 @@
 #pragma once
 #include <stddef.h>
 
-#include "passgen/container/stack/segment.h"
+#include "passgen/container/stack_new.h"
 #include "passgen/data/repeat.h"
 #include "passgen/debug.h"
 #include "passgen/export.h"
@@ -9,7 +9,7 @@
 /// Represents a group, such as `(day|night)`.
 typedef struct passgen_pattern_group {
     /// Segments that make up this group
-    struct passgen_pattern_segment_stack segments;
+    passgen_stack segments;
 } passgen_pattern_group_t;
 
 void passgen_pattern_group_init(passgen_pattern_group_t *group);
