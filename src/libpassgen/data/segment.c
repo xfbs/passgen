@@ -1,6 +1,6 @@
 #include "passgen/data/segment.h"
 
-#include "passgen/container/stack/segment_item.h"
+#include "passgen/container/stack_new.h"
 #include "passgen/data/group.h"
 #include "passgen/data/pattern_kind.h"
 #include "passgen/data/repeat.h"
@@ -8,24 +8,24 @@
 #include "passgen/data/set.h"
 
 void passgen_pattern_segment_init(struct passgen_pattern_segment *segment) {
-    passgen_pattern_item_stack_init(&segment->items, NULL);
+    passgen_stack_init(&segment->items, sizeof(passgen_pattern_item_t));
 }
 
 void passgen_pattern_segment_free(struct passgen_pattern_segment *segment) {
     for(size_t i = 0; i < segment->items.len; i++) {
         struct passgen_pattern_item *item =
-            passgen_pattern_item_stack_get(&segment->items, i);
+            passgen_stack_get(&segment->items, i);
 
         passgen_pattern_item_free(item);
     }
 
-    passgen_pattern_item_stack_free(&segment->items, NULL);
+    passgen_stack_free(&segment->items);
 }
 
 struct passgen_pattern_item *
 passgen_pattern_segment_new_item(struct passgen_pattern_segment *segment) {
     struct passgen_pattern_item *item =
-        passgen_pattern_item_stack_push(&segment->items, NULL);
+        passgen_stack_push(&segment->items, NULL);
     passgen_pattern_item_init(item);
 
     return item;
@@ -74,7 +74,7 @@ passgen_pattern_segment_new_special(struct passgen_pattern_segment *segment) {
 struct passgen_pattern_item *passgen_pattern_segment_get_item(
     struct passgen_pattern_segment *segment,
     size_t n) {
-    return passgen_pattern_item_stack_get(&segment->items, n);
+    return passgen_stack_get(&segment->items, n);
 }
 
 void passgen_pattern_segment_debug(
@@ -91,7 +91,7 @@ void passgen_pattern_segment_debug(
         }
 
         struct passgen_pattern_item *item =
-            passgen_pattern_item_stack_get(&segment->items, i);
+            passgen_stack_get(&segment->items, i);
 
         passgen_pattern_item_debug(item, debug);
     }
@@ -108,7 +108,7 @@ int passgen_segment_export(
     passgen_export_cb *fn) {
     for(size_t i = 0; i < segment->items.len; i++) {
         struct passgen_pattern_item *item =
-            passgen_pattern_item_stack_get(&segment->items, i);
+            passgen_stack_get(&segment->items, i);
 
         int export_return = passgen_item_export(item, data, fn);
 

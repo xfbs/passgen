@@ -1,9 +1,9 @@
 #pragma once
 #include <stddef.h>
 
-#include "passgen/container/stack/segment_item.h"
 #include "passgen/debug.h"
 #include "passgen/export.h"
+#include "passgen/container/stack_new.h"
 
 struct passgen_pattern_item;
 struct passgen_pattern_set;
@@ -13,7 +13,7 @@ struct passgen_pattern_special;
 
 typedef struct passgen_pattern_segment {
     // array of segment_items
-    struct passgen_pattern_item_stack items;
+    passgen_stack items;
 } passgen_pattern_segment_t;
 
 void passgen_pattern_segment_init(struct passgen_pattern_segment *segment);

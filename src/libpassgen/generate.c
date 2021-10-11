@@ -3,7 +3,6 @@
 #include "passgen/assert.h"
 #include "passgen/container/stack_new.h"
 #include "passgen/container/stack/segment.h"
-#include "passgen/container/stack/segment_item.h"
 #include "passgen/data/chars.h"
 #include "passgen/data/group.h"
 #include "passgen/data/pattern.h"
@@ -407,7 +406,7 @@ int passgen_generate_segment(
     passgen_generate_cb *func) {
     for(size_t i = 0; i < segment->items.len; i++) {
         struct passgen_pattern_item *item =
-            passgen_pattern_item_stack_get(&segment->items, i);
+            passgen_stack_get(&segment->items, i);
 
         int ret = passgen_generate_item(item, rand, env, data, func);
 

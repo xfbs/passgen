@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "passgen/container/stack/segment_item.h"
 #include "passgen/container/stack_new.h"
 #include "passgen/data/chars.h"
 #include "passgen/data/group.h"
@@ -24,7 +23,7 @@
 static inline struct passgen_pattern_item *
 last_single_item_taint(struct passgen_pattern_segment *segment) {
     struct passgen_pattern_item *item =
-        passgen_pattern_item_stack_top(&segment->items);
+        passgen_stack_top(&segment->items);
 
     if(item->kind == PASSGEN_PATTERN_CHAR) {
         if(item->data.chars.count > 1) {
@@ -151,7 +150,7 @@ int passgen_parse_group(
     // check if the last item was a character that we can add this one to
     if(state->data.group.segment->items.len) {
         struct passgen_pattern_item *last =
-            passgen_pattern_item_stack_top(&state->data.group.segment->items);
+            passgen_stack_top(&state->data.group.segment->items);
 
         if(last->kind == PASSGEN_PATTERN_CHAR) {
             if(last->data.chars.count < 7 && !last->data.chars.tainted) {

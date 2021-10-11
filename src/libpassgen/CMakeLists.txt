@@ -6,7 +6,6 @@ set(SOURCE_LIST
     "context.c"
     "container/stack/parser_state.c"
     "container/stack/segment.c"
-    "container/stack/segment_item.c"
     "container/stack.c"
     "data/array.c"
     "data/char.c"
