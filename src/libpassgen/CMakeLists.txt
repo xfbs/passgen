@@ -4,7 +4,6 @@ set(SOURCE_LIST
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
     "assert.c"
     "context.c"
-    "container/stack/parser_state.c"
     "container/stack.c"
     "data/array.c"
     "data/char.c"

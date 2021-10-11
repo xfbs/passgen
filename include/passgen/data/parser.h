@@ -1,7 +1,6 @@
 #pragma once
 #include <stdint.h>
 
-#include "passgen/container/stack/parser_state.h"
 #include "passgen/data/pattern.h"
 #include "passgen/data/range.h"
 #include "passgen/data/segment.h"
@@ -11,7 +10,7 @@
 /// Represents a parser. Contains a parsing stack, as well as a pattern, which
 /// is dynamically built, and should not be used until the parsing is finalized.
 struct passgen_parser {
-    struct passgen_parser_state_stack state;
+    passgen_stack state;
     passgen_pattern_t pattern;
 };
 

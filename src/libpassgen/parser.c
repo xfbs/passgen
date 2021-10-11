@@ -117,7 +117,7 @@ int passgen_parse_group(
                     passgen_pattern_group_new_segment(state->data.group.group);
                 return 0;
             case ')':
-                passgen_parser_state_stack_pop(&parser->state, NULL);
+                passgen_stack_pop(&parser->state, NULL);
                 return 0;
             case '(':
                 // we're supposed to read something in.
@@ -190,7 +190,7 @@ int passgen_parse_set(
             set->choices_list[i] = choices;
         }
 
-        passgen_parser_state_stack_pop(&parser->state, NULL);
+        passgen_stack_pop(&parser->state, NULL);
         return 0;
     }
 
@@ -228,7 +228,7 @@ int passgen_parse_repeat(
     // this set's over
     if(token->codepoint == '}') {
         state->data.repeat.repeat->max = state->data.repeat.repeat->min;
-        passgen_parser_state_stack_pop(&parser->state, NULL);
+        passgen_stack_pop(&parser->state, NULL);
         return 0;
     }
 
@@ -255,7 +255,7 @@ int passgen_parse_repeat_range(
     struct passgen_token *token,
     struct passgen_parser_state *state) {
     if(token->codepoint == '}') {
-        passgen_parser_state_stack_pop(&parser->state, NULL);
+        passgen_stack_pop(&parser->state, NULL);
         return 0;
     }
 
@@ -310,7 +310,7 @@ int passgen_parse_special_name_end(
         length->min = 0;
         length->max = 0;
         passgen_parser_state_free(state);
-        passgen_parser_state_stack_pop(&parser->state, NULL);
+        passgen_stack_pop(&parser->state, NULL);
         passgen_parser_state_push_repeat(parser, length);
         return 0;
     }
