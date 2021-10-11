@@ -1,7 +1,7 @@
 #include "passgen/generate.h"
 
 #include "passgen/assert.h"
-#include "passgen/container/stack/range.h"
+#include "passgen/container/stack_new.h"
 #include "passgen/container/stack/segment.h"
 #include "passgen/container/stack/segment_item.h"
 #include "passgen/data/chars.h"
@@ -208,7 +208,7 @@ int passgen_generate_set(
     }
 
     struct passgen_pattern_range *range =
-        passgen_pattern_range_stack_get(&set->items, num);
+        passgen_stack_get(&set->items, num);
 
     return func(data, range->start + choice);
 }

@@ -2,7 +2,7 @@
 #include <stddef.h>
 
 #include "passgen/debug.h"
-#include "passgen/container/stack/range.h"
+#include "passgen/container/stack_new.h"
 #include "passgen/data/array.h"
 #include "passgen/data/repeat.h"
 #include "passgen/export.h"
@@ -11,7 +11,7 @@ struct passgen_pattern_range;
 
 typedef struct passgen_pattern_set {
     // array of range_items
-    struct passgen_pattern_range_stack items;
+    passgen_stack items;
 
     // how many choices to choose from. for efficient generation. improved
     // locality.

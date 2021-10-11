@@ -5,8 +5,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "passgen/container/stack/range.h"
 #include "passgen/container/stack/segment_item.h"
+#include "passgen/container/stack_new.h"
 #include "passgen/data/chars.h"
 #include "passgen/data/group.h"
 #include "passgen/data/parser.h"
@@ -186,7 +186,7 @@ int passgen_parse_set(
             malloc(sizeof(size_t) * set->items.len);
         for(size_t i = 0; i < set->items.len; i++) {
             struct passgen_pattern_range *range =
-                passgen_pattern_range_stack_get(&set->items, i);
+                passgen_stack_get(&set->items, i);
             choices += 1 + range->end - range->start;
             set->choices_list[i] = choices;
         }
