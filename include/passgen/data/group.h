@@ -1,7 +1,7 @@
 #pragma once
 #include <stddef.h>
 
-#include "passgen/container/stack_new.h"
+#include "passgen/stack.h"
 #include "passgen/data/repeat.h"
 #include "passgen/debug.h"
 #include "passgen/export.h"

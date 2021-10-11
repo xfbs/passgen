@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "passgen/container/stack_new.h"
+#include "passgen/stack.h"
 #include "passgen/data/chars.h"
 #include "passgen/data/group.h"
 #include "passgen/data/parser.h"

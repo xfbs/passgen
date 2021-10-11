@@ -1,6 +1,5 @@
 #include "passgen/data/segment.h"
-
-#include "passgen/container/stack_new.h"
+#include "passgen/stack.h"
 #include "passgen/data/group.h"
 #include "passgen/data/pattern_kind.h"
 #include "passgen/data/repeat.h"

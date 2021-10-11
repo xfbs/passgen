@@ -3,7 +3,7 @@
 
 #include "passgen/debug.h"
 #include "passgen/export.h"
-#include "passgen/container/stack_new.h"
+#include "passgen/stack.h"
 
 struct passgen_pattern_item;
 struct passgen_pattern_set;

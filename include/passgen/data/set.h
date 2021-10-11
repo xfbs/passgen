@@ -2,7 +2,7 @@
 #include <stddef.h>
 
 #include "passgen/debug.h"
-#include "passgen/container/stack_new.h"
+#include "passgen/stack.h"
 #include "passgen/data/array.h"
 #include "passgen/data/repeat.h"
 #include "passgen/export.h"
