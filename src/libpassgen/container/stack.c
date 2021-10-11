@@ -1,4 +1,5 @@
 #include "passgen/container/stack_new.h"
+#include "passgen/assert.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -52,8 +53,10 @@ void passgen_stack_foreach(passgen_stack *stack, void (*func)(void *element)) {
             func(bin + j * stack->element_size);
         }
     }
-    if(stack->len % stack->bin_size) {
-        // TODO
+    size_t last_bin_items = stack->len % stack->bin_size;
+    for(size_t i = 0; i < last_bin_items; i++) {
+        void *bin = stack->data[full_bins];
+        func(bin + i * stack->element_size);
     }
 }
 
@@ -77,12 +80,14 @@ void *passgen_stack_push(passgen_stack *stack, void *value) {
 
         // do we need to increase the bins?
         if(new_bin != max_bin) {
-            size_t current_bins = passgen_stack_bin_count(stack, new_bin - 1);
-            size_t needed_bins = passgen_stack_bin_count(stack, new_bin);
+            size_t current_bins = passgen_stack_bin_count(stack, new_bin);
+            size_t needed_bins = passgen_stack_bin_count(stack, new_bin + 1);
             if(current_bins != needed_bins) {
                 void **new_data = realloc(stack->data, needed_bins * sizeof(void *));
+                passgen_assert(new_data);
                 stack->data = new_data;
             }
+            stack->data[new_bin] = calloc(stack->bin_size, stack->element_size);
         }
     }
 
@@ -109,10 +114,45 @@ void *passgen_stack_get(passgen_stack *stack, size_t pos) {
 }
 
 // Pop the largest element off the stack. If a non-NULL pointer is passed,
-// the element's memory is copied into that value.
-void passgen_stack_pop(passgen_stack *stack, void *element);
+// the element's memory is copied into that value, and the passed pointer
+// is returned. If the stack is empty, a NULL pointer is returned.
+void *passgen_stack_pop(passgen_stack *stack, void *element) {
+    if(!stack->len) {
+        return NULL;
+    }
+
+    if(element) {
+        void *item = passgen_stack_top(stack);
+        memcpy(element, item, stack->element_size);
+    }
+
+    if(stack->len == 1) {
+        free(stack->data[0]);
+        free(stack->data);
+    } else if(stack->len < stack->bin_size) {
+        size_t entry_size = passgen_stack_bin_count(stack, stack->len);
+        size_t new_size = passgen_stack_bin_count(stack, stack->len - 1);
+        if(entry_size != new_size) {
+            stack->data[0] = realloc(stack->data[0], new_size * stack->element_size);
+        }
+    } else {
+        size_t max_bin = passgen_stack_bin(stack, stack->len);
+        size_t new_bin = passgen_stack_bin(stack, stack->len - 1);
+        if(max_bin != new_bin) {
+            free(stack->data[max_bin]);
+        }
+    }
+
+    stack->len -= 1;
+
+    if(element) {
+        return element;
+    } else {
+        return 0x1;
+    }
+}
 
 // Returns the topmost element of the stack, or NULL if the stack is empty.
 void *passgen_stack_top(passgen_stack *stack) {
-    return passgen_stack_get(stack, stack->len > 0 ? stack->len : 0);
+    return passgen_stack_get(stack, stack->len > 0 ? stack->len - 1 : 0);
 }

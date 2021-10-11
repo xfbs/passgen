@@ -26,7 +26,7 @@ void *passgen_stack_get(passgen_stack *stack, size_t pos);
 
 // Pop the largest element off the stack. If a non-NULL pointer is passed,
 // the element's memory is copied into that value.
-void passgen_stack_pop(passgen_stack *stack, void *element);
+void *passgen_stack_pop(passgen_stack *stack, void *element);
 
 // Returns the topmost element of the stack, or NULL if the stack is empty.
 void *passgen_stack_top(passgen_stack *stack);
