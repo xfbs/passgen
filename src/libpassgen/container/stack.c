@@ -128,18 +128,21 @@ void *passgen_stack_pop(passgen_stack *stack, void *element) {
 
     if(stack->len == 1) {
         free(stack->data[0]);
+        stack->data[0] = NULL;
         free(stack->data);
-    } else if(stack->len < stack->bin_size) {
+        stack->data = NULL;
+    } else if(stack->len <= stack->bin_size) {
         size_t entry_size = passgen_stack_bin_count(stack, stack->len);
         size_t new_size = passgen_stack_bin_count(stack, stack->len - 1);
         if(entry_size != new_size) {
             stack->data[0] = realloc(stack->data[0], new_size * stack->element_size);
         }
     } else {
-        size_t max_bin = passgen_stack_bin(stack, stack->len);
-        size_t new_bin = passgen_stack_bin(stack, stack->len - 1);
+        size_t max_bin = passgen_stack_bin(stack, stack->len - 1);
+        size_t new_bin = passgen_stack_bin(stack, stack->len - 2);
         if(max_bin != new_bin) {
             free(stack->data[max_bin]);
+            stack->data[max_bin] = NULL;
         }
     }
 
