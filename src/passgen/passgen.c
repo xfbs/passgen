@@ -120,6 +120,9 @@ void passgen_run(passgen_opts opts) {
 
     printf("\n");
     free(pass);
+    passgen_hashmap_free(&opts.wordlists);
+    passgen_hashmap_foreach_value(&opts.wordlists, passgen_wordlist_free);
+    passgen_hashmap_foreach_key(&opts.wordlists, free);
     passgen_parser_free(&parser);
 }
 
