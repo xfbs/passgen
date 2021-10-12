@@ -1,5 +1,7 @@
 #include "tests.h"
 #include "passgen/hashmap.h"
+#include <stdlib.h>
+#include <string.h>
 
 test_result test_hashmap_init(void) {
     passgen_hashmap map;
@@ -30,6 +32,44 @@ test_result test_hashmap_insert(void) {
 
     entry = passgen_hashmap_lookup(&map, "other");
     assert(!entry);
+
+    passgen_hashmap_free(&map);
+    return test_ok;
+}
+
+test_result test_hashmap_insert_many(void) {
+    passgen_hashmap map;
+    passgen_hashmap_init(&map, NULL);
+    size_t insert_max = 10000;
+
+    // insert large amount of items
+    for(size_t i = 0; i < insert_max; i++) {
+        assert_eq(map.len, i);
+        char *key = malloc(32);
+        size_t *value = malloc(sizeof(size_t));
+        *value = i;
+        snprintf(key, 32, "%zu", i);
+        passgen_hashmap_insert(&map, key, value);
+
+        // fill factor is how many percent of slots are used. we want this
+        // to be high.
+        float fill = map.len * 100.0 / (double) map.capacity;
+        assert(fill > 3.0);
+    }
+
+    // retrieve all items
+    for(size_t i = 0; i < insert_max; i++) {
+        char key[32];
+        snprintf(key, 32, "%zu", i);
+        passgen_hashmap_entry *entry = passgen_hashmap_lookup(&map, key);
+        assert(entry);
+        size_t *value = entry->value;
+        assert_eq(*value, i);
+    }
+
+    // release memory
+    passgen_hashmap_foreach_key(&map, free);
+    passgen_hashmap_foreach_value(&map, free);
 
     passgen_hashmap_free(&map);
     return test_ok;
@@ -80,6 +120,36 @@ test_result test_hashmap_lookup_empty(void) {
 
     passgen_hashmap_entry *entry = passgen_hashmap_lookup(&map, "test");
     assert(!entry);
+
+    passgen_hashmap_free(&map);
+    return test_ok;
+}
+
+test_result test_hashmap_foreach_value(void) {
+    passgen_hashmap map;
+    passgen_hashmap_init(&map, NULL);
+
+    passgen_hashmap_insert(&map, "alpha", malloc(255));
+    passgen_hashmap_insert(&map, "beta", malloc(255));
+    passgen_hashmap_insert(&map, "gamma", malloc(255));
+    passgen_hashmap_insert(&map, "delta", malloc(255));
+    passgen_hashmap_insert(&map, "epsilon", malloc(255));
+    passgen_hashmap_foreach_value(&map, free);
+
+    passgen_hashmap_free(&map);
+    return test_ok;
+}
+
+test_result test_hashmap_foreach_key(void) {
+    passgen_hashmap map;
+    passgen_hashmap_init(&map, NULL);
+
+    passgen_hashmap_insert(&map, strcpy(malloc(32), "alpha"), NULL);
+    passgen_hashmap_insert(&map, strcpy(malloc(32), "beta"), NULL);
+    passgen_hashmap_insert(&map, strcpy(malloc(32), "gamma"), NULL);
+    passgen_hashmap_insert(&map, strcpy(malloc(32), "delta"), NULL);
+    passgen_hashmap_insert(&map, strcpy(malloc(32), "epsilon"), NULL);
+    passgen_hashmap_foreach_key(&map, free);
 
     passgen_hashmap_free(&map);
     return test_ok;
