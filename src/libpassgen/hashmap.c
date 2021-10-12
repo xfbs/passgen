@@ -30,7 +30,7 @@ void passgen_hashmap_realloc(passgen_hashmap *map, size_t capacity) {
     // copy data over
     for(size_t i = 0; i < old.capacity; i++) {
         if(old.data[i].key) {
-            passgen_hashmap_insert(map, old.data[i].key, old.data[i].data);
+            passgen_hashmap_insert(map, old.data[i].key, old.data[i].value);
         }
     }
 
@@ -41,7 +41,7 @@ static inline size_t passgen_hashmap_position(passgen_hashmap *map, void *key) {
     return map->context->hash(map, key) % map->capacity;
 }
 
-passgen_hashmap_entry passgen_hashmap_insert(passgen_hashmap *map, void *key, void *data) {
+passgen_hashmap_entry passgen_hashmap_insert(passgen_hashmap *map, void *key, void *value) {
     if(map->capacity == 0) {
         passgen_hashmap_realloc(map, hashmap_sizes[0]);
     }
@@ -49,18 +49,18 @@ passgen_hashmap_entry passgen_hashmap_insert(passgen_hashmap *map, void *key, vo
     size_t hash = passgen_hashmap_position(map, key);
     if(!map->data[hash].key) {
         map->data[hash].key = key;
-        map->data[hash].data = data;
+        map->data[hash].value = value;
         map->len += 1;
         return (passgen_hashmap_entry){NULL, NULL};
     } else {
         if(map->context->key_equal(map, map->data[hash].key, key)) {
             passgen_hashmap_entry entry = map->data[hash];
             map->data[hash].key = key;
-            map->data[hash].data = data;
+            map->data[hash].value = value;
             return entry;
         } else {
             passgen_hashmap_realloc(map, 2 * map->capacity);
-            return passgen_hashmap_insert(map, key, data);
+            return passgen_hashmap_insert(map, key, value);
         }
     }
 }
@@ -74,7 +74,7 @@ passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, void *key) {
         if(map->context->key_equal(map, map->data[hash].key, key)) {
             passgen_hashmap_entry entry = map->data[hash];
             map->data[hash].key = NULL;
-            map->data[hash].data = NULL;
+            map->data[hash].value = NULL;
             map->len -= 1;
             return entry;
         }
@@ -94,6 +94,26 @@ passgen_hashmap_entry *passgen_hashmap_lookup(passgen_hashmap *map, void *key) {
         return &map->data[hash];
     } else {
         return NULL;
+    }
+}
+
+void passgen_hashmap_foreach_key(passgen_hashmap *map, void (*func)(void *key)) {
+    if(map->len) {
+        for(size_t i = 0; i < map->capacity; i++) {
+            if(map->data[i].key) {
+                func(map->data[i].key);
+            }
+        }
+    }
+}
+
+void passgen_hashmap_foreach_value(passgen_hashmap *map, void (*func)(void *value)) {
+    if(map->len) {
+        for(size_t i = 0; i < map->capacity; i++) {
+            if(map->data[i].key) {
+                func(map->data[i].value);
+            }
+        }
     }
 }
 

@@ -22,11 +22,11 @@ test_result test_hashmap_insert(void) {
     passgen_hashmap_entry *entry;
     entry = passgen_hashmap_lookup(&map, "hello");
     assert(entry);
-    assert_eq(entry->data, &value_a);
+    assert_eq(entry->value, &value_a);
 
     entry = passgen_hashmap_lookup(&map, "world");
     assert(entry);
-    assert_eq(entry->data, &value_b);
+    assert_eq(entry->value, &value_b);
 
     entry = passgen_hashmap_lookup(&map, "other");
     assert(!entry);
@@ -53,7 +53,7 @@ test_result test_hashmap_remove(void) {
     entry = passgen_hashmap_remove(&map, "hello");
     assert_eq(map.len, 1);
     assert(entry.key);
-    assert_eq(entry.data, &value_a);
+    assert_eq(entry.value, &value_a);
     assert_streq(entry.key, "hello");
 
     assert(!passgen_hashmap_lookup(&map, "hello"));
@@ -63,7 +63,7 @@ test_result test_hashmap_remove(void) {
     entry = passgen_hashmap_remove(&map, "world");
     assert_eq(map.len, 0);
     assert(entry.key);
-    assert_eq(entry.data, &value_b);
+    assert_eq(entry.value, &value_b);
     assert_streq(entry.key, "world");
 
     assert(!passgen_hashmap_lookup(&map, "hello"));

@@ -294,7 +294,7 @@ int passgen_generate_special_wordlist(
     if(!entry) {
         return -1;
     }
-    passgen_wordlist_t *wordlist = entry->data;
+    passgen_wordlist_t *wordlist = entry->value;
     const char *word = passgen_wordlist_random(wordlist, rand);
     while(*word) {
         func(data, *word);
