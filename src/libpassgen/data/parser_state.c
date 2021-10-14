@@ -11,7 +11,6 @@ void passgen_parser_state_free(struct passgen_parser_state *state) {
             break;
         case PASSGEN_PARSER_SPECIAL:
         case PASSGEN_PARSER_SPECIAL_NAME:
-        case PASSGEN_PARSER_SPECIAL_NAME_END:
             passgen_pattern_special_free(state->data.special.special);
             break;
         case PASSGEN_PARSER_DONE:

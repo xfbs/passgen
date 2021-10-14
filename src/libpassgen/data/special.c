@@ -6,8 +6,6 @@ void passgen_pattern_special_init_char(
     struct passgen_pattern_special *special,
     uint32_t kind) {
     // set sane defaults for length.
-    special->length.min = 0;
-    special->length.max = 64;
     special->parameters_len = 0;
     special->parameters = calloc(256, sizeof(int32_t));
 

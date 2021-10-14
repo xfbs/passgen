@@ -243,7 +243,7 @@ int passgen_generate_special_pronounceable(
     (void) rand;
     (void) env;
     /* limit length to 64, that should be plenty. */
-    size_t max = special->length.max;
+    size_t max = 0; //special->length.max;
     if(64 < max) max = 64;
 
     int32_t buffer[max];

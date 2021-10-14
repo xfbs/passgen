@@ -68,8 +68,6 @@ int passgen_parse_token(
             return passgen_parse_special(parser, token, state);
         case PASSGEN_PARSER_SPECIAL_NAME:
             return passgen_parse_special_name(parser, token, state);
-        case PASSGEN_PARSER_SPECIAL_NAME_END:
-            return passgen_parse_special_name_end(parser, token, state);
         default:
             return -1;
     }
@@ -292,30 +290,12 @@ int passgen_parse_special_name(
     (void) parser;
 
     if(token->codepoint == ']') {
-        state->type = PASSGEN_PARSER_SPECIAL_NAME_END;
+        passgen_stack_pop(&parser->state, NULL);
     } else {
         passgen_pattern_special_add_parameter_cp(state->data.special.special, token->codepoint);
     }
 
     return 0;
-}
-
-int passgen_parse_special_name_end(
-    struct passgen_parser *parser,
-    struct passgen_token *token,
-    struct passgen_parser_state *state) {
-    if(token->codepoint == '{') {
-        struct passgen_pattern_repeat *length =
-            &state->data.special.special->length;
-        length->min = 0;
-        length->max = 0;
-        passgen_parser_state_free(state);
-        passgen_stack_pop(&parser->state, NULL);
-        passgen_parser_state_push_repeat(parser, length);
-        return 0;
-    }
-
-    return -1;
 }
 
 int passgen_parse_finish(struct passgen_parser *parser) {

@@ -81,8 +81,3 @@ int passgen_parse_special_name(
     struct passgen_parser *parser,
     struct passgen_token *token,
     struct passgen_parser_state *state);
-
-int passgen_parse_special_name_end(
-    struct passgen_parser *parser,
-    struct passgen_token *token,
-    struct passgen_parser_state *state);

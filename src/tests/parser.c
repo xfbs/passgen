@@ -474,12 +474,6 @@ test_result test_parser_special_pronounceable(void) {
     PARSE_CODEPOINT('s');
     PARSE_CODEPOINT('h');
     PARSE_CODEPOINT(']');
-    PARSE_CODEPOINT('{');
-    PARSE_CODEPOINT('9');
-    PARSE_CODEPOINT(',');
-    PARSE_CODEPOINT('1');
-    PARSE_CODEPOINT('2');
-    PARSE_CODEPOINT('}');
 
     assert(parser.state.len == 1);
 
@@ -496,8 +490,6 @@ test_result test_parser_special_pronounceable(void) {
     assert(item->repeat.max == 1);
     assert(item->maybe == false);
     assert(item->data.special.kind == PASSGEN_PATTERN_SPECIAL_PRONOUNCABLE);
-    assert(item->data.special.length.min == 9);
-    assert(item->data.special.length.max == 12);
 
     POSTAMBLE();
 
@@ -517,13 +509,6 @@ test_result test_parser_mixed_special(void) {
     PARSE_CODEPOINT('s');
     PARSE_CODEPOINT('h');
     PARSE_CODEPOINT(']');
-    PARSE_CODEPOINT('{');
-    PARSE_CODEPOINT('9');
-    PARSE_CODEPOINT(',');
-    PARSE_CODEPOINT('1');
-    PARSE_CODEPOINT('2');
-    PARSE_CODEPOINT('}');
-    PARSE_CODEPOINT('x');
 
     assert(parser.state.len == 1);
 
@@ -531,7 +516,7 @@ test_result test_parser_mixed_special(void) {
 
     segment = passgen_pattern_group_get_segment(&parser.pattern.group, 0);
     assert(segment);
-    assert(3 == segment->items.len);
+    assert(2 == segment->items.len);
 
     item = passgen_pattern_segment_get_item(segment, 0);
     assert(item);
@@ -549,17 +534,6 @@ test_result test_parser_mixed_special(void) {
     assert(item->repeat.max == 1);
     assert(item->maybe == false);
     assert(item->data.special.kind == PASSGEN_PATTERN_SPECIAL_PRONOUNCABLE);
-    assert(item->data.special.length.min == 9);
-    assert(item->data.special.length.max == 12);
-
-    item = passgen_pattern_segment_get_item(segment, 2);
-    assert(item);
-    assert(item->kind == PASSGEN_PATTERN_CHAR);
-    assert(item->data.chars.codepoints[0] == 'x');
-    assert(item->data.chars.count == 1);
-    assert(item->repeat.min == 1);
-    assert(item->repeat.max == 1);
-    assert(item->maybe == false);
 
     POSTAMBLE();
 

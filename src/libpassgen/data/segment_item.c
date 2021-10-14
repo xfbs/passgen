@@ -1,6 +1,7 @@
 #include "passgen/data/segment_item.h"
 #include "passgen/data/group.h"
 #include "passgen/data/set.h"
+#include "passgen/data/special.h"
 
 void passgen_pattern_item_free(struct passgen_pattern_item *item) {
     switch(item->kind) {
@@ -9,6 +10,9 @@ void passgen_pattern_item_free(struct passgen_pattern_item *item) {
             break;
         case PASSGEN_PATTERN_GROUP:
             passgen_pattern_group_free(&item->data.group);
+            break;
+        case PASSGEN_PATTERN_SPECIAL:
+            passgen_pattern_special_free(&item->data.special);
             break;
         default:
             break;
