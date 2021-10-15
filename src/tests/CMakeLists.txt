@@ -13,6 +13,7 @@ set(TEST_LIST
     "utf8.c"
     "wordlist.c"
     "stack.c"
+    "markov.c"
     "hashmap.c")
 
 # the testing framework wants a list of all test functions to execute, this step

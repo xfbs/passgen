@@ -2,6 +2,7 @@
 #include "passgen/assert.h"
 #include <stdlib.h>
 #include <string.h>
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 const struct passgen_markov0 *passgen_markov2_choose(
     const struct passgen_markov3 *list,
@@ -121,18 +122,33 @@ passgen_markov1_find(const struct passgen_markov1 *list, size_t choice) {
 #define MARKOV_LIST_MULTIPLIER 2
 
 // Initialize new markov chain with a given level
-void passgen_markov_init(struct passgen_markov *markov, uint8_t level) {
+void passgen_markov_init(passgen_markov *markov, uint8_t level) {
     memset(markov, 0, sizeof(*markov));
     markov->level = level;
 }
 
 // Add a word to a markov chain
-void passgen_markov_add(
-    struct passgen_markov *markov,
+passgen_markov *passgen_markov_add(
+    passgen_markov *markov,
     const uint32_t *word,
     size_t word_len,
     size_t weight) {
+    // insert start sequences
+    size_t sequence_len = markov->level - 1 + MIN(markov->level - 1, word_len);
+    uint32_t sequence[sequence_len];
+    memset(sequence, 0, sizeof(sequence[0]) * sequence_len);
+    memcpy(sequence, word, sizeof(uint32_t) * sequence_len - markov->level);
+    return markov;
+}
+
+passgen_markov *passgen_markov_insert(
+    passgen_markov *markov,
+    const uint32_t *sequence,
+    size_t weight) {
+    return markov;
 }
 
 // Free a markov chain
-void passgen_markov_free(struct passgen_markov *markov);
+void passgen_markov_free(passgen_markov *markov) {
+    free(markov);
+}

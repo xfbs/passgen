@@ -35,11 +35,14 @@ struct passgen_markov;
 struct passgen_markov {
   uint8_t level;
 
-  size_t cumulative;
-  uint32_t codepoint;
+  size_t capacity;
   union {
-    struct passgen_markov *node;
-    struct passgen_markov_leaf *leaf;
-  } children;
-  uint32_t children_len;
+    size_t cumulative;
+    union {
+      uint32_t codepoint;
+      struct passgen_markov *node;
+    } data[0];
+  } data[0];
 };
+
+typedef struct passgen_markov passgen_markov;
