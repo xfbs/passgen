@@ -11,6 +11,7 @@ option(BUILD_UTF8PROC "Build utf8proc, a dependency." YES)
 option(BUILD_TOOLS "Build utility binaries." YES)
 option(BUILD_BENCH "Build benchmark utilities." YES)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
+option(BUILD_TESTING "Build unit tests" ON)
 
 option(LIBPASSGEN_STATIC "Build libpassgen.a" ON)
 option(LIBPASSGEN_SHARED "Build libpassgen.so" ON)

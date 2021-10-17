@@ -34,5 +34,5 @@ target_link_libraries(passgen-test PRIVATE ${PASSGEN_LIB} passgen-test-lib)
 passgen_target_defaults(passgen-test)
 
 #add_test(NAME passgen-test COMMAND passgen-test)
-add_custom_target(test ${CMAKE_BINARY_DIR}/src/tests/passgen-test -v
-    DEPENDS passgen-test)
+add_custom_target(test passgen-test -v
+    DEPENDS passgen-test USES_TERMINAL)
