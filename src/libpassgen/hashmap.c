@@ -195,14 +195,14 @@ void passgen_hashmap_foreach_value(passgen_hashmap *map, void (*func)(void *valu
     }
 }
 
-uint64_t string_hash(const passgen_hashmap *map, const void *key, bool first) {
+static uint64_t string_hash(const passgen_hashmap *map, const void *key, bool first) {
     uint64_t output;
     const char *siphash_key = first ? SIPHASH_KEY_FIRST : SIPHASH_KEY_SECOND;
     passgen_siphash(key, strlen(key), siphash_key, &output, sizeof(output));
     return output;
 }
 
-bool string_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
+static bool string_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
     return strcmp(lhs, rhs) == 0;
 }
 
@@ -211,7 +211,7 @@ const passgen_hashmap_context passgen_hashmap_context_default = {
     .key_equal = string_equal,
 };
 
-size_t unicode_len(const void *data) {
+static size_t unicode_len(const void *data) {
     const int32_t *unicode = data;
     size_t len = 0;
     while(unicode[len]) {
@@ -220,14 +220,14 @@ size_t unicode_len(const void *data) {
     return len;
 }
 
-uint64_t unicode_hash(const passgen_hashmap *map, const void *key, bool first) {
+static uint64_t unicode_hash(const passgen_hashmap *map, const void *key, bool first) {
     uint64_t output;
     const char *siphash_key = first ? SIPHASH_KEY_FIRST : SIPHASH_KEY_SECOND;
     passgen_siphash(key, unicode_len(key), siphash_key, &output, sizeof(output));
     return output;
 }
 
-bool unicode_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
+static bool unicode_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
     size_t rhs_len = unicode_len(rhs);
     size_t lhs_len = unicode_len(lhs);
     if(rhs_len != lhs_len) {
