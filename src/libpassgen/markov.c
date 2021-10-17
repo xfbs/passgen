@@ -2,6 +2,7 @@
 #include "passgen/assert.h"
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define SATURATING_SUB(a, b) ((a) - MIN(a, b))
 
@@ -301,4 +302,33 @@ void passgen_markov_add(
 // Free a markov chain
 void passgen_markov_free(passgen_markov *markov) {
     passgen_markov_node_free(markov->root, markov->level);
+}
+
+uint32_t passgen_markov_generate(
+    passgen_markov *markov,
+    const uint32_t *current,
+    passgen_random_t *random) {
+    passgen_markov_node *node = markov->root;
+    size_t choices = 0;
+    for(size_t i = 0; i < markov->level; i++) {
+        size_t pos = passgen_markov_node_find(node, current[i]);
+        passgen_assert(*passgen_markov_node_codepoint(node, pos) == current[i]);
+        choices = *passgen_markov_node_cumulative(node, pos);
+        node = *passgen_markov_node_child(node, pos);
+    }
+
+    passgen_assert(choices);
+    passgen_assert(node);
+
+    size_t choice = passgen_random_u64_max(random, choices);
+    for(size_t i = 0; i < node->capacity; i++) {
+        size_t cumulative = *passgen_markov_node_cumulative(node, i);
+        if(cumulative > choice) {
+            return *passgen_markov_node_codepoint(node, i);
+        } else {
+            choice -= cumulative;
+        }
+    }
+
+    return 0;
 }

@@ -43,7 +43,7 @@ void passgen_markov_add(
 
 uint32_t passgen_markov_generate(
     passgen_markov *markov,
-    const uint32_t *previous,
+    const uint32_t *current,
     passgen_random_t *random);
 
 // Free a markov chain
