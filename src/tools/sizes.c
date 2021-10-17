@@ -51,10 +51,6 @@ static const struct size_info struct_sizes[] = {
     add_struct(passgen_pattern_special),
     add_struct(passgen_token),
     add_struct(passgen_token_parser),
-    add_struct(passgen_markov3),
-    add_struct(passgen_markov0),
-    add_struct(passgen_markov1),
-    add_struct(passgen_markov2),
     size_info_end()};
 
 void show_size_info(const struct size_info size_info[]) {
