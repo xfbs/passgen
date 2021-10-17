@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define SATURATING_SUB(a, b) ((a) - MIN(a, b))
 
 const struct passgen_markov0 *passgen_markov2_choose(
     const struct passgen_markov3 *list,
@@ -123,8 +124,16 @@ passgen_markov1_find(const struct passgen_markov1 *list, size_t choice) {
 
 // Initialize new markov chain with a given level
 void passgen_markov_init(passgen_markov *markov, uint8_t level) {
+    passgen_assert(level);
     memset(markov, 0, sizeof(*markov));
     markov->level = level;
+}
+
+passgen_markov *passgen_markov_insert(
+    passgen_markov *markov,
+    const uint32_t *sequence,
+    size_t weight) {
+    return markov;
 }
 
 // Add a word to a markov chain
@@ -134,17 +143,21 @@ passgen_markov *passgen_markov_add(
     size_t word_len,
     size_t weight) {
     // insert start sequences
-    size_t sequence_len = markov->level - 1 + MIN(markov->level - 1, word_len);
+    size_t sequence_len = markov->level + markov->level;
     uint32_t sequence[sequence_len];
     memset(sequence, 0, sizeof(sequence[0]) * sequence_len);
-    memcpy(sequence, word, sizeof(uint32_t) * sequence_len - markov->level);
-    return markov;
-}
-
-passgen_markov *passgen_markov_insert(
-    passgen_markov *markov,
-    const uint32_t *sequence,
-    size_t weight) {
+    memcpy(&sequence[markov->level], word, sizeof(uint32_t) * MIN(markov->level, word_len));
+    for(size_t i = 0; i < markov->level; i++) {
+        markov = passgen_markov_insert(markov, &sequence[i], weight);
+    }
+    for(size_t i = 0; i < SATURATING_SUB(word_len, markov->level); i++) {
+        markov = passgen_markov_insert(markov, &word[i], weight);
+    }
+    memset(sequence, 0, sizeof(sequence[0]) * sequence_len);
+    memcpy(sequence, &word[SATURATING_SUB(word_len, markov->level)], sizeof(uint32_t) * MIN(markov->level, word_len));
+    for(size_t i = 0; i < MIN(markov->level, word_len); i++) {
+        markov = passgen_markov_insert(markov, &sequence[i], weight);
+    }
     return markov;
 }
 
