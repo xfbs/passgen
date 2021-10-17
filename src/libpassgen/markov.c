@@ -129,15 +129,14 @@ void passgen_markov_init(passgen_markov *markov, uint8_t level) {
     markov->level = level;
 }
 
-passgen_markov *passgen_markov_insert(
+void passgen_markov_insert(
     passgen_markov *markov,
     const uint32_t *sequence,
     size_t weight) {
-    return markov;
 }
 
 // Add a word to a markov chain
-passgen_markov *passgen_markov_add(
+void passgen_markov_add(
     passgen_markov *markov,
     const uint32_t *word,
     size_t word_len,
@@ -148,20 +147,18 @@ passgen_markov *passgen_markov_add(
     memset(sequence, 0, sizeof(sequence[0]) * sequence_len);
     memcpy(&sequence[markov->level], word, sizeof(uint32_t) * MIN(markov->level, word_len));
     for(size_t i = 0; i < markov->level; i++) {
-        markov = passgen_markov_insert(markov, &sequence[i], weight);
+        passgen_markov_insert(markov, &sequence[i], weight);
     }
     for(size_t i = 0; i < SATURATING_SUB(word_len, markov->level); i++) {
-        markov = passgen_markov_insert(markov, &word[i], weight);
+        passgen_markov_insert(markov, &word[i], weight);
     }
     memset(sequence, 0, sizeof(sequence[0]) * sequence_len);
     memcpy(sequence, &word[SATURATING_SUB(word_len, markov->level)], sizeof(uint32_t) * MIN(markov->level, word_len));
     for(size_t i = 0; i < MIN(markov->level, word_len); i++) {
-        markov = passgen_markov_insert(markov, &sequence[i], weight);
+        passgen_markov_insert(markov, &sequence[i], weight);
     }
-    return markov;
 }
 
 // Free a markov chain
 void passgen_markov_free(passgen_markov *markov) {
-    free(markov);
 }
