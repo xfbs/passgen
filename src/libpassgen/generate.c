@@ -240,37 +240,24 @@ int passgen_generate_special_pronounceable(
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
-    (void) rand;
-    (void) env;
-    /* limit length to 64, that should be plenty. */
-    size_t max = 0; //special->length.max;
-    if(64 < max) max = 64;
-
-    int32_t buffer[max];
-
-    /* TODO: get tries and default from env! */
-    /*
-    size_t count = passgen_pronounceable_len(
-        PASSGEN_PRONOUNCEABLE_ENGLISH,
-        rand,
-        buffer,
-        special->length.min,
-        max,
-        env->pronounceable_limit);
-        */
-    size_t count = 0;
-
-    /* TODO error handling */
-    if(!count) {
-        return -2;
+    passgen_hashmap_entry *entry = passgen_hashmap_lookup(&env->wordlists, special->parameters);
+    if(!entry) {
+        return -1;
     }
+    passgen_wordlist_t *wordlist = entry->value;
+    passgen_markov *markov = &wordlist->markov;
+    uint32_t word[64];
+    size_t pos = markov->level;
+    memset(word, 0, pos * sizeof(uint32_t));
+    do {
+        word[pos] = passgen_markov_generate(markov, &word[pos - markov->level], rand);
+        pos++;
+    } while(word[pos - 1]);
 
-    for(size_t i = 0; i < count; i++) {
-        int ret = func(data, buffer[i]);
-
-        if(0 != ret) {
-            return ret;
-        }
+    pos = markov->level;
+    while(word[pos]) {
+        func(data, word[pos]);
+        pos++;
     }
 
     return 0;

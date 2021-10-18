@@ -1,5 +1,7 @@
 #pragma once
 #include "passgen/random.h"
+#include "passgen/stack.h"
+#include "passgen/markov.h"
 #include <stdio.h>
 
 typedef struct passgen_wordlist_t {
@@ -12,6 +14,9 @@ typedef struct passgen_wordlist_t {
     char **words;
     // count of words in wordlist
     size_t count;
+
+    passgen_stack stack;
+    passgen_markov markov;
 } passgen_wordlist_t;
 
 /* initialise a wordlist. must be called before it can be used.
