@@ -36,6 +36,7 @@ void passgen_wordlist_load(passgen_wordlist_t *wordlist, FILE *file) {
         buffer_pos = 0;
 
         while(utf8_buffer_pos < utf8_buffer_len) {
+            bool success = false;
             for(size_t i = 0; (utf8_buffer_pos + i) < utf8_buffer_len; i++) {
                 if(utf8_buffer[utf8_buffer_pos + i] == '\n') {
                     passgen_markov_add(&wordlist->markov, &utf8_buffer[utf8_buffer_pos], i, 1);
@@ -43,10 +44,13 @@ void passgen_wordlist_load(passgen_wordlist_t *wordlist, FILE *file) {
                     memcpy(word, &utf8_buffer[utf8_buffer_pos], i * sizeof(uint32_t));
                     passgen_stack_push(&wordlist->stack, &word);
                     utf8_buffer_pos += i + 1;
-                    continue;
+                    success = true;
+                    break;
                 }
             }
-            break;
+            if(!success) {
+                break;
+            }
         }
 
         if(utf8_buffer_pos < utf8_buffer_len) {
