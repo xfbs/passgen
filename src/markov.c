@@ -44,15 +44,15 @@ void passgen_markov_init(passgen_markov *markov, uint8_t level) {
     markov->root = passgen_markov_node_new(MARKOV_LIST_INITIAL, false);
 }
 
-inline uint32_t *passgen_markov_node_codepoint(passgen_markov_node *node, size_t index) {
+uint32_t *passgen_markov_node_codepoint(passgen_markov_node *node, size_t index) {
     return &node->data[node->capacity].codepoint[index];
 }
 
-inline size_t *passgen_markov_node_cumulative(passgen_markov_node *node, size_t index) {
+size_t *passgen_markov_node_cumulative(passgen_markov_node *node, size_t index) {
     return &node->data[0].cumulative[index];
 }
 
-inline passgen_markov_node **passgen_markov_node_child(passgen_markov_node *node, size_t index) {
+passgen_markov_node **passgen_markov_node_child(passgen_markov_node *node, size_t index) {
     return &node->data[node->capacity + node->capacity / 2].child[index];
 }
 
