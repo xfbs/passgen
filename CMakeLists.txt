@@ -68,7 +68,7 @@ endif()
 add_subdirectory(extern)
 
 # build libpassgen
-add_subdirectory(src/libpassgen)
+add_subdirectory(src)
 
 if(BUILD_BENCH)
   add_subdirectory(src/bench)

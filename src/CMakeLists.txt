@@ -30,19 +30,19 @@ set(SOURCE_LIST
     "hashmap.c")
 
 configure_file(version.c.in version.c)
-configure_file(../../include/passgen/config.h.in passgen/config.h)
+configure_file(../include/passgen/config.h.in passgen/config.h)
 
 add_library(passgen-static ${SOURCE_LIST} ${HEADER_LIST})
 target_link_libraries(passgen-static PUBLIC utf8proc m)
 set_target_properties(passgen-static PROPERTIES OUTPUT_NAME passgen)
-target_include_directories(passgen-static PUBLIC ../../include ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(passgen-static PUBLIC ../include ${CMAKE_CURRENT_BINARY_DIR})
 passgen_target_defaults(passgen-static)
 passgen_check_symbols(passgen-static)
 
 add_library(passgen-shared SHARED ${SOURCE_LIST} ${HEADER_LIST})
 target_link_libraries(passgen-shared PRIVATE utf8proc m)
 set_target_properties(passgen-shared PROPERTIES OUTPUT_NAME passgen)
-target_include_directories(passgen-shared PUBLIC ../../include ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(passgen-shared PUBLIC ../include ${CMAKE_CURRENT_BINARY_DIR})
 passgen_target_defaults(passgen-shared)
 passgen_check_symbols(passgen-shared)
 passgen_metrics(passgen-shared)
@@ -71,7 +71,7 @@ if(NOT LIBPASSGEN_SHARED)
 endif()
 
 install(
-  DIRECTORY ../../include/passgen
+  DIRECTORY ../include/passgen
   DESTINATION include
   COMPONENT dev)
 
