@@ -72,14 +72,14 @@ void passgen_random_close_xorshift(void *data) {
     free(data);
 }
 
-passgen_random_t *passgen_random_new_xorshift(uint64_t seed) {
-    passgen_random_t *random = malloc(sizeof(passgen_random_t));
+passgen_random *passgen_random_new_xorshift(uint64_t seed) {
+    passgen_random *random = malloc(sizeof(passgen_random));
     if(!random) return NULL;
 
     return passgen_random_open_xorshift(random, seed);
 }
 
-void passgen_random_reload(passgen_random_t *random) {
+void passgen_random_reload(passgen_random *random) {
     passgen_assert(random != NULL);
 
     // read random data.
@@ -94,8 +94,8 @@ void passgen_random_reload(passgen_random_t *random) {
     random->pos = 0;
 }
 
-passgen_random_t *
-passgen_random_open_xorshift(passgen_random_t *random, uint64_t seed) {
+passgen_random *
+passgen_random_open_xorshift(passgen_random *random, uint64_t seed) {
     // create state
     uint64_t *state = malloc(sizeof(uint64_t));
     if(!state) return NULL;
@@ -112,7 +112,7 @@ passgen_random_open_xorshift(passgen_random_t *random, uint64_t seed) {
 }
 
 #ifdef PASSGEN_RANDOM_HAVE_SYSTEM
-passgen_random_t *passgen_random_open_system(passgen_random_t *random) {
+passgen_random *passgen_random_open_system(passgen_random *random) {
     random->data = NULL;
     random->read = passgen_random_read_system;
     random->close = passgen_random_close_system;
@@ -120,14 +120,14 @@ passgen_random_t *passgen_random_open_system(passgen_random_t *random) {
     return random;
 }
 #else
-passgen_random_t *passgen_random_open_system(passgen_random_t *random) {
+passgen_random *passgen_random_open_system(passgen_random *random) {
     (void) random;
 
     return NULL;
 }
 #endif
 
-void passgen_random_read(passgen_random_t *random, void *data, size_t bytes) {
+void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
     if(bytes <= sizeof(random->buffer)) {
         // maximum bytes we can have right now
         size_t left = sizeof(random->buffer) - random->pos;
@@ -153,15 +153,15 @@ void passgen_random_read(passgen_random_t *random, void *data, size_t bytes) {
     }
 }
 
-passgen_random_t *passgen_random_new() {
-    passgen_random_t *random = malloc(sizeof(passgen_random_t));
+passgen_random *passgen_random_new() {
+    passgen_random *random = malloc(sizeof(passgen_random));
     passgen_assert(random);
 
     return passgen_random_open(random);
 }
 
-passgen_random_t *passgen_random_new_path(const char *path) {
-    passgen_random_t *random = malloc(sizeof(passgen_random_t));
+passgen_random *passgen_random_new_path(const char *path) {
+    passgen_random *random = malloc(sizeof(passgen_random));
     if(!random) return NULL;
 
     if(!passgen_random_open_path(random, path)) {
@@ -172,8 +172,8 @@ passgen_random_t *passgen_random_new_path(const char *path) {
     return random;
 }
 
-passgen_random_t *passgen_random_new_file(FILE *file) {
-    passgen_random_t *random = malloc(sizeof(passgen_random_t));
+passgen_random *passgen_random_new_file(FILE *file) {
+    passgen_random *random = malloc(sizeof(passgen_random));
     if(!random) return NULL;
 
     passgen_random_open_file(random, file);
@@ -181,7 +181,7 @@ passgen_random_t *passgen_random_new_file(FILE *file) {
     return random;
 }
 
-passgen_random_t *passgen_random_open(passgen_random_t *random) {
+passgen_random *passgen_random_open(passgen_random *random) {
 #ifdef PASSGEN_RANDOM_HAVE_SYSTEM
     return passgen_random_open_system(random);
 #else
@@ -189,8 +189,8 @@ passgen_random_t *passgen_random_open(passgen_random_t *random) {
 #endif
 }
 
-passgen_random_t *
-passgen_random_open_path(passgen_random_t *random, const char *path) {
+passgen_random *
+passgen_random_open_path(passgen_random *random, const char *path) {
     FILE *device = fopen(path, "r");
     if(!device) return NULL;
 
@@ -201,8 +201,8 @@ passgen_random_open_path(passgen_random_t *random, const char *path) {
     return random;
 }
 
-passgen_random_t *
-passgen_random_open_file(passgen_random_t *random, FILE *file) {
+passgen_random *
+passgen_random_open_file(passgen_random *random, FILE *file) {
     random->data = file;
     random->read = passgen_random_read_file;
     random->close = passgen_random_close_file;
@@ -210,7 +210,7 @@ passgen_random_open_file(passgen_random_t *random, FILE *file) {
     return random;
 }
 
-void passgen_random_close(passgen_random_t *random) {
+void passgen_random_close(passgen_random *random) {
     if(random != NULL) {
         random->close(random->data);
         random->data = NULL;
@@ -219,42 +219,42 @@ void passgen_random_close(passgen_random_t *random) {
     }
 }
 
-void passgen_random_free(passgen_random_t *random) {
+void passgen_random_free(passgen_random *random) {
     passgen_random_close(random);
     free(random);
 }
 
-inline uint8_t passgen_random_u8(passgen_random_t *random) {
+inline uint8_t passgen_random_u8(passgen_random *random) {
     uint8_t data;
     passgen_random_read(random, &data, sizeof(data));
     return data;
 }
 
-inline uint16_t passgen_random_u16(passgen_random_t *random) {
+inline uint16_t passgen_random_u16(passgen_random *random) {
     uint16_t data;
     passgen_random_read(random, &data, sizeof(data));
     return data;
 }
 
-inline uint32_t passgen_random_u32(passgen_random_t *random) {
+inline uint32_t passgen_random_u32(passgen_random *random) {
     uint32_t data;
     passgen_random_read(random, &data, sizeof(data));
     return data;
 }
 
-inline uint64_t passgen_random_u64(passgen_random_t *random) {
+inline uint64_t passgen_random_u64(passgen_random *random) {
     uint64_t data;
     passgen_random_read(random, &data, sizeof(data));
     return data;
 }
 
-inline bool passgen_random_bool(passgen_random_t *random) {
+inline bool passgen_random_bool(passgen_random *random) {
     uint8_t data;
     passgen_random_read(random, &data, sizeof(data));
     return (data & 128) == 0;
 }
 
-inline uint8_t passgen_random_u8_max(passgen_random_t *random, uint8_t max) {
+inline uint8_t passgen_random_u8_max(passgen_random *random, uint8_t max) {
     passgen_assert(max);
 
     uint8_t mask = max;
@@ -270,7 +270,7 @@ inline uint8_t passgen_random_u8_max(passgen_random_t *random, uint8_t max) {
     return num;
 }
 
-inline uint16_t passgen_random_u16_max(passgen_random_t *random, uint16_t max) {
+inline uint16_t passgen_random_u16_max(passgen_random *random, uint16_t max) {
     passgen_assert(max);
 
     if(max <= UINT8_MAX) {
@@ -292,7 +292,7 @@ inline uint16_t passgen_random_u16_max(passgen_random_t *random, uint16_t max) {
     return num;
 }
 
-inline uint32_t passgen_random_u32_max(passgen_random_t *random, uint32_t max) {
+inline uint32_t passgen_random_u32_max(passgen_random *random, uint32_t max) {
     passgen_assert(max);
 
     if(max < UINT16_MAX) {
@@ -315,7 +315,7 @@ inline uint32_t passgen_random_u32_max(passgen_random_t *random, uint32_t max) {
     return num;
 }
 
-inline uint64_t passgen_random_u64_max(passgen_random_t *random, uint64_t max) {
+inline uint64_t passgen_random_u64_max(passgen_random *random, uint64_t max) {
     passgen_assert(max);
 
     if(max < UINT32_MAX) {

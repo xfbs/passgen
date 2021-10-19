@@ -92,7 +92,7 @@ static int passgen_generate_write_buffer_utf8(void *data, int32_t codepoint) {
 
 size_t passgen_generate_fill_unicode(
     struct passgen_pattern *pattern,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     int32_t *buffer,
     size_t len) {
@@ -118,7 +118,7 @@ size_t passgen_generate_fill_unicode(
 
 size_t passgen_generate_fill_utf8(
     struct passgen_pattern *pattern,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     char *buffer,
     size_t len) {
@@ -143,7 +143,7 @@ size_t passgen_generate_fill_utf8(
 }
 
 size_t passgen_generate_repeat(
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     struct passgen_pattern_repeat *repeat) {
     size_t difference = repeat->max - repeat->min;
@@ -166,7 +166,7 @@ size_t passgen_generate_repeat(
 
 int passgen_generate_set(
     struct passgen_pattern_set *set,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -212,7 +212,7 @@ int passgen_generate_set(
 
 int passgen_generate_character(
     passgen_chars_t *character,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -235,7 +235,7 @@ int passgen_generate_character(
 
 int passgen_generate_special_pronounceable(
     struct passgen_pattern_special *special,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -264,7 +264,7 @@ int passgen_generate_special_pronounceable(
 
 int passgen_generate_special_wordlist(
     struct passgen_pattern_special *special,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -292,7 +292,7 @@ int passgen_generate_special_wordlist(
 
 int passgen_generate_special(
     struct passgen_pattern_special *special,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -322,7 +322,7 @@ int passgen_generate_special(
 
 int passgen_generate_item(
     struct passgen_pattern_item *item,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -387,7 +387,7 @@ int passgen_generate_item(
 
 int passgen_generate_segment(
     struct passgen_pattern_segment *segment,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -407,7 +407,7 @@ int passgen_generate_segment(
 
 int passgen_generate_group(
     struct passgen_pattern_group *group,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -428,7 +428,7 @@ int passgen_generate_group(
 
 int passgen_generate(
     struct passgen_pattern *pattern,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {

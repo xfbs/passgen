@@ -193,7 +193,7 @@ void passgen_markov_free(passgen_markov *markov) {
 uint32_t passgen_markov_generate(
     passgen_markov *markov,
     const uint32_t *current,
-    passgen_random_t *random) {
+    passgen_random *random) {
     passgen_markov_node *node = markov->root;
     size_t choices = 0;
     for(size_t i = 0; i < markov->level; i++) {

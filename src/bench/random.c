@@ -22,7 +22,7 @@ void bench(
     size_t count);
 
 int main() {
-    passgen_random_t *rand = passgen_random_new();
+    passgen_random *rand = passgen_random_new();
     bench("passgen_random_data", &bench_passgen_random_data, rand, 1024, 2000);
     bench("passgen_random_u8", &bench_passgen_random_u8, rand, 1, 2000000);
     bench("passgen_random_u16", &bench_passgen_random_u16, rand, 2, 1000000);
@@ -59,7 +59,7 @@ int main() {
 }
 
 void bench_passgen_random_data(void *data, size_t count) {
-    passgen_random_t *rand = data;
+    passgen_random *rand = data;
 
     for(size_t i = 0; i < count; i++) {
         char data[1024];
@@ -68,7 +68,7 @@ void bench_passgen_random_data(void *data, size_t count) {
 }
 
 void bench_passgen_random_u8(void *data, size_t count) {
-    passgen_random_t *rand = data;
+    passgen_random *rand = data;
     volatile uint8_t sum = 0;
 
     for(size_t i = 0; i < count; i++) {
@@ -77,7 +77,7 @@ void bench_passgen_random_u8(void *data, size_t count) {
 }
 
 void bench_passgen_random_u8_max(void *data, size_t count) {
-    passgen_random_t *rand = data;
+    passgen_random *rand = data;
     volatile uint8_t sum = 0;
 
     for(size_t i = 0; i < count; i++) {
@@ -86,7 +86,7 @@ void bench_passgen_random_u8_max(void *data, size_t count) {
 }
 
 void bench_passgen_random_u16(void *data, size_t count) {
-    passgen_random_t *rand = data;
+    passgen_random *rand = data;
     volatile uint16_t sum = 0;
 
     for(size_t i = 0; i < count; i++) {
@@ -95,7 +95,7 @@ void bench_passgen_random_u16(void *data, size_t count) {
 }
 
 void bench_passgen_random_u16_max(void *data, size_t count) {
-    passgen_random_t *rand = data;
+    passgen_random *rand = data;
     volatile uint16_t sum = 0;
 
     for(size_t i = 0; i < count; i++) {
@@ -104,7 +104,7 @@ void bench_passgen_random_u16_max(void *data, size_t count) {
 }
 
 void bench_passgen_random_u32_max(void *data, size_t count) {
-    passgen_random_t *rand = data;
+    passgen_random *rand = data;
     volatile uint32_t sum = 0;
 
     for(size_t i = 0; i < count; i++) {
@@ -113,7 +113,7 @@ void bench_passgen_random_u32_max(void *data, size_t count) {
 }
 
 void bench_passgen_random_u64_max(void *data, size_t count) {
-    passgen_random_t *rand = data;
+    passgen_random *rand = data;
     volatile uint64_t sum = 0;
 
     for(size_t i = 0; i < count; i++) {
@@ -122,7 +122,7 @@ void bench_passgen_random_u64_max(void *data, size_t count) {
 }
 
 void bench_passgen_random_u32(void *data, size_t count) {
-    passgen_random_t *rand = data;
+    passgen_random *rand = data;
     volatile uint32_t sum = 0;
 
     for(size_t i = 0; i < count; i++) {
@@ -131,7 +131,7 @@ void bench_passgen_random_u32(void *data, size_t count) {
 }
 
 void bench_passgen_random_u64(void *data, size_t count) {
-    passgen_random_t *rand = data;
+    passgen_random *rand = data;
     volatile uint64_t sum = 0;
 
     for(size_t i = 0; i < count; i++) {

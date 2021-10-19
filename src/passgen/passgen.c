@@ -22,7 +22,7 @@
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *) data)
 #define strprefix(prefix, str) memcmp(prefix, str, strlen(prefix))
 
-passgen_random_t *parse_random(const char *random) {
+passgen_random *parse_random(const char *random) {
     if(!random) {
         return passgen_random_new();
     }

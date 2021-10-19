@@ -44,7 +44,7 @@ typedef struct {
      /// The format to use when generating passwords.
      const char *format;
      /// The source of randomness to use.
-     passgen_random_t *random;
+     passgen_random *random;
      bool null;
      size_t depth;
      bool complexity;

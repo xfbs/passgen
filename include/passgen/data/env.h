@@ -6,6 +6,6 @@ struct passgen_env {
   bool find_complexity;
   double complexity;
   passgen_hashmap wordlists;
-  passgen_random_t *random;
+  passgen_random *random;
 };
 

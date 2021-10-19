@@ -4,7 +4,7 @@
 ///
 /// This file contains functions used to generate passwords using a parsed
 /// `passgen_pattern`. These functions all need some sort of source of
-/// randomness, which is a @ref passgen_random_t object. These can use
+/// randomness, which is a @ref passgen_random object. These can use
 /// of the system-specific randomness source, or read from a file, or use a
 /// custom randomness generator. 
 #pragma once
@@ -34,7 +34,7 @@ typedef int passgen_generate_cb(void *data, int32_t codepoint);
 /// codepoints written.
 size_t passgen_generate_fill_unicode(
     struct passgen_pattern *pattern,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     int32_t *buffer,
     size_t len);
@@ -44,7 +44,7 @@ size_t passgen_generate_fill_unicode(
 /// of bytes written.
 size_t passgen_generate_fill_utf8(
     struct passgen_pattern *pattern,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     char *buffer,
     size_t len);
@@ -53,68 +53,68 @@ size_t passgen_generate_fill_utf8(
 /// with the provided data pointer as well as each codepoint as it is generated.
 int passgen_generate(
     struct passgen_pattern *pattern,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
 size_t passgen_generate_repeat(
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     struct passgen_pattern_repeat *repeat);
 
 int passgen_generate_set(
     struct passgen_pattern_set *set,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
 int passgen_generate_character(
     passgen_chars_t *character,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
 int passgen_generate_special_pronounceable(
     struct passgen_pattern_special *special,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
 int passgen_generate_special_wordlist(
     struct passgen_pattern_special *special,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
 int passgen_generate_special(
     struct passgen_pattern_special *special,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
 int passgen_generate_group(
     struct passgen_pattern_group *group,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
 int passgen_generate_item(
     struct passgen_pattern_item *item,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
 int passgen_generate_segment(
     struct passgen_pattern_segment *segment,
-    passgen_random_t *rand,
+    passgen_random *rand,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func);

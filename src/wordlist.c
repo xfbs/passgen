@@ -113,7 +113,7 @@ void passgen_wordlist_scan(passgen_wordlist_t *wordlist) {
 
 const char *passgen_wordlist_random(
     passgen_wordlist_t *wordlist,
-    passgen_random_t *random) {
+    passgen_random *random) {
     size_t index = passgen_random_u64_max(random, wordlist->count);
     return wordlist->words[index];
 }

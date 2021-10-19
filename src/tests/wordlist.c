@@ -33,7 +33,7 @@ test_result test_wordlist_random(void) {
     passgen_wordlist_load(&wordlist, file);
     fclose(file);
 
-    passgen_random_t random;
+    passgen_random random;
     passgen_random_open(&random);
 
     for(size_t i = 0; i < wordlist.count; i++) {

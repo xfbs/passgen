@@ -25,7 +25,7 @@ typedef struct passgen_wordlist_t {
 void passgen_wordlist_load(passgen_wordlist_t *wordlist, FILE *file);
 
 const char *
-passgen_wordlist_random(passgen_wordlist_t *wordlist, passgen_random_t *random);
+passgen_wordlist_random(passgen_wordlist_t *wordlist, passgen_random *random);
 
 /* read a whole wordlist in from a file */
 void passgen_wordlist_read(passgen_wordlist_t *wordlist, FILE *file);

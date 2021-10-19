@@ -107,7 +107,7 @@ test_result test_markov_add(void) {
 }
 
 test_result test_markov_generate(void) {
-    passgen_random_t *rand = passgen_random_new_xorshift(SEED);
+    passgen_random *rand = passgen_random_new_xorshift(SEED);
     //passgen_random_open_xorshift(&rand, SEED);
 
     passgen_markov markov;

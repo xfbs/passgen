@@ -39,7 +39,7 @@ void random_word(const char **args, size_t args_len) {
     const char *filename = args[2];
     passgen_assert(filename);
 
-    passgen_random_t random;
+    passgen_random random;
     passgen_random_open(&random);
     passgen_wordlist_t wordlist;
     load(&wordlist, filename);
