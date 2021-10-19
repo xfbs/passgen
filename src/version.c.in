@@ -1,8 +1,8 @@
 #include <passgen/config.h>
 #include <passgen/version.h>
 
-passgen_version_t passgen_version() {
-  return (passgen_version_t) {
+passgen_version passgen_version_get() {
+  return (passgen_version) {
     .maj = @PROJECT_VERSION_MAJOR@,
     .min = @PROJECT_VERSION_MINOR@,
     .rev = @PROJECT_VERSION_PATCH@,
@@ -13,7 +13,7 @@ const char *passgen_version_str() {
   return "@PROJECT_VERSION@";
 }
 
-bool passgen_version_min(passgen_version_t version) {
+bool passgen_version_min(passgen_version version) {
   // TODO: implement
   (void) version;
 
