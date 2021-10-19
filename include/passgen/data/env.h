@@ -1,12 +1,11 @@
 #pragma once
-#include "passgen/pronounceable.h"
 #include "passgen/hashmap.h"
+#include "passgen/random.h"
 
 struct passgen_env {
   bool find_complexity;
   double complexity;
-  size_t pronounceable_limit;
-  enum passgen_pronounceable_type pronounceable_type;
   passgen_hashmap wordlists;
+  passgen_random_t *random;
 };
 

@@ -17,7 +17,6 @@
 #include "passgen/data/special_kind.h"
 #include "passgen/data/token.h"
 #include "passgen/markov.h"
-#include "passgen/pronounceable.h"
 
 #define add_type(name) \
     { #name, sizeof(name) }

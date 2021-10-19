@@ -13,7 +13,6 @@
 #include "passgen/debug.h"
 #include "passgen/generate.h"
 #include "passgen/parser.h"
-#include "passgen/pronounceable.h"
 #include "passgen/random.h"
 #include "passgen/token.h"
 #include "passgen/utf8.h"
@@ -90,9 +89,8 @@ void passgen_run(passgen_opts opts) {
     for(size_t i = 0; i < opts.amount; ++i) {
         struct passgen_env env = {
             .find_complexity = opts.complexity,
-            .pronounceable_limit = 1000,
-            .pronounceable_type = PASSGEN_PRONOUNCEABLE_ENGLISH,
             .wordlists = opts.wordlists,
+            .random = opts.random,
         };
 
         // get a NULL-terminated, random pass.

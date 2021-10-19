@@ -34,8 +34,7 @@ struct fillpos_utf8 {
 
 static struct passgen_env passgen_env_default = {
     .find_complexity = false,
-    .pronounceable_limit = 1000,
-    .pronounceable_type = PASSGEN_PRONOUNCEABLE_ENGLISH,
+    .random = NULL,
 };
 
 static int passgen_generate_write_buffer(void *data, int32_t codepoint) {
