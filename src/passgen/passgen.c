@@ -152,7 +152,7 @@ static void wordlist_add(passgen_opts *opt, const char *input) {
         return;
     }
 
-    passgen_wordlist_t *wordlist = malloc(sizeof(passgen_wordlist_t));
+    passgen_wordlist *wordlist = malloc(sizeof(passgen_wordlist));
     passgen_hashmap_insert(&opt->wordlists, name, wordlist);
     passgen_wordlist_load(wordlist, file);
 }

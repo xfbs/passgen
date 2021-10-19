@@ -7,7 +7,7 @@
 #define ALLOC_INITIAL  256
 #define ALLOC_INCREASE 2
 
-void passgen_wordlist_load(passgen_wordlist_t *wordlist, FILE *file) {
+void passgen_wordlist_load(passgen_wordlist *wordlist, FILE *file) {
     passgen_markov_init(&wordlist->markov, 3);
     passgen_stack_init(&wordlist->stack, sizeof(uint32_t *));
 
@@ -64,7 +64,7 @@ void passgen_wordlist_load(passgen_wordlist_t *wordlist, FILE *file) {
     passgen_wordlist_scan(wordlist);
 }
 
-void passgen_wordlist_read(passgen_wordlist_t *wordlist, FILE *file) {
+void passgen_wordlist_read(passgen_wordlist *wordlist, FILE *file) {
     // get size of file
     fseek(file, 0, SEEK_END);
     wordlist->size = ftell(file);
@@ -82,7 +82,7 @@ void passgen_wordlist_read(passgen_wordlist_t *wordlist, FILE *file) {
     wordlist->data[wordlist->size] = 0;
 }
 
-void passgen_wordlist_scan(passgen_wordlist_t *wordlist) {
+void passgen_wordlist_scan(passgen_wordlist *wordlist) {
     char *state = NULL, *token;
 
     size_t capacity = ALLOC_INITIAL;
@@ -112,7 +112,7 @@ void passgen_wordlist_scan(passgen_wordlist_t *wordlist) {
 }
 
 const char *passgen_wordlist_random(
-    passgen_wordlist_t *wordlist,
+    passgen_wordlist *wordlist,
     passgen_random *random) {
     size_t index = passgen_random_u64_max(random, wordlist->count);
     return wordlist->words[index];
@@ -123,7 +123,7 @@ static void free_word(void *element) {
     free(*word);
 }
 
-void passgen_wordlist_free(passgen_wordlist_t *wordlist) {
+void passgen_wordlist_free(passgen_wordlist *wordlist) {
     passgen_markov_free(&wordlist->markov);
     passgen_stack_foreach(&wordlist->stack, free_word);
     passgen_stack_free(&wordlist->stack);

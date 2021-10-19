@@ -243,7 +243,7 @@ int passgen_generate_special_pronounceable(
     if(!entry) {
         return -1;
     }
-    passgen_wordlist_t *wordlist = entry->value;
+    passgen_wordlist *wordlist = entry->value;
     passgen_markov *markov = &wordlist->markov;
     uint32_t word[128];
     size_t pos = markov->level;
@@ -275,12 +275,12 @@ int passgen_generate_special_wordlist(
     (void) data;
     (void) func;
 
-    //passgen_wordlist_t *wordlist;
+    //passgen_wordlist *wordlist;
     passgen_hashmap_entry *entry = passgen_hashmap_lookup(&env->wordlists, special->parameters);
     if(!entry) {
         return -1;
     }
-    passgen_wordlist_t *wordlist = entry->value;
+    passgen_wordlist *wordlist = entry->value;
     const char *word = passgen_wordlist_random(wordlist, rand);
     while(*word) {
         func(data, *word);

@@ -10,7 +10,7 @@ test_result test_wordlist_load(void) {
         fmemopen((void *) example_wordlist, example_wordlist_size, "r");
     assert(file);
 
-    passgen_wordlist_t wordlist;
+    passgen_wordlist wordlist;
     passgen_wordlist_load(&wordlist, file);
     fclose(file);
 
@@ -29,7 +29,7 @@ test_result test_wordlist_random(void) {
         fmemopen((void *) example_wordlist, example_wordlist_size, "r");
     assert(file);
 
-    passgen_wordlist_t wordlist;
+    passgen_wordlist wordlist;
     passgen_wordlist_load(&wordlist, file);
     fclose(file);
 

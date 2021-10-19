@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     FILE *patterns_file = fopen(patterns_path, "r");
     passgen_assert(patterns_file);
 
-    passgen_wordlist_t patterns;
+    passgen_wordlist patterns;
     passgen_wordlist_load(&patterns, patterns_file);
     fclose(patterns_file);
 

@@ -8,7 +8,7 @@ void help(const char **args, size_t args_len) {
     (void) args_len;
 }
 
-void load(passgen_wordlist_t *wordlist, const char *filename) {
+void load(passgen_wordlist *wordlist, const char *filename) {
     FILE *file = fopen(filename, "r");
     passgen_assert(file);
 
@@ -21,7 +21,7 @@ void dump(const char **args, size_t args_len) {
     const char *filename = args[2];
     passgen_assert(filename);
 
-    passgen_wordlist_t wordlist;
+    passgen_wordlist wordlist;
     load(&wordlist, filename);
 
     printf("size = %zu\n", wordlist.size);
@@ -41,7 +41,7 @@ void random_word(const char **args, size_t args_len) {
 
     passgen_random random;
     passgen_random_open(&random);
-    passgen_wordlist_t wordlist;
+    passgen_wordlist wordlist;
     load(&wordlist, filename);
 
     const char *word = passgen_wordlist_random(&wordlist, &random);
