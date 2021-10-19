@@ -5,11 +5,15 @@
 
 struct passgen_markov;
 struct passgen_markov_node;
+struct passgen_markov_leaf;
 
-struct passgen_markov {
-  size_t level;
+struct passgen_markov_leaf {
   size_t cumulative;
-  struct passgen_markov_node *root;
+  size_t capacity;
+  union {
+    uint32_t count[1];
+    uint32_t codepoint[1];
+  } data[0];
 };
 
 struct passgen_markov_node {
@@ -19,6 +23,12 @@ struct passgen_markov_node {
     uint32_t codepoint[1];
     struct passgen_markov *child[1];
   } data[0];
+};
+
+struct passgen_markov {
+  size_t level;
+  size_t cumulative;
+  struct passgen_markov_node *root;
 };
 
 typedef struct passgen_markov passgen_markov;
