@@ -70,8 +70,7 @@ See the [BUILDING.md](BUILDING.md) for more information about building the proje
 ## Prior art
 
 * [pwgen](https://linux.die.net/man/1/pwgen).
-* [apg](https://linux.die.net/man/1/apg).
-- apg
+* [apg](https://linux.die.net/man/1/apg): generates random passwords, can either be generated such that they are pronounceable, or taken from a predefined list of symbols.
 
 ## License
 
