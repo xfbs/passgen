@@ -158,7 +158,7 @@ void passgen_markov_insert(
     const uint32_t *sequence,
     size_t weight) {
     markov->root = passgen_markov_node_insert(markov->root, sequence, markov->level + 1, weight);
-    markov->cumulative += weight;
+    markov->count += weight;
 }
 
 // Add a word to a markov chain

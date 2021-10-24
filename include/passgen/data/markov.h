@@ -3,10 +3,10 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-struct passgen_markov;
-struct passgen_markov_node;
-struct passgen_markov_leaf;
-
+/// This is essentially a sorted list of codepoint-count tuples.
+/// During insertion, these are sorted by the codepoint, however when finalizing
+/// the sort order might be changed to being sorted by count to allow for faster
+/// generation.
 struct passgen_markov_leaf {
   size_t cumulative;
   size_t capacity;
@@ -16,6 +16,10 @@ struct passgen_markov_leaf {
   } data[0];
 };
 
+struct passgen_markov;
+
+/// Intermediate nodes in the markov chain tree. Implemented as custom hash map
+/// where the keys are codepoints and the values are nodes or leafs.
 struct passgen_markov_node {
   size_t capacity;
   union {
@@ -27,7 +31,7 @@ struct passgen_markov_node {
 
 struct passgen_markov {
   size_t level;
-  size_t cumulative;
+  size_t count;
   struct passgen_markov_node *root;
 };
 
