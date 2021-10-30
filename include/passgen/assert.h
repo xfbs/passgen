@@ -14,3 +14,5 @@ void passgen_assert_fail(
     const char *file,
     const char *func,
     size_t line);
+
+#define passgen_static_assert(x) _Static_assert(x)
