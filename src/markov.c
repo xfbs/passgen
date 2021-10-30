@@ -9,7 +9,19 @@
 #define MARKOV_LEAF_INITIAL    4
 #define MARKOV_LEAF_MULTIPLIER 2
 
-static const size_t markov_sizes[] = {3, 7, 17, 37, 79, 163, 331, 673, 1361, 2729, 5471, 10949, 21911, 43853, 87719, 175447, 350899, 701819, 0};
+/// Sizes for the leaf and node hash maps. These are all prime numbers, with the
+/// property that every number is greater than double the previous one. Generated
+/// with Ruby with:
+///
+/// ```ruby
+/// require 'prime'
+/// p Prime.take(10000).inject([3]){|l, p| l << p if (2*l.last) < p; l}
+/// ```
+static const size_t markov_sizes[] = {
+    3, 7, 17, 37, 79, 163, 331, 673, 1361, 2729, 5471, 10949, 21911, 43853,
+    87719, 175447, 350899, 701819, 1403641, 2807303, 5614657, 11229331,
+    22458671, 44917381, 0
+};
 
 size_t passgen_markov_node_size(size_t capacity) {
     // we use capacity + 1 there to make sure it's a round number, such that the
@@ -23,6 +35,7 @@ size_t passgen_markov_leaf_size(size_t capacity) {
 
 passgen_markov_node *passgen_markov_node_new(size_t size_index) {
     size_t capacity = markov_sizes[size_index];
+    passgen_assert(capacity);
     size_t size = passgen_markov_node_size(capacity);
     passgen_markov_node *node = calloc(1, size);
     memset(node, 0, size);
@@ -57,6 +70,28 @@ void passgen_markov_node_free(passgen_markov_node *node, size_t level) {
     free(node);
 }
 
+void passgen_markov_node_check(passgen_markov_node *node, size_t level) {
+    assert(node->capacity);
+    assert(node->capacity % 2);
+    for(size_t i = 0; i < node->capacity; i++) {
+        void *data = passgen_markov_node_child(node, i).node;
+        uint32_t codepoint = passgen_markov_node_codepoint(node, i);
+        if(codepoint) {
+            assert(data);
+        }
+        if(data) {
+            assert((codepoint % node->capacity) == i);
+            if(level > 2) {
+                passgen_markov_node_check(data, level - 1);
+            }
+        }
+    }
+}
+
+void passgen_markov_check(passgen_markov *markov) {
+    passgen_markov_node_check(markov->root, markov->level);
+}
+
 // Initialize new markov chain with a given level
 void passgen_markov_init(passgen_markov *markov, uint8_t level) {
     passgen_assert(level);
@@ -80,8 +115,10 @@ passgen_markov_node *passgen_markov_node_realloc(passgen_markov_node *node) {
     // re-insert old elements
     for(size_t i = 0; i < node->capacity; i++) {
         if(passgen_markov_node_child(node, i).node) {
-            new = passgen_markov_node_insert(new, passgen_markov_node_codepoint(node, i));
-            passgen_markov_node_child(new, i) = passgen_markov_node_child(node, i);
+            uint32_t codepoint = passgen_markov_node_codepoint(node, i);
+            new = passgen_markov_node_insert(new, codepoint);
+            assert(!passgen_markov_node_child(new, codepoint).node);
+            passgen_markov_node_child(new, codepoint).node = passgen_markov_node_child(node, i).node;
         }
     }
 
@@ -144,7 +181,7 @@ void passgen_markov_insert(
     passgen_markov *markov,
     const uint32_t *sequence,
     size_t weight) {
-    markov->root = passgen_markov_node_insert_word(markov->root, sequence, markov->level + 1, weight);
+    markov->root = passgen_markov_node_insert_word(markov->root, sequence, markov->level, weight);
     markov->count += weight;
 }
 

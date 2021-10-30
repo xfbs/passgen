@@ -107,6 +107,16 @@ test_result test_markov_node_insert_word(void) {
 }
 
 test_result test_markov_add(void) {
+    passgen_markov markov;
+
+    passgen_markov_init(&markov, 2);
+
+    passgen_markov_add(&markov, &(const uint32_t[]){'a'}, 1, 1);
+    passgen_markov_add(&markov, &(const uint32_t[]){'l', 'a'}, 2, 1);
+    passgen_markov_add(&markov, &(const uint32_t[]){'l', 'e'}, 2, 1);
+    passgen_markov_add(&markov, &(const uint32_t[]){'t', 'h', 'e'}, 3, 1);
+
+    passgen_markov_free(&markov);
 
     return test_ok;
 }
