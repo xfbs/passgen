@@ -1,6 +1,7 @@
 #include "passgen/data/special.h"
 #include "passgen/assert.h"
 #include <stdbool.h>
+#include <stdlib.h>
 
 void passgen_pattern_special_init_char(
     struct passgen_pattern_special *special,
