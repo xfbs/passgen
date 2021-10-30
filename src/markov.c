@@ -26,11 +26,15 @@ static const size_t markov_sizes[] = {
 size_t passgen_markov_node_size(size_t capacity) {
     // we use capacity + 1 there to make sure it's a round number, such that the
     // child pointers are not misaligned.
-    return sizeof(passgen_markov_node) + (capacity + 1) * sizeof(uint32_t) + capacity * sizeof(passgen_markov_node *);
+    return sizeof(passgen_markov_node)
+        + (capacity + 1) * sizeof(uint32_t)
+        + capacity * sizeof(passgen_markov_node *);
 }
 
 size_t passgen_markov_leaf_size(size_t capacity) {
-    return sizeof(passgen_markov_leaf) + capacity * (sizeof(uint32_t) + sizeof(uint32_t));
+    return sizeof(passgen_markov_leaf)
+        + capacity * sizeof(uint32_t)
+        + capacity * sizeof(uint32_t);
 }
 
 passgen_markov_node *passgen_markov_node_new(size_t size_index) {
@@ -43,11 +47,13 @@ passgen_markov_node *passgen_markov_node_new(size_t size_index) {
     return node;
 }
 
-passgen_markov_leaf *passgen_markov_leaf_new(size_t capacity) {
+passgen_markov_leaf *passgen_markov_leaf_new(size_t size_index) {
+    size_t capacity = markov_sizes[size_index];
     size_t size = passgen_markov_leaf_size(capacity);
     passgen_markov_leaf *leaf = calloc(1, size);
     memset(leaf, 0, size);
     leaf->capacity = capacity;
+    leaf->total_count = 0;
     return leaf;
 }
 
@@ -59,7 +65,7 @@ void passgen_markov_node_free(passgen_markov_node *node, size_t level) {
     for(size_t i = 0; i < node->capacity; i++) {
         void *child = passgen_markov_node_child(node, i).leaf;
         if(child) {
-            if(!level) {
+            if(level < 2) {
                 passgen_markov_leaf_free(child);
             } else {
                 passgen_markov_node_free(child, level - 1);
@@ -100,8 +106,38 @@ void passgen_markov_init(passgen_markov *markov, uint8_t level) {
     markov->root = passgen_markov_node_new(0);
 }
 
-passgen_markov_leaf *passgen_markov_leaf_insert(passgen_markov_leaf *child, uint32_t codepoint, size_t weight) {
-    return child;
+passgen_markov_leaf *passgen_markov_leaf_realloc(passgen_markov_leaf *leaf) {
+    size_t size_index = 0;
+    while(markov_sizes[size_index] < leaf->capacity) {
+        size_index++;
+    }
+
+    passgen_markov_leaf *new = passgen_markov_leaf_new(size_index + 1);
+
+    // re-insert old elements
+    for(size_t i = 0; i < leaf->capacity; i++) {
+        if(passgen_markov_leaf_count(leaf, i)) {
+            uint32_t codepoint = passgen_markov_leaf_codepoint(leaf, i);
+            uint32_t count = passgen_markov_leaf_count(leaf, i);
+            new = passgen_markov_leaf_insert(new, codepoint, count);
+        }
+    }
+
+    free(leaf);
+
+    return new;
+}
+
+passgen_markov_leaf *passgen_markov_leaf_insert(passgen_markov_leaf *leaf, uint32_t codepoint, size_t weight) {
+    while(passgen_markov_leaf_count(leaf, codepoint) && passgen_markov_leaf_codepoint(leaf, codepoint) != codepoint) {
+        leaf = passgen_markov_leaf_realloc(leaf);
+    }
+
+    // set codepoint
+    passgen_markov_leaf_count(leaf, codepoint) += weight;
+    leaf->total_count += weight;
+
+    return leaf;
 }
 
 passgen_markov_node *passgen_markov_node_realloc(passgen_markov_node *node) {
@@ -154,7 +190,7 @@ passgen_markov_node *passgen_markov_node_insert_word(
         passgen_markov_leaf *child = passgen_markov_node_child(node, codepoint).leaf;
 
         if(!child) {
-            child = passgen_markov_leaf_new(MARKOV_LEAF_INITIAL);
+            child = passgen_markov_leaf_new(0);
         }
 
         child = passgen_markov_leaf_insert(child, sequence[1], weight);
@@ -181,7 +217,7 @@ void passgen_markov_insert(
     passgen_markov *markov,
     const uint32_t *sequence,
     size_t weight) {
-    markov->root = passgen_markov_node_insert_word(markov->root, sequence, markov->level, weight);
+    markov->root = passgen_markov_node_insert_word(markov->root, sequence, markov->level + 1, weight);
     markov->count += weight;
 }
 
@@ -192,7 +228,7 @@ void passgen_markov_add(
     size_t word_len,
     size_t weight) {
     // insert start sequences
-    size_t sequence_len = markov->level + markov->level;
+    size_t sequence_len = 2 * markov->level + 1;
     uint32_t sequence[sequence_len];
     memset(sequence, 0, sizeof(sequence[0]) * sequence_len);
     memcpy(&sequence[markov->level], word, sizeof(uint32_t) * MIN(markov->level, word_len));

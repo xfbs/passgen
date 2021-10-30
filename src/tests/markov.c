@@ -22,6 +22,24 @@ test_result test_markov_node_layout(void) {
     return test_ok;
 }
 
+test_result test_markov_leaf_layout(void) {
+    passgen_markov_leaf *leaf = passgen_markov_leaf_new(0);
+
+    assert_eq(leaf->capacity, 3);
+
+    assert_eq(&passgen_markov_leaf_codepoint(leaf, 0), ((void *) leaf) + 2 * sizeof(size_t));
+    assert_eq(&passgen_markov_leaf_codepoint(leaf, 1), ((void *) leaf) + 2 * sizeof(size_t) + 1 * sizeof(uint32_t));
+    assert_eq(&passgen_markov_leaf_codepoint(leaf, 2), ((void *) leaf) + 2 * sizeof(size_t) + 2 * sizeof(uint32_t));
+
+    assert_eq(&passgen_markov_leaf_count(leaf, 0), ((void *) leaf) + 2 * sizeof(size_t) + 3 * sizeof(uint32_t));
+    assert_eq(&passgen_markov_leaf_count(leaf, 1), ((void *) leaf) + 2 * sizeof(size_t) + 4 * sizeof(uint32_t));
+    assert_eq(&passgen_markov_leaf_count(leaf, 2), ((void *) leaf) + 2 * sizeof(size_t) + 5 * sizeof(uint32_t));
+
+    free(leaf);
+
+    return test_ok;
+}
+
 test_result test_markov_node_insert(void) {
     passgen_markov_node *node = passgen_markov_node_new(0);
     assert_eq(node->capacity, 3);
@@ -77,6 +95,55 @@ test_result test_markov_node_insert(void) {
     return test_ok;
 }
 
+test_result test_markov_leaf_insert(void) {
+    passgen_markov_leaf *leaf = passgen_markov_leaf_new(0);
+    assert_eq(leaf->capacity, 3);
+
+    leaf = passgen_markov_leaf_insert(leaf, 0, 1);
+    assert(passgen_markov_leaf_count(leaf, 0) == 1);
+
+    leaf = passgen_markov_leaf_insert(leaf, 0, 1);
+    assert(passgen_markov_leaf_count(leaf, 0) == 2);
+
+    leaf = passgen_markov_leaf_insert(leaf, 1, 3);
+    assert(passgen_markov_leaf_count(leaf, 1) == 3);
+
+    leaf = passgen_markov_leaf_insert(leaf, 2, 7);
+    assert(passgen_markov_leaf_count(leaf, 2) == 7);
+
+    assert_eq(leaf->capacity, 3);
+
+    leaf = passgen_markov_leaf_insert(leaf, 3, 2);
+    assert(passgen_markov_leaf_count(leaf, 3) == 2);
+
+    assert_eq(leaf->capacity, 7);
+
+    leaf = passgen_markov_leaf_insert(leaf, 4, 4);
+    assert(passgen_markov_leaf_count(leaf, 4) == 4);
+
+    leaf = passgen_markov_leaf_insert(leaf, 5, 6);
+    assert(passgen_markov_leaf_count(leaf, 5) == 6);
+
+    leaf = passgen_markov_leaf_insert(leaf, 6, 8);
+    assert(passgen_markov_leaf_count(leaf, 6) == 8);
+
+    leaf = passgen_markov_leaf_insert(leaf, 7, 10);
+    assert(passgen_markov_leaf_count(leaf, 7) == 10);
+
+    assert_eq(leaf->capacity, 17);
+
+    for(size_t i = 8; i < 1000; i++) {
+        leaf = passgen_markov_leaf_insert(leaf, i, i);
+        assert(passgen_markov_leaf_count(leaf, i) == i);
+    }
+
+    assert_eq(leaf->capacity, 1361);
+
+    free(leaf);
+
+    return test_ok;
+}
+
 test_result test_markov_node_insert_word(void) {
     passgen_markov_node *root_node = passgen_markov_node_new(0);
 
@@ -101,7 +168,7 @@ test_result test_markov_node_insert_word(void) {
     node = passgen_markov_node_child(node, 'l').node;
     assert(node);
 
-    passgen_markov_node_free(root_node, 4);
+    passgen_markov_node_free(root_node, 5);
 
     return test_ok;
 }
