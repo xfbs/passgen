@@ -232,17 +232,19 @@ void passgen_markov_add(
     uint32_t sequence[sequence_len];
     memset(sequence, 0, sizeof(sequence[0]) * sequence_len);
     memcpy(&sequence[markov->level], word, sizeof(uint32_t) * MIN(markov->level, word_len));
-    for(size_t i = 0; i < markov->level; i++) {
+    for(size_t i = 0; i < MIN(markov->level, word_len); i++) {
         passgen_markov_insert(markov, &sequence[i], weight);
     }
     for(size_t i = 0; i < SATURATING_SUB(word_len, markov->level); i++) {
         passgen_markov_insert(markov, &word[i], weight);
     }
     memset(sequence, 0, sizeof(sequence[0]) * sequence_len);
-    memcpy(sequence, &word[SATURATING_SUB(word_len, markov->level)], sizeof(uint32_t) * MIN(markov->level, word_len));
-    for(size_t i = 0; i < MIN(markov->level, word_len); i++) {
-        passgen_markov_insert(markov, &sequence[i], weight);
-    }
+    memcpy(
+        &sequence[SATURATING_SUB(markov->level, word_len)],
+        &word[SATURATING_SUB(word_len, markov->level)],
+        sizeof(uint32_t) * MIN(markov->level, word_len)
+    );
+    passgen_markov_insert(markov, &sequence[0], weight);
 }
 
 // Free a markov chain
