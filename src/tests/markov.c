@@ -180,11 +180,63 @@ test_result test_markov_node_insert_word(void) {
 
 test_result test_markov_add(void) {
     passgen_markov markov;
+    passgen_markov_node *node;
+    passgen_markov_leaf *leaf;
 
+    // markov chain level 2, meaning two prefix chars
     passgen_markov_init(&markov, 2);
 
+    // this should have added 00a and 0a0 into the chain.
     passgen_markov_add(&markov, &(const uint32_t[]){'a'}, 1, 1);
-    passgen_markov_add(&markov, &(const uint32_t[]){'l', 'a'}, 2, 1);
+
+    // verify 00a is there
+    node = passgen_markov_node_child(markov.root, 0).node;
+    assert(node);
+    leaf = passgen_markov_node_child(node, 0).leaf;
+    assert(leaf);
+    assert_eq(leaf->total_count, 1);
+    assert_eq(passgen_markov_leaf_codepoint(leaf, 'a'), 'a');
+    assert_eq(passgen_markov_leaf_count(leaf, 'a'), 1);
+
+    // verify 0a0 is there
+    node = passgen_markov_node_child(markov.root, 0).node;
+    assert(node);
+    leaf = passgen_markov_node_child(node, 'a').leaf;
+    assert(leaf);
+    assert_eq(leaf->total_count, 1);
+    assert_eq(passgen_markov_leaf_codepoint(leaf, 0), 0);
+    assert_eq(passgen_markov_leaf_count(leaf, 0), 1);
+
+    // this should have added 00l, 0la, la0, each with a weight of 2.
+    passgen_markov_add(&markov, &(const uint32_t[]){'l', 'a'}, 2, 2);
+
+    // verify 00l is there
+    node = passgen_markov_node_child(markov.root, 0).node;
+    assert(node);
+    leaf = passgen_markov_node_child(node, 0).leaf;
+    assert(leaf);
+    assert_eq(leaf->total_count, 3);
+    assert_eq(passgen_markov_leaf_codepoint(leaf, 'l'), 'l');
+    assert_eq(passgen_markov_leaf_count(leaf, 'l'), 2);
+
+    // verify 0la is there
+    node = passgen_markov_node_child(markov.root, 0).node;
+    assert(node);
+    leaf = passgen_markov_node_child(node, 'l').leaf;
+    assert(leaf);
+    assert_eq(leaf->total_count, 2);
+    assert_eq(passgen_markov_leaf_codepoint(leaf, 'a'), 'a');
+    assert_eq(passgen_markov_leaf_count(leaf, 'a'), 2);
+
+    // verify la0 is there
+    node = passgen_markov_node_child(markov.root, 'l').node;
+    assert(node);
+    leaf = passgen_markov_node_child(node, 'a').leaf;
+    assert(leaf);
+    assert_eq(leaf->total_count, 2);
+    assert_eq(passgen_markov_leaf_codepoint(leaf, 0), 0);
+    assert_eq(passgen_markov_leaf_count(leaf, 0), 2);
+
     passgen_markov_add(&markov, &(const uint32_t[]){'l', 'e'}, 2, 1);
     passgen_markov_add(&markov, &(const uint32_t[]){'t', 'h', 'e'}, 3, 1);
     passgen_markov_add(&markov, &(const uint32_t[]){'p', 'a', 'r', 't'}, 4, 1);
