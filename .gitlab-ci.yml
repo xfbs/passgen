@@ -79,7 +79,7 @@ build:alpine:
   stage: build
   script:
     - mkdir -p build-alpine-release && cd build-alpine-release
-    - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC=y ..
+    - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y ..
     - ninja
     - ./src/tests/passgen-test
     - cpack -G TXZ
