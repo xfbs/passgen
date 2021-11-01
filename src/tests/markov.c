@@ -165,10 +165,15 @@ test_result test_markov_node_insert_word(void) {
     assert(node);
 
     assert_eq(passgen_markov_node_codepoint(node, 'l'), 'l');
-    node = passgen_markov_node_child(node, 'l').node;
-    assert(node);
+    passgen_markov_leaf *leaf = passgen_markov_node_child(node, 'l').leaf;
+    assert(leaf);
+    assert_eq(leaf->capacity, 3);
+    assert_eq(leaf->total_count, 1);
 
-    passgen_markov_node_free(root_node, 5);
+    assert_eq(passgen_markov_leaf_codepoint(leaf, 'o'), 'o');
+    assert_eq(passgen_markov_leaf_count(leaf, 'o'), 1);
+
+    passgen_markov_node_free(root_node, 4);
 
     return test_ok;
 }
@@ -182,6 +187,8 @@ test_result test_markov_add(void) {
     passgen_markov_add(&markov, &(const uint32_t[]){'l', 'a'}, 2, 1);
     passgen_markov_add(&markov, &(const uint32_t[]){'l', 'e'}, 2, 1);
     passgen_markov_add(&markov, &(const uint32_t[]){'t', 'h', 'e'}, 3, 1);
+    passgen_markov_add(&markov, &(const uint32_t[]){'p', 'a', 'r', 't'}, 4, 1);
+    passgen_markov_add(&markov, &(const uint32_t[]){'p', 'h', 'o', 'n', 'e'}, 5, 1);
 
     passgen_markov_free(&markov);
 

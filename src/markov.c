@@ -134,6 +134,7 @@ passgen_markov_leaf *passgen_markov_leaf_insert(passgen_markov_leaf *leaf, uint3
     }
 
     // set codepoint
+    passgen_markov_leaf_codepoint(leaf, codepoint) = codepoint;
     passgen_markov_leaf_count(leaf, codepoint) += weight;
     leaf->total_count += weight;
 
