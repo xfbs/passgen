@@ -258,26 +258,27 @@ uint32_t passgen_markov_generate(
     const uint32_t *current,
     passgen_random *random) {
     passgen_markov_node *node = markov->root;
-    size_t choices = 0;
+
     for(size_t i = 0; i < markov->level; i++) {
-        size_t pos = 0; // = passgen_markov_node_find(node, current[i]);
-        //passgen_assert(*passgen_markov_node_codepoint(node, pos) == current[i]);
-        //choices = *passgen_markov_node_cumulative(node, pos);
-        //node = *passgen_markov_node_child(node, pos);
+        node = passgen_markov_node_child(node, current[i]).leaf;
+        assert(node);
     }
 
-    passgen_assert(choices);
-    passgen_assert(node);
+    passgen_markov_leaf *leaf = node;
 
-    size_t choice = passgen_random_u64_max(random, choices);
-    for(size_t i = 0; i < node->capacity; i++) {
-        size_t cumulative = 0; // *passgen_markov_node_cumulative(node, i);
-        if(cumulative > choice) {
-            //return *passgen_markov_node_codepoint(node, i);
-        } else {
-            choice -= cumulative;
+    size_t choice = passgen_random_u64_max(random, leaf->total_count);
+    for(size_t i = 0; i < leaf->capacity; i++) {
+        uint32_t count = passgen_markov_leaf_count(leaf, i);
+        if(count) {
+            if(choice < count) {
+                return passgen_markov_leaf_codepoint(leaf, i);
+            } else {
+                choice -= count;
+            }
         }
     }
+
+    assert(false);
 
     return 0;
 }
