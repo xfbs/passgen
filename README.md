@@ -48,7 +48,7 @@ Create something that looks like an email address.
 
 Create an password consisting of three pronounceable (but randomly generated) words.
 
-    $ passgen '\p[english]{9,12}(-\p[english]{9,12}){2}'
+    $ passgen --wordlist english:/usr/share/dict/british-english '\p[english]{9,12}(-\p[english]{9,12}){2}'
     arapurity-readygoauce-nathundly
 
 ## Installing
