@@ -6,6 +6,7 @@ Code Coverage: [lcov](https://xfbs.gitlab.io/passgen/coverage/lcov), [llvm-cov](
 Documentation: [![Docs](https://xfbs.gitlab.io/passgen/badges/docs.svg)](https://xfbs.gitlab.io/passgen/doxygen/index.html).  
 Continuous Integration: [![GitLab Pipelines](https://gitlab.com/xfbs/passgen/badges/master/pipeline.svg)](https://gitlab.com/xfbs/passgen/pipelines).  
 Snapshots:
+  - [passgen-master-amd64.deb](https://xfbs.gitlab.io/passgen/snapshot/passgen-master-amd64.deb),
   - [passgen-master-amd64.tar.xz](https://xfbs.gitlab.io/passgen/snapshot/passgen-master-amd64.tar.xz),
   - [passgen-master-musl-amd64.tar.xz](https://xfbs.gitlab.io/passgen/snapshot/passgen-master-musl-amd64.tar.xz),
   - [passgen-master-osx-amd64.tar.xz](https://xfbs.gitlab.io/passgen/snapshot/passgen-master-osx-amd64.tar.xz).
@@ -13,25 +14,35 @@ Snapshots:
 ## Usage
 
 ```
-passgen version 0.1.0
+passgen version 1.0.0
 Generate passwords from a regex-like pattern.
-Usage: ./build/release/passgen [OPTIONS] [PATTERN]
+Usage: ./src/passgen/passgen [OPTIONS] [PATTERN]
 
 PATTERN is a regex-like string describing the password.
-  abc|def            Matches string 'abc' or 'def' (choice).
-  [a-cf]             Matches character 'a', 'b', 'c', and 'f' (range).
-  (abc)              Matches strings 'abc' (group).
-  [a-c]{2,3}         Matches between 2 and 3 repetition of element (repeat).
+    abc|def           Matches string 'abc' or 'def' (choice).
+    [a-cf]            Matches character 'a', 'b', 'c', and 'f' (range).
+    (abc)             Matches strings 'abc' (group).
+    [a-c]{2,3}        Matches between 2 and 3 repetition of element (repeat).
 
 OPTIONS
-  -a, --amount       The amount of passwords
-  -h, --help         Show this help information
-  -p, --preset name  Use the given preset.
-  -v, --version      Show the version of this build.
+    -a, --amount      The amount of passwords
+    -z, --null        Use NUL instead of newline to separate passes.
+    -h, --help        Show this help information
+    -p, --preset      Use the given preset.
+    -v, --version     Show the version of this build.
+    -d, --depth       Limit the parsing depth.
+    -c, --complexity  Output complexity for each password.
+    -r, --random STR  Which source of randomness to use. Can be:
+                          file:/path/to/file, to use the file
+                          xor:1234, to use xorshift with the given seed.
+    -w, --wordlist NAME:PATH
+                      Load a wordlist. For example:
+                          german:/usr/share/dict/ngerman
+                          english:/usr/share/dict/british-english
 
 PRESETS
-  apple1             Generate passwords like 'oKC-T37-Dew-Qyn'.
-  apple2             Generate passwords like 'mHXr4X-CiK4w6-hbjF7T'.
+    apple1            Generate passwords like 'oKC-T37-Dew-Qyn'.
+    apple2            Generate passwords like 'mHXr4X-CiK4w6-hbjF7T'.
 ```
 
 ## Examples
