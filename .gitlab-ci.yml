@@ -59,12 +59,12 @@ test:alpine:
     - ./build/src/tests/passgen-test -v
     - valgrind ./build/src/tests/passgen-test -v
 
-build:riscv:
+build:riscv64:
   stage: build
   script:
     - apt update
     - apt install -y git cmake gcc-riscv64-linux-gnu ruby python3
-    - mkdir build-riscv64 && build-riscv64
+    - mkdir build-riscv64 && cd build-riscv64
     - cmake -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Release ..
     - ninja
     - cpack -G TXZ
@@ -131,6 +131,7 @@ pages:
     - build:alpine
     - build:bionic
     - build:osxcross
+    - build:riscv64
   script:
     - mkdir -p public/coverage
     - mv build-clang/ccov/passgen-test public/coverage/llvm-cov
@@ -143,6 +144,8 @@ pages:
     - cp build-alpine-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-musl-amd64.tar.xz
     - cp build-bionic-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-amd64.tar.xz
     - cp build-bionic-release/passgen_*_amd64.deb public/snapshot/passgen-master-amd64.deb
+    - cp build-riscv64/passgen-*-Linux.tar.xz public/snapshot/passgen-master-riscv64.tar.xz
+    - cp build-riscv64/passgen_*_riscv64.deb public/snapshot/passgen-master-riscv64.deb
     - cp build-osx-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-osx-amd64.tar.xz
   artifacts:
     paths:
