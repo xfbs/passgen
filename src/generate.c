@@ -297,7 +297,7 @@ int passgen_generate_special(
     void *data,
     passgen_generate_cb *func) {
     switch(special->kind) {
-        case PASSGEN_PATTERN_SPECIAL_PRONOUNCABLE:
+        case PASSGEN_PATTERN_SPECIAL_MARKOV:
             return passgen_generate_special_pronounceable(
                 special,
                 rand,

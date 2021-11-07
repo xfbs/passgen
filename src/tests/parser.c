@@ -24,20 +24,20 @@
     passgen_parser_init(&parser);
 
 #define POSTAMBLE()                             \
-    assert(0 == passgen_parse_finish(&parser)); \
+    assert_eq(0, passgen_parse_finish(&parser)); \
     passgen_parser_free(&parser)
 
 #define PARSE_CODEPOINT(codepoint)                               \
     assert(                                                      \
         passgen_token_parse(&token_parser, &token, codepoint) == \
         PASSGEN_TOKEN_INIT);                                     \
-    assert(0 == passgen_parse_token(&parser, &token))
+    assert_eq(0, passgen_parse_token(&parser, &token))
 
 #define PARSE_CODEPOINT_DOUBLE(a, b)                                          \
     assert(passgen_token_parse(&token_parser, &token, a) > 0);                \
     assert(                                                                   \
         passgen_token_parse(&token_parser, &token, b) == PASSGEN_TOKEN_INIT); \
-    assert(0 == passgen_parse_token(&parser, &token))
+    assert_eq(0, passgen_parse_token(&parser, &token))
 
 test_result test_parser_empty(void) {
     struct passgen_parser parser;
@@ -464,8 +464,8 @@ test_result test_parser_item_maybe(void) {
 
 test_result test_parser_special_pronounceable(void) {
     PREAMBLE();
-    PARSE_CODEPOINT_DOUBLE('\\', 'p');
-    PARSE_CODEPOINT('[');
+    PARSE_CODEPOINT_DOUBLE('\\', 'm');
+    PARSE_CODEPOINT('{');
     PARSE_CODEPOINT('e');
     PARSE_CODEPOINT('n');
     PARSE_CODEPOINT('g');
@@ -473,7 +473,7 @@ test_result test_parser_special_pronounceable(void) {
     PARSE_CODEPOINT('i');
     PARSE_CODEPOINT('s');
     PARSE_CODEPOINT('h');
-    PARSE_CODEPOINT(']');
+    PARSE_CODEPOINT('}');
 
     assert(parser.state.len == 1);
 
@@ -489,7 +489,7 @@ test_result test_parser_special_pronounceable(void) {
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
     assert(item->maybe == false);
-    assert(item->data.special.kind == PASSGEN_PATTERN_SPECIAL_PRONOUNCABLE);
+    assert(item->data.special.kind == PASSGEN_PATTERN_SPECIAL_MARKOV);
 
     POSTAMBLE();
 
@@ -499,8 +499,8 @@ test_result test_parser_special_pronounceable(void) {
 test_result test_parser_mixed_special(void) {
     PREAMBLE();
     PARSE_CODEPOINT('a');
-    PARSE_CODEPOINT_DOUBLE('\\', 'p');
-    PARSE_CODEPOINT('[');
+    PARSE_CODEPOINT_DOUBLE('\\', 'm');
+    PARSE_CODEPOINT('{');
     PARSE_CODEPOINT('e');
     PARSE_CODEPOINT('n');
     PARSE_CODEPOINT('g');
@@ -508,7 +508,7 @@ test_result test_parser_mixed_special(void) {
     PARSE_CODEPOINT('i');
     PARSE_CODEPOINT('s');
     PARSE_CODEPOINT('h');
-    PARSE_CODEPOINT(']');
+    PARSE_CODEPOINT('}');
 
     assert(parser.state.len == 1);
 
@@ -533,7 +533,7 @@ test_result test_parser_mixed_special(void) {
     assert(item->repeat.min == 1);
     assert(item->repeat.max == 1);
     assert(item->maybe == false);
-    assert(item->data.special.kind == PASSGEN_PATTERN_SPECIAL_PRONOUNCABLE);
+    assert(item->data.special.kind == PASSGEN_PATTERN_SPECIAL_MARKOV);
 
     POSTAMBLE();
 

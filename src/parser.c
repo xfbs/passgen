@@ -95,7 +95,7 @@ int passgen_parse_group(
                 // escaped token which would normally do something but
                 // should be treated as text
                 break;
-            case 'p':
+            case 'm':
             case 'w':
                 // special token
                 special = passgen_pattern_segment_new_special(
@@ -275,7 +275,7 @@ int passgen_parse_special(
     struct passgen_parser_state *state) {
     (void) parser;
 
-    if(token->codepoint == '[') {
+    if(token->codepoint == '{') {
         state->type = PASSGEN_PARSER_SPECIAL_NAME;
         return 0;
     }
@@ -289,7 +289,7 @@ int passgen_parse_special_name(
     struct passgen_parser_state *state) {
     (void) parser;
 
-    if(token->codepoint == ']') {
+    if(token->codepoint == '}') {
         passgen_stack_pop(&parser->state, NULL);
     } else {
         passgen_pattern_special_add_parameter_cp(state->data.special.special, token->codepoint);

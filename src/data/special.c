@@ -11,8 +11,8 @@ void passgen_pattern_special_init_char(
     special->parameters = calloc(256, sizeof(int32_t));
 
     switch(kind) {
-        case 'p':
-            special->kind = PASSGEN_PATTERN_SPECIAL_PRONOUNCABLE;
+        case 'm':
+            special->kind = PASSGEN_PATTERN_SPECIAL_MARKOV;
             break;
         case 'w':
             special->kind = PASSGEN_PATTERN_SPECIAL_WORDLIST;
