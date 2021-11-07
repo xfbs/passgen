@@ -66,6 +66,7 @@ build:riscv64:
     - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
     - cd build-riscv64
     - ninja
+    - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./src/tests/passgen-test
     - cpack -G TXZ
     - cpack -G DEB
   artifacts:
