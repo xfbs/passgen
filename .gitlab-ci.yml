@@ -59,6 +59,14 @@ test:alpine:
     - ./build/src/tests/passgen-test -v
     - valgrind ./build/src/tests/passgen-test -v
 
+test:riscv64:
+  image: registry.gitlab.com/xfbs/passgen/riscv64
+  stage: test
+  script:
+    - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug
+    - cmake --build build-riscv64
+    - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./build-riscv64/src/tests/passgen-test
+
 build:riscv64:
   image: registry.gitlab.com/xfbs/passgen/riscv64
   stage: build
