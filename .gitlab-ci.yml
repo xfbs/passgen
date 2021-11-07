@@ -60,11 +60,9 @@ test:alpine:
     - valgrind ./build/src/tests/passgen-test -v
 
 build:riscv64:
+  image: registry.gitlab.com/xfbs/passgen/riscv64
   stage: build
   script:
-    - apt update
-    - apt install -y git cmake gcc-riscv64-linux-gnu ruby python3
-    - mkdir build-riscv64 && cd build-riscv64
     - cmake -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Release ..
     - ninja
     - cpack -G TXZ
