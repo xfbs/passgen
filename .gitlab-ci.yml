@@ -63,7 +63,8 @@ build:riscv64:
   image: registry.gitlab.com/xfbs/passgen/riscv64
   stage: build
   script:
-    - cmake -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Release ..
+    - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
+    - cd build-riscv64
     - ninja
     - cpack -G TXZ
     - cpack -G DEB
