@@ -29,6 +29,21 @@ docker:
   only:
     - docker
 
+docker:riscv64:
+  image: docker
+  stage: setup
+  services:
+    - docker:dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build . -f scripts/riscv64.dockerfile -t "$CI_REGISTRY_IMAGE/riscv64"
+    - docker push "$CI_REGISTRY_IMAGE/riscv64"
+  only:
+    refs:
+      - master
+    changes:
+      - scripts/riscv64.dockerfile
+
 sanitize:
   image: registry.gitlab.com/xfbs/passgen:bionic
   stage: test
