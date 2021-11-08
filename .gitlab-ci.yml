@@ -199,11 +199,9 @@ build:macos:
     AR: /opt/osxcross/bin/x86_64-apple-darwin18-ar
     CC: /opt/osxcross/bin/x86_64h-apple-darwin18-clang
     RANLIB: /opt/osxcross/bin/x86_64h-apple-darwin18-ranlib
-    CMAKE: /opt/cmake/bin/cmake
-    CPACK: /opt/cmake/bin/cpack
   script:
-    - $CMAKE -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_AR=$AR -DCMAKE_RANLIB=$RANLIB
-    - $CMAKE --build build-macos
+    - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_AR=$AR -DCMAKE_RANLIB=$RANLIB
+    - cmake --build build-macos
     - cd build-macos && cpack -G TXZ
   artifacts:
     paths:
