@@ -40,6 +40,18 @@ docker:macos:
     changes:
       - scripts/macos.dockerfile
 
+build:macos:
+  image: registry.gitlab.com/xfbs/passgen/macos
+  stage: build
+  script:
+    - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_TOOLCHAIN_FILE=scripts/macos-toolchain.cmake
+    - cmake --build build-macos
+    - cd build-macos && cpack -G TXZ
+  artifacts:
+    paths:
+      - build-macos
+    expire_in: 1 week
+
 docker:riscv64:
   image: docker
   stage: setup
@@ -190,18 +202,6 @@ build:alpine:
   artifacts:
     paths:
       - build-alpine-release
-    expire_in: 1 week
-
-build:macos:
-  image: registry.gitlab.com/xfbs/passgen/macos
-  stage: build
-  script:
-    - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_TOOLCHAIN_FILE=scripts/macos-toolchain.cmake
-    - cmake --build build-macos
-    - cd build-macos && cpack -G TXZ
-  artifacts:
-    paths:
-      - build-macos
     expire_in: 1 week
 
 pages:
