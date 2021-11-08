@@ -44,6 +44,21 @@ docker:riscv64:
     changes:
       - scripts/riscv64.dockerfile
 
+docker:amd64:
+  image: docker
+  stage: setup
+  services:
+    - docker:dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build . -f scripts/amd64.dockerfile -t "$CI_REGISTRY_IMAGE/amd64"
+    - docker push "$CI_REGISTRY_IMAGE/amd64"
+  only:
+    refs:
+      - master
+    changes:
+      - scripts/amd64.dockerfile
+
 docker:aarch64:
   image: docker
   stage: setup
@@ -83,19 +98,19 @@ build:aarch64:
     expire_in: 1 week
 
 sanitize:
-  image: registry.gitlab.com/xfbs/passgen:bionic
+  image: registry.gitlab.com/xfbs/passgen/amd64
   stage: test
   script:
-    - CC=clang-10 scripts/run_sanitizer.sh Address
-    - CC=clang-10 scripts/run_sanitizer.sh Memory
-    - CC=clang-10 scripts/run_sanitizer.sh Undefined
-    - CC=clang-10 scripts/run_sanitizer.sh Leak
+    - CC=clang scripts/run_sanitizer.sh Address
+    - CC=clang scripts/run_sanitizer.sh Memory
+    - CC=clang scripts/run_sanitizer.sh Undefined
+    - CC=clang scripts/run_sanitizer.sh Leak
 
-test:bionic:
-  image: registry.gitlab.com/xfbs/passgen:bionic
+test:amd64:
+  image: registry.gitlab.com/xfbs/passgen/amd64
   stage: test
   script:
-    - CC=clang-10 ./scripts/gen_coverage.sh passgen-test build-clang
+    - CC=clang ./scripts/gen_coverage.sh passgen-test build-clang
     - CC=gcc ./scripts/gen_coverage.sh passgen-test build-gcc
   artifacts:
     paths:
@@ -136,11 +151,11 @@ build:riscv64:
     expire_in: 1 week
 
 # build stuff on ubuntu.
-build:bionic:
-  image: registry.gitlab.com/xfbs/passgen:bionic
+build:amd64:
+  image: registry.gitlab.com/xfbs/passgen/amd64
   stage: build
   script:
-    - mkdir build-bionic-release && cd build-bionic-release
+    - mkdir build-amd64 && cd build-amd64
     - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release ..
     - ninja
     - ./src/tests/passgen-test
@@ -148,7 +163,7 @@ build:bionic:
     - cpack -G DEB
   artifacts:
     paths:
-      - build-bionic-release
+      - build-amd64
     expire_in: 1 week
 
 # build stuff on alpine.
@@ -188,9 +203,9 @@ pages:
   image: registry.gitlab.com/xfbs/passgen:deploy
   stage: deploy
   dependencies:
-    - test:bionic
+    - test:amd64
     - build:alpine
-    - build:bionic
+    - build:amd64
     - build:osxcross
     - build:riscv64
   script:
@@ -203,8 +218,8 @@ pages:
     - python3 scripts/docs_coverage.py docs/xml/ --badge public/badges/docs.svg --noerror
     - mkdir public/snapshot
     - cp build-alpine-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-musl-amd64.tar.xz
-    - cp build-bionic-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-amd64.tar.xz
-    - cp build-bionic-release/passgen_*_amd64.deb public/snapshot/passgen-master-amd64.deb
+    - cp build-amd64/passgen-*-Linux.tar.xz public/snapshot/passgen-master-amd64.tar.xz
+    - cp build-amd64/passgen_*_amd64.deb public/snapshot/passgen-master-amd64.deb
     - cp build-riscv64/passgen-*-Linux.tar.xz public/snapshot/passgen-master-riscv64.tar.xz
     - cp build-riscv64/passgen_*_riscv64.deb public/snapshot/passgen-master-riscv64.deb
     - cp build-osx-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-osx-amd64.tar.xz
