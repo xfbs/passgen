@@ -19,15 +19,26 @@ docker:
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker build . -f scripts/alpine.Dockerfile -t "$CI_REGISTRY_IMAGE:alpine"
-    - docker build . -f scripts/bionic.Dockerfile -t "$CI_REGISTRY_IMAGE:bionic"
     - docker build . -f scripts/deploy.Dockerfile -t "$CI_REGISTRY_IMAGE:deploy"
-    - docker build . -f scripts/osxcross.Dockerfile -t "$CI_REGISTRY_IMAGE:osxcross"
     - docker push "$CI_REGISTRY_IMAGE:alpine"
-    - docker push "$CI_REGISTRY_IMAGE:bionic"
     - docker push "$CI_REGISTRY_IMAGE:deploy"
-    - docker push "$CI_REGISTRY_IMAGE:osxcross"
   only:
     - docker
+
+docker:macos:
+  image: docker
+  stage: setup
+  services:
+    - docker:dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build . -f scripts/macos.dockerfile -t "$CI_REGISTRY_IMAGE/macos"
+    - docker push "$CI_REGISTRY_IMAGE/macos"
+  only:
+    refs:
+      - master
+    changes:
+      - scripts/macos.dockerfile
 
 docker:riscv64:
   image: docker
@@ -181,8 +192,8 @@ build:alpine:
       - build-alpine-release
     expire_in: 1 week
 
-build:osxcross:
-  image: registry.gitlab.com/xfbs/passgen:osxcross
+build:macos:
+  image: registry.gitlab.com/xfbs/passgen/macos
   stage: build
   variables:
     AR: /opt/osxcross/bin/x86_64-apple-darwin18-ar
@@ -191,12 +202,12 @@ build:osxcross:
     CMAKE: /opt/cmake/bin/cmake
     CPACK: /opt/cmake/bin/cpack
   script:
-    - $CMAKE -S . -B build-osx-release -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_AR=$AR -DCMAKE_RANLIB=$RANLIB
-    - $CMAKE --build build-osx-release
-    - cd build-osx-release && cpack -G TXZ
+    - $CMAKE -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_AR=$AR -DCMAKE_RANLIB=$RANLIB
+    - $CMAKE --build build-macos
+    - cd build-macos && cpack -G TXZ
   artifacts:
     paths:
-      - build-osx-release
+      - build-macos
     expire_in: 1 week
 
 pages:
@@ -206,7 +217,7 @@ pages:
     - test:amd64
     - build:alpine
     - build:amd64
-    - build:osxcross
+    - build:macos
     - build:riscv64
   script:
     - mkdir -p public/coverage
@@ -222,7 +233,7 @@ pages:
     - cp build-amd64/passgen_*_amd64.deb public/snapshot/passgen-master-amd64.deb
     - cp build-riscv64/passgen-*-Linux.tar.xz public/snapshot/passgen-master-riscv64.tar.xz
     - cp build-riscv64/passgen_*_riscv64.deb public/snapshot/passgen-master-riscv64.deb
-    - cp build-osx-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-osx-amd64.tar.xz
+    - cp build-macos/passgen-*-Linux.tar.xz public/snapshot/passgen-master-macos-amd64.tar.xz
   artifacts:
     paths:
       - public
