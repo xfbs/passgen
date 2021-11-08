@@ -25,6 +25,34 @@ docker:
   only:
     - docker
 
+docker:mingw64:
+  image: docker
+  stage: setup
+  services:
+    - docker:dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build . -f scripts/mingw64.dockerfile -t "$CI_REGISTRY_IMAGE/mingw64"
+    - docker push "$CI_REGISTRY_IMAGE/mingw64"
+  only:
+    refs:
+      - master
+    changes:
+      - scripts/mingw64.dockerfile
+
+build:mingw64:
+  image: registry.gitlab.com/xfbs/passgen/mingw64
+  stage: build
+  script:
+    - cmake -S . -B build-mingw64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
+    - cd build-mingw64
+    - ninja
+    - cpack -G ZIP
+  artifacts:
+    paths:
+      - build-mingw64
+    expire_in: 1 week
+
 docker:macos:
   image: docker
   stage: setup

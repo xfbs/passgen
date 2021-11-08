@@ -11,7 +11,6 @@ RUN apt update \
         gcc-mingw-w64 \
         git \
         ninja-build \
-        wine64 \
         python3 \
         ruby \
     && apt clean
