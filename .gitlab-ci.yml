@@ -44,9 +44,9 @@ build:mingw64:
   image: registry.gitlab.com/xfbs/passgen/mingw64
   stage: build
   script:
-    - cmake -S . -B build-mingw64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
+    - cmake -S . -B build-mingw64 -DCMAKE_TOOLCHAIN_FILE=scripts/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y
     - cd build-mingw64
-    - ninja
+    - make -j
     - cpack -G ZIP
   artifacts:
     paths:
@@ -241,6 +241,7 @@ pages:
     - build:amd64
     - build:macos
     - build:riscv64
+    - build:mingw64
   script:
     - mkdir -p public/coverage
     - mv build-clang/ccov/passgen-test public/coverage/llvm-cov
@@ -256,6 +257,7 @@ pages:
     - cp build-riscv64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-riscv64.tar.xz
     - cp build-riscv64/passgen_*_riscv64.deb public/nightly/passgen-linux-riscv64.deb
     - cp build-macos/passgen-*-Darwin.tar.xz public/nightly/passgen-macos-amd64.tar.xz
+    - cp build-mingw64/passgen-*-win64.zip public/nightly/passgen-win64-amd64.tar.xz
   artifacts:
     paths:
       - public
