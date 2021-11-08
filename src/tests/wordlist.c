@@ -6,6 +6,7 @@ const char example_wordlist[] = "abacus\nbrother\nculling";
 size_t example_wordlist_size = sizeof(example_wordlist);
 
 test_result test_wordlist_load(void) {
+#ifndef _WIN32
     FILE *file =
         fmemopen((void *) example_wordlist, example_wordlist_size, "r");
     assert(file);
@@ -20,11 +21,13 @@ test_result test_wordlist_load(void) {
     assert(0 == strcmp(wordlist.words[2], "culling"));
 
     passgen_wordlist_free(&wordlist);
+#endif
 
     return test_ok;
 }
 
 test_result test_wordlist_random(void) {
+#ifndef _WIN32
     FILE *file =
         fmemopen((void *) example_wordlist, example_wordlist_size, "r");
     assert(file);
@@ -52,6 +55,7 @@ test_result test_wordlist_random(void) {
 
     passgen_wordlist_free(&wordlist);
     passgen_random_close(&random);
+#endif
 
     return test_ok;
 }
