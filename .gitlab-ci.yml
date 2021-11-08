@@ -221,13 +221,13 @@ pages:
     - mv docs/html public/doxygen
     - mkdir public/badges
     - python3 scripts/docs_coverage.py docs/xml/ --badge public/badges/docs.svg --noerror
-    - mkdir public/snapshot
-    - cp build-alpine-release/passgen-*-Linux.tar.xz public/snapshot/passgen-master-musl-amd64.tar.xz
-    - cp build-amd64/passgen-*-Linux.tar.xz public/snapshot/passgen-master-amd64.tar.xz
-    - cp build-amd64/passgen_*_amd64.deb public/snapshot/passgen-master-amd64.deb
-    - cp build-riscv64/passgen-*-Linux.tar.xz public/snapshot/passgen-master-riscv64.tar.xz
-    - cp build-riscv64/passgen_*_riscv64.deb public/snapshot/passgen-master-riscv64.deb
-    - cp build-macos/passgen-*-Darwin.tar.xz public/snapshot/passgen-master-macos-amd64.tar.xz
+    - mkdir public/nightly
+    - cp build-alpine-release/passgen-*-Linux.tar.xz public/nightly/passgen-linux-musl-amd64.tar.xz
+    - cp build-amd64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-amd64.tar.xz
+    - cp build-amd64/passgen_*_amd64.deb public/nightly/passgen-linux-amd64.deb
+    - cp build-riscv64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-riscv64.tar.xz
+    - cp build-riscv64/passgen_*_riscv64.deb public/nightly/passgen-linux-riscv64.deb
+    - cp build-macos/passgen-*-Darwin.tar.xz public/nightly/passgen-macos-amd64.tar.xz
   artifacts:
     paths:
       - public
