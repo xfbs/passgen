@@ -13,6 +13,7 @@ Nightly builds from the master branch:
   - [passgen-linux-riscv64.tar.xz](https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.tar.xz),
   - [passgen-linux-riscv64.deb](https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.deb),
   - [passgen-macos-amd64.tar.xz](https://xfbs.gitlab.io/passgen/nightly/passgen-macos-amd64.tar.xz).
+  - [passgen-win64-amd64.zip](https://xfbs.gitlab.io/passgen/nightly/passgen-win64-amd64.zip).
 
 ## Usage
 
