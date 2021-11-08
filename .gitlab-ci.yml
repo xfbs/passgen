@@ -44,6 +44,44 @@ docker:riscv64:
     changes:
       - scripts/riscv64.dockerfile
 
+docker:aarch64:
+  image: docker
+  stage: setup
+  services:
+    - docker:dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build . -f scripts/aarch64.dockerfile -t "$CI_REGISTRY_IMAGE/aarch64"
+    - docker push "$CI_REGISTRY_IMAGE/aarch64"
+  only:
+    refs:
+      - master
+    changes:
+      - scripts/aarch64.dockerfile
+
+test:aarch64:
+  image: registry.gitlab.com/xfbs/passgen/aarch64
+  stage: test
+  script:
+    - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug
+    - cmake --build build-aarch64
+    - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./build-aarch64/src/tests/passgen-test
+
+build:aarch64:
+  image: registry.gitlab.com/xfbs/passgen/aarch64
+  stage: build
+  script:
+    - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
+    - cd build-aarch64
+    - ninja
+    - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/tests/passgen-test
+    - cpack -G TXZ
+    - cpack -G DEB
+  artifacts:
+    paths:
+      - build-aarch64
+    expire_in: 1 week
+
 sanitize:
   image: registry.gitlab.com/xfbs/passgen:bionic
   stage: test
