@@ -7,12 +7,12 @@ Documentation: [![Docs](https://xfbs.gitlab.io/passgen/badges/docs.svg)](https:/
 Continuous Integration: [![GitLab Pipelines](https://gitlab.com/xfbs/passgen/badges/master/pipeline.svg)](https://gitlab.com/xfbs/passgen/pipelines).  
 
 Nightly builds from the master branch:
-  - [passgen-master-amd64.deb](https://xfbs.gitlab.io/passgen/snapshot/passgen-master-amd64.deb),
-  - [passgen-master-amd64.tar.xz](https://xfbs.gitlab.io/passgen/snapshot/passgen-master-amd64.tar.xz),
-  - [passgen-master-musl-amd64.tar.xz](https://xfbs.gitlab.io/passgen/snapshot/passgen-master-musl-amd64.tar.xz),
-  - [passgen-master-macos-amd64.tar.xz](https://xfbs.gitlab.io/passgen/snapshot/passgen-master-macos-amd64.tar.xz).
-  - [passgen-master-riscv64.deb](https://xfbs.gitlab.io/passgen/snapshot/passgen-master-riscv64.deb),
-  - [passgen-master-riscv64.tar.xz](https://xfbs.gitlab.io/passgen/snapshot/passgen-master-riscv64.tar.xz),
+  - [passgen-linux-amd64.tar.xz](https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.tar.xz),
+  - [passgen-linux-amd64.deb](https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.deb),
+  - [passgen-linux-musl-amd64.tar.xz](https://xfbs.gitlab.io/passgen/nightly/passgen-linux-musl-amd64.tar.xz),
+  - [passgen-linux-riscv64.tar.xz](https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.tar.xz),
+  - [passgen-linux-riscv64.deb](https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.deb),
+  - [passgen-macos-amd64.tar.xz](https://xfbs.gitlab.io/passgen/nightly/passgen-macos-amd64.tar.xz).
 
 ## Usage
 
