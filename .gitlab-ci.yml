@@ -257,7 +257,7 @@ pages:
     - cp build-riscv64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-riscv64.tar.xz
     - cp build-riscv64/passgen_*_riscv64.deb public/nightly/passgen-linux-riscv64.deb
     - cp build-macos/passgen-*-Darwin.tar.xz public/nightly/passgen-macos-amd64.tar.xz
-    - cp build-mingw64/passgen-*-win64.zip public/nightly/passgen-win64-amd64.tar.xz
+    - cp build-mingw64/passgen-*-win64.zip public/nightly/passgen-win64-amd64.zip
   artifacts:
     paths:
       - public
