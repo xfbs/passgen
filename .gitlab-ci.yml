@@ -195,12 +195,8 @@ build:alpine:
 build:macos:
   image: registry.gitlab.com/xfbs/passgen/macos
   stage: build
-  variables:
-    AR: /opt/osxcross/bin/x86_64-apple-darwin18-ar
-    CC: /opt/osxcross/bin/x86_64h-apple-darwin18-clang
-    RANLIB: /opt/osxcross/bin/x86_64h-apple-darwin18-ranlib
   script:
-    - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_AR=$AR -DCMAKE_RANLIB=$RANLIB
+    - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_TOOLCHAIN_FILE=scripts/macos-toolchain.cmake
     - cmake --build build-macos
     - cd build-macos && cpack -G TXZ
   artifacts:
