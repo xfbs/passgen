@@ -256,10 +256,12 @@ pages:
     - test:amd64
     - build:alpine
     - build:amd64
+    - build:aarch64
     - build:macos
     - build:riscv64
     - build:mingw64
   script:
+    - bash scripts/ci-publish-website.sh
     - bash scripts/ci-publish-coverage.sh
     - bash scripts/ci-publish-doxygen.sh
     - bash scripts/ci-publish-builds.sh

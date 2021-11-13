@@ -1,0 +1,18 @@
+site_name: Passgen
+
+copyright: 'Copyright &copy; 2021 Patrick M. Elsen'
+
+repo_name: 'xfbs/passgen'
+repo_url: 'https://gitlab.com/xfbs/passgen'
+
+theme: 'material'
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+
+nav:
+  - About: index.md
