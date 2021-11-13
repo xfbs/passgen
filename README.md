@@ -10,6 +10,8 @@ Nightly builds from the master branch:
   - [passgen-linux-amd64.tar.xz][] ([signature][passgen-linux-amd64.tar.xz.sig])
   - [passgen-linux-amd64.deb][] ([signature][passgen-linux-amd64.deb.sig])
   - [passgen-linux-musl-amd64.tar.xz][] ([signature][passgen-linux-musl-amd64.tar.xz.sig])
+  - [passgen-linux-aarch64.tar.xz][] ([signature][passgen-linux-aarch64.tar.xz.sig])
+  - [passgen-linux-aarch64.deb][] ([signature][passgen-linux-aarch64.deb.sig])
   - [passgen-linux-riscv64.tar.xz][] ([signature][passgen-linux-riscv64.tar.xz.sig])
   - [passgen-linux-riscv64.deb][] ([signature][passgen-linux-riscv64.deb.sig])
   - [passgen-macos-amd64.tar.xz][] ([signature][passgen-macos-amd64.tar.xz.sig])
@@ -106,6 +108,8 @@ There are word lists included in this repository, their respective license appli
 [passgen-linux-amd64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.tar.xz
 [passgen-linux-amd64.deb]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.deb
 [passgen-linux-musl-amd64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-musl-amd64.tar.xz
+[passgen-linux-aarch64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-aarch64.tar.xz
+[passgen-linux-aarch64.deb]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-aarch64.deb
 [passgen-linux-riscv64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.tar.xz
 [passgen-linux-riscv64.deb]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.deb
 [passgen-macos-amd64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-macos-amd64.tar.xz
@@ -114,6 +118,8 @@ There are word lists included in this repository, their respective license appli
 [passgen-linux-amd64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.tar.xz.sig
 [passgen-linux-amd64.deb.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.deb.sig
 [passgen-linux-musl-amd64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-musl-amd64.tar.xz.sig
+[passgen-linux-aarch64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-aarch64.tar.xz.sig
+[passgen-linux-aarch64.deb.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-aarch64.deb.sig
 [passgen-linux-riscv64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.tar.xz.sig
 [passgen-linux-riscv64.deb.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.deb.sig
 [passgen-macos-amd64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-macos-amd64.tar.xz.sig
