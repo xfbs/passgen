@@ -37,7 +37,10 @@ docker:deploy:
     - docker build . -f scripts/deploy.dockerfile -t "$CI_REGISTRY_IMAGE/deploy"
     - docker push "$CI_REGISTRY_IMAGE/deploy"
   only:
-    - docker
+    refs:
+      - master
+    changes:
+      - scripts/deploy.dockerfile
 
 docker:mingw64:
   image: docker
@@ -54,18 +57,20 @@ docker:mingw64:
     changes:
       - scripts/mingw64.dockerfile
 
-build:mingw64:
-  image: registry.gitlab.com/xfbs/passgen/mingw64
-  stage: build
+docker:riscv64:
+  image: docker
+  stage: setup
+  services:
+    - docker:dind
   script:
-    - cmake -S . -B build-mingw64 -DCMAKE_TOOLCHAIN_FILE=scripts/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y
-    - cd build-mingw64
-    - make -j
-    - cpack -G ZIP
-  artifacts:
-    paths:
-      - build-mingw64
-    expire_in: 1 week
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build . -f scripts/riscv64.dockerfile -t "$CI_REGISTRY_IMAGE/riscv64"
+    - docker push "$CI_REGISTRY_IMAGE/riscv64"
+  only:
+    refs:
+      - master
+    changes:
+      - scripts/riscv64.dockerfile
 
 docker:macos:
   image: docker
@@ -81,33 +86,6 @@ docker:macos:
       - master
     changes:
       - scripts/macos.dockerfile
-
-build:macos:
-  image: registry.gitlab.com/xfbs/passgen/macos
-  stage: build
-  script:
-    - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_TOOLCHAIN_FILE=scripts/macos-toolchain.cmake
-    - cmake --build build-macos
-    - cd build-macos && cpack -G TXZ
-  artifacts:
-    paths:
-      - build-macos
-    expire_in: 1 week
-
-docker:riscv64:
-  image: docker
-  stage: setup
-  services:
-    - docker:dind
-  script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f scripts/riscv64.dockerfile -t "$CI_REGISTRY_IMAGE/riscv64"
-    - docker push "$CI_REGISTRY_IMAGE/riscv64"
-  only:
-    refs:
-      - master
-    changes:
-      - scripts/riscv64.dockerfile
 
 docker:amd64:
   image: docker
@@ -139,29 +117,6 @@ docker:aarch64:
     changes:
       - scripts/aarch64.dockerfile
 
-test:aarch64:
-  image: registry.gitlab.com/xfbs/passgen/aarch64
-  stage: test
-  script:
-    - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug
-    - cmake --build build-aarch64
-    - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./build-aarch64/src/tests/passgen-test
-
-build:aarch64:
-  image: registry.gitlab.com/xfbs/passgen/aarch64
-  stage: build
-  script:
-    - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
-    - cd build-aarch64
-    - ninja
-    - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/tests/passgen-test
-    - cpack -G TXZ
-    - cpack -G DEB
-  artifacts:
-    paths:
-      - build-aarch64
-    expire_in: 1 week
-
 sanitize:
   image: registry.gitlab.com/xfbs/passgen/amd64
   stage: test
@@ -170,6 +125,14 @@ sanitize:
     - CC=clang scripts/run_sanitizer.sh Memory
     - CC=clang scripts/run_sanitizer.sh Undefined
     - CC=clang scripts/run_sanitizer.sh Leak
+
+test:aarch64:
+  image: registry.gitlab.com/xfbs/passgen/aarch64
+  stage: test
+  script:
+    - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug
+    - cmake --build build-aarch64
+    - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./build-aarch64/src/tests/passgen-test
 
 test:amd64:
   image: registry.gitlab.com/xfbs/passgen/amd64
@@ -199,6 +162,46 @@ test:riscv64:
     - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug
     - cmake --build build-riscv64
     - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./build-riscv64/src/tests/passgen-test
+
+build:mingw64:
+  image: registry.gitlab.com/xfbs/passgen/mingw64
+  stage: build
+  script:
+    - cmake -S . -B build-mingw64 -DCMAKE_TOOLCHAIN_FILE=scripts/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y
+    - cd build-mingw64
+    - make -j
+    - cpack -G ZIP
+  artifacts:
+    paths:
+      - build-mingw64
+    expire_in: 1 week
+
+build:macos:
+  image: registry.gitlab.com/xfbs/passgen/macos
+  stage: build
+  script:
+    - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_TOOLCHAIN_FILE=scripts/macos-toolchain.cmake
+    - cmake --build build-macos
+    - cd build-macos && cpack -G TXZ
+  artifacts:
+    paths:
+      - build-macos
+    expire_in: 1 week
+
+build:aarch64:
+  image: registry.gitlab.com/xfbs/passgen/aarch64
+  stage: build
+  script:
+    - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
+    - cd build-aarch64
+    - ninja
+    - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/tests/passgen-test
+    - cpack -G TXZ
+    - cpack -G DEB
+  artifacts:
+    paths:
+      - build-aarch64
+    expire_in: 1 week
 
 build:riscv64:
   image: registry.gitlab.com/xfbs/passgen/riscv64
