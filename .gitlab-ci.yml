@@ -147,7 +147,7 @@ test:amd64:
     expire_in: 1 week
 
 test:alpine:
-  image: registry.gitlab.com/xfbs/passgen:alpine
+  image: registry.gitlab.com/xfbs/passgen/alpine
   stage: test
   script:
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DUSE_BACKTRACE=NO -GNinja
@@ -236,7 +236,7 @@ build:amd64:
 
 # build stuff on alpine.
 build:alpine:
-  image: registry.gitlab.com/xfbs/passgen:alpine
+  image: registry.gitlab.com/xfbs/passgen/alpine
   stage: build
   script:
     - mkdir -p build-alpine-release && cd build-alpine-release
@@ -250,7 +250,7 @@ build:alpine:
     expire_in: 1 week
 
 pages:
-  image: registry.gitlab.com/xfbs/passgen:deploy
+  image: registry.gitlab.com/xfbs/passgen/deploy
   stage: deploy
   dependencies:
     - test:amd64
@@ -260,21 +260,9 @@ pages:
     - build:riscv64
     - build:mingw64
   script:
-    - mkdir -p public/coverage
-    - mv build-clang/ccov/passgen-test public/coverage/llvm-cov
-    - mv build-gcc/ccov/passgen-test public/coverage/lcov
-    - doxygen Doxyfile
-    - mv docs/html public/doxygen
-    - mkdir public/badges
-    - python3 scripts/docs_coverage.py docs/xml/ --badge public/badges/docs.svg --noerror
-    - mkdir public/nightly
-    - cp build-alpine-release/passgen-*-Linux.tar.xz public/nightly/passgen-linux-musl-amd64.tar.xz
-    - cp build-amd64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-amd64.tar.xz
-    - cp build-amd64/passgen_*_amd64.deb public/nightly/passgen-linux-amd64.deb
-    - cp build-riscv64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-riscv64.tar.xz
-    - cp build-riscv64/passgen_*_riscv64.deb public/nightly/passgen-linux-riscv64.deb
-    - cp build-macos/passgen-*-Darwin.tar.xz public/nightly/passgen-macos-amd64.tar.xz
-    - cp build-mingw64/passgen-*-win64.zip public/nightly/passgen-win64-amd64.zip
+    - bash scripts/ci-publish-coverage.sh
+    - bash scripts/ci-publish-doxygen.sh
+    - bash scripts/ci-publish-builds.sh
   artifacts:
     paths:
       - public
