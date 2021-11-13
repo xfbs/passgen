@@ -7,13 +7,13 @@ Documentation: [![Docs](https://xfbs.gitlab.io/passgen/badges/docs.svg)](https:/
 Continuous Integration: [![GitLab Pipelines](https://gitlab.com/xfbs/passgen/badges/master/pipeline.svg)](https://gitlab.com/xfbs/passgen/pipelines).  
 
 Nightly builds from the master branch:
-  - [passgen-linux-amd64.tar.xz](https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.tar.xz),
-  - [passgen-linux-amd64.deb](https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.deb),
-  - [passgen-linux-musl-amd64.tar.xz](https://xfbs.gitlab.io/passgen/nightly/passgen-linux-musl-amd64.tar.xz),
-  - [passgen-linux-riscv64.tar.xz](https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.tar.xz),
-  - [passgen-linux-riscv64.deb](https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.deb),
-  - [passgen-macos-amd64.tar.xz](https://xfbs.gitlab.io/passgen/nightly/passgen-macos-amd64.tar.xz).
-  - [passgen-win64-amd64.zip](https://xfbs.gitlab.io/passgen/nightly/passgen-win64-amd64.zip).
+  - [passgen-linux-amd64.tar.xz][] ([signature][passgen-linux-amd64.tar.xz.sig])
+  - [passgen-linux-amd64.deb][] ([signature][passgen-linux-amd64.deb.sig])
+  - [passgen-linux-musl-amd64.tar.xz][] ([signature][passgen-linux-musl-amd64.tar.xz.sig])
+  - [passgen-linux-riscv64.tar.xz][] ([signature][passgen-linux-riscv64.tar.xz.sig])
+  - [passgen-linux-riscv64.deb][] ([signature][passgen-linux-riscv64.deb.sig])
+  - [passgen-macos-amd64.tar.xz][] ([signature][passgen-macos-amd64.tar.xz.sig])
+  - [passgen-win64-amd64.zip][] ([signature][passgen-win64-amd64.zip.sig])
 
 ## Usage
 
@@ -95,3 +95,19 @@ There are word lists included in this repository, their respective license appli
 
 - German word list taken from <https://github.com/davidak/wortliste>
 - Latin word list taken from <https://github.com/bbloomf/verbalatina>
+
+[passgen-linux-amd64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.tar.xz
+[passgen-linux-amd64.deb]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.deb
+[passgen-linux-musl-amd64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-musl-amd64.tar.xz
+[passgen-linux-riscv64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.tar.xz
+[passgen-linux-riscv64.deb]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.deb
+[passgen-macos-amd64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-macos-amd64.tar.xz
+[passgen-win64-amd64.zip]: https://xfbs.gitlab.io/passgen/nightly/passgen-win64-amd64.zip
+
+[passgen-linux-amd64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.tar.xz.sig
+[passgen-linux-amd64.deb.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.deb.sig
+[passgen-linux-musl-amd64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-musl-amd64.tar.xz.sig
+[passgen-linux-riscv64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.tar.xz.sig
+[passgen-linux-riscv64.deb.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.deb.sig
+[passgen-macos-amd64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-macos-amd64.tar.xz.sig
+[passgen-win64-amd64.zip.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-win64-amd64.zip.sig
