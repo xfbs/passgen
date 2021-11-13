@@ -14,7 +14,7 @@ cp build-mingw64/passgen-*-win64.zip public/nightly/passgen-win64-amd64.zip
 chmod 0600 $PASSGEN_SIGNING_KEY
 
 function sign() {
-    ssh-keygen -Y sign -f $PASSGEN_SIGNING_KEY -n file $1 > $1.sig
+    ssh-keygen -Y sign -f $PASSGEN_SIGNING_KEY -n file $1
 }
 
 sign public/nightly/passgen-linux-musl-amd64.tar.xz
