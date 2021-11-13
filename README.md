@@ -15,6 +15,13 @@ Nightly builds from the master branch:
   - [passgen-macos-amd64.tar.xz][] ([signature][passgen-macos-amd64.tar.xz.sig])
   - [passgen-win64-amd64.zip][] ([signature][passgen-win64-amd64.zip.sig])
 
+To verify the signature on these nightly releases, you need `ssh-keygen`. Given the release file `passgen.deb`, the signature `passgen.deb.sig` and the `passgen.pub` file from this repository, run:
+
+    $ ssh-keygen -Y verify -n file -s passgen.deb.sig -f passgen.pub -I nightly@passgen.it < passgen.deb
+    Good "file" signature for nightly@passgen.it with ED25519 key SHA256:k7BsqKVzJMDEmgomupIE4VE9Xe4V4ffP506BLkz4JGQ
+
+If the tool responds with anything other than "good file signature", do not trust the nightly build, preserve the files and contact the developers immediately.
+
 ## Usage
 
 ```

@@ -24,3 +24,6 @@ sign public/nightly/passgen-linux-riscv64.tar.xz
 sign public/nightly/passgen-linux-riscv64.deb
 sign public/nightly/passgen-macos-amd64.tar.xz
 sign public/nightly/passgen-win64-amd64.zip
+
+# export keys file
+cp passgen.pub public/passgen.pub
