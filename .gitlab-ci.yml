@@ -11,17 +11,31 @@ stages:
   - deploy
 
 # rebuild alpine docker container.
-docker:
+docker:alpine:
   image: docker
   stage: setup
   services:
     - docker:dind
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f scripts/alpine.Dockerfile -t "$CI_REGISTRY_IMAGE:alpine"
-    - docker build . -f scripts/deploy.Dockerfile -t "$CI_REGISTRY_IMAGE:deploy"
-    - docker push "$CI_REGISTRY_IMAGE:alpine"
-    - docker push "$CI_REGISTRY_IMAGE:deploy"
+    - docker build . -f scripts/alpine.dockerfile -t "$CI_REGISTRY_IMAGE/alpine"
+    - docker push "$CI_REGISTRY_IMAGE/alpine"
+  only:
+    refs:
+      - master
+    changes:
+      - scripts/alpine.dockerfile
+
+# rebuild deploy docker container.
+docker:deploy:
+  image: docker
+  stage: setup
+  services:
+    - docker:dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build . -f scripts/deploy.dockerfile -t "$CI_REGISTRY_IMAGE/deploy"
+    - docker push "$CI_REGISTRY_IMAGE/deploy"
   only:
     - docker
 
