@@ -28,6 +28,8 @@ $ passgen "(this|that) house"
 that house
 ```
 
+## Wordlist-based generation
+
 There is a few more cool things it can do, tho. It turns out that these completely random characters are quite hard to remember, especially if you're being a good digital citizen and use a different password for every website. One trick that is quite common is using random words from a dictionary. You have to use longer passwords to make this safe, but they are significantly easier to memorize. Passgen supports loading in arbitrary wordlists, and has a syntax that you can use to pick one (or more) random words from that list.
 
 ```
@@ -40,4 +42,23 @@ But it can do even better than that. Instead of picking real words from a dictio
 ```
 $ passgen --wordlist english:/usr/share/dict/words "(\m{english}-){3}\m{english}"
 logis-med-musives-interprefinglidits
+```
+
+## Presets
+
+Passgen has a number of presets built-in that you can use out-of-the-box. Using the `-p` option, along with the name of a preset.
+
+```
+$ passgen -p apple2
+L6stQv-Z4duMn-azVKvU
+```
+
+## Entropy estimation
+
+Finally, passgen is able to tell you exactly how much entropy a generated password contains. You can use this information to know exactly how secure a password is. When using passgen to generate passwords for security-critical applications, this information can be used to specify exactly what the minimum security requirements are for a password rather than specifying minimum lengths or characters.
+
+```
+$ passgen -c "[a-zA-Z0-9]{16}"
+entropy: 95.267141 bit
+uoVbYPLeuoR7dCzE
 ```
