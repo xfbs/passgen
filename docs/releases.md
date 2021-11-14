@@ -10,21 +10,34 @@ As of right now, there are no real releases for passgen, but we do have nightly 
 | ARM64 | [passgen-linux-aarch64.tar.xz][] ([sig][passgen-linux-aarch64.tar.xz.sig]) | [passgen-linux-aarch64.deb][] ([sig][passgen-linux-aarch64.deb.sig]) |
 | RISC-V 64biy | [passgen-linux-riscv64.tar.xz][] ([sig][passgen-linux-riscv64.tar.xz.sig]) | [passgen-linux-riscv64.deb][] ([sig][passgen-linux-riscv64.deb.sig]) |
 
+Please reach out to us if you want us to provide builds for more platforms.
+
 ## macOS
 
 *Warning: the macOS releases are considered experimental because they are untested.*
 
 | Architecture | Tarball |
-| --- | --- | --- |
+| --- | --- |
 | AMD64 | [passgen-macos-amd64.tar.xz][] ([sig][passgen-macos-amd64.tar.xz.sig]) |
+
+We are working on supplying builds for the exciting new M1 line of macOS devices.
 
 ## MS Windows
 
 *Warning: the macOS releases are considered experimental because they are untested.*
 
 | Architecture | Tarball |
-| --- | --- | --- |
+| --- | --- |
 | AMD64 | [passgen-win64-amd64.tar.xz][] ([sig][passgen-win64-amd64.tar.xz.sig]) |
+
+# Verifying
+
+Every release comes with a signature file. This can be used to verify the authenticity and integrity of the releases. To do so, you need `ssh-keygen` and the passgen developer public key.
+
+```bash
+wget https://xfbs.gitlab.com/passgen/passgen.pub
+ssh-keygen -Y verify -f passgen.pub -s passgen-linux-amd64.deb.sig -n name < passgen-linux-amd64.deb
+```
 
 [passgen-linux-amd64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.tar.xz
 [passgen-linux-amd64.deb]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.deb

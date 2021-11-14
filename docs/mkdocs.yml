@@ -16,4 +16,8 @@ markdown_extensions:
       permalink: true
 
 nav:
-  - About: index.md
+  - Home: index.md
+  - Grammar: grammar.md
+  - Releases: releases.md
+  - Development: development.md
+  - About: about.md
