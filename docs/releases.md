@@ -14,21 +14,20 @@ Please reach out to us if you want us to provide builds for more platforms.
 
 ## macOS
 
-*Warning: the macOS releases are considered experimental because they are untested.*
+*Warning: the macOS releases are considered experimental because they are untested.*  
+We are working on supplying builds for the exciting new M1 line of macOS devices.
 
 | Architecture | Tarball |
 | --- | --- |
 | AMD64 | [passgen-macos-amd64.tar.xz][] ([sig][passgen-macos-amd64.tar.xz.sig]) |
 
-We are working on supplying builds for the exciting new M1 line of macOS devices.
-
 ## MS Windows
 
-*Warning: the macOS releases are considered experimental because they are untested.*
+*Warning: the msdos releases are considered experimental because they are untested.*
 
-| Architecture | Tarball |
+| Architecture | ZIP Archive |
 | --- | --- |
-| AMD64 | [passgen-win64-amd64.tar.xz][] ([sig][passgen-win64-amd64.tar.xz.sig]) |
+| AMD64 | [passgen-win64-amd64.zip][] ([sig][passgen-win64-amd64.zip.sig]) |
 
 # Verifying
 
@@ -36,8 +35,11 @@ Every release comes with a signature file. This can be used to verify the authen
 
 ```bash
 wget https://xfbs.gitlab.com/passgen/passgen.pub
-ssh-keygen -Y verify -f passgen.pub -s passgen-linux-amd64.deb.sig -n name < passgen-linux-amd64.deb
+ssh-keygen -Y verify -f passgen.pub -s passgen-linux-amd64.deb.sig -n name -I nightly@passgen.it < passgen-linux-amd64.deb
+Good "file" signature for nightly@passgen.it with ED25519 key SHA256:k7BsqKVzJMDEmgomupIE4VE9Xe4V4ffP506BLkz4JGQ
 ```
+
+If the verification fails, please do not trust the build and contact the developers immediately!
 
 [passgen-linux-amd64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.tar.xz
 [passgen-linux-amd64.deb]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.deb
