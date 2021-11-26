@@ -1,6 +1,6 @@
 # Releases
 
-As of right now, there are no real releases for passgen, but we do have nightly builds from the master branch that you can download and try out. Currently, we support a variety of platforms for our Linux builds and have working unit tests for all platforms. We also offer macOS and MS Windows builds, however these are considered experimental because there is no easy way to run unit tests for them right now.
+As of right now, there are no real releases for passgen, but there are nightly builds from the `master` branch that you can download and try out. Currently, passgen supports a variety of platforms for the Linux builds, as well as macOS and Windows builds. The latter however are considered experimental at this point because they are not tested as part of the CI process.
 
 ## Linux
 
@@ -8,14 +8,11 @@ As of right now, there are no real releases for passgen, but we do have nightly 
 | --- | --- | --- |
 | AMD64 | [passgen-linux-amd64.tar.xz][] ([sig][passgen-linux-amd64.tar.xz.sig]) | [passgen-linux-amd64.deb][] ([sig][passgen-linux-amd64.deb.sig]) |
 | ARM64 | [passgen-linux-aarch64.tar.xz][] ([sig][passgen-linux-aarch64.tar.xz.sig]) | [passgen-linux-aarch64.deb][] ([sig][passgen-linux-aarch64.deb.sig]) |
-| RISC-V 64biy | [passgen-linux-riscv64.tar.xz][] ([sig][passgen-linux-riscv64.tar.xz.sig]) | [passgen-linux-riscv64.deb][] ([sig][passgen-linux-riscv64.deb.sig]) |
-
-It should be fairly easy to add more architectures, please reach out if you want to help with that.
+| RISC-V 64-bit | [passgen-linux-riscv64.tar.xz][] ([sig][passgen-linux-riscv64.tar.xz.sig]) | [passgen-linux-riscv64.deb][] ([sig][passgen-linux-riscv64.deb.sig]) |
 
 ## macOS
 
-*Warning: the macOS releases are considered experimental because they are untested.*  
-M1 Mac builds are work-in-progress.
+*Warning: the macOS releases are considered experimental because they are untested. M1 Mac builds are work-in-progress.*
 
 | Architecture | Tarball |
 | --- | --- |
