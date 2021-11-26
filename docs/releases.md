@@ -10,12 +10,12 @@ As of right now, there are no real releases for passgen, but we do have nightly 
 | ARM64 | [passgen-linux-aarch64.tar.xz][] ([sig][passgen-linux-aarch64.tar.xz.sig]) | [passgen-linux-aarch64.deb][] ([sig][passgen-linux-aarch64.deb.sig]) |
 | RISC-V 64biy | [passgen-linux-riscv64.tar.xz][] ([sig][passgen-linux-riscv64.tar.xz.sig]) | [passgen-linux-riscv64.deb][] ([sig][passgen-linux-riscv64.deb.sig]) |
 
-Please reach out to us if you want us to provide builds for more platforms.
+It should be fairly easy to add more architectures, please reach out if you want to help with that.
 
 ## macOS
 
 *Warning: the macOS releases are considered experimental because they are untested.*  
-We are working on supplying builds for the exciting new M1 line of macOS devices.
+M1 Mac builds are work-in-progress.
 
 | Architecture | Tarball |
 | --- | --- |
@@ -23,7 +23,7 @@ We are working on supplying builds for the exciting new M1 line of macOS devices
 
 ## MS Windows
 
-*Warning: the msdos releases are considered experimental because they are untested.*
+*Warning: the win64 releases are considered experimental because they are untested.*
 
 | Architecture | ZIP Archive |
 | --- | --- |
