@@ -8,7 +8,7 @@ if(BUILD_UTILS)
   # (pattern-dump passgen)
 endif()
 
-add_executable(passgen-bin passgen.c main.c pattern_presets.c)
+add_executable(passgen-bin passgen.c main.c)
 target_link_libraries(passgen-bin PUBLIC ${PASSGEN_LIB} m)
 set_target_properties(passgen-bin PROPERTIES OUTPUT_NAME passgen)
 passgen_target_defaults(passgen-bin)

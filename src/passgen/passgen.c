@@ -188,7 +188,6 @@ void passgen_opts_init(passgen_opts *opts) {
 int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
     const char *short_opts = "a:p:P:d:w:r:czhv";
     const char *preset = NULL;
-    const char *random = NULL;
 
     // clang-format off
     static struct option long_opts[] = {
@@ -269,12 +268,12 @@ int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
 
     // if a preset was given, parse it.
     if(preset) {
-        for(size_t i = 0; pattern_presets[i].name; ++i) {
-            if(0 == strcmp(pattern_presets[i].name, preset)) {
-                opts->format = pattern_presets[i].format;
-                break;
-            }
+        passgen_hashmap_entry *entry = passgen_hashmap_lookup(&opts->presets, preset);
+        if(!entry->key) {
+            printf("Error: preset `%s` not found\n", preset);
+            return 1;
         }
+        opts->format = entry->value;
     }
 
     // parse a given format, making sure we don't have multiple."

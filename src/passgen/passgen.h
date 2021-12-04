@@ -24,19 +24,6 @@ typedef enum {
      PASSGEN_ERROR_ILLEGAL_AMOUNT,
 } passgen_error;
 
-/// Type used to encode a pattern preset.
-typedef struct pattern_preset {
-     /// The name that is specified on the command line.
-     const char *name;
-     /// The format of this preset.
-     const char *format;
-
-     const char *description;
-} pattern_preset;
-
-/// List of pattern presets.
-extern pattern_preset pattern_presets[];
-
 /// Options parsed from the command line.
 typedef struct {
      /// How many passwords to generate.
