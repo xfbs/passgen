@@ -2,27 +2,10 @@
 
 Passgen is a tool to generate passwords from a regex-like format string.
 
-Code Coverage: [lcov](https://xfbs.gitlab.io/passgen/coverage/lcov), [llvm-cov](https://xfbs.gitlab.io/passgen/coverage/llvm-cov).  
-Documentation: [![Docs](https://xfbs.gitlab.io/passgen/badges/docs.svg)](https://xfbs.gitlab.io/passgen/doxygen/index.html).  
-Continuous Integration: [![GitLab Pipelines](https://gitlab.com/xfbs/passgen/badges/master/pipeline.svg)](https://gitlab.com/xfbs/passgen/pipelines).  
-
-Nightly builds from the master branch:
-  - [passgen-linux-amd64.tar.xz][] ([signature][passgen-linux-amd64.tar.xz.sig])
-  - [passgen-linux-amd64.deb][] ([signature][passgen-linux-amd64.deb.sig])
-  - [passgen-linux-musl-amd64.tar.xz][] ([signature][passgen-linux-musl-amd64.tar.xz.sig])
-  - [passgen-linux-aarch64.tar.xz][] ([signature][passgen-linux-aarch64.tar.xz.sig])
-  - [passgen-linux-aarch64.deb][] ([signature][passgen-linux-aarch64.deb.sig])
-  - [passgen-linux-riscv64.tar.xz][] ([signature][passgen-linux-riscv64.tar.xz.sig])
-  - [passgen-linux-riscv64.deb][] ([signature][passgen-linux-riscv64.deb.sig])
-  - [passgen-macos-amd64.tar.xz][] ([signature][passgen-macos-amd64.tar.xz.sig])
-  - [passgen-win64-amd64.zip][] ([signature][passgen-win64-amd64.zip.sig])
-
-To verify the signature on these nightly releases, you need `ssh-keygen`. Given the release file `passgen.deb`, the signature `passgen.deb.sig` and the `passgen.pub` file from this repository, run:
-
-    $ ssh-keygen -Y verify -n file -s passgen.deb.sig -f passgen.pub -I nightly@passgen.it < passgen.deb
-    Good "file" signature for nightly@passgen.it with ED25519 key SHA256:k7BsqKVzJMDEmgomupIE4VE9Xe4V4ffP506BLkz4JGQ
-
-If the tool responds with anything other than "good file signature", do not trust the nightly build, preserve the files and contact the developers immediately.
+* Code Coverage: [lcov](https://xfbs.gitlab.io/passgen/coverage/lcov), [llvm-cov](https://xfbs.gitlab.io/passgen/coverage/llvm-cov)
+* Documentation: [Doxygen](https://xfbs.gitlab.io/passgen/doxygen/index.html)
+* Continuous Integration: [Pipelines](https://gitlab.com/xfbs/passgen/pipelines)
+* Builds: [Nightly Releases](https://passgen.it/releases)
 
 ## Usage
 
