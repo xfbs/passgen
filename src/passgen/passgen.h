@@ -64,6 +64,12 @@ int passgen_opts_wordlist(passgen_opts *opt, const char *input);
 /// Parse a randomness definition, like `system` or `xor:2342322`
 int passgen_opts_random(passgen_opts *opts, const char *random);
 
+/// Load configuration options from file
+int passgen_opts_load_file(passgen_opts *opts, FILE *file);
+
+/// Load configuration options from string
+int passgen_opts_load(passgen_opts *opts, char *data);
+
 /// Print usage (help text) using @p executable as the name of the program.
 ///
 /// @param executable Name of the program, typically `argv[0]`.

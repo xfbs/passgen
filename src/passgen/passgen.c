@@ -122,9 +122,6 @@ void passgen_run(passgen_opts opts) {
 
     printf("\n");
     free(pass);
-    passgen_hashmap_free(&opts.wordlists);
-    passgen_hashmap_foreach_value(&opts.wordlists, passgen_wordlist_free);
-    passgen_hashmap_foreach_key(&opts.wordlists, free);
     passgen_parser_free(&parser);
 }
 
@@ -383,4 +380,65 @@ void passgen_bail(passgen_error error, void *data) {
 
 void passgen_opts_free(passgen_opts *opts) {
     passgen_random_free(opts->random);
+    passgen_hashmap_free(&opts->presets);
+    passgen_hashmap_foreach_value(&opts->wordlists, passgen_wordlist_free);
+    passgen_hashmap_foreach_key(&opts->wordlists, free);
+    passgen_hashmap_free(&opts->wordlists);
+}
+
+int passgen_opts_load_file(passgen_opts *opts, FILE *file) {
+    // TODO: use something like passgen_buffer to do this
+    char *config = malloc(10240);
+    size_t read = fread(config, 1, 10240, file);
+    config[read] = 0;
+    int ret = passgen_opts_load(opts, config);
+    free(config);
+    return ret;
+}
+
+int passgen_opts_load(passgen_opts *opts, char *data) {
+    // TODO: this code is a mess.
+    for(size_t pos = 0; data[pos]; pos++) {
+        if(data[pos] == '#') {
+            // skip this line, it's a comment
+            while(data[pos] && data[pos] != '\n') pos++;
+            continue;
+        }
+        if(data[pos] == '\n') {
+            // skip this newline
+            continue;
+        }
+        if(0 == strprefix("random", &data[pos])) {
+            pos += 6;
+            while(data[pos] && (data[pos] == ' ' || data[pos] == '\t')) pos++;
+            size_t length = 0;
+            while(data[pos + length] && data[pos + length] != '\n') length++;
+            data[pos + length] = 0;
+            passgen_opts_random(opts, &data[pos]);
+            pos += length;
+            continue;
+        }
+        if(0 == strprefix("wordlist", &data[pos])) {
+            pos += 8;
+            while(data[pos] && (data[pos] == ' ' || data[pos] == '\t')) pos++;
+            size_t length = 0;
+            while(data[pos + length] && data[pos + length] != '\n') length++;
+            data[pos + length] = 0;
+            passgen_opts_wordlist(opts, &data[pos]);
+            pos += length;
+            continue;
+        }
+        if(0 == strprefix("preset", &data[pos])) {
+            pos += 6;
+            while(data[pos] && (data[pos] == ' ' || data[pos] == '\t')) pos++;
+            size_t length = 0;
+            while(data[pos + length] && data[pos + length] != '\n') length++;
+            data[pos + length] = 0;
+            passgen_opts_preset(opts, &data[pos]);
+            pos += length;
+            continue;
+        }
+
+    }
+    return 0;
 }
