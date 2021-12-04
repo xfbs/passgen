@@ -49,7 +49,20 @@ typedef struct {
      size_t depth;
      bool complexity;
      passgen_hashmap wordlists;
+     passgen_hashmap presets;
 } passgen_opts;
+
+/// Initialize passgen_opts to default values.
+void passgen_opts_init(passgen_opts *opts);
+
+/// Define a preset, with an argument like `name:value`.
+int passgen_opts_define_preset(passgen_opts *opt, const char *arg);
+
+/// Define a wordlist, with an argument like `name:path`.
+int passgen_opts_wordlist(passgen_opts *opt, const char *input);
+
+/// Parse a randomness definition, like `system` or `xor:2342322`
+int passgen_opts_random(passgen_opts *opts, const char *random);
 
 /// Print usage (help text) using @p executable as the name of the program.
 ///

@@ -22,20 +22,24 @@
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *) data)
 #define strprefix(prefix, str) memcmp(prefix, str, strlen(prefix))
 
-passgen_random *parse_random(const char *random) {
-    if(!random) {
-        return passgen_random_new();
+int passgen_opts_random(passgen_opts *opts, const char *random) {
+    if(opts->random) {
+        passgen_random_free(&opts->random);
+        opts->random = NULL;
     }
 
     if(strprefix("file:", random) == 0) {
-        return passgen_random_new_path(&random[5]);
+        opts->random = passgen_random_new_path(&random[5]);
+    } else if(strprefix("xor:", random) == 0) {
+        opts->random = passgen_random_new_xorshift(atoi(&random[4]));
+    } else if(0 == strcmp(random, "system")) {
+        opts->random = passgen_random_new();
+    } else {
+        printf("Error: unrecognized randomness definition: `%s`\n", random);
+        return 1;
     }
 
-    if(strprefix("xor:", random) == 0) {
-        return passgen_random_new_xorshift(atoi(&random[4]));
-    }
-
-    return NULL;
+    return 0;
 }
 
 int print_char(void *data, uint32_t codepoint) {
@@ -124,7 +128,7 @@ void passgen_run(passgen_opts opts) {
     passgen_parser_free(&parser);
 }
 
-static void wordlist_add(passgen_opts *opt, const char *input) {
+int passgen_opts_wordlist(passgen_opts *opt, const char *input) {
     const char *colon = strstr(input, ":");
     if(!colon) {
         return;
@@ -155,21 +159,37 @@ static void wordlist_add(passgen_opts *opt, const char *input) {
     passgen_wordlist *wordlist = malloc(sizeof(passgen_wordlist));
     passgen_hashmap_insert(&opt->wordlists, name, wordlist);
     passgen_wordlist_load(wordlist, file);
+
+    return 0;
 }
 
-int passgen_opts_parse(passgen_opts *popts, int argc, char *argv[]) {
-    passgen_opts opts = {
-        .format = NULL,
-        .amount = 1,
-        .depth = 100,
-        .null = false,
-        .complexity = false,
-        .random = NULL,
-    };
+int passgen_opts_preset(passgen_opts *opts, const char *arg) {
+    size_t arg_len = strlen(arg);
+    char *arg_copy = malloc(arg_len + 1);
+    memcpy(arg_copy, arg, arg_len + 1);
+    char *colon = strstr(arg_copy, ":");
+    if(!colon) {
+        printf("Error: expected preset:value for preset definition `%s`\n", arg);
+        return 1;
+    }
+    *colon = 0;
+    passgen_hashmap_insert(&opts->presets, arg_copy, colon + 1);
+    return 0;
+}
 
-    passgen_hashmap_init(&opts.wordlists, &passgen_hashmap_context_unicode);
+void passgen_opts_init(passgen_opts *opts) {
+    opts->format = NULL;
+    opts->amount = 1;
+    opts->depth = 100;
+    opts->null = false;
+    opts->complexity = false;
+    opts->random = NULL;
+    passgen_hashmap_init(&opts->wordlists, &passgen_hashmap_context_unicode);
+    passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_default);
+}
 
-    const char *short_opts = "a:p:d:w:r:czhv";
+int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
+    const char *short_opts = "a:p:P:d:w:r:czhv";
     const char *preset = NULL;
     const char *random = NULL;
 
@@ -184,12 +204,14 @@ int passgen_opts_parse(passgen_opts *popts, int argc, char *argv[]) {
         {"complexity", no_argument, NULL, 'c'},
         {"wordlist", required_argument, NULL, 'w'},
         {"random", required_argument, NULL, 'r'},
+        {"define-preset", required_argument, NULL, 'P'},
         {NULL, no_argument, NULL, 0}
     };
     // clang-format on
 
     while(true) {
         int opt = getopt_long(argc, argv, short_opts, long_opts, NULL);
+        int ret = 0;
 
         if(opt < 0) break;
 
@@ -204,29 +226,32 @@ int passgen_opts_parse(passgen_opts *popts, int argc, char *argv[]) {
                 if(opt < 1) {
                     bail(ILLEGAL_AMOUNT, &opt);
                 }
-                opts.amount = opt;
+                opts->amount = opt;
                 break;
             case 'p':
                 preset = optarg;
                 break;
             case 'd':
                 opt = atoi(optarg);
-                opts.depth = opt;
+                opts->depth = opt;
                 break;
             case 'z':
-                opts.null = true;
+                opts->null = true;
                 break;
             case 'c':
-                opts.complexity = true;
+                opts->complexity = true;
                 break;
             case 'v':
                 bail(VERSION, NULL);
                 break;
             case 'w':
-                wordlist_add(&opts, optarg);
+                ret = passgen_opts_wordlist(opts, optarg);
                 break;
             case 'r':
-                random = optarg;
+                ret = passgen_opts_random(opts, optarg);
+                break;
+            case 'P':
+                ret = passgen_opts_preset(opts, optarg);
                 break;
             case '?':
             default:
@@ -234,18 +259,22 @@ int passgen_opts_parse(passgen_opts *popts, int argc, char *argv[]) {
                 bail(HELP, argv[0]);
                 break;
         }
+
+        if(ret != 0) {
+            return ret;
+        }
     }
 
     // can't have both a preset and a format at the same time.
-    if(preset && opts.format) {
-        bail(MULTIPLE_FORMATS, opts.format);
+    if(preset && opts->format) {
+        bail(MULTIPLE_FORMATS, opts->format);
     }
 
     // if a preset was given, parse it.
     if(preset) {
         for(size_t i = 0; pattern_presets[i].name; ++i) {
             if(0 == strcmp(pattern_presets[i].name, preset)) {
-                opts.format = pattern_presets[i].format;
+                opts->format = pattern_presets[i].format;
                 break;
             }
         }
@@ -253,22 +282,24 @@ int passgen_opts_parse(passgen_opts *popts, int argc, char *argv[]) {
 
     // parse a given format, making sure we don't have multiple."
     if(optind < argc) {
-        if(opts.format || (argc - optind) > 1) {
+        if(opts->format || (argc - optind) > 1) {
             bail(MULTIPLE_FORMATS, (void *) argv[optind]);
         } else {
-            opts.format = argv[optind];
+            opts->format = argv[optind];
         }
     }
 
     // if no format or preset was given, show help.
-    if(!opts.format) {
+    if(!opts->format) {
         bail(HELP, argv[0]);
     }
 
-    opts.random = parse_random(random);
-    assert(opts.random);
+    // fallback to system randomness if nothing else is defined
+    if(!opts->random) {
+        opts->random = passgen_random_new();
+        assert(opts->random);
+    }
 
-    *popts = opts;
     return 0;
 }
 
