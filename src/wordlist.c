@@ -24,6 +24,7 @@ void passgen_wordlist_load(passgen_wordlist *wordlist, FILE *file) {
             utf8_buffer,
             1024,
             &utf8_buffer_len,
+            NULL,
             buffer,
             buffer_len,
             &buffer_pos);

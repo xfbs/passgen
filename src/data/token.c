@@ -2,6 +2,7 @@
 
 void passgen_token_parser_init(struct passgen_token_parser *token_parser) {
     token_parser->state = PASSGEN_TOKEN_INIT;
+    token_parser->offset = 0;
 }
 
 const char *passgen_token_state_to_str(enum passgen_token_state state) {

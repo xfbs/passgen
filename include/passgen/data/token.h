@@ -21,7 +21,10 @@ enum passgen_token_state {
 
 /// Parser state for tokenizer.
 struct passgen_token_parser {
+    /// Current state of the parser.
     enum passgen_token_state state;
+    /// Current offset in parsing.
+    size_t offset;
     union {
         // when parsing a \u{FA} unicode literal, this is where we keep the
         // state.
@@ -34,7 +37,7 @@ struct passgen_token_parser {
 
 struct passgen_token {
     uint32_t codepoint;
-    void *origin;
+    size_t offset;
 };
 
 void passgen_token_parser_init(struct passgen_token_parser *token_parser);

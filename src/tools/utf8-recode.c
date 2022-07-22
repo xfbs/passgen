@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
             decoded,
             sizeof(decoded),
             &decoded_pos,
+            NULL,
             utf8_input,
             utf8_input_end - utf8_input_start,
             &utf8_input_start);

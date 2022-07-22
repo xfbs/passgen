@@ -62,6 +62,7 @@ void passgen_run(passgen_opts opts) {
         format_decoded,
         256,
         &format_decoded_len,
+        NULL,
         (unsigned char *) opts.format,
         format_input_len,
         &format_bytes_read);
@@ -143,6 +144,7 @@ int passgen_opts_wordlist(passgen_opts *opt, const char *input) {
         name,
         256,
         &name_len_out,
+        NULL,
         (unsigned char *) input,
         name_len,
         &input_pos);

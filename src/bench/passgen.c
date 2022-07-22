@@ -44,6 +44,7 @@ int main(int argc, char *argv[]) {
                 format_decoded,
                 256,
                 &format_decoded_len,
+                NULL,
                 (unsigned char *) pattern,
                 format_input_len,
                 &format_bytes_read);

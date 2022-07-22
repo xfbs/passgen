@@ -2,29 +2,35 @@
 #include <utf8proc.h>
 
 int passgen_utf8_decode(
-    uint32_t *out,
-    size_t out_len,
-    size_t *out_pos,
-    const uint8_t *in,
-    size_t in_len,
-    size_t *in_pos) {
+    uint32_t *output,
+    size_t output_len,
+    size_t *output_pos,
+    uint8_t *output_widths,
+    const uint8_t *input,
+    size_t input_len,
+    size_t *input_pos) {
     utf8proc_ssize_t n;
 
-    while((out_len > *out_pos) && (in_len > *in_pos)) {
+    while((output_len > *output_pos) && (input_len > *input_pos)) {
         n = utf8proc_iterate(
-            in + *in_pos,
-            in_len - *in_pos,
-            (utf8proc_int32_t *) (out) + *out_pos);
+            input + *input_pos,
+            input_len - *input_pos,
+            (utf8proc_int32_t *) (output) + *output_pos);
 
         if(n < 0) {
             return n;
         }
 
-        *in_pos += n;
-        *out_pos += 1;
+        // save offset
+        if(output_widths) {
+            output_widths[*output_pos] = n;
+        }
+
+        *input_pos += n;
+        *output_pos += 1;
     }
 
-    return in_len - *in_pos;
+    return input_len - *input_pos;
 }
 
 int passgen_utf8_encode(
