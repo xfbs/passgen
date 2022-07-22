@@ -1,5 +1,6 @@
 DOCKER=docker
 DOCKER_IMAGE=registry.gitlab.com/xfbs/passgen
+DOXYGEN=doxygen
 
 docker:
 	$(DOCKER) build scripts -f scripts/riscv64.dockerfile -t $(DOCKER_IMAGE)/riscv64
@@ -10,3 +11,8 @@ docker:
 docker-push:
 	$(DOCKER) push $(DOCKER_IMAGE)/riscv64
 	$(DOCKER) push $(DOCKER_IMAGE)/aarch64
+
+docs:
+	$(DOXYGEN) Doxyfile
+
+.PHONY: docs

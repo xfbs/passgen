@@ -3,9 +3,10 @@
 void passgen_token_parser_init(struct passgen_token_parser *token_parser) {
     token_parser->state = PASSGEN_TOKEN_INIT;
     token_parser->offset = 0;
+    token_parser->byte_offset = 0;
 }
 
-const char *passgen_token_state_to_str(enum passgen_token_state state) {
+const char *passgen_token_state_string(enum passgen_token_state state) {
     switch(state) {
         case PASSGEN_TOKEN_INIT:
             return "Ready for parsing";
@@ -16,11 +17,11 @@ const char *passgen_token_state_to_str(enum passgen_token_state state) {
         case PASSGEN_TOKEN_UNICODE_PAYLOAD:
             return "Parsing unicode token payload";
         case PASSGEN_TOKEN_ERROR_UNICODE_START:
-            return "Expected '{' to come after unicode token start '\\u'";
+            return "Error: unexpected character while parsing unicode literal";
         case PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD:
-            return "";
+            return "Error: unexpected character while parsing unicode literal";
         case PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN:
-            return "";
+            return "Error: Unicode literal payload too long";
         default:
             return NULL;
     }

@@ -328,7 +328,7 @@ int passgen_parser_unicode(
     int ret;
 
     for(size_t pos = 0; pos < length; pos++) {
-        ret = passgen_token_parse(&token_parser, &token, data[pos]);
+        ret = passgen_token_parse(&token_parser, &token, 1, data[pos]);
 
         if(ret == PASSGEN_TOKEN_INIT) {
             ret = passgen_parse_token(parser, &token);

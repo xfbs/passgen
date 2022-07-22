@@ -29,14 +29,14 @@
 
 #define PARSE_CODEPOINT(codepoint)                               \
     assert(                                                      \
-        passgen_token_parse(&token_parser, &token, codepoint) == \
+        passgen_token_parse(&token_parser, &token, 1, codepoint) == \
         PASSGEN_TOKEN_INIT);                                     \
     assert_eq(0, passgen_parse_token(&parser, &token))
 
 #define PARSE_CODEPOINT_DOUBLE(a, b)                                          \
-    assert(passgen_token_parse(&token_parser, &token, a) > 0);                \
+    assert(passgen_token_parse(&token_parser, &token, 1, a) > 0);                \
     assert(                                                                   \
-        passgen_token_parse(&token_parser, &token, b) == PASSGEN_TOKEN_INIT); \
+        passgen_token_parse(&token_parser, &token, 1, b) == PASSGEN_TOKEN_INIT); \
     assert_eq(0, passgen_parse_token(&parser, &token))
 
 test_result test_parser_empty(void) {

@@ -35,7 +35,7 @@
         int token_parser_state = PASSGEN_TOKEN_INIT;                    \
         for(size_t i = 0; pattern[i]; i++) {                            \
             token_parser_state =                                        \
-                passgen_token_parse(&token_parser, &token, pattern[i]); \
+                passgen_token_parse(&token_parser, &token, 1, pattern[i]); \
             if(token_parser_state == PASSGEN_TOKEN_INIT) {              \
                 assert(0 == passgen_parse_token(&parser, &token));      \
             }                                                           \

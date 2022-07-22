@@ -7,6 +7,10 @@ static inline void token_parse_init(
     struct passgen_token_parser *parser,
     struct passgen_token *token,
     uint32_t codepoint) {
+    // save position of initial token
+    token->offset = parser->offset;
+    token->byte_offset = parser->byte_offset;
+
     if(codepoint == '\\') {
         parser->state = PASSGEN_TOKEN_ESCAPED;
     } else {
@@ -99,6 +103,7 @@ static inline void token_parse_unicode_payload(
 int passgen_token_parse(
     struct passgen_token_parser *parser,
     struct passgen_token *token,
+    uint8_t width,
     uint32_t codepoint) {
     switch(parser->state) {
         case PASSGEN_TOKEN_INIT:
@@ -114,8 +119,12 @@ int passgen_token_parse(
             token_parse_unicode_payload(parser, token, codepoint);
             break;
         default:
-            break;
+            return parser->state;
     }
+
+    // update parser offsets
+    parser->offset += 1;
+    parser->byte_offset += width;
 
     return parser->state;
 }

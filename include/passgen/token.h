@@ -1,9 +1,14 @@
 /// @file token.h
 /// @author Patrick M. Elsen
-/// @brief Token Parsing functions.
+/// @brief Functions to parse Unicode codepoints into @ref passgen_token values.
 ///
-/// Tokens are typically individual symbols, but can also be
-/// escaped symbols, or special tokens.
+/// The input to Passgen at this point is a sequence of unicode codepoints. These are
+/// converted into tokens. For most codepoints, every codepoint maps one-to-one to a token,
+/// but there are some special cases such as unicode escape sequences (for example `\u{0a}`
+/// will get you a space).
+///
+/// Tokens also handle escaping characters. For example, to write a closing bracket in a
+/// character range, you can escape it with a backslash (such as `[a-z&=\]]`).
 #pragma once
 #include <stddef.h>
 #include <stdint.h>
@@ -11,14 +16,25 @@
 struct passgen_token;
 struct passgen_token_parser;
 
-/// parse a single codepoint. The return value signals what happened. If it
-/// returns zero (PASSGEN_TOKEN_INIT), it means that a token has been parsed into
-/// `token`. If it returns a positive integer, it means that it was successful
-/// but the token hasn't finished parsing yet, it is awaiting more input. If it
-/// returns negatively, it means that there has been an error.
+/// Parse a single codepoint.
+///
+/// This function parses a single codepoint into a `passgen_token`. It needs an initialized
+/// parser to do so, and will return a value indicating if the parsing was successful or not.
+/// It can also be passed a width, which indicates the byte width of the codepoint (if it was
+/// decoded from a UTF-8 string) which is used to keep track of the exact byte offset for
+/// every token to make diagnostic error reporting easier.
+///
+/// @param parser An initialized `passgen_token_parser`. Use `passgen_token_parser_init` to
+///   initialize it if you are not sure.
+/// @param token The token that is parsed, this is an output.
+/// @param width The width (in bytes) of the codepoint. This can be set to 1 if the original
+///   input was Unicode codepoints.
+/// @param codepoint The codepoint to parse.
+/// @return The status of the parsing. This is an @ref passgen_token_state enum value.
 int passgen_token_parse(
     struct passgen_token_parser *parser,
     struct passgen_token *token,
+    uint8_t width,
     uint32_t codepoint);
 
 /// Parse a bunch of codepoints from an array. The variable size should contain

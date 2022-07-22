@@ -70,7 +70,7 @@ void passgen_run(passgen_opts opts) {
     assert(ret == 0);
 
     for(size_t i = 0; i < format_decoded_len; i++) {
-        int ret = passgen_token_parse(&token_parser, &token, format_decoded[i]);
+        int ret = passgen_token_parse(&token_parser, &token, 1, format_decoded[i]);
 
         if(ret == PASSGEN_TOKEN_INIT) {
             ret = passgen_parse_token(&parser, &token);
