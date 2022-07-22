@@ -1,8 +1,9 @@
 /// @file random.h
+/// @author Patrick M. Elsen <pelsen@xfbs.net>
+/// @brief Generate random data from various sources.
 ///
 /// Functions used to extract random data. Provides an interface around a
 /// random data device, typically `/dev/urandom`, that can be used safely.
-
 #pragma once
 #include <stdbool.h>
 #include <stdint.h>

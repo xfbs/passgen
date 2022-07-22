@@ -1,6 +1,6 @@
 /// @file parser.h
-/// @brief Parsing API
 /// @author Patrick M. Elsen
+/// @brief Passgen syntax parser.
 ///
 /// Parsing API. Needs a `passgen_parser` struct instance, which is defined in @ref data/parser.h.
 ///

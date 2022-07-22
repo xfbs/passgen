@@ -1,3 +1,6 @@
+/// @file stack.h
+/// @author Patrick M. Elsen <pelsen@xfbs.net>
+/// @brief Stack data structure
 #pragma once
 #include <stddef.h>
 

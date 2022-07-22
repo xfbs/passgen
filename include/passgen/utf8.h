@@ -1,7 +1,6 @@
 /// @file utf8.h
 /// @author Patrick M. Elsen <pelsen@xfbs.net>
-///
-/// UTF-8 encoding and decoding utilities.
+/// @brief UTF-8 encoding and decoding utilities.
 ///
 /// Internally, passgen has proper Unicode support (meaning that it works with UTF-32
 /// codepoints). However, for transport and storage, UTF-8 is more common. Therefore,

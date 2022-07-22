@@ -1,3 +1,9 @@
+/// @file hashmap.h
+/// @author Patrick M. Elsen <pelsen@xfbs.net>
+/// @brief HashMap implementation
+///
+/// This implements a hashmap with a variable hash function and open addressing.
+
 #pragma once
 
 #include <stdint.h>

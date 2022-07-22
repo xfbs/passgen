@@ -1,3 +1,6 @@
+/// @file version.h
+/// @author Patrick M. Elsen <pelsen@xfbs.net>
+/// @brief Version information for libpassgen.
 #pragma once
 #include <stdbool.h>
 #include <stdint.h>
