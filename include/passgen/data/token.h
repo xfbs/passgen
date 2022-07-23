@@ -1,3 +1,6 @@
+/// @file token.h
+/// @author Patrick M. Elsen <pelsen@xfbs.net>
+/// @brief Token and token parser data structures and methods.
 #pragma once
 #include <stdbool.h>
 #include <stddef.h>

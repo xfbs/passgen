@@ -1,8 +1,15 @@
+/// @file range.h
+/// @author Patrick M. Elsen
+/// @brief Pattern range data structure.
+///
+/// A pattern range is something like `a-z`, which matches all characters in the range from `a` to `z`.
+/// The @ref passgen_pattern_range struct is how these ranges are stored in memory.
 #pragma once
-#include "passgen/debug.h"
-#include "passgen/export.h"
 #include <stddef.h>
 #include <stdint.h>
+
+#include "passgen/debug.h"
+#include "passgen/export.h"
 
 /// Represents a single range of characters, such as `a-z`.
 ///

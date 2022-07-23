@@ -1,3 +1,6 @@
+/// @file parser.h
+/// @author Patrick M. Elsen <pelsen@xfbs.net>
+/// @brief Passgen pattern parser data structures
 #pragma once
 #include <stdint.h>
 
@@ -10,7 +13,9 @@
 /// Represents a parser. Contains a parsing stack, as well as a pattern, which
 /// is dynamically built, and should not be used until the parsing is finalized.
 struct passgen_parser {
+    /// Current state of the parser, as a stack.
     passgen_stack state;
+    /// The current, possibly incomplete parsed pattern.
     passgen_pattern_t pattern;
 };
 

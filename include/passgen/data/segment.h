@@ -1,3 +1,6 @@
+/// @file segment.h
+/// @author Patrick M. Elsen <pelsen@xfbs.net>
+/// @brief Pattern segment data structure and methods.
 #pragma once
 #include <stddef.h>
 
