@@ -28,8 +28,8 @@ typedef enum {
 typedef struct {
      /// How many passwords to generate.
      size_t amount;
-     /// The format to use when generating passwords.
-     const char *format;
+     /// The pattern to use when generating passwords.
+     const char *pattern;
      /// The source of randomness to use.
      passgen_random *random;
      bool null;

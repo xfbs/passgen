@@ -53,30 +53,40 @@ void passgen_run(passgen_opts opts) {
     struct passgen_token token = {0};
     passgen_parser_init(&parser);
 
-    uint32_t format_decoded[256];
-    size_t format_decoded_len = 0;
-    size_t format_bytes_read = 0;
-    size_t format_input_len = strlen(opts.format);
+    size_t pattern_max = 256;
+    uint32_t pattern[pattern_max];
+    uint8_t pattern_widths[pattern_max];
+    size_t pattern_len = 0;
+    size_t pattern_raw_read = 0;
+    size_t pattern_raw_len = strlen(opts.pattern);
 
+    // decode input utf8 into unicode codepoints
     int ret = passgen_utf8_decode(
-        format_decoded,
-        256,
-        &format_decoded_len,
-        NULL,
-        (unsigned char *) opts.format,
-        format_input_len,
-        &format_bytes_read);
+        pattern,
+        pattern_max,
+        &pattern_len,
+        pattern_widths,
+        (unsigned char *) opts.pattern,
+        pattern_raw_len,
+        &pattern_raw_read);
 
     assert(ret == 0);
 
-    for(size_t i = 0; i < format_decoded_len; i++) {
-        int ret = passgen_token_parse(&token_parser, &token, 1, format_decoded[i]);
+    // parse tokens and pattern
+    for(size_t i = 0; i < pattern_len; i++) {
+        int ret = passgen_token_parse(
+                &token_parser,
+                &token,
+                pattern_widths[i],
+                pattern[i]);
 
         if(ret == PASSGEN_TOKEN_INIT) {
             ret = passgen_parse_token(&parser, &token);
             assert(ret == 0);
         }
     }
+
+    // FIXME: check that token_parser.state == PASSGEN_TOKEN_INIT
 
     // allocate some space for pass.
     // size_t pass_len = pattern_maxlen(pattern);
@@ -177,7 +187,7 @@ int passgen_opts_preset(passgen_opts *opts, const char *arg) {
 }
 
 void passgen_opts_init(passgen_opts *opts) {
-    opts->format = NULL;
+    opts->pattern = NULL;
     opts->amount = 1;
     opts->depth = 100;
     opts->null = false;
@@ -264,8 +274,8 @@ int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
     }
 
     // can't have both a preset and a format at the same time.
-    if(preset && opts->format) {
-        bail(MULTIPLE_FORMATS, opts->format);
+    if(preset && opts->pattern) {
+        bail(MULTIPLE_FORMATS, opts->pattern);
     }
 
     // if a preset was given, parse it.
@@ -275,20 +285,20 @@ int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
             printf("Error: preset `%s` not found\n", preset);
             return 1;
         }
-        opts->format = entry->value;
+        opts->pattern = entry->value;
     }
 
     // parse a given format, making sure we don't have multiple."
     if(optind < argc) {
-        if(opts->format || (argc - optind) > 1) {
+        if(opts->pattern || (argc - optind) > 1) {
             bail(MULTIPLE_FORMATS, (void *) argv[optind]);
         } else {
-            opts->format = argv[optind];
+            opts->pattern = argv[optind];
         }
     }
 
     // if no format or preset was given, show help.
-    if(!opts->format) {
+    if(!opts->pattern) {
         bail(HELP, argv[0]);
     }
 
@@ -360,7 +370,7 @@ void passgen_bail(passgen_error error, void *data) {
             exit(-1);
         case PASSGEN_ERROR_MULTIPLE_FORMATS:
             printf(
-                "Error: multiple formats specified (%s).\n",
+                "Error: multiple patterns specified (%s).\n",
                 (const char *) data);
             exit(-2);
         case PASSGEN_ERROR_RANDOM_ALLOC:
