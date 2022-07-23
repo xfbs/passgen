@@ -4,6 +4,11 @@ image: debian:11
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
+# by default, retry failed jobs up to three times. sometimes jobs can fail due to
+# temporary blips like network connectivity issues.
+default:
+  retry: 3
+
 stages:
   - setup
   - test
