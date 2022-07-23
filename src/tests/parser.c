@@ -729,6 +729,45 @@ const char *pattern_broken[] = {
 };
 
 const char *pattern_working[] = {
+    // character literal
+    "",
+    "a",
+    "ab",
+    "abc",
+    "abcd",
+    "abcde",
+    "abcdef",
+    "abcdefg",
+    "abcdefgh",
+    "abcdefghi",
+    "abcdefghij",
+    // character literal repetition
+    "a{1}",
+    "a{9}",
+    "a{12}",
+    "a{12,16}",
+    // group
+    "()",
+    "(a)",
+    "(a|b)",
+    "(a|b|c)",
+    "(a{2}|b|c)",
+    "(a|b|c){2}",
+    // character range
+    "[a]",
+    "[abc]",
+    "[a-z]",
+    "[a-z0-9]",
+    "[a-z0-9!@#$%^&*]",
+    "[a-z]{2}",
+    "[a-z]{2,8}",
+    // unicode literal
+    "\\u{0a}",
+    "\\u{0A}",
+    "\\u{fc}",
+    "\\u{FC}",
+    "\\u{00fc}",
+    "\\u{00FC}",
     NULL,
 };
 
@@ -739,5 +778,17 @@ test_result test_parser_can_parse_broken(void) {
         int ret = passgen_parse(&pattern, &error, pattern_broken[i]);
         assert(ret != 0);
     }
+
+    return test_ok;
+}
+
+test_result test_parser_can_parse_working(void) {
+    for(int i = 0; pattern_working[i]; i++) {
+        struct passgen_pattern pattern;
+        passgen_error error;
+        int ret = passgen_parse(&pattern, &error, pattern_working[i]);
+        assert(ret == 0);
+    }
+
     return test_ok;
 }
