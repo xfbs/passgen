@@ -260,11 +260,11 @@ uint32_t passgen_markov_generate(
     passgen_markov_node *node = markov->root;
 
     for(size_t i = 0; i < markov->level; i++) {
-        node = passgen_markov_node_child(node, current[i]).leaf;
+        node = (passgen_markov_node *) passgen_markov_node_child(node, current[i]).leaf;
         assert(node);
     }
 
-    passgen_markov_leaf *leaf = node;
+    passgen_markov_leaf *leaf = (passgen_markov_leaf *) node;
 
     size_t choice = passgen_random_u64_max(random, leaf->total_count);
     for(size_t i = 0; i < leaf->capacity; i++) {

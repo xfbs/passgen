@@ -149,7 +149,10 @@ void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
         }
     } else {
         size_t ret = random->read(data, bytes, random->data);
-        passgen_assert(ret == bytes);
+        if(ret != bytes) {
+            fprintf(stderr, "Error reading from randomness source: trying to read %zu bytes but got %zu", bytes, ret);
+            abort();
+        }
     }
 }
 

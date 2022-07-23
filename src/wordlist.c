@@ -11,7 +11,7 @@ void passgen_wordlist_load(passgen_wordlist *wordlist, FILE *file) {
     passgen_markov_init(&wordlist->markov, 3);
     passgen_stack_init(&wordlist->stack, sizeof(uint32_t *));
 
-    char buffer[1024];
+    uint8_t buffer[1024];
     size_t buffer_len = 0;
     size_t buffer_pos = 0;
     uint32_t utf8_buffer[1024];

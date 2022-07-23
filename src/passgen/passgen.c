@@ -19,12 +19,13 @@
 #include "passgen/version.h"
 #include "passgen/wordlist.h"
 
+#define UNUSED(x) (void) x
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *) data)
 #define strprefix(prefix, str) memcmp(prefix, str, strlen(prefix))
 
 int passgen_opts_random(passgen_opts *opts, const char *random) {
     if(opts->random) {
-        passgen_random_free(&opts->random);
+        passgen_random_free(opts->random);
         opts->random = NULL;
     }
 
@@ -39,11 +40,6 @@ int passgen_opts_random(passgen_opts *opts, const char *random) {
         return 1;
     }
 
-    return 0;
-}
-
-int print_char(void *data, uint32_t codepoint) {
-    fprintf(stderr, "%c", codepoint);
     return 0;
 }
 
@@ -147,7 +143,7 @@ int passgen_opts_wordlist(passgen_opts *opt, const char *input) {
     }
 
     // copy name
-    int32_t *name = calloc(256, sizeof(int32_t));
+    uint32_t *name = calloc(256, sizeof(int32_t));
     size_t name_len_out = 0;
     size_t input_pos = 0;
     int ret = passgen_utf8_decode(
@@ -392,7 +388,7 @@ void passgen_bail(passgen_error error, void *data) {
 void passgen_opts_free(passgen_opts *opts) {
     passgen_random_free(opts->random);
     passgen_hashmap_free(&opts->presets);
-    passgen_hashmap_foreach_value(&opts->wordlists, passgen_wordlist_free);
+    passgen_hashmap_foreach_value(&opts->wordlists, (void *) passgen_wordlist_free);
     passgen_hashmap_foreach_key(&opts->wordlists, free);
     passgen_hashmap_free(&opts->wordlists);
 }

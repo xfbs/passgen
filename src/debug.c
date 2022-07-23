@@ -3,12 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define UNUSED(x) (void) x
 
 static void struct_start(void *data, const char *name) {
     fprintf(data, "%s {", name);
 }
 
 static void struct_end(void *data, const char *name) {
+    UNUSED(name);
     fprintf(data, "}");
 }
 
@@ -17,6 +19,7 @@ static void member_start(void *data, const char *name) {
 }
 
 static void member_end(void *data, const char *name) {
+    UNUSED(name);
     fprintf(data, ", ");
 }
 
@@ -29,14 +32,15 @@ static void value_bool(void *data, bool value) {
 }
 
 static void value_uint(void *data, uintmax_t value) {
-    fprintf(data, "%llu", value);
+    fprintf(data, "%lu", value);
 }
 
 static void value_int(void *data, intmax_t value) {
-    fprintf(data, "%lli", value);
+    fprintf(data, "%li", value);
 }
 
 static void value_enum(void *data, int value, const char *name) {
+    UNUSED(value);
     fprintf(data, "%s", name);
 }
 
@@ -94,6 +98,7 @@ static void pretty_struct_start(void *data, const char *name) {
 }
 
 static void pretty_struct_end(void *data, const char *name) {
+    UNUSED(name);
     pretty_dedent(data);
     pretty_indentation(data);
     fprintf(stderr, "}");
@@ -105,26 +110,34 @@ static void pretty_member_start(void *data, const char *name) {
 }
 
 static void pretty_member_end(void *data, const char *name) {
+    UNUSED(data);
+    UNUSED(name);
     fprintf(stderr, ",\n");
 }
 
 static void pretty_value_ptr(void *data, void *ptr) {
+    UNUSED(data);
     fprintf(stderr, "%p", ptr);
 }
 
 static void pretty_value_bool(void *data, bool value) {
+    UNUSED(data);
     fprintf(stderr, "%s", value ? "true" : "false");
 }
 
 static void pretty_value_uint(void *data, uintmax_t value) {
-    fprintf(stderr, "%llu", value);
+    UNUSED(data);
+    fprintf(stderr, "%lu", value);
 }
 
 static void pretty_value_int(void *data, intmax_t value) {
-    fprintf(stderr, "%lli", value);
+    UNUSED(data);
+    fprintf(stderr, "%li", value);
 }
 
 static void pretty_value_enum(void *data, int value, const char *name) {
+    UNUSED(data);
+    UNUSED(value);
     fprintf(stderr, "%s", name);
 }
 

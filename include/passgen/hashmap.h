@@ -90,7 +90,7 @@ passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, void *key);
 /// Feel free to change the value via this pointer. However, the returned entry
 /// is only valid until the next change to the hashmap (insertion, deletion).
 /// Do not change the key via this pointer.
-passgen_hashmap_entry *passgen_hashmap_lookup(passgen_hashmap *map, void *key);
+passgen_hashmap_entry *passgen_hashmap_lookup(passgen_hashmap *map, const void *key);
 
 /// Run the passed function for every key.
 void passgen_hashmap_foreach_key(passgen_hashmap *map, void (*func)(void *key));

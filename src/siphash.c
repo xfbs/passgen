@@ -113,16 +113,22 @@ int passgen_siphash(const void *in, const size_t inlen, const void *k, uint8_t *
     switch (left) {
     case 7:
         b |= ((uint64_t)ni[6]) << 48;
+        // fall through
     case 6:
         b |= ((uint64_t)ni[5]) << 40;
+        // fall through
     case 5:
         b |= ((uint64_t)ni[4]) << 32;
+        // fall through
     case 4:
         b |= ((uint64_t)ni[3]) << 24;
+        // fall through
     case 3:
         b |= ((uint64_t)ni[2]) << 16;
+        // fall through
     case 2:
         b |= ((uint64_t)ni[1]) << 8;
+        // fall through
     case 1:
         b |= ((uint64_t)ni[0]);
         break;

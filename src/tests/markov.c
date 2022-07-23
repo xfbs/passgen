@@ -46,46 +46,46 @@ test_result test_markov_node_insert(void) {
 
     node = passgen_markov_node_insert(node, 0);
     assert(!passgen_markov_node_child(node, 0).node);
-    passgen_markov_node_child(node, 0).node = &node;
+    passgen_markov_node_child(node, 0).node = (passgen_markov_node *) &node;
 
     node = passgen_markov_node_insert(node, 1);
     assert(!passgen_markov_node_child(node, 1).node);
-    passgen_markov_node_child(node, 1).node = &node;
+    passgen_markov_node_child(node, 1).node = (passgen_markov_node *) &node;
 
     node = passgen_markov_node_insert(node, 2);
     assert(!passgen_markov_node_child(node, 2).node);
-    passgen_markov_node_child(node, 2).node = &node;
+    passgen_markov_node_child(node, 2).node = (passgen_markov_node *) &node;
 
     assert_eq(node->capacity, 3);
 
     node = passgen_markov_node_insert(node, 3);
     assert(!passgen_markov_node_child(node, 3).node);
-    passgen_markov_node_child(node, 3).node = &node;
+    passgen_markov_node_child(node, 3).node = (passgen_markov_node *) &node;
 
     assert_eq(node->capacity, 7);
 
     node = passgen_markov_node_insert(node, 4);
     assert(!passgen_markov_node_child(node, 4).node);
-    passgen_markov_node_child(node, 4).node = &node;
+    passgen_markov_node_child(node, 4).node = (passgen_markov_node *) &node;
 
     node = passgen_markov_node_insert(node, 5);
     assert(!passgen_markov_node_child(node, 5).node);
-    passgen_markov_node_child(node, 5).node = &node;
+    passgen_markov_node_child(node, 5).node = (passgen_markov_node *) &node;
 
     node = passgen_markov_node_insert(node, 6);
     assert(!passgen_markov_node_child(node, 6).node);
-    passgen_markov_node_child(node, 6).node = &node;
+    passgen_markov_node_child(node, 6).node = (passgen_markov_node *) &node;
 
     node = passgen_markov_node_insert(node, 7);
     assert(!passgen_markov_node_child(node, 7).node);
-    passgen_markov_node_child(node, 7).node = &node;
+    passgen_markov_node_child(node, 7).node = (passgen_markov_node *) &node;
 
     assert_eq(node->capacity, 17);
 
     for(size_t i = 8; i < 1000; i++) {
         node = passgen_markov_node_insert(node, i);
         assert(!passgen_markov_node_child(node, i).node);
-        passgen_markov_node_child(node, i).node = &node;
+        passgen_markov_node_child(node, i).node = (passgen_markov_node *) &node;
     }
 
     assert_eq(node->capacity, 1361);
@@ -149,7 +149,7 @@ test_result test_markov_node_insert_word(void) {
 
     const uint32_t word[] = {'h', 'e', 'l', 'l', 'o'};
 
-    root_node = passgen_markov_node_insert_word(root_node, &word, 5, 1);
+    root_node = passgen_markov_node_insert_word(root_node, (void *) &word, 5, 1);
     passgen_markov_node *node = root_node;
 
     assert_eq(passgen_markov_node_codepoint(node, 'h'), 'h');
@@ -187,7 +187,7 @@ test_result test_markov_add(void) {
     passgen_markov_init(&markov, 2);
 
     // this should have added 00a and 0a0 into the chain.
-    passgen_markov_add(&markov, &(const uint32_t[]){'a'}, 1, 1);
+    passgen_markov_add(&markov, (void *) &(const uint32_t[]){'a'}, 1, 1);
 
     // verify 00a is there
     node = passgen_markov_node_child(markov.root, 0).node;
@@ -208,7 +208,7 @@ test_result test_markov_add(void) {
     assert_eq(passgen_markov_leaf_count(leaf, 0), 1);
 
     // this should have added 00l, 0la, la0, each with a weight of 2.
-    passgen_markov_add(&markov, &(const uint32_t[]){'l', 'a'}, 2, 2);
+    passgen_markov_add(&markov, (void *) &(const uint32_t[]){'l', 'a'}, 2, 2);
 
     // verify 00l is there
     node = passgen_markov_node_child(markov.root, 0).node;
@@ -237,10 +237,10 @@ test_result test_markov_add(void) {
     assert_eq(passgen_markov_leaf_codepoint(leaf, 0), 0);
     assert_eq(passgen_markov_leaf_count(leaf, 0), 2);
 
-    passgen_markov_add(&markov, &(const uint32_t[]){'l', 'e'}, 2, 1);
-    passgen_markov_add(&markov, &(const uint32_t[]){'t', 'h', 'e'}, 3, 1);
-    passgen_markov_add(&markov, &(const uint32_t[]){'p', 'a', 'r', 't'}, 4, 1);
-    passgen_markov_add(&markov, &(const uint32_t[]){'p', 'h', 'o', 'n', 'e'}, 5, 1);
+    passgen_markov_add(&markov, (void *) &(const uint32_t[]){'l', 'e'}, 2, 1);
+    passgen_markov_add(&markov, (void *) &(const uint32_t[]){'t', 'h', 'e'}, 3, 1);
+    passgen_markov_add(&markov, (void *) &(const uint32_t[]){'p', 'a', 'r', 't'}, 4, 1);
+    passgen_markov_add(&markov, (void *) &(const uint32_t[]){'p', 'h', 'o', 'n', 'e'}, 5, 1);
 
     passgen_markov_free(&markov);
 

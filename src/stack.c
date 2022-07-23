@@ -5,7 +5,6 @@
 
 static const size_t passgen_stack_bin_size = 32;
 static const size_t passgen_stack_cap_init = 4;
-static const size_t passgen_stack_cap_mult = 2;
 
 static size_t passgen_stack_bins(const passgen_stack *stack) {
     return (stack->len + stack->bin_size - 1) / stack->bin_size;
@@ -16,6 +15,7 @@ static size_t passgen_stack_bin(const passgen_stack *stack, size_t pos) {
 }
 
 static size_t passgen_stack_bin_count(const passgen_stack *stack, size_t len) {
+    (void) stack;
     size_t power = 1;
     while(power < len) {
             power *= 2;
@@ -151,7 +151,8 @@ void *passgen_stack_pop(passgen_stack *stack, void *element) {
     if(element) {
         return element;
     } else {
-        return 0x1;
+        /// FIXME: use a constant here?
+        return (void *) 0x1;
     }
 }
 

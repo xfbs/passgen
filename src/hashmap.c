@@ -1,6 +1,7 @@
 #include "passgen/hashmap.h"
 #include "passgen/siphash.h"
 #include <stdlib.h>
+#define UNUSED(x) (void) x
 
 static const size_t hashmap_sizes[] = {3, 7, 17, 37, 79, 163, 331, 673, 1361, 2729, 5471, 10949, 21911, 43853, 87719, 175447, 350899, 701819, 0};
 static const char *SIPHASH_KEY_FIRST = "someverylongpass";
@@ -38,7 +39,7 @@ void passgen_hashmap_realloc(passgen_hashmap *map, size_t capacity) {
     free(old.data);
 }
 
-static inline size_t passgen_hashmap_position(passgen_hashmap *map, void *key, bool first) {
+static inline size_t passgen_hashmap_position(passgen_hashmap *map, const void *key, bool first) {
     return map->context->hash(map, key, first) % map->capacity;
 }
 
@@ -152,7 +153,7 @@ passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, void *key) {
     return (passgen_hashmap_entry){NULL, NULL};
 }
 
-passgen_hashmap_entry *passgen_hashmap_lookup(passgen_hashmap *map, void *key) {
+passgen_hashmap_entry *passgen_hashmap_lookup(passgen_hashmap *map, const void *key) {
     // make sure the hashmap is not empty
     if(!map->data) {
         return NULL;
@@ -196,13 +197,15 @@ void passgen_hashmap_foreach_value(passgen_hashmap *map, void (*func)(void *valu
 }
 
 static uint64_t string_hash(const passgen_hashmap *map, const void *key, bool first) {
+    UNUSED(map);
     uint64_t output;
     const char *siphash_key = first ? SIPHASH_KEY_FIRST : SIPHASH_KEY_SECOND;
-    passgen_siphash(key, strlen(key), siphash_key, &output, sizeof(output));
+    passgen_siphash(key, strlen(key), siphash_key, (uint8_t *) &output, sizeof(output));
     return output;
 }
 
 static bool string_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
+    UNUSED(map);
     return strcmp(lhs, rhs) == 0;
 }
 
@@ -221,13 +224,15 @@ static size_t unicode_len(const void *data) {
 }
 
 static uint64_t unicode_hash(const passgen_hashmap *map, const void *key, bool first) {
+    UNUSED(map);
     uint64_t output;
     const char *siphash_key = first ? SIPHASH_KEY_FIRST : SIPHASH_KEY_SECOND;
-    passgen_siphash(key, unicode_len(key), siphash_key, &output, sizeof(output));
+    passgen_siphash(key, unicode_len(key), siphash_key, (uint8_t *) &output, sizeof(output));
     return output;
 }
 
 static bool unicode_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
+    UNUSED(map);
     size_t rhs_len = unicode_len(rhs);
     size_t lhs_len = unicode_len(lhs);
     if(rhs_len != lhs_len) {
