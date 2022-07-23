@@ -81,6 +81,7 @@ int passgen_parse(
         error->codepoint = pattern_pos_total;
         error->byte = pattern_raw_pos;
         error->message = "Parsing not finished";
+        return -1;
     }
 
     *output = parser.pattern;

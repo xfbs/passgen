@@ -225,6 +225,14 @@ int passgen_parse_set_range(
     struct passgen_token *token,
     struct passgen_parser_state *state) {
     (void) parser;
+    if(token->codepoint == ']') {
+        return -1;
+    }
+
+    if(token->codepoint < state->data.set.range->start) {
+        return -1;
+    }
+
     state->data.set.range->end = token->codepoint;
     state->type = PASSGEN_PARSER_SET;
 

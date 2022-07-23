@@ -697,15 +697,25 @@ const char *pattern_broken[] = {
     ")",
     ")))",
     "[a-z]))",
+    // groups with end lower than start
+    "[a-0]",
+    "[z-a]",
+    // groups with missing end
+    "[a-",
+    "[b-",
+    "[b-]",
+    "[za-",
+    // unclosed groups
+    "(",
+    "(()",
     // unfinished escape sequence
     "\\",
-    // unfinished unicode literal
     "\\u",
-    // unfinished unicode literal payload
     "\\u{",
     "\\u{0a",
     // unicode literal payload too long
     "\\u{0000000000000",
+    "\\u{123456789abcdef",
     // repeat without anything before
     "{0}",
     // invalid utf8 sequences, taken from: https://stackoverflow.com/questions/1301402/example-invalid-utf8-string
