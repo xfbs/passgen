@@ -129,11 +129,11 @@ void passgen_run(passgen_opts opts) {
 int passgen_opts_wordlist(passgen_opts *opt, const char *input) {
     const char *colon = strstr(input, ":");
     if(!colon) {
-        return;
+        return 1;
     }
     size_t name_len = colon - input;
     if(name_len == 0) {
-        return;
+        return 1;
     }
 
     // copy name
@@ -152,7 +152,7 @@ int passgen_opts_wordlist(passgen_opts *opt, const char *input) {
 
     FILE *file = fopen(colon + 1, "r");
     if(!file) {
-        return;
+        return 1;
     }
 
     passgen_wordlist *wordlist = malloc(sizeof(passgen_wordlist));
