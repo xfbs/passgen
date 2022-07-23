@@ -56,3 +56,6 @@ int passgen_utf8_encode(
     const uint32_t *in,
     size_t in_len,
     size_t *in_pos);
+
+/// Given an error (negative return value), returns a string describing it.
+const char *passgen_utf8_error(int retval);

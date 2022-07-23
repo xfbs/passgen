@@ -1,5 +1,6 @@
 #include "passgen/parser.h"
 
+#include <passgen/passgen.h>
 #include "passgen/stack.h"
 #include "passgen/data/chars.h"
 #include "passgen/data/group.h"
@@ -688,3 +689,55 @@ test_result test_parser_char_repeat_tainted(void) {
 
 #undef PREAMBLE
 #undef POSTAMBLE
+#undef PARSE_CODEPOINT
+#undef PARSE_CODEPOINT_DOUBLE
+
+const char *pattern_broken[] = {
+    // closing groups that don't exist
+    ")",
+    ")))",
+    "[a-z]))",
+    // unfinished escape sequence
+    "\\",
+    // unfinished unicode literal
+    "\\u",
+    // unfinished unicode literal payload
+    "\\u{",
+    "\\u{0a",
+    // unicode literal payload too long
+    "\\u{0000000000000",
+    // repeat without anything before
+    "{0}",
+    // invalid utf8 sequences, taken from: https://stackoverflow.com/questions/1301402/example-invalid-utf8-string
+    // invalid 2-octet utf8
+    "\xc3\x28",
+    // invalid 3-octet utf8 (in second octet)
+    "\xe2\x28\xa1",
+    // invalid 3-octet utf8 (in third octet)
+    "\xe2\x82\x28",
+    // Invalid 4 Octet Sequence (in 2nd Octet)'
+    "\xf0\x28\x8c\xbc",
+    // Invalid 4 Octet Sequence (in 3rd Octet)
+    "\xf0\x90\x28\xbc",
+    // Invalid 4 Octet Sequence (in 4th Octet)
+    "\xf0\x28\x8c\x28",
+    // Valid 5 Octet Sequence (but not Unicode!)
+    "\xf8\xa1\xa1\xa1\xa1",
+    // Valid 6 Octet Sequence (but not Unicode!)
+    "\xfc\xa1\xa1\xa1\xa1\xa1",
+    NULL,
+};
+
+const char *pattern_working[] = {
+    NULL,
+};
+
+test_result test_parser_can_parse_broken(void) {
+    for(int i = 0; pattern_broken[i]; i++) {
+        struct passgen_pattern pattern;
+        passgen_error error;
+        int ret = passgen_parse(&pattern, &error, pattern_broken[i]);
+        assert(ret != 0);
+    }
+    return test_ok;
+}

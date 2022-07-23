@@ -5,6 +5,7 @@ set(SOURCE_LIST
     "assert.c"
     "context.c"
     "stack.c"
+    "passgen.c"
     "data/array.c"
     "data/char.c"
     "data/group.c"

@@ -53,3 +53,7 @@ int passgen_utf8_encode(
 
     return n;
 }
+
+const char *passgen_utf8_error(int retval) {
+    return utf8proc_errmsg(retval);
+}

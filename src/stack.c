@@ -148,12 +148,7 @@ void *passgen_stack_pop(passgen_stack *stack, void *element) {
 
     stack->len -= 1;
 
-    if(element) {
-        return element;
-    } else {
-        /// FIXME: use a constant here?
-        return (void *) 0x1;
-    }
+    return element;
 }
 
 // Returns the topmost element of the stack, or NULL if the stack is empty.

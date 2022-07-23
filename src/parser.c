@@ -25,6 +25,10 @@ last_single_item_taint(struct passgen_pattern_segment *segment) {
     struct passgen_pattern_item *item =
         passgen_stack_top(&segment->items);
 
+    if(!item) {
+        return NULL;
+    }
+
     if(item->kind == PASSGEN_PATTERN_CHAR) {
         if(item->data.chars.count > 1) {
             // save last codepoint
@@ -115,7 +119,11 @@ int passgen_parse_group(
                     passgen_pattern_group_new_segment(state->data.group.group);
                 return 0;
             case ')':
-                passgen_stack_pop(&parser->state, NULL);
+                if(parser->state.len > 1) {
+                    passgen_stack_pop(&parser->state, NULL);
+                } else {
+                    return -1;
+                }
                 return 0;
             case '(':
                 // we're supposed to read something in.
@@ -134,6 +142,10 @@ int passgen_parse_group(
                 return 0;
             case '{':
                 item = last_single_item_taint(state->data.group.segment);
+                // error, there was no item
+                if(!item) {
+                    return -1;
+                }
                 passgen_parser_state_push_repeat(parser, &item->repeat);
                 return 0;
             case '?':
@@ -193,7 +205,7 @@ int passgen_parse_set(
     }
 
     // part of a range expression
-    if(token->codepoint == '-') {
+    if(state->data.set.range && token->codepoint == '-') {
         state->type = PASSGEN_PARSER_SET_RANGE;
         return 0;
     }
