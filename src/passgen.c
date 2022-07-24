@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <string.h>
 #include "passgen/data/parser.h"
+#include "passgen/data/pattern.h"
 #include "passgen/data/token.h"
 #include <passgen/passgen.h>
 #include "passgen/parser.h"
@@ -61,6 +62,7 @@ int passgen_parse(
                     error->codepoint = token.offset;
                     error->byte = token.byte_offset;
                     error->message = "Error parsing";
+                    passgen_pattern_free(&parser.pattern);
                     return -1;
                 }
                 assert(ret == 0);
@@ -73,6 +75,7 @@ int passgen_parse(
         error->codepoint = pattern_pos_total;
         error->byte = pattern_raw_pos;
         error->message = passgen_token_parse_error_str(token_parser.state);
+        passgen_pattern_free(&parser.pattern);
         return -1;
     }
 
@@ -81,6 +84,7 @@ int passgen_parse(
         error->codepoint = pattern_pos_total;
         error->byte = pattern_raw_pos;
         error->message = "Parsing not finished";
+        passgen_pattern_free(&parser.pattern);
         return -1;
     }
 
