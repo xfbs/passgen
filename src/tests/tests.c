@@ -250,8 +250,9 @@ bool run(test_run test) {
         case 2:
             if(ret.ok) {
                 printf(
-                    "%-30s \033[0;32mpassed\033[0m in %4.3lfs.\n",
+                    "%-30s \033[0;32mpassed\033[0m in %s%4.3lfs\033[0m.\n",
                     test.entry.name,
+                    (time > 0.1) ? "\033[0;33m" : "",
                     time);
             } else {
                 printf(
