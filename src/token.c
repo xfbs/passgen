@@ -144,8 +144,5 @@ int passgen_token_parse(
 }
 
 const char *passgen_token_parse_error_str(int ret) {
-    // TODO fixme
-    (void) ret;
-
-    return "err";
+    return passgen_token_state_string(ret);
 }

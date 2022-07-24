@@ -22,7 +22,7 @@ typedef enum {
      PASSGEN_ERROR_PATTERN_PARSE,
      PASSGEN_ERROR_ALLOC,
      PASSGEN_ERROR_ILLEGAL_AMOUNT,
-} passgen_error;
+} passgen_cli_error;
 
 /// Options parsed from the command line.
 typedef struct {
@@ -66,7 +66,7 @@ void passgen_usage(const char *executable);
 void passgen_show_version(void);
 
 /// Exit the program early using the specified error and data.
-void passgen_bail(passgen_error error, void *data);
+void passgen_bail(passgen_cli_error error, void *data);
 
 /// Parse the options passed on the command line, @p argc and @p argv, and
 /// return the parsed result.

@@ -10,6 +10,7 @@
 
 #include "passgen/data/parser.h"
 #include "passgen/data/token.h"
+#include "passgen/data/pattern.h"
 #include "passgen/debug.h"
 #include "passgen/generate.h"
 #include "passgen/parser.h"
@@ -18,6 +19,7 @@
 #include "passgen/utf8.h"
 #include "passgen/version.h"
 #include "passgen/wordlist.h"
+#include "passgen/passgen.h"
 
 #define UNUSED(x) (void) x
 #define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *) data)
@@ -44,42 +46,18 @@ int passgen_opts_random(passgen_opts *opts, const char *random) {
 }
 
 void passgen_run(passgen_opts opts) {
-    struct passgen_parser parser;
-    struct passgen_token_parser token_parser = {0};
-    struct passgen_token token = {0};
-    passgen_parser_init(&parser);
-
-    size_t pattern_max = 256;
-    uint32_t pattern[pattern_max];
-    uint8_t pattern_widths[pattern_max];
-    size_t pattern_len = 0;
-    size_t pattern_raw_read = 0;
-    size_t pattern_raw_len = strlen(opts.pattern);
-
-    // decode input utf8 into unicode codepoints
-    int ret = passgen_utf8_decode(
-        pattern,
-        pattern_max,
-        &pattern_len,
-        pattern_widths,
-        (unsigned char *) opts.pattern,
-        pattern_raw_len,
-        &pattern_raw_read);
-
-    assert(ret == 0);
-
-    // parse tokens and pattern
-    for(size_t i = 0; i < pattern_len; i++) {
-        int ret = passgen_token_parse(
-                &token_parser,
-                &token,
-                pattern_widths[i],
-                pattern[i]);
-
-        if(ret == PASSGEN_TOKEN_INIT) {
-            ret = passgen_parse_token(&parser, &token);
-            assert(ret == 0);
+    struct passgen_pattern pattern;
+    struct passgen_error error;
+    int ret = passgen_parse(&pattern, &error, opts.pattern);
+    if(ret != 0) {
+        fprintf(stderr, "\033[1;31merror\033[0m parsing pattern: %s\n", error.message);
+        fprintf(stderr, "\033[1;33mpattern\033[0m: %s\n", opts.pattern);
+        fprintf(stderr, "         ");
+        for(size_t i = 1; i < error.byte; i++) {
+            fprintf(stderr, " ");
         }
+        fprintf(stderr, "\033[1;31m^\033[0m\n");
+        return;
     }
 
     // FIXME: check that token_parser.state == PASSGEN_TOKEN_INIT
@@ -106,7 +84,7 @@ void passgen_run(passgen_opts opts) {
 
         // get a NULL-terminated, random pass.
         size_t written = passgen_generate_fill_utf8(
-            &parser.pattern,
+            &pattern,
             opts.random,
             &env,
             pass,
@@ -129,7 +107,7 @@ void passgen_run(passgen_opts opts) {
 
     printf("\n");
     free(pass);
-    passgen_parser_free(&parser);
+    passgen_pattern_free(&pattern);
 }
 
 int passgen_opts_wordlist(passgen_opts *opt, const char *input) {
@@ -356,7 +334,7 @@ void passgen_show_version(void) {
     }
 }
 
-void passgen_bail(passgen_error error, void *data) {
+void passgen_bail(passgen_cli_error error, void *data) {
     switch(error) {
         case PASSGEN_ERROR_HELP:
             passgen_usage(data);
