@@ -1,6 +1,5 @@
 #include "passgen/parser.h"
 
-#include "passgen/stack.h"
 #include "passgen/data/chars.h"
 #include "passgen/data/group.h"
 #include "passgen/data/parser.h"
@@ -13,6 +12,7 @@
 #include "passgen/data/set.h"
 #include "passgen/data/token.h"
 #include "passgen/generate.h"
+#include "passgen/stack.h"
 #include "passgen/token.h"
 #include "tests.h"
 
@@ -24,34 +24,34 @@
     struct passgen_token_parser token_parser = {0}; \
     struct passgen_token token = {0};               \
     const char *pattern;                            \
-    passgen_random random;                        \
+    passgen_random random;                          \
     assert(passgen_random_open_xorshift(&random, SEED))
 
-#define GENERATE(output, pattern)                                       \
-    do {                                                                \
-        passgen_parser_init(&parser);                                   \
-        passgen_token_parser_init(&token_parser);                       \
-                                                                        \
-        int token_parser_state = PASSGEN_TOKEN_INIT;                    \
-        for(size_t i = 0; pattern[i]; i++) {                            \
-            token_parser_state =                                        \
+#define GENERATE(output, pattern)                                          \
+    do {                                                                   \
+        passgen_parser_init(&parser);                                      \
+        passgen_token_parser_init(&token_parser);                          \
+                                                                           \
+        int token_parser_state = PASSGEN_TOKEN_INIT;                       \
+        for(size_t i = 0; pattern[i]; i++) {                               \
+            token_parser_state =                                           \
                 passgen_token_parse(&token_parser, &token, 1, pattern[i]); \
-            if(token_parser_state == PASSGEN_TOKEN_INIT) {              \
-                assert(0 == passgen_parse_token(&parser, &token));      \
-            }                                                           \
-        }                                                               \
-                                                                        \
-        assert(token_parser_state == PASSGEN_TOKEN_INIT);               \
-        assert(0 == passgen_parse_finish(&parser));                     \
-        size_t len = passgen_generate_fill_unicode(                     \
-            &parser.pattern,                                            \
-            &random,                                                    \
-            NULL,                                                       \
-            output,                                                     \
-            sizeof(output));                                            \
-        output[len] = 0;                                                \
-                                                                        \
-        passgen_parser_free(&parser);                                   \
+            if(token_parser_state == PASSGEN_TOKEN_INIT) {                 \
+                assert(0 == passgen_parse_token(&parser, &token));         \
+            }                                                              \
+        }                                                                  \
+                                                                           \
+        assert(token_parser_state == PASSGEN_TOKEN_INIT);                  \
+        assert(0 == passgen_parse_finish(&parser));                        \
+        size_t len = passgen_generate_fill_unicode(                        \
+            &parser.pattern,                                               \
+            &random,                                                       \
+            NULL,                                                          \
+            output,                                                        \
+            sizeof(output));                                               \
+        output[len] = 0;                                                   \
+                                                                           \
+        passgen_parser_free(&parser);                                      \
     } while(0)
 
 #define POSTAMBLE() passgen_random_close(&random)

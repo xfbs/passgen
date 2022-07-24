@@ -18,7 +18,6 @@ BreakBeforeTernaryOperators: 'true'
 BreakStringLiterals: 'true'
 ColumnLimit: '80'
 IndentCaseLabels: 'true'
-IndentPPDirectives: AfterHash
 IndentWidth: 4
 IndentWrappedFunctionNames: 'false'
 KeepEmptyLinesAtTheStartOfBlocks: 'false'

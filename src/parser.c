@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "passgen/stack.h"
 #include "passgen/data/chars.h"
 #include "passgen/data/group.h"
 #include "passgen/data/parser.h"
@@ -17,13 +16,13 @@
 #include "passgen/data/segment_item.h"
 #include "passgen/data/set.h"
 #include "passgen/data/token.h"
+#include "passgen/stack.h"
 
 // get the last item, making sure that it's only a single character.
 // in case of characters, mark it as tainted.
 static inline struct passgen_pattern_item *
 last_single_item_taint(struct passgen_pattern_segment *segment) {
-    struct passgen_pattern_item *item =
-        passgen_stack_top(&segment->items);
+    struct passgen_pattern_item *item = passgen_stack_top(&segment->items);
 
     if(!item) {
         return NULL;
@@ -191,8 +190,7 @@ int passgen_parse_set(
     if(token->codepoint == ']') {
         // compute sum of choices and choices list for binary search.
         size_t choices = 0;
-        set->choices_list =
-            malloc(sizeof(size_t) * set->items.len);
+        set->choices_list = malloc(sizeof(size_t) * set->items.len);
         for(size_t i = 0; i < set->items.len; i++) {
             struct passgen_pattern_range *range =
                 passgen_stack_get(&set->items, i);
@@ -312,7 +310,9 @@ int passgen_parse_special_name(
     if(token->codepoint == '}') {
         passgen_stack_pop(&parser->state, NULL);
     } else {
-        passgen_pattern_special_add_parameter_cp(state->data.special.special, token->codepoint);
+        passgen_pattern_special_add_parameter_cp(
+            state->data.special.special,
+            token->codepoint);
     }
 
     return 0;
@@ -342,7 +342,6 @@ int passgen_parser_unicode(
     struct passgen_parser *parser,
     uint32_t *data,
     size_t length) {
-
     struct passgen_token_parser token_parser = {0};
     struct passgen_token token = {0};
     int ret;

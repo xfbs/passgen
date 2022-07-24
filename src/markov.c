@@ -1,40 +1,38 @@
 #include "passgen/markov.h"
 #include "passgen/assert.h"
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define SATURATING_SUB(a, b) ((a) - MIN(a, b))
+#define MIN(a, b)            ((a) < (b) ? (a) : (b))
+#define SATURATING_SUB(a, b) ((a) -MIN(a, b))
 
 #define MARKOV_LEAF_INITIAL    4
 #define MARKOV_LEAF_MULTIPLIER 2
 
 /// Sizes for the leaf and node hash maps. These are all prime numbers, with the
-/// property that every number is greater than double the previous one. Generated
-/// with Ruby with:
+/// property that every number is greater than double the previous one.
+/// Generated with Ruby with:
 ///
 /// ```ruby
 /// require 'prime'
 /// p Prime.take(10000).inject([3]){|l, p| l << p if (2*l.last) < p; l}
 /// ```
 static const size_t markov_sizes[] = {
-    3, 7, 17, 37, 79, 163, 331, 673, 1361, 2729, 5471, 10949, 21911, 43853,
-    87719, 175447, 350899, 701819, 1403641, 2807303, 5614657, 11229331,
-    22458671, 44917381, 0
-};
+    3,        7,        17,       37,     79,      163,     331,
+    673,      1361,     2729,     5471,   10949,   21911,   43853,
+    87719,    175447,   350899,   701819, 1403641, 2807303, 5614657,
+    11229331, 22458671, 44917381, 0};
 
 size_t passgen_markov_node_size(size_t capacity) {
     // we use capacity + 1 there to make sure it's a round number, such that the
     // child pointers are not misaligned.
-    return sizeof(passgen_markov_node)
-        + (capacity + 1) * sizeof(uint32_t)
-        + capacity * sizeof(passgen_markov_node *);
+    return sizeof(passgen_markov_node) + (capacity + 1) * sizeof(uint32_t) +
+           capacity * sizeof(passgen_markov_node *);
 }
 
 size_t passgen_markov_leaf_size(size_t capacity) {
-    return sizeof(passgen_markov_leaf)
-        + capacity * sizeof(uint32_t)
-        + capacity * sizeof(uint32_t);
+    return sizeof(passgen_markov_leaf) + capacity * sizeof(uint32_t) +
+           capacity * sizeof(uint32_t);
 }
 
 passgen_markov_node *passgen_markov_node_new(size_t size_index) {
@@ -128,8 +126,12 @@ passgen_markov_leaf *passgen_markov_leaf_realloc(passgen_markov_leaf *leaf) {
     return new;
 }
 
-passgen_markov_leaf *passgen_markov_leaf_insert(passgen_markov_leaf *leaf, uint32_t codepoint, size_t weight) {
-    while(passgen_markov_leaf_count(leaf, codepoint) && passgen_markov_leaf_codepoint(leaf, codepoint) != codepoint) {
+passgen_markov_leaf *passgen_markov_leaf_insert(
+    passgen_markov_leaf *leaf,
+    uint32_t codepoint,
+    size_t weight) {
+    while(passgen_markov_leaf_count(leaf, codepoint) &&
+          passgen_markov_leaf_codepoint(leaf, codepoint) != codepoint) {
         leaf = passgen_markov_leaf_realloc(leaf);
     }
 
@@ -155,7 +157,8 @@ passgen_markov_node *passgen_markov_node_realloc(passgen_markov_node *node) {
             uint32_t codepoint = passgen_markov_node_codepoint(node, i);
             new = passgen_markov_node_insert(new, codepoint);
             assert(!passgen_markov_node_child(new, codepoint).node);
-            passgen_markov_node_child(new, codepoint).node = passgen_markov_node_child(node, i).node;
+            passgen_markov_node_child(new, codepoint).node =
+                passgen_markov_node_child(node, i).node;
         }
     }
 
@@ -164,11 +167,10 @@ passgen_markov_node *passgen_markov_node_realloc(passgen_markov_node *node) {
     return new;
 }
 
-passgen_markov_node *passgen_markov_node_insert(
-    passgen_markov_node *node,
-    uint32_t codepoint) {
-
-    while(passgen_markov_node_child(node, codepoint).node && passgen_markov_node_codepoint(node, codepoint) != codepoint) {
+passgen_markov_node *
+passgen_markov_node_insert(passgen_markov_node *node, uint32_t codepoint) {
+    while(passgen_markov_node_child(node, codepoint).node &&
+          passgen_markov_node_codepoint(node, codepoint) != codepoint) {
         node = passgen_markov_node_realloc(node);
     }
 
@@ -183,12 +185,12 @@ passgen_markov_node *passgen_markov_node_insert_word(
     const uint32_t *sequence,
     size_t length,
     size_t weight) {
-
     uint32_t codepoint = sequence[0];
     node = passgen_markov_node_insert(node, codepoint);
 
     if(length == 2) {
-        passgen_markov_leaf *child = passgen_markov_node_child(node, codepoint).leaf;
+        passgen_markov_leaf *child =
+            passgen_markov_node_child(node, codepoint).leaf;
 
         if(!child) {
             child = passgen_markov_leaf_new(0);
@@ -199,13 +201,18 @@ passgen_markov_node *passgen_markov_node_insert_word(
         passgen_markov_node_child(node, codepoint).leaf = child;
     } else {
         // retrieve or create child node
-        passgen_markov_node *child = passgen_markov_node_child(node, codepoint).node;
+        passgen_markov_node *child =
+            passgen_markov_node_child(node, codepoint).node;
         if(!child) {
             child = passgen_markov_node_new(0);
         }
 
         // insert word into child
-        child = passgen_markov_node_insert_word(child, &sequence[1], length - 1, weight);
+        child = passgen_markov_node_insert_word(
+            child,
+            &sequence[1],
+            length - 1,
+            weight);
 
         // save child
         passgen_markov_node_child(node, codepoint).node = child;
@@ -218,7 +225,11 @@ void passgen_markov_insert(
     passgen_markov *markov,
     const uint32_t *sequence,
     size_t weight) {
-    markov->root = passgen_markov_node_insert_word(markov->root, sequence, markov->level + 1, weight);
+    markov->root = passgen_markov_node_insert_word(
+        markov->root,
+        sequence,
+        markov->level + 1,
+        weight);
     markov->count += weight;
 }
 
@@ -232,7 +243,10 @@ void passgen_markov_add(
     size_t sequence_len = 2 * markov->level + 1;
     uint32_t sequence[sequence_len];
     memset(sequence, 0, sizeof(sequence[0]) * sequence_len);
-    memcpy(&sequence[markov->level], word, sizeof(uint32_t) * MIN(markov->level, word_len));
+    memcpy(
+        &sequence[markov->level],
+        word,
+        sizeof(uint32_t) * MIN(markov->level, word_len));
     for(size_t i = 0; i < MIN(markov->level, word_len); i++) {
         passgen_markov_insert(markov, &sequence[i], weight);
     }
@@ -243,8 +257,7 @@ void passgen_markov_add(
     memcpy(
         &sequence[SATURATING_SUB(markov->level, word_len)],
         &word[SATURATING_SUB(word_len, markov->level)],
-        sizeof(uint32_t) * MIN(markov->level, word_len)
-    );
+        sizeof(uint32_t) * MIN(markov->level, word_len));
     passgen_markov_insert(markov, &sequence[0], weight);
 }
 
@@ -260,7 +273,9 @@ uint32_t passgen_markov_generate(
     passgen_markov_node *node = markov->root;
 
     for(size_t i = 0; i < markov->level; i++) {
-        node = (passgen_markov_node *) passgen_markov_node_child(node, current[i]).leaf;
+        node =
+            (passgen_markov_node *) passgen_markov_node_child(node, current[i])
+                .leaf;
         assert(node);
     }
 

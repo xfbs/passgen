@@ -1,8 +1,5 @@
 #include "passgen/parser.h"
 
-#include <passgen/passgen.h>
-#include "passgen/stack.h"
-#include "passgen/random.h"
 #include "passgen/data/chars.h"
 #include "passgen/data/group.h"
 #include "passgen/data/parser.h"
@@ -14,8 +11,11 @@
 #include "passgen/data/segment_item.h"
 #include "passgen/data/set.h"
 #include "passgen/data/token.h"
+#include "passgen/random.h"
+#include "passgen/stack.h"
 #include "passgen/token.h"
 #include "tests.h"
+#include <passgen/passgen.h>
 
 #define PREAMBLE()                                  \
     struct passgen_parser parser;                   \
@@ -25,20 +25,21 @@
     struct passgen_pattern_item *item;              \
     passgen_parser_init(&parser);
 
-#define POSTAMBLE()                             \
+#define POSTAMBLE()                              \
     assert_eq(0, passgen_parse_finish(&parser)); \
     passgen_parser_free(&parser)
 
-#define PARSE_CODEPOINT(codepoint)                               \
-    assert(                                                      \
+#define PARSE_CODEPOINT(codepoint)                                  \
+    assert(                                                         \
         passgen_token_parse(&token_parser, &token, 1, codepoint) == \
-        PASSGEN_TOKEN_INIT);                                     \
+        PASSGEN_TOKEN_INIT);                                        \
     assert_eq(0, passgen_parse_token(&parser, &token))
 
-#define PARSE_CODEPOINT_DOUBLE(a, b)                                          \
-    assert(passgen_token_parse(&token_parser, &token, 1, a) > 0);                \
-    assert(                                                                   \
-        passgen_token_parse(&token_parser, &token, 1, b) == PASSGEN_TOKEN_INIT); \
+#define PARSE_CODEPOINT_DOUBLE(a, b)                              \
+    assert(passgen_token_parse(&token_parser, &token, 1, a) > 0); \
+    assert(                                                       \
+        passgen_token_parse(&token_parser, &token, 1, b) ==       \
+        PASSGEN_TOKEN_INIT);                                      \
     assert_eq(0, passgen_parse_token(&parser, &token))
 
 test_result test_parser_empty(void) {
@@ -722,7 +723,8 @@ const char *pattern_broken[] = {
 
     // repeat without anything before
     "{0}",
-    // invalid utf8 sequences, taken from: https://stackoverflow.com/questions/1301402/example-invalid-utf8-string
+    // invalid utf8 sequences, taken from:
+    // https://stackoverflow.com/questions/1301402/example-invalid-utf8-string
     // invalid 2-octet utf8
     "\xc3\x28",
     // invalid 3-octet utf8 (in second octet)
@@ -812,13 +814,16 @@ test_result test_parser_can_parse_working(void) {
     return test_ok;
 }
 
-/// Make sure that we can parse random patterns. Some of these might be valid, some might not.
-/// But none of these should be able to crash the parser in any way.
+/// Make sure that we can parse random patterns. Some of these might be valid,
+/// some might not. But none of these should be able to crash the parser in any
+/// way.
 test_result test_parser_can_parse_random(void) {
     // How many random patterns to generate.
     size_t iterations = 10000;
-    // Characters to choose from. Must be zero-terminated for `strlen` to work on it.
-    const char characters[] = {'(', ')', '[', ']', '|', '{', '}', ',', 'a', 'z', '0', '9', '\\', 0};
+    // Characters to choose from. Must be zero-terminated for `strlen` to work
+    // on it.
+    const char characters[] =
+        {'(', ')', '[', ']', '|', '{', '}', ',', 'a', 'z', '0', '9', '\\', 0};
     // Find out how many possible characters there are.
     size_t characters_len = strlen(characters);
     // Maximum length of the string to try parsing.
@@ -836,7 +841,8 @@ test_result test_parser_can_parse_random(void) {
         string[length] = 0;
         // Generate random characters.
         for(size_t c = 0; c < length; c++) {
-            string[c] = characters[passgen_random_u8_max(random, characters_len)];
+            string[c] =
+                characters[passgen_random_u8_max(random, characters_len)];
         }
 
         // Parse the string.

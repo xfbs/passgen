@@ -9,13 +9,25 @@ test_result test_markov_node_layout(void) {
 
     assert_eq(node->capacity, 3);
 
-    assert_eq(&passgen_markov_node_codepoint(node, 0), ((void *) node) + sizeof(size_t));
-    assert_eq(&passgen_markov_node_codepoint(node, 1), ((void *) node) + sizeof(size_t) + 1 * sizeof(uint32_t));
-    assert_eq(&passgen_markov_node_codepoint(node, 2), ((void *) node) + sizeof(size_t) + 2 * sizeof(uint32_t));
+    assert_eq(
+        &passgen_markov_node_codepoint(node, 0),
+        ((void *) node) + sizeof(size_t));
+    assert_eq(
+        &passgen_markov_node_codepoint(node, 1),
+        ((void *) node) + sizeof(size_t) + 1 * sizeof(uint32_t));
+    assert_eq(
+        &passgen_markov_node_codepoint(node, 2),
+        ((void *) node) + sizeof(size_t) + 2 * sizeof(uint32_t));
 
-    assert_eq(&passgen_markov_node_child(node, 0), ((void *) node) + sizeof(size_t) + 4 * sizeof(uint32_t));
-    assert_eq(&passgen_markov_node_child(node, 1), ((void *) node) + 2 * sizeof(size_t) + 4 * sizeof(uint32_t));
-    assert_eq(&passgen_markov_node_child(node, 2), ((void *) node) + 3 * sizeof(size_t) + 4 * sizeof(uint32_t));
+    assert_eq(
+        &passgen_markov_node_child(node, 0),
+        ((void *) node) + sizeof(size_t) + 4 * sizeof(uint32_t));
+    assert_eq(
+        &passgen_markov_node_child(node, 1),
+        ((void *) node) + 2 * sizeof(size_t) + 4 * sizeof(uint32_t));
+    assert_eq(
+        &passgen_markov_node_child(node, 2),
+        ((void *) node) + 3 * sizeof(size_t) + 4 * sizeof(uint32_t));
 
     free(node);
 
@@ -27,13 +39,25 @@ test_result test_markov_leaf_layout(void) {
 
     assert_eq(leaf->capacity, 3);
 
-    assert_eq(&passgen_markov_leaf_codepoint(leaf, 0), ((void *) leaf) + 2 * sizeof(size_t));
-    assert_eq(&passgen_markov_leaf_codepoint(leaf, 1), ((void *) leaf) + 2 * sizeof(size_t) + 1 * sizeof(uint32_t));
-    assert_eq(&passgen_markov_leaf_codepoint(leaf, 2), ((void *) leaf) + 2 * sizeof(size_t) + 2 * sizeof(uint32_t));
+    assert_eq(
+        &passgen_markov_leaf_codepoint(leaf, 0),
+        ((void *) leaf) + 2 * sizeof(size_t));
+    assert_eq(
+        &passgen_markov_leaf_codepoint(leaf, 1),
+        ((void *) leaf) + 2 * sizeof(size_t) + 1 * sizeof(uint32_t));
+    assert_eq(
+        &passgen_markov_leaf_codepoint(leaf, 2),
+        ((void *) leaf) + 2 * sizeof(size_t) + 2 * sizeof(uint32_t));
 
-    assert_eq(&passgen_markov_leaf_count(leaf, 0), ((void *) leaf) + 2 * sizeof(size_t) + 3 * sizeof(uint32_t));
-    assert_eq(&passgen_markov_leaf_count(leaf, 1), ((void *) leaf) + 2 * sizeof(size_t) + 4 * sizeof(uint32_t));
-    assert_eq(&passgen_markov_leaf_count(leaf, 2), ((void *) leaf) + 2 * sizeof(size_t) + 5 * sizeof(uint32_t));
+    assert_eq(
+        &passgen_markov_leaf_count(leaf, 0),
+        ((void *) leaf) + 2 * sizeof(size_t) + 3 * sizeof(uint32_t));
+    assert_eq(
+        &passgen_markov_leaf_count(leaf, 1),
+        ((void *) leaf) + 2 * sizeof(size_t) + 4 * sizeof(uint32_t));
+    assert_eq(
+        &passgen_markov_leaf_count(leaf, 2),
+        ((void *) leaf) + 2 * sizeof(size_t) + 5 * sizeof(uint32_t));
 
     free(leaf);
 
@@ -149,7 +173,8 @@ test_result test_markov_node_insert_word(void) {
 
     const uint32_t word[] = {'h', 'e', 'l', 'l', 'o'};
 
-    root_node = passgen_markov_node_insert_word(root_node, (void *) &word, 5, 1);
+    root_node =
+        passgen_markov_node_insert_word(root_node, (void *) &word, 5, 1);
     passgen_markov_node *node = root_node;
 
     assert_eq(passgen_markov_node_codepoint(node, 'h'), 'h');
@@ -238,9 +263,21 @@ test_result test_markov_add(void) {
     assert_eq(passgen_markov_leaf_count(leaf, 0), 2);
 
     passgen_markov_add(&markov, (void *) &(const uint32_t[]){'l', 'e'}, 2, 1);
-    passgen_markov_add(&markov, (void *) &(const uint32_t[]){'t', 'h', 'e'}, 3, 1);
-    passgen_markov_add(&markov, (void *) &(const uint32_t[]){'p', 'a', 'r', 't'}, 4, 1);
-    passgen_markov_add(&markov, (void *) &(const uint32_t[]){'p', 'h', 'o', 'n', 'e'}, 5, 1);
+    passgen_markov_add(
+        &markov,
+        (void *) &(const uint32_t[]){'t', 'h', 'e'},
+        3,
+        1);
+    passgen_markov_add(
+        &markov,
+        (void *) &(const uint32_t[]){'p', 'a', 'r', 't'},
+        4,
+        1);
+    passgen_markov_add(
+        &markov,
+        (void *) &(const uint32_t[]){'p', 'h', 'o', 'n', 'e'},
+        5,
+        1);
 
     passgen_markov_free(&markov);
 

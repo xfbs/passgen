@@ -1,6 +1,6 @@
 #include "passgen/wordlist.h"
-#include "passgen/utf8.h"
 #include "passgen/assert.h"
+#include "passgen/utf8.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -40,9 +40,16 @@ void passgen_wordlist_load(passgen_wordlist *wordlist, FILE *file) {
             bool success = false;
             for(size_t i = 0; (utf8_buffer_pos + i) < utf8_buffer_len; i++) {
                 if(utf8_buffer[utf8_buffer_pos + i] == '\n') {
-                    passgen_markov_add(&wordlist->markov, &utf8_buffer[utf8_buffer_pos], i, 1);
+                    passgen_markov_add(
+                        &wordlist->markov,
+                        &utf8_buffer[utf8_buffer_pos],
+                        i,
+                        1);
                     uint32_t *word = calloc(i + 1, sizeof(uint32_t));
-                    memcpy(word, &utf8_buffer[utf8_buffer_pos], i * sizeof(uint32_t));
+                    memcpy(
+                        word,
+                        &utf8_buffer[utf8_buffer_pos],
+                        i * sizeof(uint32_t));
                     passgen_stack_push(&wordlist->stack, &word);
                     utf8_buffer_pos += i + 1;
                     success = true;
@@ -55,7 +62,10 @@ void passgen_wordlist_load(passgen_wordlist *wordlist, FILE *file) {
         }
 
         if(utf8_buffer_pos < utf8_buffer_len) {
-            memmove(utf8_buffer, &utf8_buffer[utf8_buffer_pos], (utf8_buffer_len - utf8_buffer_pos) * sizeof(uint32_t));
+            memmove(
+                utf8_buffer,
+                &utf8_buffer[utf8_buffer_pos],
+                (utf8_buffer_len - utf8_buffer_pos) * sizeof(uint32_t));
         }
         utf8_buffer_len = utf8_buffer_len - utf8_buffer_pos;
         utf8_buffer_pos = 0;
@@ -112,9 +122,8 @@ void passgen_wordlist_scan(passgen_wordlist *wordlist) {
         realloc(wordlist->words, sizeof(char *) * wordlist->count);
 }
 
-const char *passgen_wordlist_random(
-    passgen_wordlist *wordlist,
-    passgen_random *random) {
+const char *
+passgen_wordlist_random(passgen_wordlist *wordlist, passgen_random *random) {
     size_t index = passgen_random_u64_max(random, wordlist->count);
     return wordlist->words[index];
 }

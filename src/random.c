@@ -4,8 +4,8 @@
 #include <string.h>
 
 #ifdef __linux__
-#    define PASSGEN_RANDOM_HAVE_SYSTEM
-#    include <sys/random.h>
+#define PASSGEN_RANDOM_HAVE_SYSTEM
+#include <sys/random.h>
 
 size_t passgen_random_read_system(void *dest, size_t size, void *data) {
     (void) data;
@@ -14,7 +14,7 @@ size_t passgen_random_read_system(void *dest, size_t size, void *data) {
 #endif
 
 #ifdef __APPLE__
-#    define PASSGEN_RANDOM_HAVE_SYSTEM
+#define PASSGEN_RANDOM_HAVE_SYSTEM
 
 size_t passgen_random_read_system(void *dest, size_t size, void *data) {
     (void) data;
@@ -150,7 +150,12 @@ void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
     } else {
         size_t ret = random->read(data, bytes, random->data);
         if(ret != bytes) {
-            fprintf(stderr, "Error reading from randomness source: trying to read %zu bytes but got %zu", bytes, ret);
+            fprintf(
+                stderr,
+                "Error reading from randomness source: trying to read %zu "
+                "bytes but got %zu",
+                bytes,
+                ret);
             abort();
         }
     }
@@ -204,8 +209,7 @@ passgen_random_open_path(passgen_random *random, const char *path) {
     return random;
 }
 
-passgen_random *
-passgen_random_open_file(passgen_random *random, FILE *file) {
+passgen_random *passgen_random_open_file(passgen_random *random, FILE *file) {
     random->data = file;
     random->read = passgen_random_read_file;
     random->close = passgen_random_close_file;

@@ -1,7 +1,7 @@
 #include "passgen.h"
 
 #define check_success(value) \
-    ret = value; \
+    ret = value;             \
     if(ret != EXIT_SUCCESS) return ret
 
 int main(int argc, char *argv[]) {

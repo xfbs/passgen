@@ -1,7 +1,6 @@
 #include "passgen/generate.h"
 
 #include "passgen/assert.h"
-#include "passgen/stack.h"
 #include "passgen/data/chars.h"
 #include "passgen/data/group.h"
 #include "passgen/data/pattern.h"
@@ -13,9 +12,10 @@
 #include "passgen/data/set.h"
 #include "passgen/data/special.h"
 #include "passgen/data/special_kind.h"
-#include "passgen/markov.h"
-#include "passgen/wordlist.h"
 #include "passgen/hashmap.h"
+#include "passgen/markov.h"
+#include "passgen/stack.h"
+#include "passgen/wordlist.h"
 
 #include <string.h>
 #include <utf8proc.h>
@@ -204,8 +204,7 @@ int passgen_generate_set(
         choice -= set->choices_list[num - 1];
     }
 
-    struct passgen_pattern_range *range =
-        passgen_stack_get(&set->items, num);
+    struct passgen_pattern_range *range = passgen_stack_get(&set->items, num);
 
     return func(data, range->start + choice);
 }
@@ -239,7 +238,8 @@ int passgen_generate_special_pronounceable(
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
-    passgen_hashmap_entry *entry = passgen_hashmap_lookup(&env->wordlists, special->parameters);
+    passgen_hashmap_entry *entry =
+        passgen_hashmap_lookup(&env->wordlists, special->parameters);
     if(!entry) {
         return -1;
     }
@@ -249,7 +249,8 @@ int passgen_generate_special_pronounceable(
     size_t pos = markov->level;
     memset(word, 0, pos * sizeof(uint32_t));
     do {
-        word[pos] = passgen_markov_generate(markov, &word[pos - markov->level], rand);
+        word[pos] =
+            passgen_markov_generate(markov, &word[pos - markov->level], rand);
         pos++;
     } while(word[pos - 1]);
 
@@ -275,8 +276,9 @@ int passgen_generate_special_wordlist(
     (void) data;
     (void) func;
 
-    //passgen_wordlist *wordlist;
-    passgen_hashmap_entry *entry = passgen_hashmap_lookup(&env->wordlists, special->parameters);
+    // passgen_wordlist *wordlist;
+    passgen_hashmap_entry *entry =
+        passgen_hashmap_lookup(&env->wordlists, special->parameters);
     if(!entry) {
         return -1;
     }

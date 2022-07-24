@@ -1,13 +1,13 @@
-#include <assert.h>
-#include <string.h>
 #include "passgen/data/parser.h"
 #include "passgen/data/pattern.h"
 #include "passgen/data/token.h"
-#include <passgen/passgen.h>
 #include "passgen/parser.h"
 #include "passgen/random.h"
 #include "passgen/token.h"
 #include "passgen/utf8.h"
+#include <assert.h>
+#include <passgen/passgen.h>
+#include <string.h>
 
 int passgen_parse(
     struct passgen_pattern *output,
@@ -53,10 +53,10 @@ int passgen_parse(
         // parse tokens and pattern
         for(size_t i = 0; i < pattern_pos; i++) {
             int ret = passgen_token_parse(
-                    &token_parser,
-                    &token,
-                    pattern_widths[i],
-                    pattern[i]);
+                &token_parser,
+                &token,
+                pattern_widths[i],
+                pattern[i]);
 
             // make sure parsing the token was successful
             if(ret < 0) {

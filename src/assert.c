@@ -4,13 +4,13 @@
 
 #ifdef PASSGEN_DEBUG
 
-#    ifdef PASSGEN_BACKTRACE
-#        include <execinfo.h>
-#    endif
+#ifdef PASSGEN_BACKTRACE
+#include <execinfo.h>
+#endif
 
-#    include <stdio.h>
+#include <stdio.h>
 
-#    define CALLSTACK_MAX 128
+#define CALLSTACK_MAX 128
 
 void passgen_assert_fail(
     const char *cond,
@@ -26,7 +26,7 @@ void passgen_assert_fail(
         line,
         cond);
 
-#    ifdef PASSGEN_BACKTRACE
+#ifdef PASSGEN_BACKTRACE
     // print backtrace
     fprintf(stderr, "\nBacktrace:\n");
 
@@ -39,7 +39,7 @@ void passgen_assert_fail(
     }
 
     free(strs);
-#   endif
+#endif
 
     exit(EXIT_FAILURE);
 }

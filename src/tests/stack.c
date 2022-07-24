@@ -1,5 +1,5 @@
-#include "tests.h"
 #include "passgen/stack.h"
+#include "tests.h"
 #include <stdlib.h>
 
 test_result test_stack_init(void) {

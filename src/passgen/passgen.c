@@ -9,20 +9,20 @@
 #include <string.h>
 
 #include "passgen/data/parser.h"
-#include "passgen/data/token.h"
 #include "passgen/data/pattern.h"
+#include "passgen/data/token.h"
 #include "passgen/debug.h"
 #include "passgen/generate.h"
 #include "passgen/parser.h"
+#include "passgen/passgen.h"
 #include "passgen/random.h"
 #include "passgen/token.h"
 #include "passgen/utf8.h"
 #include "passgen/version.h"
 #include "passgen/wordlist.h"
-#include "passgen/passgen.h"
 
-#define UNUSED(x) (void) x
-#define bail(kind, data) passgen_bail(PASSGEN_ERROR_##kind, (void *) data)
+#define UNUSED(x)              (void) x
+#define bail(kind, data)       passgen_bail(PASSGEN_ERROR_##kind, (void *) data)
 #define strprefix(prefix, str) memcmp(prefix, str, strlen(prefix))
 
 int passgen_opts_random(passgen_opts *opts, const char *random) {
@@ -50,7 +50,10 @@ void passgen_run(passgen_opts opts) {
     struct passgen_error error;
     int ret = passgen_parse(&pattern, &error, opts.pattern);
     if(ret != 0) {
-        fprintf(stderr, "\033[1;31merror\033[0m parsing pattern: %s\n", error.message);
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m parsing pattern: %s\n",
+            error.message);
         fprintf(stderr, "\033[1;33mpattern\033[0m: %s\n", opts.pattern);
         fprintf(stderr, "         ");
         for(size_t i = 1; i < error.byte; i++) {
@@ -152,7 +155,9 @@ int passgen_opts_preset(passgen_opts *opts, const char *arg) {
     memcpy(arg_copy, arg, arg_len + 1);
     char *colon = strstr(arg_copy, ":");
     if(!colon) {
-        printf("Error: expected preset:value for preset definition `%s`\n", arg);
+        printf(
+            "Error: expected preset:value for preset definition `%s`\n",
+            arg);
         return 1;
     }
     *colon = 0;
@@ -175,7 +180,6 @@ int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
     const char *short_opts = "a:p:P:d:w:r:czhv";
     const char *preset = NULL;
 
-    // clang-format off
     static struct option long_opts[] = {
         {"amount", required_argument, NULL, 'a'},
         {"help", no_argument, NULL, 'h'},
@@ -187,9 +191,7 @@ int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
         {"wordlist", required_argument, NULL, 'w'},
         {"random", required_argument, NULL, 'r'},
         {"define-preset", required_argument, NULL, 'P'},
-        {NULL, no_argument, NULL, 0}
-    };
-    // clang-format on
+        {NULL, no_argument, NULL, 0}};
 
     while(true) {
         int opt = getopt_long(argc, argv, short_opts, long_opts, NULL);
@@ -254,7 +256,8 @@ int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
 
     // if a preset was given, parse it.
     if(preset) {
-        passgen_hashmap_entry *entry = passgen_hashmap_lookup(&opts->presets, preset);
+        passgen_hashmap_entry *entry =
+            passgen_hashmap_lookup(&opts->presets, preset);
         if(!entry->key) {
             printf("Error: preset `%s` not found\n", preset);
             return 1;
@@ -310,7 +313,8 @@ void passgen_usage(const char *executable) {
         "    -c, --complexity  Output complexity for each password.\n"
         "    -r, --random STR  Which source of randomness to use. Can be:\n"
         "                          file:/path/to/file, to use the file\n"
-        "                          xor:1234, to use xorshift with the given seed.\n"
+        "                          xor:1234, to use xorshift with the given "
+        "seed.\n"
         "    -w, --wordlist NAME:PATH\n"
         "                      Load a wordlist. For example:\n"
         "                          german:/usr/share/dict/ngerman\n"
@@ -366,7 +370,9 @@ void passgen_bail(passgen_cli_error error, void *data) {
 void passgen_opts_free(passgen_opts *opts) {
     passgen_random_free(opts->random);
     passgen_hashmap_free(&opts->presets);
-    passgen_hashmap_foreach_value(&opts->wordlists, (void *) passgen_wordlist_free);
+    passgen_hashmap_foreach_value(
+        &opts->wordlists,
+        (void *) passgen_wordlist_free);
     passgen_hashmap_foreach_key(&opts->wordlists, free);
     passgen_hashmap_free(&opts->wordlists);
 }
@@ -423,7 +429,6 @@ int passgen_opts_load(passgen_opts *opts, char *data) {
             pos += length;
             continue;
         }
-
     }
     return 0;
 }

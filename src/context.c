@@ -1,6 +1,6 @@
 #include "passgen/context.h"
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 void passgen_context_init(passgen_context *ctx) {
     memset(ctx, 0, sizeof(passgen_context));

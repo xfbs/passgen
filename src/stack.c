@@ -1,7 +1,7 @@
 #include "passgen/stack.h"
 #include "passgen/assert.h"
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 static const size_t passgen_stack_bin_size = 32;
 static const size_t passgen_stack_cap_init = 4;
@@ -18,7 +18,7 @@ static size_t passgen_stack_bin_count(const passgen_stack *stack, size_t len) {
     (void) stack;
     size_t power = 1;
     while(power < len) {
-            power *= 2;
+        power *= 2;
     }
     return power;
 }
@@ -69,11 +69,13 @@ void *passgen_stack_push(passgen_stack *stack, void *value) {
     if(!new_bin) {
         if(!stack->len) {
             stack->data = calloc(1, sizeof(void *));
-            stack->data[0] = calloc(passgen_stack_cap_init, stack->element_size);
+            stack->data[0] =
+                calloc(passgen_stack_cap_init, stack->element_size);
         }
         if(passgen_stack_bin_count(stack, stack->len) == stack->len) {
             size_t new_size = passgen_stack_bin_count(stack, stack->len + 1);
-            stack->data[0] = realloc(stack->data[0], new_size * stack->element_size);
+            stack->data[0] =
+                realloc(stack->data[0], new_size * stack->element_size);
         }
     } else {
         size_t max_bin = passgen_stack_bin(stack, stack->len - 1);
@@ -83,7 +85,8 @@ void *passgen_stack_push(passgen_stack *stack, void *value) {
             size_t current_bins = passgen_stack_bin_count(stack, new_bin);
             size_t needed_bins = passgen_stack_bin_count(stack, new_bin + 1);
             if(current_bins != needed_bins) {
-                void **new_data = realloc(stack->data, needed_bins * sizeof(void *));
+                void **new_data =
+                    realloc(stack->data, needed_bins * sizeof(void *));
                 passgen_assert(new_data);
                 stack->data = new_data;
             }
@@ -135,7 +138,8 @@ void *passgen_stack_pop(passgen_stack *stack, void *element) {
         size_t entry_size = passgen_stack_bin_count(stack, stack->len);
         size_t new_size = passgen_stack_bin_count(stack, stack->len - 1);
         if(entry_size != new_size) {
-            stack->data[0] = realloc(stack->data[0], new_size * stack->element_size);
+            stack->data[0] =
+                realloc(stack->data[0], new_size * stack->element_size);
         }
     } else {
         size_t max_bin = passgen_stack_bin(stack, stack->len - 1);

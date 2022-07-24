@@ -3,11 +3,32 @@
 #include <stdlib.h>
 #define UNUSED(x) (void) x
 
-static const size_t hashmap_sizes[] = {3, 7, 17, 37, 79, 163, 331, 673, 1361, 2729, 5471, 10949, 21911, 43853, 87719, 175447, 350899, 701819, 0};
+static const size_t hashmap_sizes[] = {
+    3,
+    7,
+    17,
+    37,
+    79,
+    163,
+    331,
+    673,
+    1361,
+    2729,
+    5471,
+    10949,
+    21911,
+    43853,
+    87719,
+    175447,
+    350899,
+    701819,
+    0};
 static const char *SIPHASH_KEY_FIRST = "someverylongpass";
 static const char *SIPHASH_KEY_SECOND = "myotherverylongk";
 
-void passgen_hashmap_init(passgen_hashmap *map, const passgen_hashmap_context *context) {
+void passgen_hashmap_init(
+    passgen_hashmap *map,
+    const passgen_hashmap_context *context) {
     memset(map, 0, sizeof(*map));
     if(context) {
         map->context = context;
@@ -39,7 +60,8 @@ void passgen_hashmap_realloc(passgen_hashmap *map, size_t capacity) {
     free(old.data);
 }
 
-static inline size_t passgen_hashmap_position(passgen_hashmap *map, const void *key, bool first) {
+static inline size_t
+passgen_hashmap_position(passgen_hashmap *map, const void *key, bool first) {
     return map->context->hash(map, key, first) % map->capacity;
 }
 
@@ -69,7 +91,8 @@ static inline size_t next_capacity(passgen_hashmap *map) {
     }
 }
 
-passgen_hashmap_entry passgen_hashmap_insert(passgen_hashmap *map, void *key, void *value) {
+passgen_hashmap_entry
+passgen_hashmap_insert(passgen_hashmap *map, void *key, void *value) {
     if(map->capacity == 0) {
         passgen_hashmap_realloc(map, hashmap_sizes[0]);
     }
@@ -136,7 +159,6 @@ passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, void *key) {
         }
     }
 
-
     // if this key exists
     hash = passgen_hashmap_position(map, key, false);
     if(map->data[hash].key) {
@@ -153,7 +175,8 @@ passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, void *key) {
     return (passgen_hashmap_entry){NULL, NULL};
 }
 
-passgen_hashmap_entry *passgen_hashmap_lookup(passgen_hashmap *map, const void *key) {
+passgen_hashmap_entry *
+passgen_hashmap_lookup(passgen_hashmap *map, const void *key) {
     // make sure the hashmap is not empty
     if(!map->data) {
         return NULL;
@@ -163,20 +186,24 @@ passgen_hashmap_entry *passgen_hashmap_lookup(passgen_hashmap *map, const void *
 
     // lookup first possible location
     hash = passgen_hashmap_position(map, key, true);
-    if(map->data[hash].key && map->context->key_equal(map, map->data[hash].key, key)) {
+    if(map->data[hash].key &&
+       map->context->key_equal(map, map->data[hash].key, key)) {
         return &map->data[hash];
     }
 
     // lookup second possible location
     hash = passgen_hashmap_position(map, key, false);
-    if(map->data[hash].key && map->context->key_equal(map, map->data[hash].key, key)) {
+    if(map->data[hash].key &&
+       map->context->key_equal(map, map->data[hash].key, key)) {
         return &map->data[hash];
     }
 
     return NULL;
 }
 
-void passgen_hashmap_foreach_key(passgen_hashmap *map, void (*func)(void *key)) {
+void passgen_hashmap_foreach_key(
+    passgen_hashmap *map,
+    void (*func)(void *key)) {
     if(map->len) {
         for(size_t i = 0; i < map->capacity; i++) {
             if(map->data[i].key) {
@@ -186,7 +213,9 @@ void passgen_hashmap_foreach_key(passgen_hashmap *map, void (*func)(void *key)) 
     }
 }
 
-void passgen_hashmap_foreach_value(passgen_hashmap *map, void (*func)(void *value)) {
+void passgen_hashmap_foreach_value(
+    passgen_hashmap *map,
+    void (*func)(void *value)) {
     if(map->len) {
         for(size_t i = 0; i < map->capacity; i++) {
             if(map->data[i].key) {
@@ -196,15 +225,22 @@ void passgen_hashmap_foreach_value(passgen_hashmap *map, void (*func)(void *valu
     }
 }
 
-static uint64_t string_hash(const passgen_hashmap *map, const void *key, bool first) {
+static uint64_t
+string_hash(const passgen_hashmap *map, const void *key, bool first) {
     UNUSED(map);
     uint64_t output;
     const char *siphash_key = first ? SIPHASH_KEY_FIRST : SIPHASH_KEY_SECOND;
-    passgen_siphash(key, strlen(key), siphash_key, (uint8_t *) &output, sizeof(output));
+    passgen_siphash(
+        key,
+        strlen(key),
+        siphash_key,
+        (uint8_t *) &output,
+        sizeof(output));
     return output;
 }
 
-static bool string_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
+static bool
+string_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
     UNUSED(map);
     return strcmp(lhs, rhs) == 0;
 }
@@ -223,15 +259,22 @@ static size_t unicode_len(const void *data) {
     return len;
 }
 
-static uint64_t unicode_hash(const passgen_hashmap *map, const void *key, bool first) {
+static uint64_t
+unicode_hash(const passgen_hashmap *map, const void *key, bool first) {
     UNUSED(map);
     uint64_t output;
     const char *siphash_key = first ? SIPHASH_KEY_FIRST : SIPHASH_KEY_SECOND;
-    passgen_siphash(key, unicode_len(key), siphash_key, (uint8_t *) &output, sizeof(output));
+    passgen_siphash(
+        key,
+        unicode_len(key),
+        siphash_key,
+        (uint8_t *) &output,
+        sizeof(output));
     return output;
 }
 
-static bool unicode_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
+static bool
+unicode_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
     UNUSED(map);
     size_t rhs_len = unicode_len(rhs);
     size_t lhs_len = unicode_len(lhs);
