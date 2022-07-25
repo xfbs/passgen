@@ -6,7 +6,7 @@ As of right now, there are no real releases for passgen, but there are nightly b
 
 | Architecture | Links |
 | --- | --- |
-| Linux amd64 | [passgen-linux-amd64.tar.xz][] ([sig][passgen-linux-amd64.tar.xz.sig])<br />[passgen-linux-amd64.deb][] ([sig][passgen-linux-amd64.deb.sig]) |
+| Linux amd64 | [passgen-linux-amd64.tar.xz][] ([sig][passgen-linux-amd64.tar.xz.sig])<br />[passgen-linux-amd64.deb][] ([sig][passgen-linux-amd64.deb.sig])<br />[passgen-linux-amd64-musl.tar.xz][] ([sig][passgen-linux-amd64-musl.tar.xz.sig])<br />[passgen-linux-amd64-musl.bin][] ([sig][passgen-linux-amd64-musl.bin.sig]) |
 | Linux arm64 | [passgen-linux-aarch64.tar.xz][] ([sig][passgen-linux-aarch64.tar.xz.sig])<br />[passgen-linux-aarch64.deb][] ([sig][passgen-linux-aarch64.deb.sig]) |
 | Linux riscv64 | [passgen-linux-riscv64.tar.xz][] ([sig][passgen-linux-riscv64.tar.xz.sig])<br />[passgen-linux-riscv64.deb][] ([sig][passgen-linux-riscv64.deb.sig]) |
 | macOS amd64 *experimental* | [passgen-macos-amd64.tar.xz][] ([sig][passgen-macos-amd64.tar.xz.sig]) |
@@ -26,7 +26,8 @@ If the verification fails, please do not trust the build and contact the develop
 
 [passgen-linux-amd64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.tar.xz
 [passgen-linux-amd64.deb]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.deb
-[passgen-linux-musl-amd64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-musl-amd64.tar.xz
+[passgen-linux-amd64-musl.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64-musl.tar.xz
+[passgen-linux-amd64-musl.bin]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64-musl.bin
 [passgen-linux-aarch64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-aarch64.tar.xz
 [passgen-linux-aarch64.deb]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-aarch64.deb
 [passgen-linux-riscv64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.tar.xz
@@ -36,7 +37,8 @@ If the verification fails, please do not trust the build and contact the develop
 
 [passgen-linux-amd64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.tar.xz.sig
 [passgen-linux-amd64.deb.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.deb.sig
-[passgen-linux-musl-amd64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-musl-amd64.tar.xz.sig
+[passgen-linux-amd64-musl.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64-musl.tar.xz.sig
+[passgen-linux-amd64-musl.bin.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64-musl.bin.sig
 [passgen-linux-aarch64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-aarch64.tar.xz.sig
 [passgen-linux-aarch64.deb.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-aarch64.deb.sig
 [passgen-linux-riscv64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.tar.xz.sig
