@@ -86,6 +86,10 @@ if(BUILD_TESTING)
   add_subdirectory(src/tests)
 endif()
 
+# setup and install man page
+configure_file(man/passgen.1.in passgen.1)
+install(FILES passgen.1 DESTINATION share/man/man1)
+
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Passgen")
 set(CPACK_PACKAGE_VENDOR "xfbs")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
