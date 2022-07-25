@@ -13,6 +13,11 @@ target_link_libraries(passgen-bin PUBLIC ${PASSGEN_LIB} m)
 set_target_properties(passgen-bin PROPERTIES OUTPUT_NAME passgen)
 passgen_target_defaults(passgen-bin)
 
+# enable static linking when requested
+if(PASSGEN_STATIC)
+    target_link_options(passgen-bin PRIVATE -static)
+endif()
+
 install(TARGETS passgen-bin
     DESTINATION bin
     COMPONENT bin
