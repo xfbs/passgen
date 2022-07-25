@@ -51,11 +51,20 @@ int passgen_opts_wordlist(passgen_opts *opt, const char *input);
 /// Parse a randomness definition, like `system` or `xor:2342322`
 int passgen_opts_random(passgen_opts *opts, const char *random);
 
+/// Load system and user config into options
+int passgen_opts_config(passgen_opts *opts);
+
+/// Load system config into options, if it exists
+int passgen_opts_config_system(passgen_opts *opts);
+
+/// Load user config into options, if it exists
+int passgen_opts_config_user(passgen_opts *opts);
+
 /// Load configuration options from file
-int passgen_opts_load_file(passgen_opts *opts, FILE *file);
+int passgen_opts_config_load(passgen_opts *opts, FILE *file);
 
 /// Load configuration options from string
-int passgen_opts_load(passgen_opts *opts, char *data);
+int passgen_opts_config_parse(passgen_opts *opts, char *data);
 
 /// Print usage (help text) using @p executable as the name of the program.
 ///

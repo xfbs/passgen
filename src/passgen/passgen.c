@@ -188,6 +188,11 @@ void passgen_opts_init(passgen_opts *opts) {
     opts->random = NULL;
     passgen_hashmap_init(&opts->wordlists, &passgen_hashmap_context_unicode);
     passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_default);
+
+    // some defaults
+    passgen_hashmap_insert(&opts->presets, "apple1", "([a-zA-Z0-9]{3}-){3}[a-zA-Z0-9]{3}");
+    passgen_hashmap_insert(&opts->presets, "apple2", "([a-zA-Z0-9]{6}-){2}[a-zA-Z0-9]{6}");
+    passgen_hashmap_insert(&opts->presets, "firefox", "[a-zA-Z0-9]{15}");
 }
 
 int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
@@ -272,8 +277,8 @@ int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
     if(preset) {
         passgen_hashmap_entry *entry =
             passgen_hashmap_lookup(&opts->presets, preset);
-        if(!entry->key) {
-            printf("Error: preset `%s` not found\n", preset);
+        if(!entry) {
+            printf("\033[1;31merror\033[0m: preset `%s` not found\n", preset);
             return 1;
         }
         opts->pattern = entry->value;
@@ -391,17 +396,17 @@ void passgen_opts_free(passgen_opts *opts) {
     passgen_hashmap_free(&opts->wordlists);
 }
 
-int passgen_opts_load_file(passgen_opts *opts, FILE *file) {
+int passgen_opts_config_load(passgen_opts *opts, FILE *file) {
     // TODO: use something like passgen_buffer to do this
     char *config = malloc(10240);
     size_t read = fread(config, 1, 10240, file);
     config[read] = 0;
-    int ret = passgen_opts_load(opts, config);
+    int ret = passgen_opts_config_parse(opts, config);
     free(config);
     return ret;
 }
 
-int passgen_opts_load(passgen_opts *opts, char *data) {
+int passgen_opts_config_parse(passgen_opts *opts, char *data) {
     // TODO: this code is a mess.
     for(size_t pos = 0; data[pos]; pos++) {
         if(data[pos] == '#') {
@@ -445,4 +450,54 @@ int passgen_opts_load(passgen_opts *opts, char *data) {
         }
     }
     return 0;
+}
+
+int passgen_opts_config(passgen_opts *opts) {
+    int ret;
+
+    ret = passgen_opts_config_system(opts);
+    if(ret != 0) {
+        return ret;
+    }
+
+    ret = passgen_opts_config_user(opts);
+    if(ret != 0) {
+        return ret;
+    }
+
+    return 0;
+}
+
+int passgen_opts_config_system(passgen_opts *opts) {
+    FILE *file = fopen("/etc/passgen.conf", "r");
+    if(file) {
+        int ret = passgen_opts_config_load(opts, file);
+        fclose(file);
+        return ret;
+    } else {
+        return 0;
+    }
+}
+
+int passgen_opts_config_user(passgen_opts *opts) {
+    char config_path[256];
+    const char *xdg_config_path = getenv("XDG_CONFIG_PATH");
+    if(xdg_config_path) {
+        sprintf(config_path, "%s/passgen.conf", xdg_config_path);
+    } else {
+        const char *home = getenv("HOME");
+        if(!home) {
+            fprintf(stderr, "error: cannot locate home directory\n");
+            return -1;
+        }
+        sprintf(config_path, "%s/.config/passgen.conf", home);
+    }
+    FILE *file = fopen(config_path, "r");
+    if(file) {
+        int ret = passgen_opts_config_load(opts, file);
+        fclose(file);
+        return ret;
+    } else {
+        return 0;
+    }
 }
