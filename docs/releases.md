@@ -17,7 +17,7 @@ As of right now, there are no real releases for passgen, but there are nightly b
 Every release comes with a signature file. This can be used to verify the authenticity and integrity of the releases. To do so, you need `ssh-keygen` and the passgen developer public key.
 
 ```bash
-wget https://xfbs.gitlab.com/passgen/passgen.pub
+wget https://passgen.it/passgen.pub
 ssh-keygen -Y verify -f passgen.pub -s passgen-linux-amd64.deb.sig -n name -I nightly@passgen.it < passgen-linux-amd64.deb
 Good "file" signature for nightly@passgen.it with ED25519 key SHA256:k7BsqKVzJMDEmgomupIE4VE9Xe4V4ffP506BLkz4JGQ
 ```
