@@ -89,7 +89,7 @@ endif()
 # setup and install man page
 configure_file(man/passgen.1.in passgen.1)
 install(
-    FILES passgen.1
+    FILES ${PROJECT_BINARY_DIR}/passgen.1
     DESTINATION share/man/man1
     COMPONENT man)
 
