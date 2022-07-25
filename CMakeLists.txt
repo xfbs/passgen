@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(
-  passgen
-  VERSION 1.0.0
-  DESCRIPTION "Regex-based password generator"
-  LANGUAGES C)
+    passgen
+    VERSION 1.0.0
+    DESCRIPTION "Regex-based password generator"
+    LANGUAGES C)
 
 # project build options.
 option(BUILD_UTF8PROC "Build utf8proc, a dependency." YES)
@@ -61,8 +61,8 @@ passgen_metrics_setup()
 
 # get commit info, if git is available.
 if(BUILD_GIT_INFO)
-  include(GitInfo)
-  git_info()
+    include(GitInfo)
+    git_info()
 endif()
 
 add_subdirectory(extern)
@@ -71,24 +71,27 @@ add_subdirectory(extern)
 add_subdirectory(src)
 
 if(BUILD_BENCH)
-  add_subdirectory(src/bench)
+    add_subdirectory(src/bench)
 endif()
 
 # build passgen binary and perhaps utils
 add_subdirectory(src/passgen)
 
 if(BUILD_TOOLS)
-  add_subdirectory(src/tools)
+    add_subdirectory(src/tools)
 endif()
 
 # unit tests
 if(BUILD_TESTING)
-  add_subdirectory(src/tests)
+    add_subdirectory(src/tests)
 endif()
 
 # setup and install man page
 configure_file(man/passgen.1.in passgen.1)
-install(FILES passgen.1 DESTINATION share/man/man1)
+install(
+    FILES passgen.1
+    DESTINATION share/man/man1
+    COMPONENT man)
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Passgen")
 set(CPACK_PACKAGE_VENDOR "xfbs")

@@ -58,10 +58,10 @@ generate_export_header(passgen-shared
 target_compile_definitions(passgen-static PUBLIC -DPASSGEN_STATIC_DEFINE)
 
 install(
-  TARGETS passgen-static passgen-shared
-  DESTINATION lib
-  COMPONENT lib
-  OPTIONAL)
+    TARGETS passgen-static passgen-shared
+    DESTINATION lib
+    COMPONENT lib
+    OPTIONAL)
 
 if(NOT LIBPASSGEN_STATIC)
     set_target_properties(passgen-static PROPERTIES EXCLUDE_FROM_ALL TRUE)
@@ -72,9 +72,9 @@ if(NOT LIBPASSGEN_SHARED)
 endif()
 
 install(
-  DIRECTORY ../include/passgen
-  DESTINATION include
-  COMPONENT dev)
+    DIRECTORY ../include/passgen
+    DESTINATION include
+    COMPONENT dev)
 
 install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/passgen/config.h"
