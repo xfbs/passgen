@@ -2,29 +2,15 @@
 
 As of right now, there are no real releases for passgen, but there are nightly builds from the `master` branch that you can download and try out. Currently, passgen supports a variety of platforms for the Linux builds, as well as macOS and Windows builds. The latter however are considered experimental at this point because they are not tested as part of the CI process.
 
-## Linux
+## Downloads
 
-| Architecture | Tarball | Debian |
-| --- | --- | --- |
-| AMD64 | [passgen-linux-amd64.tar.xz][] ([sig][passgen-linux-amd64.tar.xz.sig]) | [passgen-linux-amd64.deb][] ([sig][passgen-linux-amd64.deb.sig]) |
-| ARM64 | [passgen-linux-aarch64.tar.xz][] ([sig][passgen-linux-aarch64.tar.xz.sig]) | [passgen-linux-aarch64.deb][] ([sig][passgen-linux-aarch64.deb.sig]) |
-| RISC-V 64-bit | [passgen-linux-riscv64.tar.xz][] ([sig][passgen-linux-riscv64.tar.xz.sig]) | [passgen-linux-riscv64.deb][] ([sig][passgen-linux-riscv64.deb.sig]) |
-
-## macOS
-
-*Warning: the macOS releases are considered experimental because they are untested. M1 Mac builds are work-in-progress.*
-
-| Architecture | Tarball |
+| Architecture | Links |
 | --- | --- |
-| AMD64 | [passgen-macos-amd64.tar.xz][] ([sig][passgen-macos-amd64.tar.xz.sig]) |
-
-## MS Windows
-
-*Warning: the win64 releases are considered experimental because they are untested.*
-
-| Architecture | ZIP Archive |
-| --- | --- |
-| AMD64 | [passgen-win64-amd64.zip][] ([sig][passgen-win64-amd64.zip.sig]) |
+| Linux amd64 | [passgen-linux-amd64.tar.xz][] ([sig][passgen-linux-amd64.tar.xz.sig])<br />[passgen-linux-amd64.deb][] ([sig][passgen-linux-amd64.deb.sig]) |
+| Linux arm64 | [passgen-linux-aarch64.tar.xz][] ([sig][passgen-linux-aarch64.tar.xz.sig])<br />[passgen-linux-aarch64.deb][] ([sig][passgen-linux-aarch64.deb.sig]) |
+| Linux riscv64 | [passgen-linux-riscv64.tar.xz][] ([sig][passgen-linux-riscv64.tar.xz.sig])<br />[passgen-linux-riscv64.deb][] ([sig][passgen-linux-riscv64.deb.sig]) |
+| macOS amd64 *experimental* | [passgen-macos-amd64.tar.xz][] ([sig][passgen-macos-amd64.tar.xz.sig]) |
+| Windows amd64 | [passgen-win64-amd64.zip][] ([sig][passgen-win64-amd64.zip.sig]) |
 
 # Verifying
 
