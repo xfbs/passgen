@@ -3,7 +3,9 @@ set -euxo pipefail
 
 mkdir -p public/nightly
 
-cp build-alpine-release/passgen-*-Linux.tar.xz public/nightly/passgen-linux-musl-amd64.tar.xz
+cp build-alpine-release/passgen-*-Linux.tar.xz public/nightly/passgen-linux-amd64-musl.tar.xz
+cp build-alpine-release/src/passgen/passgen public/nightly/passgen-linux-amd64-musl.bin
+
 cp build-amd64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-amd64.tar.xz
 cp build-amd64/passgen_*_amd64.deb public/nightly/passgen-linux-amd64.deb
 
@@ -23,7 +25,8 @@ function sign() {
     ssh-keygen -Y sign -f $PASSGEN_SIGNING_KEY -n file $1
 }
 
-sign public/nightly/passgen-linux-musl-amd64.tar.xz
+sign public/nightly/passgen-linux-amd64-musl.tar.xz
+sign public/nightly/passgen-linux-amd64-musl.bin
 sign public/nightly/passgen-linux-amd64.tar.xz
 sign public/nightly/passgen-linux-amd64.deb
 sign public/nightly/passgen-linux-aarch64.tar.xz
