@@ -14,6 +14,7 @@ RUN apt update \
         pkg-config \
         ruby \
         sudo \
+        libseccomp-dev \
     && apt clean
 
 # create nonprivileged user to build stuff under with access to sudo
