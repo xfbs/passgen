@@ -7,6 +7,11 @@
 int main(int argc, char *argv[]) {
     int ret;
     passgen_opts opts;
+
+#ifdef PASSGEN_SECCOMP
+    passgen_seccomp_init();
+#endif
+
     passgen_opts_init(&opts);
     check_success(passgen_opts_config(&opts));
     check_success(passgen_opts_parse(&opts, argc, argv));

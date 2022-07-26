@@ -8,6 +8,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef PASSGEN_SECCOMP
+#include <fcntl.h>
+#include <seccomp.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#endif
+
 #include "passgen/data/parser.h"
 #include "passgen/data/pattern.h"
 #include "passgen/data/token.h"
@@ -501,3 +509,57 @@ int passgen_opts_config_user(passgen_opts *opts) {
         return 0;
     }
 }
+
+#ifdef PASSGEN_SECCOMP
+void passgen_seccomp_init() {
+    scmp_filter_ctx ctx;
+    ctx = seccomp_init(SCMP_ACT_KILL);
+
+    // allow open syscalls, as long as they are read-only.
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(open), 1,
+        SCMP_CMP(1, SCMP_CMP_EQ, O_RDONLY));
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(openat), 1,
+        SCMP_CMP(2, SCMP_CMP_EQ, O_RDONLY));
+
+    // allow reading stat of files
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(fstat), 0);
+
+    // allow reading and seeking in files
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(read), 0);
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(lseek), 0);
+
+    // allow writing, but only to stdout or stderr.
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(write), 1,
+        SCMP_CMP(0, SCMP_CMP_EQ, 2));
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(write), 1,
+        SCMP_CMP(0, SCMP_CMP_EQ, 1));
+
+    // allow closing, as long as the fd is not any of the standard streams.
+    seccomp_rule_add(
+        ctx,
+        SCMP_ACT_ALLOW,
+        SCMP_SYS(close),
+        1,
+        SCMP_CMP(0, SCMP_CMP_GT, 2));
+
+    // allow reading random data
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(getrandom), 0);
+
+    // allow exiting
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(exit_group), 0);
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(exit), 0);
+
+    // allow allocating memory
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(brk), 0);
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(mmap), 3,
+        SCMP_CMP(0, SCMP_CMP_EQ, NULL),
+        SCMP_CMP(2, SCMP_CMP_EQ, PROT_READ | PROT_WRITE),
+        SCMP_CMP(3, SCMP_CMP_EQ, MAP_PRIVATE | MAP_ANONYMOUS));
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(mremap), 0);
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(munmap), 0);
+
+    // apply rules
+    seccomp_load(ctx);
+    seccomp_release(ctx);
+}
+#endif

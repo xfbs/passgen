@@ -86,3 +86,8 @@ void passgen_run(passgen_opts opts);
 
 /// Free data from passgen ops.
 void passgen_opts_free(passgen_opts *opts);
+
+#ifdef PASSGEN_SECCOMP
+/// Initialize seccomp filters
+void passgen_seccomp_init();
+#endif
