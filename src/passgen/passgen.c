@@ -90,7 +90,7 @@ void passgen_run(passgen_opts opts) {
     // allocate some space for pass.
     // size_t pass_len = pattern_maxlen(pattern);
     size_t pass_len = 256;
-    char *pass = malloc(pass_len + 1);
+    uint8_t *pass = malloc(pass_len + 1);
     if(!pass) {
         bail(ALLOC, NULL);
     }

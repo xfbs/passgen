@@ -27,7 +27,7 @@ typedef struct passgen_chars passgen_chars_t;
 
 /// Callback for generation. Takes an arbitrary data pointer and the codepoint
 /// that was generated.
-typedef int passgen_generate_cb(void *data, int32_t codepoint);
+typedef int passgen_generate_cb(void *data, uint32_t codepoint);
 
 /// Generate a password from a pattern, filling the unicode codepoints into the
 /// provided buffer. Will not NULL-terminate anything, returns number of
@@ -36,7 +36,7 @@ size_t passgen_generate_fill_unicode(
     struct passgen_pattern *pattern,
     passgen_random *rand,
     struct passgen_env *env,
-    int32_t *buffer,
+    uint32_t *buffer,
     size_t len);
 
 /// Generate a password from a patter, filling the result UTF-8 encoded into
@@ -46,7 +46,7 @@ size_t passgen_generate_fill_utf8(
     struct passgen_pattern *pattern,
     passgen_random *rand,
     struct passgen_env *env,
-    char *buffer,
+    uint8_t *buffer,
     size_t len);
 
 /// Generate a password from a pattern, calling the provided callback function

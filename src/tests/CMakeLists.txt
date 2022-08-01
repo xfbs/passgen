@@ -6,15 +6,17 @@ passgen_target_defaults(passgen-test-lib)
 # list of test sources.
 set(TEST_LIST
     "array.c"
+    "complexity.c"
+    "generate.c"
+    "hashmap.c"
+    "markov.c"
     "parser.c"
     "random.c"
+    "stack.c"
     "token.c"
-    "generate.c"
     "utf8.c"
     "wordlist.c"
-    "stack.c"
-    "markov.c"
-    "hashmap.c")
+)
 
 # the testing framework wants a list of all test functions to execute, this step
 # generates this list automagically from the test sources with the help of a

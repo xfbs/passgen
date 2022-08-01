@@ -21,13 +21,13 @@
 #include <utf8proc.h>
 
 struct fillpos {
-    int32_t *buffer;
+    uint32_t *buffer;
     size_t cur;
     size_t len;
 };
 
 struct fillpos_utf8 {
-    char *buffer;
+    uint8_t *buffer;
     size_t cur;
     size_t len;
 };
@@ -37,7 +37,7 @@ static struct passgen_env passgen_env_default = {
     .random = NULL,
 };
 
-static int passgen_generate_write_buffer(void *data, int32_t codepoint) {
+static int passgen_generate_write_buffer(void *data, uint32_t codepoint) {
     struct fillpos *fillpos = data;
 
     if(fillpos->cur == fillpos->len) {
@@ -50,7 +50,7 @@ static int passgen_generate_write_buffer(void *data, int32_t codepoint) {
     return 0;
 }
 
-static int passgen_generate_write_buffer_utf8(void *data, int32_t codepoint) {
+static int passgen_generate_write_buffer_utf8(void *data, uint32_t codepoint) {
     struct fillpos_utf8 *fillpos = data;
 
     if(fillpos->cur == fillpos->len) {
@@ -94,7 +94,7 @@ size_t passgen_generate_fill_unicode(
     struct passgen_pattern *pattern,
     passgen_random *rand,
     struct passgen_env *env,
-    int32_t *buffer,
+    uint32_t *buffer,
     size_t len) {
     struct fillpos fillpos = {
         .buffer = buffer,
@@ -120,7 +120,7 @@ size_t passgen_generate_fill_utf8(
     struct passgen_pattern *pattern,
     passgen_random *rand,
     struct passgen_env *env,
-    char *buffer,
+    uint8_t *buffer,
     size_t len) {
     struct fillpos_utf8 fillpos = {
         .buffer = buffer,

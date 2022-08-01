@@ -58,7 +58,7 @@
 
 test_result test_generate_empty(void) {
     PREAMBLE();
-    int32_t output[10];
+    uint32_t output[10];
 
     pattern = "";
     GENERATE(output, pattern);
@@ -70,7 +70,7 @@ test_result test_generate_empty(void) {
 
 test_result test_generate_chars(void) {
     PREAMBLE();
-    int32_t output[10];
+    uint32_t output[10];
 
     // single char
     pattern = "a";
@@ -104,7 +104,7 @@ test_result test_generate_chars(void) {
 
 test_result test_generate_segments(void) {
     PREAMBLE();
-    int32_t output[10];
+    uint32_t output[10];
 
     // either a or b
     pattern = "a|b";
@@ -124,7 +124,7 @@ test_result test_generate_segments(void) {
 
 test_result test_generate_group(void) {
     PREAMBLE();
-    int32_t output[10];
+    uint32_t output[10];
 
     // "abc"
     pattern = "(abc)";
@@ -153,7 +153,7 @@ test_result test_generate_group(void) {
 
 test_result test_generate_set(void) {
     PREAMBLE();
-    int32_t output[10];
+    uint32_t output[10];
 
     // "abc"
     pattern = "[a]";
@@ -202,7 +202,7 @@ test_result test_generate_set(void) {
 
 test_result test_generate_maybe(void) {
     PREAMBLE();
-    int32_t output[10];
+    uint32_t output[10];
 
     // char or not?
     pattern = "a?";
@@ -243,7 +243,7 @@ test_result test_generate_maybe(void) {
 
 test_result test_generate_repeat(void) {
     PREAMBLE();
-    int32_t output[10];
+    uint32_t output[10];
 
     // char or not?
     pattern = "a{5}";
