@@ -369,10 +369,10 @@ void passgen_bail(passgen_cli_error error, void *data) {
     switch(error) {
         case PASSGEN_ERROR_HELP:
             passgen_usage(data);
-            exit(-1);
+            exit(0);
         case PASSGEN_ERROR_VERSION:
             passgen_show_version();
-            exit(-1);
+            exit(0);
         case PASSGEN_ERROR_MULTIPLE_FORMATS:
             printf(
                 "Error: multiple patterns specified (%s).\n",
