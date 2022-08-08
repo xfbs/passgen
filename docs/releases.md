@@ -18,7 +18,7 @@ Every release comes with a signature file. This can be used to verify the authen
 
 ```bash
 wget https://passgen.it/passgen.pub
-ssh-keygen -Y verify -f passgen.pub -s passgen-linux-amd64.deb.sig -n name -I nightly@passgen.it < passgen-linux-amd64.deb
+ssh-keygen -Y verify -f passgen.pub -s passgen-linux-amd64.deb.sig -n file -I nightly@passgen.it < passgen-linux-amd64.deb
 Good "file" signature for nightly@passgen.it with ED25519 key SHA256:k7BsqKVzJMDEmgomupIE4VE9Xe4V4ffP506BLkz4JGQ
 ```
 
