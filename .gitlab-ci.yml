@@ -201,7 +201,7 @@ build:aarch64:
     - cd build-aarch64
     - ninja
     - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/tests/passgen-test
-    - ../scripts/ci-test-passgen.sh qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/passgen/passgen
+    - ../scripts/ci-test-passgen.sh qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/cli/passgen
     - cpack -G TXZ
     - cpack -G DEB
   artifacts:
@@ -217,7 +217,7 @@ build:riscv64:
     - cd build-riscv64
     - ninja
     - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./src/tests/passgen-test
-    - ../scripts/ci-test-passgen.sh qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./src/passgen/passgen
+    - ../scripts/ci-test-passgen.sh qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./src/cli/passgen
     - cpack -G TXZ
     - cpack -G DEB
   artifacts:
@@ -234,7 +234,7 @@ build:amd64:
     - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_SECCOMP=YES ..
     - ninja
     - ./src/tests/passgen-test
-    - ../scripts/ci-test-passgen.sh ./src/passgen/passgen
+    - ../scripts/ci-test-passgen.sh ./src/cli/passgen
     - cpack -G TXZ
     - cpack -G DEB
   artifacts:
@@ -251,7 +251,7 @@ build:alpine:
     - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y ..
     - ninja
     - ./src/tests/passgen-test
-    - ../scripts/ci-test-passgen.sh ./src/passgen/passgen
+    - ../scripts/ci-test-passgen.sh ./src/cli/passgen
     - cpack -G TXZ
   artifacts:
     paths:

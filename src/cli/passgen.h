@@ -45,60 +45,60 @@ typedef struct {
      passgen_hashmap wordlists;
      /// Presets to choose from.
      passgen_hashmap presets;
-} passgen_opts;
+} passgen_cli_opts;
 
-/// Initialize passgen_opts to default values.
-void passgen_opts_init(passgen_opts *opts);
+/// Initialize passgen_cli_opts to default values.
+void passgen_cli_opts_init(passgen_cli_opts *opts);
 
 /// Define a preset, with an argument like `name:value`.
-int passgen_opts_define_preset(passgen_opts *opt, const char *arg);
+int passgen_cli_opts_define_preset(passgen_cli_opts *opt, const char *arg);
 
 /// Define a wordlist, with an argument like `name:path`.
-int passgen_opts_wordlist(passgen_opts *opt, const char *input);
+int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input);
 
 /// Parse a randomness definition, like `system` or `xor:2342322`
-int passgen_opts_random(passgen_opts *opts, const char *random);
+int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random);
 
 /// Load system and user config into options
-int passgen_opts_config(passgen_opts *opts);
+int passgen_cli_opts_config(passgen_cli_opts *opts);
 
 /// Load system config into options, if it exists
-int passgen_opts_config_system(passgen_opts *opts);
+int passgen_cli_opts_config_system(passgen_cli_opts *opts);
 
 /// Load user config into options, if it exists
-int passgen_opts_config_user(passgen_opts *opts);
+int passgen_cli_opts_config_user(passgen_cli_opts *opts);
 
 /// Load configuration options from file
-int passgen_opts_config_load(passgen_opts *opts, FILE *file);
+int passgen_cli_opts_config_load(passgen_cli_opts *opts, FILE *file);
 
 /// Load configuration options from string
-int passgen_opts_config_parse(passgen_opts *opts, char *data);
+int passgen_cli_opts_config_parse(passgen_cli_opts *opts, char *data);
 
 /// Print usage (help text) using @p executable as the name of the program.
 ///
 /// @param executable Name of the program, typically `argv[0]`.
-void passgen_usage(const char *executable);
+void passgen_cli_usage(const char *executable);
 
 /// Print the version of the program.
-void passgen_show_version(void);
+void passgen_cli_show_version(void);
 
 /// Exit the program early using the specified error and data.
-void passgen_bail(passgen_cli_error error, void *data);
+void passgen_cli_bail(passgen_cli_error error, void *data);
 
 /// Parse the options passed on the command line, @p argc and @p argv, and
 /// return the parsed result.
-int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]);
+int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]);
 
 /// Run passgen with @p opts.
-void passgen_run(passgen_opts opts);
+void passgen_cli_run(passgen_cli_opts opts);
 
 /// Generate passgen passwords.
-void passgen_cli_generate(passgen_opts opts, struct passgen_pattern *pattern);
+void passgen_cli_generate(passgen_cli_opts opts, struct passgen_pattern *pattern);
 
 /// Free data from passgen ops.
-void passgen_opts_free(passgen_opts *opts);
+void passgen_cli_opts_free(passgen_cli_opts *opts);
 
 #ifdef PASSGEN_SECCOMP
 /// Initialize seccomp filters
-void passgen_seccomp_init();
+void passgen_cli_seccomp_init();
 #endif

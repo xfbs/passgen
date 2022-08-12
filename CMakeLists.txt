@@ -75,7 +75,7 @@ if(BUILD_BENCH)
 endif()
 
 # build passgen binary and perhaps utils
-add_subdirectory(src/passgen)
+add_subdirectory(src/cli)
 
 if(BUILD_TOOLS)
     add_subdirectory(src/tools)

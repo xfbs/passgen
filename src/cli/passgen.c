@@ -30,10 +30,10 @@
 #include "passgen/wordlist.h"
 
 #define UNUSED(x)              (void) x
-#define bail(kind, data)       passgen_bail(PASSGEN_ERROR_##kind, (void *) data)
+#define bail(kind, data)       passgen_cli_bail(PASSGEN_ERROR_##kind, (void *) data)
 #define strprefix(prefix, str) memcmp(prefix, str, strlen(prefix))
 
-int passgen_opts_random(passgen_opts *opts, const char *random) {
+int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
     if(opts->random) {
         passgen_random_free(opts->random);
         opts->random = NULL;
@@ -67,7 +67,7 @@ int passgen_opts_random(passgen_opts *opts, const char *random) {
     return 1;
 }
 
-void passgen_run(passgen_opts opts) {
+void passgen_cli_run(passgen_cli_opts opts) {
     struct passgen_pattern pattern;
     struct passgen_error error;
     int ret = passgen_parse(&pattern, &error, opts.pattern);
@@ -89,7 +89,7 @@ void passgen_run(passgen_opts opts) {
     passgen_pattern_free(&pattern);
 }
 
-void passgen_cli_generate_normal(passgen_opts opts, struct passgen_pattern *pattern) {
+void passgen_cli_generate_normal(passgen_cli_opts opts, struct passgen_pattern *pattern) {
     // allocate some space for pass.
     // size_t pass_len = pattern_maxlen(pattern);
     size_t pass_len = 256;
@@ -137,7 +137,7 @@ void passgen_cli_generate_normal(passgen_opts opts, struct passgen_pattern *patt
     free(pass);
 }
 
-void passgen_cli_generate_json(passgen_opts opts, struct passgen_pattern *pattern) {
+void passgen_cli_generate_json(passgen_cli_opts opts, struct passgen_pattern *pattern) {
     // allocate some space for pass.
     // size_t pass_len = pattern_maxlen(pattern);
     size_t pass_len = 256;
@@ -176,7 +176,7 @@ void passgen_cli_generate_json(passgen_opts opts, struct passgen_pattern *patter
     free(pass);
 }
 
-void passgen_cli_generate(passgen_opts opts, struct passgen_pattern *pattern) {
+void passgen_cli_generate(passgen_cli_opts opts, struct passgen_pattern *pattern) {
     if(!opts.json) {
         passgen_cli_generate_normal(opts, pattern);
     } else {
@@ -184,7 +184,7 @@ void passgen_cli_generate(passgen_opts opts, struct passgen_pattern *pattern) {
     }
 }
 
-int passgen_opts_wordlist(passgen_opts *opt, const char *input) {
+int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
     const char *colon = strstr(input, ":");
     if(!colon) {
         return 1;
@@ -220,7 +220,7 @@ int passgen_opts_wordlist(passgen_opts *opt, const char *input) {
     return 0;
 }
 
-int passgen_opts_preset(passgen_opts *opts, const char *arg) {
+int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
     size_t arg_len = strlen(arg);
     char *arg_copy = malloc(arg_len + 1);
     memcpy(arg_copy, arg, arg_len + 1);
@@ -236,7 +236,7 @@ int passgen_opts_preset(passgen_opts *opts, const char *arg) {
     return 0;
 }
 
-void passgen_opts_init(passgen_opts *opts) {
+void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->pattern = NULL;
     opts->amount = 1;
     opts->depth = 100;
@@ -253,7 +253,7 @@ void passgen_opts_init(passgen_opts *opts) {
     passgen_hashmap_insert(&opts->presets, "firefox", "[a-zA-Z0-9]{15}");
 }
 
-int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
+int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     const char *short_opts = "a:p:P:d:w:r:czhv";
     const char *preset = NULL;
 
@@ -307,13 +307,13 @@ int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
                 bail(VERSION, NULL);
                 break;
             case 'w':
-                ret = passgen_opts_wordlist(opts, optarg);
+                ret = passgen_cli_opts_wordlist(opts, optarg);
                 break;
             case 'r':
-                ret = passgen_opts_random(opts, optarg);
+                ret = passgen_cli_opts_random(opts, optarg);
                 break;
             case 'P':
-                ret = passgen_opts_preset(opts, optarg);
+                ret = passgen_cli_opts_preset(opts, optarg);
                 break;
             case 'j':
                 opts->json = true;
@@ -369,7 +369,7 @@ int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
     return 0;
 }
 
-void passgen_usage(const char *executable) {
+void passgen_cli_usage(const char *executable) {
     fprintf(
         stderr,
         "passgen version %s\n"
@@ -409,7 +409,7 @@ void passgen_usage(const char *executable) {
         executable);
 }
 
-void passgen_show_version(void) {
+void passgen_cli_show_version(void) {
     fprintf(stderr, "passgen, version %s\n", passgen_version_str());
 
     if(passgen_is_debug()) {
@@ -419,13 +419,13 @@ void passgen_show_version(void) {
     }
 }
 
-void passgen_bail(passgen_cli_error error, void *data) {
+void passgen_cli_bail(passgen_cli_error error, void *data) {
     switch(error) {
         case PASSGEN_ERROR_HELP:
-            passgen_usage(data);
+            passgen_cli_usage(data);
             exit(0);
         case PASSGEN_ERROR_VERSION:
-            passgen_show_version();
+            passgen_cli_show_version();
             exit(0);
         case PASSGEN_ERROR_MULTIPLE_FORMATS:
             printf(
@@ -448,7 +448,7 @@ void passgen_bail(passgen_cli_error error, void *data) {
     }
 }
 
-void passgen_opts_free(passgen_opts *opts) {
+void passgen_cli_opts_free(passgen_cli_opts *opts) {
     passgen_random_free(opts->random);
     passgen_hashmap_free(&opts->presets);
     passgen_hashmap_foreach_value(
@@ -458,17 +458,17 @@ void passgen_opts_free(passgen_opts *opts) {
     passgen_hashmap_free(&opts->wordlists);
 }
 
-int passgen_opts_config_load(passgen_opts *opts, FILE *file) {
+int passgen_cli_opts_config_load(passgen_cli_opts *opts, FILE *file) {
     // TODO: use something like passgen_buffer to do this
     char *config = malloc(10240);
     size_t read = fread(config, 1, 10240, file);
     config[read] = 0;
-    int ret = passgen_opts_config_parse(opts, config);
+    int ret = passgen_cli_opts_config_parse(opts, config);
     free(config);
     return ret;
 }
 
-int passgen_opts_config_parse(passgen_opts *opts, char *data) {
+int passgen_cli_opts_config_parse(passgen_cli_opts *opts, char *data) {
     // TODO: this code is a mess.
     for(size_t pos = 0; data[pos]; pos++) {
         if(data[pos] == '#') {
@@ -486,7 +486,7 @@ int passgen_opts_config_parse(passgen_opts *opts, char *data) {
             size_t length = 0;
             while(data[pos + length] && data[pos + length] != '\n') length++;
             data[pos + length] = 0;
-            passgen_opts_random(opts, &data[pos]);
+            passgen_cli_opts_random(opts, &data[pos]);
             pos += length;
             continue;
         }
@@ -496,7 +496,7 @@ int passgen_opts_config_parse(passgen_opts *opts, char *data) {
             size_t length = 0;
             while(data[pos + length] && data[pos + length] != '\n') length++;
             data[pos + length] = 0;
-            passgen_opts_wordlist(opts, &data[pos]);
+            passgen_cli_opts_wordlist(opts, &data[pos]);
             pos += length;
             continue;
         }
@@ -506,7 +506,7 @@ int passgen_opts_config_parse(passgen_opts *opts, char *data) {
             size_t length = 0;
             while(data[pos + length] && data[pos + length] != '\n') length++;
             data[pos + length] = 0;
-            passgen_opts_preset(opts, &data[pos]);
+            passgen_cli_opts_preset(opts, &data[pos]);
             pos += length;
             continue;
         }
@@ -514,15 +514,15 @@ int passgen_opts_config_parse(passgen_opts *opts, char *data) {
     return 0;
 }
 
-int passgen_opts_config(passgen_opts *opts) {
+int passgen_cli_opts_config(passgen_cli_opts *opts) {
     int ret;
 
-    ret = passgen_opts_config_system(opts);
+    ret = passgen_cli_opts_config_system(opts);
     if(ret != 0) {
         return ret;
     }
 
-    ret = passgen_opts_config_user(opts);
+    ret = passgen_cli_opts_config_user(opts);
     if(ret != 0) {
         return ret;
     }
@@ -530,10 +530,10 @@ int passgen_opts_config(passgen_opts *opts) {
     return 0;
 }
 
-int passgen_opts_config_system(passgen_opts *opts) {
+int passgen_cli_opts_config_system(passgen_cli_opts *opts) {
     FILE *file = fopen("/etc/passgen.conf", "r");
     if(file) {
-        int ret = passgen_opts_config_load(opts, file);
+        int ret = passgen_cli_opts_config_load(opts, file);
         fclose(file);
         return ret;
     } else {
@@ -541,7 +541,7 @@ int passgen_opts_config_system(passgen_opts *opts) {
     }
 }
 
-int passgen_opts_config_user(passgen_opts *opts) {
+int passgen_cli_opts_config_user(passgen_cli_opts *opts) {
     char config_path[256];
     const char *xdg_config_path = getenv("XDG_CONFIG_PATH");
     if(xdg_config_path) {
@@ -556,7 +556,7 @@ int passgen_opts_config_user(passgen_opts *opts) {
     }
     FILE *file = fopen(config_path, "r");
     if(file) {
-        int ret = passgen_opts_config_load(opts, file);
+        int ret = passgen_cli_opts_config_load(opts, file);
         fclose(file);
         return ret;
     } else {
@@ -565,7 +565,7 @@ int passgen_opts_config_user(passgen_opts *opts) {
 }
 
 #ifdef PASSGEN_SECCOMP
-void passgen_seccomp_init() {
+void passgen_cli_seccomp_init() {
     scmp_filter_ctx ctx;
     ctx = seccomp_init(SCMP_ACT_KILL);
 
