@@ -289,6 +289,10 @@ int passgen_generate_special_wordlist(
         word++;
     }
 
+    if(env->find_complexity) {
+        env->complexity *= passgen_wordlist_count(wordlist);
+    }
+
     return 0;
 }
 
