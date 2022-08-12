@@ -334,9 +334,10 @@ int passgen_generate_special_pronounceable(
     uint32_t word[128];
     size_t pos = markov->level;
     memset(word, 0, pos * sizeof(uint32_t));
+    double *complexity = env->find_complexity ? &env->complexity : NULL;
     do {
         word[pos] =
-            passgen_markov_generate(markov, &word[pos - markov->level], rand);
+            passgen_markov_generate(markov, &word[pos - markov->level], rand, complexity);
         pos++;
     } while(word[pos - 1]);
 

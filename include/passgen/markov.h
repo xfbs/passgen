@@ -21,11 +21,13 @@ void passgen_markov_add(
 /// @param current Must contain markov->level amount of previous chars
 /// @param markov Must be a parsed markov chain
 /// @param random Must be a valid randomness instance
+/// @param complexity Will be multiplied with the complexity of the choice if it not NULL.
 /// @return The generated next character
 uint32_t passgen_markov_generate(
     passgen_markov *markov,
     const uint32_t *current,
-    passgen_random *random);
+    passgen_random *random,
+    double *complexity);
 
 /// Free a markov chain
 void passgen_markov_free(passgen_markov *markov);

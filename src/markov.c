@@ -269,7 +269,8 @@ void passgen_markov_free(passgen_markov *markov) {
 uint32_t passgen_markov_generate(
     passgen_markov *markov,
     const uint32_t *current,
-    passgen_random *random) {
+    passgen_random *random,
+    double *complexity) {
     passgen_markov_node *node = markov->root;
 
     for(size_t i = 0; i < markov->level; i++) {
@@ -281,11 +282,21 @@ uint32_t passgen_markov_generate(
 
     passgen_markov_leaf *leaf = (passgen_markov_leaf *) node;
 
+    // record total choices.
+    if(complexity) {
+        *complexity *= (double) leaf->total_count;
+    }
+
     size_t choice = passgen_random_u64_max(random, leaf->total_count);
     for(size_t i = 0; i < leaf->capacity; i++) {
         uint32_t count = passgen_markov_leaf_count(leaf, i);
         if(count) {
             if(choice < count) {
+                // record bucket (reduces total choices).
+                if(complexity) {
+                    *complexity /= (double) count;
+                }
+
                 return passgen_markov_leaf_codepoint(leaf, i);
             } else {
                 choice -= count;
