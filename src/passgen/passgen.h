@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <passgen/random.h>
 #include <passgen/hashmap.h>
+#include "passgen/data/pattern.h"
 
 /// The kinds of errors that cause the binary to exit early and with a nonzero
 /// return code.
@@ -32,10 +33,17 @@ typedef struct {
      const char *pattern;
      /// The source of randomness to use.
      passgen_random *random;
+     /// Separate output with null characters.
      bool null;
+     /// Output as JSON.
+     bool json;
+     /// Parsing depth.
      size_t depth;
+     /// Output complexity.
      bool complexity;
+     /// Wordlists that are to be loaded.
      passgen_hashmap wordlists;
+     /// Presets to choose from.
      passgen_hashmap presets;
 } passgen_opts;
 
@@ -83,6 +91,9 @@ int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]);
 
 /// Run passgen with @p opts.
 void passgen_run(passgen_opts opts);
+
+/// Generate passgen passwords.
+void passgen_cli_generate(passgen_opts opts, struct passgen_pattern *pattern);
 
 /// Free data from passgen ops.
 void passgen_opts_free(passgen_opts *opts);

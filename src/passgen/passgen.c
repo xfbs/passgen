@@ -85,8 +85,11 @@ void passgen_run(passgen_opts opts) {
         return;
     }
 
-    // FIXME: check that token_parser.state == PASSGEN_TOKEN_INIT
+    passgen_cli_generate(opts, &pattern);
+    passgen_pattern_free(&pattern);
+}
 
+void passgen_cli_generate_normal(passgen_opts opts, struct passgen_pattern *pattern) {
     // allocate some space for pass.
     // size_t pass_len = pattern_maxlen(pattern);
     size_t pass_len = 256;
@@ -100,16 +103,16 @@ void passgen_run(passgen_opts opts) {
         sep = '\0';
     }
 
-    for(size_t i = 0; i < opts.amount; ++i) {
-        struct passgen_env env = {
-            .find_complexity = opts.complexity,
-            .wordlists = opts.wordlists,
-            .random = opts.random,
-        };
+    struct passgen_env env = {
+        .find_complexity = opts.complexity,
+        .wordlists = opts.wordlists,
+        .random = opts.random,
+    };
 
+    for(size_t i = 0; i < opts.amount; ++i) {
         // get a NULL-terminated, random pass.
         size_t written = passgen_generate_fill_utf8(
-            &pattern,
+            pattern,
             opts.random,
             &env,
             pass,
@@ -132,7 +135,53 @@ void passgen_run(passgen_opts opts) {
 
     printf("\n");
     free(pass);
-    passgen_pattern_free(&pattern);
+}
+
+void passgen_cli_generate_json(passgen_opts opts, struct passgen_pattern *pattern) {
+    // allocate some space for pass.
+    // size_t pass_len = pattern_maxlen(pattern);
+    size_t pass_len = 256;
+    uint8_t *pass = malloc(pass_len + 1);
+    if(!pass) {
+        bail(ALLOC, NULL);
+    }
+
+    struct passgen_env env = {
+        .find_complexity = opts.complexity,
+        .wordlists = opts.wordlists,
+        .random = opts.random,
+    };
+
+    printf("[");
+    for(size_t i = 0; i < opts.amount; ++i) {
+        // get a NULL-terminated, random pass.
+        size_t written = passgen_generate_fill_json_utf8(
+            pattern,
+            opts.random,
+            &env,
+            pass,
+            pass_len);
+        pass[written] = '\0';
+        printf("%s{\"generated\":\"%s\"", (i == 0) ? "" : ",", pass);
+
+        if(opts.complexity) {
+            printf(",\"complexity\":%lf",
+                log(env.complexity) / log(2));
+        }
+
+        printf("}");
+    }
+    printf("]\n");
+
+    free(pass);
+}
+
+void passgen_cli_generate(passgen_opts opts, struct passgen_pattern *pattern) {
+    if(!opts.json) {
+        passgen_cli_generate_normal(opts, pattern);
+    } else {
+        passgen_cli_generate_json(opts, pattern);
+    }
 }
 
 int passgen_opts_wordlist(passgen_opts *opt, const char *input) {
@@ -194,6 +243,7 @@ void passgen_opts_init(passgen_opts *opts) {
     opts->null = false;
     opts->complexity = false;
     opts->random = NULL;
+    opts->json = false;
     passgen_hashmap_init(&opts->wordlists, &passgen_hashmap_context_unicode);
     passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_default);
 
@@ -218,6 +268,7 @@ int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
         {"wordlist", required_argument, NULL, 'w'},
         {"random", required_argument, NULL, 'r'},
         {"define-preset", required_argument, NULL, 'P'},
+        {"json", no_argument, NULL, 'j'},
         {NULL, no_argument, NULL, 0}};
 
     while(true) {
@@ -263,6 +314,9 @@ int passgen_opts_parse(passgen_opts *opts, int argc, char *argv[]) {
                 break;
             case 'P':
                 ret = passgen_opts_preset(opts, optarg);
+                break;
+            case 'j':
+                opts->json = true;
                 break;
             case '?':
             default:

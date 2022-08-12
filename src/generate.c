@@ -90,6 +90,66 @@ static int passgen_generate_write_buffer_utf8(void *data, uint32_t codepoint) {
     return 0;
 }
 
+/// Write JSON-escaped UTF-8 to buffer.
+static int passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
+    struct fillpos_utf8 *fillpos = data;
+
+    if(fillpos->cur == fillpos->len) {
+        return -1;
+    }
+
+    size_t buffer[4];
+    buffer[0] = '\\';
+    size_t bytes = 0;
+    switch(codepoint) {
+        case '"':
+            buffer[1] = '"';
+            bytes = 2;
+            break;
+        case '\\':
+            buffer[1] = '\\';
+            bytes = 2;
+            break;
+        case '\b':
+            buffer[1] = 'b';
+            bytes = 2;
+            break;
+        case '\f':
+            buffer[1] = 'f';
+            bytes = 2;
+            break;
+        case '\r':
+            buffer[1] = 'r';
+            bytes = 2;
+            break;
+        case '\n':
+            buffer[1] = 'n';
+            bytes = 2;
+            break;
+        case '\t':
+            buffer[1] = 't';
+            bytes = 2;
+            break;
+        default:
+            bytes = utf8proc_encode_char(codepoint, (utf8proc_uint8_t *) &buffer[0]);
+    }
+
+    // check that no error happened.
+    if(!bytes) {
+        return -1;
+    }
+
+    // make sure it fits.
+    if(bytes <= (fillpos->len - fillpos->cur)) {
+        memcpy(&fillpos->buffer[fillpos->cur], &buffer[0], bytes);
+        fillpos->cur += bytes;
+    } else {
+        return -1;
+    }
+
+    return 0;
+}
+
 size_t passgen_generate_fill_unicode(
     struct passgen_pattern *pattern,
     passgen_random *rand,
@@ -134,6 +194,32 @@ size_t passgen_generate_fill_utf8(
         env,
         &fillpos,
         passgen_generate_write_buffer_utf8);
+
+    if(0 != ret) {
+        return 0;
+    }
+
+    return fillpos.cur;
+}
+
+size_t passgen_generate_fill_json_utf8(
+    struct passgen_pattern *pattern,
+    passgen_random *rand,
+    struct passgen_env *env,
+    uint8_t *buffer,
+    size_t len) {
+    struct fillpos_utf8 fillpos = {
+        .buffer = buffer,
+        .len = len,
+        .cur = 0,
+    };
+
+    int ret = passgen_generate(
+        pattern,
+        rand,
+        env,
+        &fillpos,
+        passgen_generate_write_buffer_json_utf8);
 
     if(0 != ret) {
         return 0;

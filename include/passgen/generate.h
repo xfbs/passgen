@@ -49,6 +49,16 @@ size_t passgen_generate_fill_utf8(
     uint8_t *buffer,
     size_t len);
 
+/// Generate a password from a patter, filling the result UTF-8 encoded and
+/// JSON-escaped into the provided buffer. Will not NULL-terminate the buffer,
+/// returns the number of bytes written.
+size_t passgen_generate_fill_json_utf8(
+    struct passgen_pattern *pattern,
+    passgen_random *rand,
+    struct passgen_env *env,
+    uint8_t *buffer,
+    size_t len);
+
 /// Generate a password from a pattern, calling the provided callback function
 /// with the provided data pointer as well as each codepoint as it is generated.
 int passgen_generate(
