@@ -4,7 +4,7 @@ set -euxo pipefail
 mkdir -p public/nightly
 
 cp build-alpine-release/passgen-*-Linux.tar.xz public/nightly/passgen-linux-amd64-musl.tar.xz
-cp build-alpine-release/src/passgen/passgen public/nightly/passgen-linux-amd64-musl.bin
+cp build-alpine-release/src/cli/passgen public/nightly/passgen-linux-amd64-musl.bin
 
 cp build-amd64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-amd64.tar.xz
 cp build-amd64/passgen_*_amd64.deb public/nightly/passgen-linux-amd64.deb
