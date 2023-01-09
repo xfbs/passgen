@@ -1,6 +1,5 @@
 #pragma once
 #include "passgen/data/repeat.h"
-#include "passgen/debug.h"
 #include "passgen/export.h"
 #include <stdint.h>
 
@@ -12,7 +11,5 @@ typedef struct passgen_chars {
     uint8_t tainted;
     int32_t codepoints[7];
 } passgen_chars_t;
-
-void passgen_pattern_char_debug(passgen_chars_t *chr, passgen_debug_t *debug);
 
 int passgen_chars_export(passgen_chars_t *chars, void *data, passgen_export_cb *fn);

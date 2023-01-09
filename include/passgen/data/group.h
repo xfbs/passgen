@@ -11,7 +11,6 @@
 
 #include "passgen/stack.h"
 #include "passgen/data/repeat.h"
-#include "passgen/debug.h"
 #include "passgen/export.h"
 
 /// Represents a group, such as `(day|night)`.
@@ -33,7 +32,5 @@ passgen_pattern_group_new_segment(passgen_pattern_group_t *group);
 /// Get a specific segment from a @ref passgen_pattern_group by index.
 struct passgen_pattern_segment *
 passgen_pattern_group_get_segment(passgen_pattern_group_t *group, size_t n);
-
-void passgen_pattern_group_debug(passgen_pattern_group_t *group, passgen_debug_t *debug);
 
 int passgen_group_export(passgen_pattern_group_t *pattern, void *data, passgen_export_cb *fn);

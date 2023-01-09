@@ -31,31 +31,6 @@ passgen_pattern_group_get_segment(passgen_pattern_group_t *group, size_t n) {
     return passgen_stack_get(&group->segments, n);
 }
 
-void passgen_pattern_group_debug(
-    passgen_pattern_group_t *group,
-    passgen_debug_t *debug) {
-    debug->struct_start(debug->data, "passgen_pattern_group");
-
-    debug->member_start(debug->data, "segments");
-    debug->array_start(debug->data);
-
-    for(size_t i = 0; i < group->segments.len; i++) {
-        if(i != 0) {
-            debug->array_sep(debug->data);
-        }
-
-        passgen_pattern_segment_t *segment =
-            passgen_stack_get(&group->segments, i);
-
-        passgen_pattern_segment_debug(segment, debug);
-    }
-
-    debug->array_end(debug->data);
-    debug->member_end(debug->data, "segments");
-
-    debug->struct_end(debug->data, "passgen_pattern_group");
-}
-
 int passgen_group_export(
     passgen_pattern_group_t *group,
     void *data,

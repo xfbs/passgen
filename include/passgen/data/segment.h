@@ -4,7 +4,6 @@
 #pragma once
 #include <stddef.h>
 
-#include "passgen/debug.h"
 #include "passgen/export.h"
 #include "passgen/stack.h"
 
@@ -43,7 +42,5 @@ passgen_pattern_segment_new_special(struct passgen_pattern_segment *segment);
 struct passgen_pattern_item *passgen_pattern_segment_get_item(
     struct passgen_pattern_segment *segment,
     size_t n);
-
-void passgen_pattern_segment_debug(passgen_pattern_segment_t *segment, passgen_debug_t *debug);
 
 int passgen_segment_export(passgen_pattern_segment_t *segment, void *data, passgen_export_cb *fn);

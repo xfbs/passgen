@@ -1,7 +1,6 @@
 #pragma once
 #include <stddef.h>
 
-#include "passgen/debug.h"
 #include "passgen/stack.h"
 #include "passgen/data/array.h"
 #include "passgen/data/repeat.h"
@@ -30,7 +29,5 @@ passgen_pattern_set_new_range(struct passgen_pattern_set *set);
 
 struct passgen_pattern_range *
 passgen_pattern_set_get_range(struct passgen_pattern_set *set, size_t n);
-
-void passgen_pattern_set_debug(passgen_pattern_set_t *set, passgen_debug_t *debug);
 
 int passgen_charset_export(passgen_pattern_set_t *set, void *data, passgen_export_cb *fn);

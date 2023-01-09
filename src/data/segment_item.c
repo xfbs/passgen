@@ -25,55 +25,6 @@ void passgen_pattern_item_init(struct passgen_pattern_item *item) {
     item->maybe = 0;
 }
 
-void passgen_pattern_item_debug(
-    passgen_pattern_item_t *item,
-    passgen_debug_t *debug) {
-    debug->struct_start(debug->data, "passgen_pattern_item");
-
-    debug->member_start(debug->data, "kind");
-    switch(item->kind) {
-        case PASSGEN_PATTERN_SET:
-            debug->value_enum(debug->data, item->kind, "SET");
-            break;
-        case PASSGEN_PATTERN_GROUP:
-            debug->value_enum(debug->data, item->kind, "GROUP");
-            break;
-        case PASSGEN_PATTERN_CHAR:
-            debug->value_enum(debug->data, item->kind, "CHAR");
-            break;
-        case PASSGEN_PATTERN_SPECIAL:
-            debug->value_enum(debug->data, item->kind, "SPECIAL");
-            break;
-    }
-    debug->member_end(debug->data, "kind");
-
-    debug->member_start(debug->data, "data");
-    switch(item->kind) {
-        case PASSGEN_PATTERN_SET:
-            passgen_pattern_set_debug(&item->data.set, debug);
-            break;
-        case PASSGEN_PATTERN_GROUP:
-            passgen_pattern_group_debug(&item->data.group, debug);
-            break;
-        case PASSGEN_PATTERN_CHAR:
-            passgen_pattern_char_debug(&item->data.chars, debug);
-            break;
-        case PASSGEN_PATTERN_SPECIAL:
-            break;
-    }
-    debug->member_end(debug->data, "data");
-
-    debug->member_start(debug->data, "repeat");
-    passgen_pattern_repeat_debug(&item->repeat, debug);
-    debug->member_end(debug->data, "repeat");
-
-    debug->member_start(debug->data, "maybe");
-    debug->value_bool(debug->data, item->maybe);
-    debug->member_end(debug->data, "maybe");
-
-    debug->struct_end(debug->data, "passgen_pattern_item");
-}
-
 int passgen_item_export(
     passgen_pattern_item_t *item,
     void *data,

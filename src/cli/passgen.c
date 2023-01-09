@@ -19,7 +19,6 @@
 #include "passgen/data/parser.h"
 #include "passgen/data/pattern.h"
 #include "passgen/data/token.h"
-#include "passgen/debug.h"
 #include "passgen/generate.h"
 #include "passgen/parser.h"
 #include "passgen/passgen.h"
