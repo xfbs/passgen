@@ -8,8 +8,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "passgen/export.h"
-
 /// Represents a single range of characters, such as `a-z`.
 ///
 /// The range has a start and an end character, both are inclusive. The end character
@@ -23,5 +21,3 @@ typedef struct passgen_pattern_range {
 
     size_t multiplier;
 } passgen_pattern_range_t;
-
-int passgen_pattern_range_export(passgen_pattern_range_t *range, void *data, passgen_export_cb *fn);

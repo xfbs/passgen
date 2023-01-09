@@ -30,27 +30,3 @@ struct passgen_pattern_segment *
 passgen_pattern_group_get_segment(passgen_pattern_group_t *group, size_t n) {
     return passgen_stack_get(&group->segments, n);
 }
-
-int passgen_group_export(
-    passgen_pattern_group_t *group,
-    void *data,
-    passgen_export_cb *fn) {
-    fn(data, '(');
-
-    for(size_t i = 0; i < group->segments.len; i++) {
-        if(i != 0) {
-            fn(data, '|');
-        }
-
-        passgen_pattern_segment_t *segment =
-            passgen_stack_get(&group->segments, i);
-
-        int export_return = passgen_segment_export(segment, data, fn);
-        if(export_return != PASSGEN_EXPORT_SUCCESS) {
-            return export_return;
-        }
-    }
-
-    fn(data, ')');
-    return PASSGEN_EXPORT_SUCCESS;
-}

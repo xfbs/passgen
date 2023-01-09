@@ -1,6 +1,5 @@
 #pragma once
 #include "passgen/data/repeat.h"
-#include "passgen/export.h"
 #include <stdint.h>
 
 // stores a bunch of character - up to seven. why seven? this is stored in an
@@ -11,5 +10,3 @@ typedef struct passgen_chars {
     uint8_t tainted;
     int32_t codepoints[7];
 } passgen_chars_t;
-
-int passgen_chars_export(passgen_chars_t *chars, void *data, passgen_export_cb *fn);

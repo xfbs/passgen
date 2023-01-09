@@ -25,5 +25,3 @@ typedef struct passgen_pattern_item {
 
 void passgen_pattern_item_init(struct passgen_pattern_item *item);
 void passgen_pattern_item_free(struct passgen_pattern_item *item);
-
-int passgen_item_export(passgen_pattern_item_t *item, void *data, passgen_export_cb *fn);
