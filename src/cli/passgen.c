@@ -169,10 +169,10 @@ void passgen_cli_generate_json(
             pass,
             pass_len);
         pass[written] = '\0';
-        printf("%s{\"generated\":\"%s\"", (i == 0) ? "" : ",", pass);
+        printf("%s{\"output\":\"%s\"", (i == 0) ? "" : ",", pass);
 
         if(opts.complexity) {
-            printf(",\"complexity\":%lf", log(env.complexity) / log(2));
+            printf(",\"entropy\":%lf", log(env.complexity) / log(2));
         }
 
         printf("}");
@@ -272,8 +272,18 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     passgen_hashmap_insert(&opts->presets, "firefox", "[a-zA-Z0-9]{15}");
 }
 
+int passgen_cli_preset_show(void *data, passgen_hashmap_entry *entry) {
+    (void) data;
+    printf("preset %s %s\n", (const char *) entry->key, (const char *) entry->value);
+    return 0;
+}
+
+void passgen_cli_presets_list(const passgen_cli_opts *opts) {
+    passgen_hashmap_foreach(&opts->presets, NULL, passgen_cli_preset_show);
+}
+
 int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
-    const char *short_opts = "a:p:P:d:w:r:czhv";
+    const char *short_opts = "a:p:P:d:w:r:ezhvjl";
     const char *preset = NULL;
 
     static struct option long_opts[] = {
@@ -283,9 +293,10 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
         {"depth", required_argument, NULL, 'd'},
         {"version", no_argument, NULL, 'v'},
         {"null", no_argument, NULL, 'z'},
-        {"complexity", no_argument, NULL, 'c'},
+        {"entropy", no_argument, NULL, 'e'},
         {"wordlist", required_argument, NULL, 'w'},
         {"random", required_argument, NULL, 'r'},
+        {"list", no_argument, NULL, 'l'},
         {"define-preset", required_argument, NULL, 'P'},
         {"json", no_argument, NULL, 'j'},
         {NULL, no_argument, NULL, 0}};
@@ -319,12 +330,15 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             case 'z':
                 opts->null = true;
                 break;
-            case 'c':
+            case 'e':
                 opts->complexity = true;
                 break;
             case 'v':
                 bail(VERSION, NULL);
                 break;
+            case 'l':
+                passgen_cli_presets_list(opts);
+                exit(0);
             case 'w':
                 ret = passgen_cli_opts_wordlist(opts, optarg);
                 break;
@@ -392,33 +406,28 @@ void passgen_cli_usage(const char *executable) {
     fprintf(
         stderr,
         "passgen version %s\n"
-        "Generate passwords from a regex-like pattern.\n"
+        "Generate random sequences from a regex-like pattern.\n"
         "Usage: %s [OPTIONS] [PATTERN]\n\n"
         "PATTERN is a regex-like string describing the password.\n"
-        "    abc|def           Matches string 'abc' or 'def' (choice).\n"
-        "    [a-cf]            Matches character 'a', 'b', 'c', and 'f' "
-        "(range).\n"
-        "    (abc)             Matches strings 'abc' (group).\n"
-        "    [a-c]{2,3}        Matches between 2 and 3 repetition of element "
-        "(repeat).\n"
+        "    a                  Literal: outputs character 'a'\n"
+        "    abc|def            Choice: outputs string 'abc' or 'def'\n"
+        "    [a-z0-9:]          Range: outputs a lowercase letter, number, or ':'\n"
+        "    (abc)              Group: outputs 'abc'\n"
+        "    a{2}               Repeat: outputs 'aa'\n"
         "\n"
         "OPTIONS\n"
-        "    -a, --amount      Amount of passwords to generate\n"
-        "    -c, --complexity  Output complexity for each password.\n"
-        "    -h, --help        Show this help information\n"
-        "    -j, --json        Output as JSON\n"
-        "    -v, --version     Show the version of this build.\n"
-        "    -p, --preset      Use the given preset.\n"
-        "    -r, --random STR  Which source of randomness to use. Can be:\n"
-        "                          file:/path/to/file, to use the file\n"
-        "                          xor:1234, to use xorshift with the given "
+        "    -a, --amount       Amount of passwords to generate\n"
+        "    -e, --entropy      Compute entropy for each password in bits.\n"
+        "    -h, --help         Show this help information\n"
+        "    -j, --json         Output as JSON\n"
+        "    -v, --version      Show the version of this build.\n"
+        "    -p, --preset NAME  Use the given preset.\n"
+        "    -l, --list         List loaded presets.\n"
+        "    -r, --random RAND  Source of randomness to use\n"
         "seed.\n"
         "    -w, --wordlist NAME:PATH\n"
-        "                      Load a wordlist. For example:\n"
-        "                          german:/usr/share/dict/ngerman\n"
-        "                          english:/usr/share/dict/british-english\n"
-        "    -z, --null        Use NUL instead of newline to separate "
-        "passes.\n"
+        "                       Load wordlist NAME from PATH\n"
+        "    -z, --null         Use NUL instead of newline to separate outputs\n"
         "\n"
         "PRESETS\n"
         "    apple1            Generate passwords like 'oKC-T37-Dew-Qyn'\n"
@@ -470,13 +479,17 @@ void passgen_cli_bail(passgen_cli_error error, void *data) {
     }
 }
 
+int passgen_cli_opts_wordlist_free(void *user, passgen_hashmap_entry *entry) {
+    (void) user;
+    free(entry->key);
+    passgen_wordlist_free(entry->value);
+    return 0;
+}
+
 void passgen_cli_opts_free(passgen_cli_opts *opts) {
     passgen_random_free(opts->random);
     passgen_hashmap_free(&opts->presets);
-    passgen_hashmap_foreach_value(
-        &opts->wordlists,
-        (void *) passgen_wordlist_free);
-    passgen_hashmap_foreach_key(&opts->wordlists, free);
+    passgen_hashmap_foreach(&opts->wordlists, NULL, passgen_cli_opts_wordlist_free);
     passgen_hashmap_free(&opts->wordlists);
 }
 

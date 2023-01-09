@@ -92,8 +92,8 @@ passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, void *key);
 /// Do not change the key via this pointer.
 passgen_hashmap_entry *passgen_hashmap_lookup(passgen_hashmap *map, const void *key);
 
-/// Run the passed function for every key.
-void passgen_hashmap_foreach_key(passgen_hashmap *map, void (*func)(void *key));
-
 /// Run the passed function for every value.
-void passgen_hashmap_foreach_value(passgen_hashmap *map, void (*func)(void *value));
+int passgen_hashmap_foreach(passgen_hashmap *map, void *user, int (*func)(void *user, passgen_hashmap_entry *entry));
+
+/// Free both key and entry in hashmap.
+int passgen_hashmap_entry_free(void *user, passgen_hashmap_entry *entry);

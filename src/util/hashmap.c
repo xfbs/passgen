@@ -225,6 +225,24 @@ void passgen_hashmap_foreach_value(
     }
 }
 
+int passgen_hashmap_foreach(
+    passgen_hashmap *map,
+    void *user,
+    int (*func)(void *user, passgen_hashmap_entry *entry)) {
+    if(map->len) {
+        for(size_t i = 0; i < map->capacity; i++) {
+            if(map->data[i].key) {
+                int ret = func(user, &map->data[i]);
+                if(ret != 0) {
+                    return ret;
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
 static uint64_t
 string_hash(const passgen_hashmap *map, const void *key, bool first) {
     UNUSED(map);
@@ -288,3 +306,9 @@ const passgen_hashmap_context passgen_hashmap_context_unicode = {
     .hash = unicode_hash,
     .key_equal = unicode_equal,
 };
+
+int passgen_hashmap_entry_free(void *user, passgen_hashmap_entry *entry) {
+    (void) user;
+    free(entry->key);
+    free(entry->value);
+}

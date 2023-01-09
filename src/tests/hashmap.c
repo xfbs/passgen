@@ -68,8 +68,7 @@ test_result test_hashmap_insert_many(void) {
     }
 
     // release memory
-    passgen_hashmap_foreach_key(&map, free);
-    passgen_hashmap_foreach_value(&map, free);
+    passgen_hashmap_foreach(&map, NULL, passgen_hashmap_entry_free);
 
     passgen_hashmap_free(&map);
     return test_ok;
@@ -125,7 +124,19 @@ test_result test_hashmap_lookup_empty(void) {
     return test_ok;
 }
 
-test_result test_hashmap_foreach_value(void) {
+int function_fails(void *data, passgen_hashmap_entry *entry) {
+    (void) data;
+    (void) entry;
+    return 7;
+}
+
+int free_value(void *data, passgen_hashmap_entry *entry) {
+    (void) data;
+    free(entry->value);
+    return 0;
+}
+
+test_result test_hashmap_foreach(void) {
     passgen_hashmap map;
     passgen_hashmap_init(&map, NULL);
 
@@ -134,22 +145,9 @@ test_result test_hashmap_foreach_value(void) {
     passgen_hashmap_insert(&map, "gamma", malloc(255));
     passgen_hashmap_insert(&map, "delta", malloc(255));
     passgen_hashmap_insert(&map, "epsilon", malloc(255));
-    passgen_hashmap_foreach_value(&map, free);
 
-    passgen_hashmap_free(&map);
-    return test_ok;
-}
-
-test_result test_hashmap_foreach_key(void) {
-    passgen_hashmap map;
-    passgen_hashmap_init(&map, NULL);
-
-    passgen_hashmap_insert(&map, strcpy(malloc(32), "alpha"), NULL);
-    passgen_hashmap_insert(&map, strcpy(malloc(32), "beta"), NULL);
-    passgen_hashmap_insert(&map, strcpy(malloc(32), "gamma"), NULL);
-    passgen_hashmap_insert(&map, strcpy(malloc(32), "delta"), NULL);
-    passgen_hashmap_insert(&map, strcpy(malloc(32), "epsilon"), NULL);
-    passgen_hashmap_foreach_key(&map, free);
+    assert_eq(passgen_hashmap_foreach(&map, NULL, function_fails), 7);
+    assert_eq(passgen_hashmap_foreach(&map, NULL, free_value), 0);
 
     passgen_hashmap_free(&map);
     return test_ok;
