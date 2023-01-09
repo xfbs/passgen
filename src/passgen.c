@@ -1,9 +1,9 @@
+#include "passgen/parser/parser.h"
+#include "passgen/parser/token.h"
 #include "passgen/pattern/parser.h"
 #include "passgen/pattern/pattern.h"
 #include "passgen/pattern/token.h"
-#include "passgen/parser/parser.h"
 #include "passgen/util/random.h"
-#include "passgen/parser/token.h"
 #include "passgen/util/utf8.h"
 #include <assert.h>
 #include <passgen/passgen.h>

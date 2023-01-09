@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "passgen/util/array.h"
+#include "passgen/markov.h"
 #include "passgen/pattern/chars.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/parser.h"
@@ -16,7 +16,7 @@
 #include "passgen/pattern/special.h"
 #include "passgen/pattern/special_kind.h"
 #include "passgen/pattern/token.h"
-#include "passgen/markov.h"
+#include "passgen/util/array.h"
 
 #define add_type(name) \
     { #name, sizeof(name) }

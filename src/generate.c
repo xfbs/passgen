@@ -1,6 +1,7 @@
 #include "passgen/generate.h"
 
 #include "passgen/assert.h"
+#include "passgen/markov.h"
 #include "passgen/pattern/chars.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/pattern.h"
@@ -13,7 +14,6 @@
 #include "passgen/pattern/special.h"
 #include "passgen/pattern/special_kind.h"
 #include "passgen/util/hashmap.h"
-#include "passgen/markov.h"
 #include "passgen/util/stack.h"
 #include "passgen/wordlist.h"
 

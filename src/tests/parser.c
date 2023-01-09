@@ -1,5 +1,6 @@
 #include "passgen/parser/parser.h"
 
+#include "passgen/parser/token.h"
 #include "passgen/pattern/chars.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/parser.h"
@@ -13,7 +14,6 @@
 #include "passgen/pattern/token.h"
 #include "passgen/util/random.h"
 #include "passgen/util/stack.h"
-#include "passgen/parser/token.h"
 #include "tests.h"
 #include <passgen/passgen.h>
 

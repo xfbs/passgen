@@ -1,5 +1,7 @@
 #include "passgen/parser/parser.h"
 
+#include "passgen/generate.h"
+#include "passgen/parser/token.h"
 #include "passgen/pattern/chars.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/parser.h"
@@ -11,9 +13,7 @@
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/token.h"
-#include "passgen/generate.h"
 #include "passgen/util/stack.h"
-#include "passgen/parser/token.h"
 #include "tests.h"
 
 // don't change this seed - that will break tests!
