@@ -251,6 +251,7 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     passgen_hashmap_insert(&opts->presets, "apple1", "([a-zA-Z0-9]{3}-){3}[a-zA-Z0-9]{3}");
     passgen_hashmap_insert(&opts->presets, "apple2", "([a-zA-Z0-9]{6}-){2}[a-zA-Z0-9]{6}");
     passgen_hashmap_insert(&opts->presets, "uuid", "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
+    passgen_hashmap_insert(&opts->presets, "edge", "[A-Za-f0-9:_-]{15}");
     passgen_hashmap_insert(&opts->presets, "firefox", "[a-zA-Z0-9]{15}");
 }
 
