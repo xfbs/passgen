@@ -250,6 +250,7 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     // some defaults
     passgen_hashmap_insert(&opts->presets, "apple1", "([a-zA-Z0-9]{3}-){3}[a-zA-Z0-9]{3}");
     passgen_hashmap_insert(&opts->presets, "apple2", "([a-zA-Z0-9]{6}-){2}[a-zA-Z0-9]{6}");
+    passgen_hashmap_insert(&opts->presets, "uuid", "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
     passgen_hashmap_insert(&opts->presets, "firefox", "[a-zA-Z0-9]{15}");
 }
 
@@ -402,9 +403,11 @@ void passgen_cli_usage(const char *executable) {
         "passes.\n"
         "\n"
         "PRESETS\n"
-        "    apple1            Generate passwords like 'oKC-T37-Dew-Qyn'.\n"
+        "    apple1            Generate passwords like 'oKC-T37-Dew-Qyn'\n"
         "    apple2            Generate passwords like "
-        "'mHXr4X-CiK4w6-hbjF7T'.\n",
+        "'mHXr4X-CiK4w6-hbjF7T'\n"
+        "    firefox           Generate passwords like 'aKTKyS9pPgAQ8Oz'\n"
+        "    uuid              Generate UUIDv4 like 0072ca58-5966-497c-8657-a59fca93bf25\n",
         passgen_version_str(),
         executable);
 }
