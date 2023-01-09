@@ -49,7 +49,9 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
         const char *seed_str = &random[4];
         uint64_t seed = atoll(seed_str);
         if(seed == 0) {
-            printf("\033[1;31merror\033[0m: invalid xorshift seed '%s'\n", seed_str);
+            printf(
+                "\033[1;31merror\033[0m: invalid xorshift seed '%s'\n",
+                seed_str);
             return 1;
         }
         opts->random = passgen_random_new_xorshift(seed);
@@ -62,7 +64,9 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
         return 0;
     }
 
-    printf("\033[1;31merror\033[0m: unrecognized randomness definition: `%s`\n", random);
+    printf(
+        "\033[1;31merror\033[0m: unrecognized randomness definition: `%s`\n",
+        random);
     return 1;
 }
 
@@ -88,7 +92,9 @@ void passgen_cli_run(passgen_cli_opts opts) {
     passgen_pattern_free(&pattern);
 }
 
-void passgen_cli_generate_normal(passgen_cli_opts opts, struct passgen_pattern *pattern) {
+void passgen_cli_generate_normal(
+    passgen_cli_opts opts,
+    struct passgen_pattern *pattern) {
     // allocate some space for pass.
     // size_t pass_len = pattern_maxlen(pattern);
     size_t pass_len = 256;
@@ -136,7 +142,9 @@ void passgen_cli_generate_normal(passgen_cli_opts opts, struct passgen_pattern *
     free(pass);
 }
 
-void passgen_cli_generate_json(passgen_cli_opts opts, struct passgen_pattern *pattern) {
+void passgen_cli_generate_json(
+    passgen_cli_opts opts,
+    struct passgen_pattern *pattern) {
     // allocate some space for pass.
     // size_t pass_len = pattern_maxlen(pattern);
     size_t pass_len = 256;
@@ -164,8 +172,7 @@ void passgen_cli_generate_json(passgen_cli_opts opts, struct passgen_pattern *pa
         printf("%s{\"generated\":\"%s\"", (i == 0) ? "" : ",", pass);
 
         if(opts.complexity) {
-            printf(",\"complexity\":%lf",
-                log(env.complexity) / log(2));
+            printf(",\"complexity\":%lf", log(env.complexity) / log(2));
         }
 
         printf("}");
@@ -175,7 +182,9 @@ void passgen_cli_generate_json(passgen_cli_opts opts, struct passgen_pattern *pa
     free(pass);
 }
 
-void passgen_cli_generate(passgen_cli_opts opts, struct passgen_pattern *pattern) {
+void passgen_cli_generate(
+    passgen_cli_opts opts,
+    struct passgen_pattern *pattern) {
     if(!opts.json) {
         passgen_cli_generate_normal(opts, pattern);
     } else {
@@ -247,9 +256,18 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_default);
 
     // some defaults
-    passgen_hashmap_insert(&opts->presets, "apple1", "([a-zA-Z0-9]{3}-){3}[a-zA-Z0-9]{3}");
-    passgen_hashmap_insert(&opts->presets, "apple2", "([a-zA-Z0-9]{6}-){2}[a-zA-Z0-9]{6}");
-    passgen_hashmap_insert(&opts->presets, "uuid", "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
+    passgen_hashmap_insert(
+        &opts->presets,
+        "apple1",
+        "([a-zA-Z0-9]{3}-){3}[a-zA-Z0-9]{3}");
+    passgen_hashmap_insert(
+        &opts->presets,
+        "apple2",
+        "([a-zA-Z0-9]{6}-){2}[a-zA-Z0-9]{6}");
+    passgen_hashmap_insert(
+        &opts->presets,
+        "uuid",
+        "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
     passgen_hashmap_insert(&opts->presets, "edge", "[A-Za-f0-9:_-]{15}");
     passgen_hashmap_insert(&opts->presets, "firefox", "[a-zA-Z0-9]{15}");
 }
@@ -407,7 +425,8 @@ void passgen_cli_usage(const char *executable) {
         "    apple2            Generate passwords like "
         "'mHXr4X-CiK4w6-hbjF7T'\n"
         "    firefox           Generate passwords like 'aKTKyS9pPgAQ8Oz'\n"
-        "    uuid              Generate UUIDv4 like 0072ca58-5966-497c-8657-a59fca93bf25\n",
+        "    uuid              Generate UUIDv4 like "
+        "0072ca58-5966-497c-8657-a59fca93bf25\n",
         passgen_version_str(),
         executable);
 }
@@ -573,9 +592,17 @@ void passgen_cli_seccomp_init() {
     ctx = seccomp_init(SCMP_ACT_KILL);
 
     // allow open syscalls, as long as they are read-only.
-    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(open), 1,
+    seccomp_rule_add(
+        ctx,
+        SCMP_ACT_ALLOW,
+        SCMP_SYS(open),
+        1,
         SCMP_CMP(1, SCMP_CMP_EQ, O_RDONLY));
-    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(openat), 1,
+    seccomp_rule_add(
+        ctx,
+        SCMP_ACT_ALLOW,
+        SCMP_SYS(openat),
+        1,
         SCMP_CMP(2, SCMP_CMP_EQ, O_RDONLY));
 
     // allow reading stat of files
@@ -587,9 +614,17 @@ void passgen_cli_seccomp_init() {
     seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(lseek), 0);
 
     // allow writing, but only to stdout or stderr.
-    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(write), 1,
+    seccomp_rule_add(
+        ctx,
+        SCMP_ACT_ALLOW,
+        SCMP_SYS(write),
+        1,
         SCMP_CMP(0, SCMP_CMP_EQ, 2));
-    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(write), 1,
+    seccomp_rule_add(
+        ctx,
+        SCMP_ACT_ALLOW,
+        SCMP_SYS(write),
+        1,
         SCMP_CMP(0, SCMP_CMP_EQ, 1));
 
     // allow closing, as long as the fd is not any of the standard streams.
@@ -609,7 +644,11 @@ void passgen_cli_seccomp_init() {
 
     // allow allocating memory
     seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(brk), 0);
-    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(mmap), 3,
+    seccomp_rule_add(
+        ctx,
+        SCMP_ACT_ALLOW,
+        SCMP_SYS(mmap),
+        3,
         SCMP_CMP(0, SCMP_CMP_EQ, NULL),
         SCMP_CMP(2, SCMP_CMP_EQ, PROT_READ | PROT_WRITE),
         SCMP_CMP(3, SCMP_CMP_EQ, MAP_PRIVATE | MAP_ANONYMOUS));

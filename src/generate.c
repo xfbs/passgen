@@ -91,7 +91,8 @@ static int passgen_generate_write_buffer_utf8(void *data, uint32_t codepoint) {
 }
 
 /// Write JSON-escaped UTF-8 to buffer.
-static int passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
+static int
+passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
     struct fillpos_utf8 *fillpos = data;
 
     if(fillpos->cur == fillpos->len) {
@@ -131,7 +132,9 @@ static int passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoin
             bytes = 2;
             break;
         default:
-            bytes = utf8proc_encode_char(codepoint, (utf8proc_uint8_t *) &buffer[0]);
+            bytes = utf8proc_encode_char(
+                codepoint,
+                (utf8proc_uint8_t *) &buffer[0]);
     }
 
     // check that no error happened.
@@ -336,8 +339,11 @@ int passgen_generate_special_pronounceable(
     memset(word, 0, pos * sizeof(uint32_t));
     double *complexity = env->find_complexity ? &env->complexity : NULL;
     do {
-        word[pos] =
-            passgen_markov_generate(markov, &word[pos - markov->level], rand, complexity);
+        word[pos] = passgen_markov_generate(
+            markov,
+            &word[pos - markov->level],
+            rand,
+            complexity);
         pos++;
     } while(word[pos - 1]);
 

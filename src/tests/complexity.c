@@ -1,4 +1,3 @@
-#include "passgen/parser.h"
 #include "passgen/data/chars.h"
 #include "passgen/data/group.h"
 #include "passgen/data/parser.h"
@@ -10,13 +9,14 @@
 #include "passgen/data/segment_item.h"
 #include "passgen/data/set.h"
 #include "passgen/data/token.h"
+#include "passgen/parser.h"
 #include "passgen/random.h"
 #include "passgen/stack.h"
 #include "passgen/token.h"
 #include "tests.h"
-#include <passgen/passgen.h>
-#include <passgen/generate.h>
 #include <math.h>
+#include <passgen/generate.h>
+#include <passgen/passgen.h>
 
 double complexity(const char *p) {
     // parse pattern
