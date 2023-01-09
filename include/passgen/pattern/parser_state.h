@@ -1,6 +1,6 @@
 #pragma once
 
-#include "passgen/data/pattern.h"
+#include "passgen/pattern/pattern.h"
 
 enum passgen_parser_state_type {
     PASSGEN_PARSER_GROUP,

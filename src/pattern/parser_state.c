@@ -1,5 +1,5 @@
-#include "passgen/data/parser_state.h"
-#include "passgen/data/special.h"
+#include "passgen/pattern/parser_state.h"
+#include "passgen/pattern/special.h"
 
 void passgen_parser_state_free(struct passgen_parser_state *state) {
     switch(state->type) {

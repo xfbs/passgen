@@ -1,7 +1,7 @@
-#include "passgen/data/segment_item.h"
-#include "passgen/data/group.h"
-#include "passgen/data/set.h"
-#include "passgen/data/special.h"
+#include "passgen/pattern/segment_item.h"
+#include "passgen/pattern/group.h"
+#include "passgen/pattern/set.h"
+#include "passgen/pattern/special.h"
 
 void passgen_pattern_item_free(struct passgen_pattern_item *item) {
     switch(item->kind) {

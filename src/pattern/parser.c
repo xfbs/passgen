@@ -1,9 +1,9 @@
-#include "passgen/parser.h"
+#include "passgen/parser/parser.h"
 
 #include <stddef.h>
 
-#include "passgen/data/parser.h"
-#include "passgen/data/parser_state.h"
+#include "passgen/pattern/parser.h"
+#include "passgen/pattern/parser_state.h"
 
 struct passgen_pattern_group;
 struct passgen_pattern_item;

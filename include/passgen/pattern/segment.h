@@ -4,7 +4,7 @@
 #pragma once
 #include <stddef.h>
 
-#include "passgen/stack.h"
+#include "passgen/util/stack.h"
 
 struct passgen_pattern_item;
 struct passgen_pattern_set;

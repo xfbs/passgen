@@ -4,11 +4,11 @@
 #pragma once
 #include <stdint.h>
 
-#include "passgen/data/pattern.h"
-#include "passgen/data/range.h"
-#include "passgen/data/segment.h"
-#include "passgen/data/segment_item.h"
-#include "passgen/token.h"
+#include "passgen/pattern/pattern.h"
+#include "passgen/pattern/range.h"
+#include "passgen/pattern/segment.h"
+#include "passgen/pattern/segment_item.h"
+#include "passgen/parser/token.h"
 
 /// Represents a parser. Contains a parsing stack, as well as a pattern, which
 /// is dynamically built, and should not be used until the parsing is finalized.

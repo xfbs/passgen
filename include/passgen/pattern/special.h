@@ -1,8 +1,8 @@
 #pragma once
 #include <stdint.h>
 
-#include "passgen/data/repeat.h"
-#include "passgen/data/special_kind.h"
+#include "passgen/pattern/repeat.h"
+#include "passgen/pattern/special_kind.h"
 
 struct passgen_pattern_special {
     enum passgen_pattern_special_kind kind;

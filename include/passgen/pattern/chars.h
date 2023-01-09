@@ -1,5 +1,5 @@
 #pragma once
-#include "passgen/data/repeat.h"
+#include "passgen/pattern/repeat.h"
 #include <stdint.h>
 
 // stores a bunch of character - up to seven. why seven? this is stored in an

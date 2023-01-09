@@ -1,5 +1,5 @@
-#include "passgen/hashmap.h"
-#include "passgen/siphash.h"
+#include "passgen/util/hashmap.h"
+#include "passgen/util/siphash.h"
 #include <stdlib.h>
 #define UNUSED(x) (void) x
 

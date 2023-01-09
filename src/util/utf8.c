@@ -1,4 +1,4 @@
-#include "passgen/utf8.h"
+#include "passgen/util/utf8.h"
 #include <utf8proc.h>
 
 int passgen_utf8_decode(

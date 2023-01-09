@@ -1,9 +1,9 @@
 #pragma once
 #include <stddef.h>
 
-#include "passgen/stack.h"
-#include "passgen/data/array.h"
-#include "passgen/data/repeat.h"
+#include "passgen/util/stack.h"
+#include "passgen/util/array.h"
+#include "passgen/pattern/repeat.h"
 
 struct passgen_pattern_range;
 

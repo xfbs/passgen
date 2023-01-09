@@ -1,22 +1,22 @@
-#include "passgen/parser.h"
+#include "passgen/parser/parser.h"
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "passgen/data/chars.h"
-#include "passgen/data/group.h"
-#include "passgen/data/parser.h"
-#include "passgen/data/parser_state.h"
-#include "passgen/data/pattern.h"
-#include "passgen/data/range.h"
-#include "passgen/data/repeat.h"
-#include "passgen/data/segment.h"
-#include "passgen/data/segment_item.h"
-#include "passgen/data/set.h"
-#include "passgen/data/token.h"
-#include "passgen/stack.h"
+#include "passgen/pattern/chars.h"
+#include "passgen/pattern/group.h"
+#include "passgen/pattern/parser.h"
+#include "passgen/pattern/parser_state.h"
+#include "passgen/pattern/pattern.h"
+#include "passgen/pattern/range.h"
+#include "passgen/pattern/repeat.h"
+#include "passgen/pattern/segment.h"
+#include "passgen/pattern/segment_item.h"
+#include "passgen/pattern/set.h"
+#include "passgen/pattern/token.h"
+#include "passgen/util/stack.h"
 
 // get the last item, making sure that it's only a single character.
 // in case of characters, mark it as tainted.

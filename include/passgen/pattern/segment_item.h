@@ -1,13 +1,13 @@
 #pragma once
 #include <stdbool.h>
 
-#include "passgen/stack.h"
-#include "passgen/data/chars.h"
-#include "passgen/data/group.h"
-#include "passgen/data/pattern_kind.h"
-#include "passgen/data/repeat.h"
-#include "passgen/data/set.h"
-#include "passgen/data/special.h"
+#include "passgen/util/stack.h"
+#include "passgen/pattern/chars.h"
+#include "passgen/pattern/group.h"
+#include "passgen/pattern/pattern_kind.h"
+#include "passgen/pattern/repeat.h"
+#include "passgen/pattern/set.h"
+#include "passgen/pattern/special.h"
 
 typedef struct passgen_pattern_item {
     enum passgen_pattern_kind kind;

@@ -7,8 +7,8 @@
 /// # Example
 ///
 /// ```c
-/// #include <passgen/data/parser.h>
-/// #include <passgen/parser.h>
+/// #include <passgen/pattern/parser.h>
+/// #include <passgen/parser/parser.h>
 ///
 /// struct passgen_parser parser = {0};
 /// passgen_parser_init(&parser);

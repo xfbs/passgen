@@ -8,9 +8,9 @@
 #pragma once
 #include <stdbool.h>
 #include <stdlib.h>
-#include <passgen/random.h>
-#include <passgen/hashmap.h>
-#include "passgen/data/pattern.h"
+#include <passgen/util/random.h>
+#include <passgen/util/hashmap.h>
+#include "passgen/pattern/pattern.h"
 
 /// The kinds of errors that cause the binary to exit early and with a nonzero
 /// return code.

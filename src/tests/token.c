@@ -1,5 +1,5 @@
-#include "passgen/data/token.h"
-#include "passgen/token.h"
+#include "passgen/pattern/token.h"
+#include "passgen/parser/token.h"
 #include "tests.h"
 
 test_result test_token_normal(void) {

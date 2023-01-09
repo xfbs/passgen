@@ -1,4 +1,4 @@
-#include "passgen/hashmap.h"
+#include "passgen/util/hashmap.h"
 #include "tests.h"
 #include <stdlib.h>
 #include <string.h>

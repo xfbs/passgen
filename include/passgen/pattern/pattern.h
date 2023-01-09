@@ -1,6 +1,6 @@
 #pragma once
 
-#include "passgen/data/group.h"
+#include "passgen/pattern/group.h"
 
 /// Represents an entire patten.
 ///

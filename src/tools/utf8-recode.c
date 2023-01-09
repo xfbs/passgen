@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "passgen/utf8.h"
+#include "passgen/util/utf8.h"
 
 int main(int argc, char *argv[]) {
     uint8_t utf8_input[128];

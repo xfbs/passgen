@@ -12,7 +12,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "passgen/data/env.h"
+#include "passgen/pattern/env.h"
 
 struct passgen_pattern;
 struct passgen_chars;

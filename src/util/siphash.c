@@ -12,7 +12,7 @@
    <http://creativecommons.org/publicdomain/zero/1.0/>.
  */
 
-#include "passgen/siphash.h"
+#include "passgen/util/siphash.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>

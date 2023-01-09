@@ -9,8 +9,8 @@
 #pragma once
 #include <stddef.h>
 
-#include "passgen/stack.h"
-#include "passgen/data/repeat.h"
+#include "passgen/util/stack.h"
+#include "passgen/pattern/repeat.h"
 
 /// Represents a group, such as `(day|night)`.
 typedef struct passgen_pattern_group {

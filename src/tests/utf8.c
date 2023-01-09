@@ -1,4 +1,4 @@
-#include "passgen/utf8.h"
+#include "passgen/util/utf8.h"
 #include "tests.h"
 
 // test that we can decode an empty string.

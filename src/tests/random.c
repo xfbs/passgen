@@ -1,4 +1,4 @@
-#include "passgen/random.h"
+#include "passgen/util/random.h"
 
 #include <stdbool.h>
 #include <stdio.h>

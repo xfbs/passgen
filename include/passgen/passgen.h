@@ -3,7 +3,7 @@
 /// @brief Passgen main interface
 #pragma once
 #include <stddef.h>
-#include <passgen/data/pattern.h>
+#include <passgen/pattern/pattern.h>
 
 struct passgen_pattern;
 

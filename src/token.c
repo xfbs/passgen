@@ -1,5 +1,5 @@
-#include "passgen/token.h"
-#include "passgen/data/token.h"
+#include "passgen/parser/token.h"
+#include "passgen/pattern/token.h"
 
 static inline int8_t hex_decode(uint32_t c) {
     if('0' <= c && c <= '9') {

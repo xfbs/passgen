@@ -2,8 +2,8 @@
 ///
 /// Utilities for parsing wordlists, with markov chain generation.
 #pragma once
-#include "passgen/random.h"
-#include "passgen/stack.h"
+#include "passgen/util/random.h"
+#include "passgen/util/stack.h"
 #include "passgen/markov.h"
 #include <stdio.h>
 

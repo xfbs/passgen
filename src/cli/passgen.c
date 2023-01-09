@@ -16,15 +16,15 @@
 #include <sys/types.h>
 #endif
 
-#include "passgen/data/parser.h"
-#include "passgen/data/pattern.h"
-#include "passgen/data/token.h"
+#include "passgen/pattern/parser.h"
+#include "passgen/pattern/pattern.h"
+#include "passgen/pattern/token.h"
 #include "passgen/generate.h"
-#include "passgen/parser.h"
+#include "passgen/parser/parser.h"
 #include "passgen/passgen.h"
-#include "passgen/random.h"
-#include "passgen/token.h"
-#include "passgen/utf8.h"
+#include "passgen/util/random.h"
+#include "passgen/parser/token.h"
+#include "passgen/util/utf8.h"
 #include "passgen/version.h"
 #include "passgen/wordlist.h"
 

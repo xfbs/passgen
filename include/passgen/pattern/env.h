@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "passgen/hashmap.h"
-#include "passgen/random.h"
+#include "passgen/util/hashmap.h"
+#include "passgen/util/random.h"
 
 /// Environment that is needed when generating patterns.
 ///

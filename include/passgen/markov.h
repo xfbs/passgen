@@ -2,8 +2,8 @@
 /// @author Patrick M. Elsen <pelsen@xfbs.net>
 /// @brief Markov chain data structure functions.
 #pragma once
-#include "passgen/data/markov.h"
-#include "passgen/random.h"
+#include "passgen/pattern/markov.h"
+#include "passgen/util/random.h"
 #include <stddef.h>
 #include <stdint.h>
 
