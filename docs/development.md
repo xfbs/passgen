@@ -12,11 +12,11 @@ Passgen uses the [CMake][cmake] build system, allowing it to be built on differe
 
 [gitlab]: https://gitlab.com/xfbs/passgen
 [github]: https://github.com/xfbs/passgen
-[doxygen]: https://xfbs.gitlab.io/passgen/doxygen/html
+[doxygen]: https://passgen.it/docs/
 [merge-requests]: https://gitlab.com/xfbs/passgen/-/merge_requests
 [bug-reports]: https://gitlab.com/xfbs/passgen/-/issues
-[coverage-lcov]: https://xfbs.gitlab.io/passgen/coverage/lcov/
-[coverage-llvm-cov]: https://xfbs.gitlab.io/passgen/coverage/llvm-cov/
+[coverage-lcov]: https://passgen.it/coverage/lcov/
+[coverage-llvm-cov]: https://passgen.it/coverage/llvm-cov/
 [cmake]: https://cmake.org/
 [llvm-sanitizer]: https://clang.llvm.org/docs/AddressSanitizer.html
 [valgrind]: https://valgrind.org/
