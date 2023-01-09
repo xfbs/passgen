@@ -1,11 +1,14 @@
 #include <passgen/config.h>
 #include <passgen/version.h>
+#include <stddef.h>
 
 passgen_version passgen_version_get() {
   return (passgen_version) {
-    .maj = @PROJECT_VERSION_MAJOR@,
-    .min = @PROJECT_VERSION_MINOR@,
-    .rev = @PROJECT_VERSION_PATCH@,
+    .major = @PROJECT_VERSION_MAJOR@,
+    .minor = @PROJECT_VERSION_MINOR@,
+    .patch = @PROJECT_VERSION_PATCH@,
+    .build = "@PROJECT_GIT_DESCRIBE@-@PROJECT_GIT_COMMIT@",
+    .prerelease = NULL,
   };
 }
 

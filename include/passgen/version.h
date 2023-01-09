@@ -5,13 +5,21 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/// Struct describing the version of libpassgen.
 typedef struct passgen_version {
-    uint8_t maj;
-    uint8_t min;
-    uint8_t rev;
+    /// Major version
+    uint8_t major;
+    /// Minor version
+    uint8_t minor;
+    /// Patch version
+    uint8_t patch;
+    /// Build information
+    const char *build;
+    /// Prerelease information
+    const char *prerelease;
 } passgen_version;
 
-/// Returns the version of passgen.
+/// Returns the version of libpassgen.
 passgen_version passgen_version_get();
 
 /// Returns a pointer to a string representing the current version.
