@@ -19,6 +19,8 @@ cp build-macos/passgen-*-Darwin.tar.xz public/nightly/passgen-macos-amd64.tar.xz
 
 cp build-mingw64/passgen-*-win64.zip public/nightly/passgen-win64-amd64.zip
 
+cp build-wasi/src/cli/passgen public/nightly/passgen.wasi
+
 chmod 0600 $PASSGEN_SIGNING_KEY
 
 function sign() {
@@ -35,6 +37,7 @@ sign public/nightly/passgen-linux-riscv64.tar.xz
 sign public/nightly/passgen-linux-riscv64.deb
 sign public/nightly/passgen-macos-amd64.tar.xz
 sign public/nightly/passgen-win64-amd64.zip
+sign public/nightly/passgen.wasi
 
 # export keys file
 cp passgen.pub public/passgen.pub

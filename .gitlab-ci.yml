@@ -122,6 +122,21 @@ docker:aarch64:
     changes:
       - scripts/aarch64.dockerfile
 
+docker:wasi:
+  image: docker
+  stage: setup
+  services:
+    - docker:dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build . -f scripts/wasi.dockerfile -t "$CI_REGISTRY_IMAGE/wasi"
+    - docker push "$CI_REGISTRY_IMAGE/wasi"
+  only:
+    refs:
+      - master
+    changes:
+      - scripts/wasi.dockerfile
+
 sanitize:
   image: registry.gitlab.com/xfbs/passgen/amd64
   stage: test
@@ -258,6 +273,18 @@ build:alpine:
       - build-alpine-release
     expire_in: 1 week
 
+build:wasi:
+  image: registry.gitlab.com/xfbs/passgen/wasi
+  stage: build
+  script:
+    - mkdir build-wasi && cd build-wasi
+    - cmake cmake -DLIBPASSGEN_SHARED=OFF ..
+    - make -j passgen-bin
+  artifacts:
+    paths:
+      - build-wasi
+    expire_in: 1 week
+
 pages:
   image: registry.gitlab.com/xfbs/passgen/deploy
   stage: deploy
@@ -269,6 +296,7 @@ pages:
     - build:macos
     - build:riscv64
     - build:mingw64
+    - build:wasi
   script:
     - bash scripts/ci-publish-website.sh
     - bash scripts/ci-publish-coverage.sh
