@@ -11,6 +11,7 @@ As of right now, there are no real releases for passgen, but there are nightly b
 | Linux riscv64 | [passgen-linux-riscv64.tar.xz][] ([sig][passgen-linux-riscv64.tar.xz.sig])<br />[passgen-linux-riscv64.deb][] ([sig][passgen-linux-riscv64.deb.sig]) |
 | macOS amd64 *experimental* | [passgen-macos-amd64.tar.xz][] ([sig][passgen-macos-amd64.tar.xz.sig]) |
 | Windows amd64 | [passgen-win64-amd64.zip][] ([sig][passgen-win64-amd64.zip.sig]) |
+| [WebAssembly WASI](wasi.md) | [passgen-wasi.wasm][] ([sig][passgen-wasi.wasm.sig]) |
 
 # Verifying
 
@@ -34,6 +35,7 @@ If the verification fails, please do not trust the build and contact the develop
 [passgen-linux-riscv64.deb]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.deb
 [passgen-macos-amd64.tar.xz]: https://xfbs.gitlab.io/passgen/nightly/passgen-macos-amd64.tar.xz
 [passgen-win64-amd64.zip]: https://xfbs.gitlab.io/passgen/nightly/passgen-win64-amd64.zip
+[passgen-wasi.wasm]: https://xfbs.gitlab.io/passgen/nightly/passgen-wasi.wasm
 
 [passgen-linux-amd64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.tar.xz.sig
 [passgen-linux-amd64.deb.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-amd64.deb.sig
@@ -45,3 +47,4 @@ If the verification fails, please do not trust the build and contact the develop
 [passgen-linux-riscv64.deb.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-linux-riscv64.deb.sig
 [passgen-macos-amd64.tar.xz.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-macos-amd64.tar.xz.sig
 [passgen-win64-amd64.zip.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-win64-amd64.zip.sig
+[passgen-wasi.wasm.sig]: https://xfbs.gitlab.io/passgen/nightly/passgen-wasi.wasm.sig
