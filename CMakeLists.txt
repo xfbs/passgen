@@ -104,7 +104,7 @@ else()
 endif()
 set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
 set(CPACK_DEB_COMPONENT_INSTALL OFF)
-set(CPACK_PACKAGE_CONTACT "Patrick Elsen <patrick@rtbrick.com>")
+set(CPACK_PACKAGE_CONTACT "Patrick Elsen <pelsen@xfbs.net>")
 set(CPACK_PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
 
 include(CPack)
