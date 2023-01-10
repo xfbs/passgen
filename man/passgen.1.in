@@ -1,53 +1,117 @@
-.Dd July 7, 2019
+.Dd January 10, 2023
 .Dt PASSGEN 1 URM
 .Os Passgen v@PROJECT_VERSION@
 .Sh NAME
 .Nm passgen
-.Nd Generate passwords.
+.Nd Generate random sequences from a regex-like pattern.
 .Sh SYNOPSIS
 .Nm
-.Op Fl vVh
+.Op Fl ejz
 .Op Fl a Ar amount
-.Op Fl p Ar preset
-.Op Ar pattern
-.Sh DESCRIPTION          \" Section Header - required - don't modify
-Generate passwords according to a given pattern, which is a regex-line string
-description of the format of the password, or use a preset.
-.Bl -tag -width -indent
-.It Ar preset
-The name of a preset to use as pattern for the password. See section PRESET for
-a list of available presets.
-.It Ar pattern
-The pattern to use for generating the password. See section PATTERN for more
-information.
-.El
+.Op Fl r Ar random
+.Op Fl w Ar wordlist
+.Ar pattern
+.Nm
+.Op Fl ejz
+.Op Fl a Ar amount
+.Op Fl r Ar random
+.Op Fl w Ar wordlist
+.Fl p
+.Ar preset
+.Nm
+-l
+.Op Fl j
+| -v | -h
+.Sh DESCRIPTION
+Given preset name or a custom pattern, this tool will generate a random
+sequence matching that pattern. Used to generate secure passphrases or keys of any shape.
 .Pp
-A list of flags and their descriptions:
-.Bl -tag -width -indent  \" Differs from above in tag removed
-.It Fl a, Fl -amount Ar amount                \"-a flag as a list item
-Set the amount of passwords to generate.
-.It Fl h, Fl -help
-Show help.
-.It Fl p, Fl -preset Ar preset
+List of flags and their descriptions:
+.Bl -tag -width -indent
+.It Fl a, Fl -amount Ar AMOUNT
+Set the amount of sequences to generate. By default, only a single sequence is generated and output.
+.It Fl r, Fl -random Ar RANDOM
+Overrides the randomness source. See the RANDOM section for more information.
+.It Fl w, Fl -wordlist Ar WORDLIST
+Load an additional wordlist. Wordlists can be referenced in patterns, this is used to generate passphrases that are easier to remember.
+.It Fl j, Fl -json
+Outputs result as JSON instead of as unformatted text. This option can be used when generating random phrases, or when listing presets.
+.It Fl l, Fl -list
+List available presets along with example outputs and quit.
+.It Fl p, Fl -preset Ar PRESET
 Use the specified preset to generate a password.
+.It Fl e, Fl -entropy
+Compute the entropy of every generated sequence. This is a number that describes how much randomness went into generating a specific sequence. It is used to measures the difficulty of cracking the sequence if the pattern is known.
+.It Fl h, Fl -help
+Show help and quit.
+.It Fl v, Fl -version
+Show version and build information and quit.
 .El
 .Sh PRESET
 Presets are some sane defaults for generating passwords if you don't
 specifically care about their format.
 .Sh PATTERN
 Patterns are regular-expression-like strings that allow specifying the format of
-generated passwords. The allowed grammar is a subset of what regular regexes
+generated passwords. The allowed grammar is a subset of what regular expressions
 support.
+.Pp
+Patterns support any valid Unicode characters. It is also possible to use the escape sequence '\\u{...}' along with a hexidecimal representation of the codepoint. For example, the letter 'a' could also be written '\\u{61}'.
+.Pp
+Overview of syntax:
+.Bl -tag -width -indent
+.It Ar abc
+Literal: outputs 'abc'.
+.It Ar (abc|def|ihj)
+Group: outputs one of 'abc', 'def', or 'ihj'. Groups are enclosed in parentheses and different cases are delimited by a pipe character. They can contain any other syntax element, not just literals.
+.It Ar [a-z0-9!@#]
+Range: outputs any lowercase character (a-z), digit (0-9), or one of '!', '@', '#'. Must be enclosed in square brackets and can contain either individual listed characters (for example [abc]) or ranges of characters (for example [a-zA-Z]), or both. When specifying ranges of characters, they should be listed in lexicographical order.
+
+If a literal dash is desired, it may need to be escaped with a backslash (for example [a\\-b]). For some languages, using ranges might produce unexpected results, because the characters do not have sequential Unicode codepoints.
+.It Ar a{8}
+Repetition: this will output 'aaaaaaaa'. When putting a repetition mark after any syntax element, this syntax element will be repeated the specified amount. Denoted by curly braces with a single or two comma-separated numbers. When two numbers are given, they are treated as a range, for example '[a-z]{8,12}' will yield between eight and twelve lowercase alphabetic characters.
+.It Ar \[rs]w{name}
+Wordlist: this will pick a random word from the wordlist
+.Ar name .
+It is an error to specify this if a wordlist with the given name has not been loaded. Use the
+.Fl -wordlist
+flag to load additional wordlists.
+.It Ar \[rs]m{name}
+Markov: this generates a random, but pronounceable word using a markov chain trained on the wordlist
+.Ar name .
+It is an error to specify this if a wordlist with the given name has not been loaded. Use the
+.Fl -wordlist
+flag to load additional wordlists.
+.El
 .Sh EXAMPLES
 Generate a password using the "apple" preset.
 .Pp
-    $ passgen -p apple
+    $ passgen -p apple1
+    fnK-Nvo-Ipj-W3M
 .Pp
 Generate 5 lowercase alphanumeric passwords with length 12.
 .Pp
     $ passgen -a 5 "[a-z0-9]{12}"
+    k8taknzsj324
+    lywtyf0dw6r9
+    qayn8jveduri
+    ddtoolrwmlk3
+    541kdz29gfdi
+.Sh FILES
+.Bl -tag -width Ds -indent
+.It Pa /etc/passgen.conf
+System configuration file for presets and wordlists. See
+.Xr passgen.conf 5
+for information on the syntax of this file.
+.It Pa ~/.config/passgen.conf
+User-local configuration for presets and wordlists. See
+.Xr passgen.conf 5
+for information on the syntax of this file.
+.El
+.Sh EXIT STATUS
+The tool will return 0, or 1 if an error is encountered.
 .Sh SEE ALSO
 .Xr apg 1 ,
-.Xr passwd 1
+.Xr passwd 1 ,
+.Xr passgen.conf 5
 .Sh AUTHORS
 .An "Patrick M. Elsen" Aq pelsen@xfbs.net
