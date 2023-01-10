@@ -193,14 +193,20 @@ passgen_random *passgen_random_open(passgen_random *random) {
 #ifdef PASSGEN_RANDOM_HAVE_SYSTEM
     return passgen_random_open_system(random);
 #else
-    return passgen_random_open_path(random, passgen_random_default_device);
+    passgen_random *rand = passgen_random_open_path(random, passgen_random_default_device);
+    if(!rand) {
+        fprintf(stderr, "error: cannot open system randomness device '%s'\n", passgen_random_default_device);
+    }
+    return rand;
 #endif
 }
 
 passgen_random *
 passgen_random_open_path(passgen_random *random, const char *path) {
     FILE *device = fopen(path, "r");
-    if(!device) return NULL;
+    if(!device) {
+        return NULL;
+    }
 
     return passgen_random_open_file(random, device);
 
