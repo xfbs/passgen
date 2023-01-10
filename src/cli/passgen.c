@@ -584,8 +584,8 @@ int passgen_cli_opts_config_user(passgen_cli_opts *opts) {
     } else {
         const char *home = getenv("HOME");
         if(!home) {
-            fprintf(stderr, "error: cannot locate home directory\n");
-            return -1;
+            fprintf(stderr, "warning: cannot locate home directory\n");
+            return 0;
         }
         sprintf(config_path, "%s/.config/passgen.conf", home);
     }
