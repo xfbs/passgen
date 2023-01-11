@@ -27,18 +27,29 @@ $passgen "[a-zA-Z0-9#]{1,2}"
 $passgen -p apple1
 $passgen -p apple2
 $passgen -p firefox
+$passgen -p uuid
+$passgen -p edge
 
 # test options
 $passgen --amount 5 "a"
 $passgen -a 5 "a"
+
 $passgen --null "a"
 $passgen -z "a"
-$passgen --complexity "a"
-$passgen -c "a"
+
+$passgen --entropy "a"
+$passgen -e "a"
+
 $passgen --random "xor:1234" "a"
+$passgen --random "zero" "a"
+$passgen --random "system" "a"
 
 # test flags
 $passgen --version
 $passgen -v
+
 $passgen --help
 $passgen -h
+
+$passgen --list
+$passgen -l

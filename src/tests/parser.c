@@ -253,6 +253,48 @@ test_result test_parser_set_simple(void) {
     return test_ok;
 }
 
+test_result test_parser_set_simple_escaped(void) {
+    PREAMBLE();
+    PARSE_CODEPOINT('[');
+    PARSE_CODEPOINT('a');
+    PARSE_CODEPOINT_DOUBLE('\\', '-');
+    PARSE_CODEPOINT('b');
+    PARSE_CODEPOINT(']');
+    struct passgen_pattern_range *range;
+
+    // single segment containing char 'a'
+    assert(1 == parser.pattern.group.segments.len);
+
+    segment = passgen_pattern_group_get_segment(&parser.pattern.group, 0);
+    assert(segment);
+    assert(1 == segment->items.len);
+
+    item = passgen_pattern_segment_get_item(segment, 0);
+    assert(item);
+    assert(item->kind == PASSGEN_PATTERN_SET);
+
+    assert(item->data.set.items.len == 3);
+
+    range = passgen_pattern_set_get_range(&item->data.set, 0);
+    assert(range);
+    assert(range->start == 'a');
+    assert(range->end == 'a');
+
+    range = passgen_pattern_set_get_range(&item->data.set, 1);
+    assert(range);
+    assert(range->start == '-');
+    assert(range->end == '-');
+
+    range = passgen_pattern_set_get_range(&item->data.set, 2);
+    assert(range);
+    assert(range->start == 'b');
+    assert(range->end == 'b');
+
+    POSTAMBLE();
+
+    return test_ok;
+}
+
 test_result test_parser_range_simple(void) {
     PREAMBLE();
     PARSE_CODEPOINT('[');

@@ -56,7 +56,11 @@ passgen_random *passgen_random_new_path(const char *path);
 /// Allocates and opens a new random object with @p file as randomness source.
 passgen_random *passgen_random_new_file(FILE *file);
 
+/// Allocates and opens a new random object using the xorshift PRNG.
 passgen_random *passgen_random_new_xorshift(uint64_t seed);
+
+/// Allocates and opens a new random object using the zero randomness generator.
+passgen_random *passgen_random_new_zero();
 
 /// Opens a new, existing random object. Returns `NULL` on failure. Uses
 /// `/dev/urandom` as random device.
@@ -82,9 +86,13 @@ passgen_random_open_path(passgen_random *random, const char *path);
 passgen_random *
 passgen_random_open_file(passgen_random *random, FILE *file);
 
-/// Opens a new random object using the xorshift PRNG (nor really random!)
+/// Opens a new random object using the xorshift PRNG.
 passgen_random *
 passgen_random_open_xorshift(passgen_random *random, uint64_t seed);
+
+/// Opens a new random object using the zero randomness generator
+passgen_random *
+passgen_random_open_zero(passgen_random *random);
 
 /// Close @p random. Use this with object opened by passgen_random_open().
 void passgen_random_close(passgen_random *random);

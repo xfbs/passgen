@@ -1,8 +1,12 @@
 #include "passgen.h"
 
-#define check_success(value) \
-    ret = value;             \
-    if(ret != EXIT_SUCCESS) return ret
+#define try(statement)            \
+    do {                          \
+        int ret = statement;      \
+        if(ret != EXIT_SUCCESS) { \
+            return ret;           \
+        }                         \
+    } while(0)
 
 int main(int argc, char *argv[]) {
     int ret;
@@ -21,13 +25,22 @@ int main(int argc, char *argv[]) {
 
     // load values from a config file (located at /etc/passgen.conf, or
     // $HOME/.config/passgen.conf).
-    check_success(passgen_cli_opts_config(&opts));
+    try(passgen_cli_opts_config(&opts));
 
     // parse CLI options, which override the previously loaded configuration.
-    check_success(passgen_cli_opts_parse(&opts, argc, argv));
+    ret = passgen_cli_opts_parse(&opts, argc, argv);
+    if(ret == PASSGEN_SHOW_HELP) {
+        passgen_cli_usage(argv[0]);
+        return 0;
+    } else if(ret == PASSGEN_SHOW_VERSION) {
+        passgen_cli_show_version();
+        return 0;
+    } else if(ret != PASSGEN_ERROR_NONE) {
+        return ret;
+    }
 
     // run the cli commands and free memory.
-    passgen_cli_run(opts);
+    try(passgen_cli_run(opts));
     passgen_cli_opts_free(&opts);
 
     return EXIT_SUCCESS;

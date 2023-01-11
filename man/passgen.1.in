@@ -28,14 +28,18 @@ sequence matching that pattern. Used to generate secure passphrases or keys of a
 .Pp
 List of flags and their descriptions:
 .Bl -tag -width -indent
-.It Fl a, Fl -amount Ar AMOUNT
-Set the amount of sequences to generate. By default, only a single sequence is generated and output.
-.It Fl r, Fl -random Ar RANDOM
+.It Fl a, Fl -amount Ar amount
+Set the amount of sequences to generate. Must be a positive, non-zero integer. By default, only a single sequence is generated and output.
+.It Fl r, Fl -random Ar random
 Overrides the randomness source. See the RANDOM section for more information.
-.It Fl w, Fl -wordlist Ar WORDLIST
-Load an additional wordlist. Wordlists can be referenced in patterns, this is used to generate passphrases that are easier to remember.
-.It Fl m, Fl -markov-length Ar LENGTH
-Set the markov chain length for the next wordlist. Every wordlist can be parsed into a markov chain in order to generate pronounceable, but random sequences. The default is 3, longer markov chains might be able to generate more realistic words, at the expense of taking longer to parse.
+.It Fl w, Fl -wordlist Ar name:/path/to/file
+Load an additional wordlist. Must be specified in the format
+.Ar name:/path/to/file .
+Wordlists can be referenced in patterns, this is used to generate passphrases that are easier to remember.
+.It Fl m, Fl -markov-length Ar length
+Set the markov chain length for the next wordlist. Must be a positive, non-zero integer. Every wordlist can be parsed into a markov chain in order to generate pronounceable, but random sequences. The default length is 3.
+
+Longer markov chains might be able to generate more realistic words, at the expense of taking longer to parse.
 .It Fl j, Fl -json
 Outputs result as JSON instead of as unformatted text. This option can be used when generating random phrases, or when listing presets.
 .It Fl l, Fl -list
@@ -49,9 +53,29 @@ Show help and quit.
 .It Fl v, Fl -version
 Show version and build information and quit.
 .El
-.Sh PRESET
-Presets are some sane defaults for generating passwords if you don't
-specifically care about their format.
+.Sh RANDOM
+By default, passgen will use the system's built-in random number generator. This is chosen to be a secure source of randomness and is typically the best choice. Passgen can however be easily extended to support different sources of randomness, and the source of randomness can be specified at runtime using the
+.Fl -random
+command-line flag. This flag takes a textual description of which source to use and any arguments it might need.
+.Pp
+List of built-in source of randomness and how to specify them:
+.Bl -tag -width -indent
+.It Ar system
+Use the system randomness source. This will pick whichever is the native method of getting access to secure random data on the system that passgen is running on. This is the default source of randomness.
+
+On Linux systems, this will use the
+.Xr getrandom 2
+system call. On macOS, it uses the
+.Xr arc4random_buf 2
+system call to read secure, random data. Alternatively, it falls back to reading from
+.Ar /dev/urandom .
+.It Ar xor:seed
+Use the xorshift pseudorandom number generator. This is not recommended to produce random sequences, but has the advantage of being deterministic (using the same seed value with the same flags always produces the same output). The seed should be a large, nonzero number.
+.It Ar file:/path/to/file
+Read the file as source of randomness. This can be useful on systems where the source of randomness has a nonstandard path.
+.It Ar zero
+Use the zero random number generator. This does not produce random sequences, and is only useful for testing.
+.El
 .Sh PATTERN
 Patterns are regular-expression-like strings that allow specifying the format of
 generated passwords. The allowed grammar is a subset of what regular expressions
@@ -110,7 +134,34 @@ User-local configuration for presets and wordlists. See
 for information on the syntax of this file.
 .El
 .Sh EXIT STATUS
-The tool will return 0, or 1 if an error is encountered.
+On success, the tool returns 0. When an error is encountered, it will return a different exit code, depending on the error. Note that this list can change between minor releases of the tool.
+.Pp
+.Bl -tag -width -indent -compact
+.It Ar 1
+Multiple patterns have been specified on the command line. Only specify a single pattern per run of the tool.
+.It Ar 2
+There has been an issue allocating the random number generator. When overriding the random number generator to be used, make sure that it exists. When using sandboxing, make sure passgen has access to
+.Pa /dev/urandom
+or the
+.Xr getrandom 2
+system call.
+.It Ar 3
+Error parsing the pattern. Make sure that the pattern is well-formed. The standard output should indicate the position of the error in the pattern.
+.It Ar 4
+There has been an issue allocating memory, make sure your system has enough memory.
+.It Ar 5
+An illegal
+.Ar AMOUNT
+has been specified. Make sure the amount of sequences you have requested is not negative and not zero.
+.It Ar 6
+Illegal markov chain length has been specified. When overriding the markov chain length, make sure that the length you specify is not negative and not zero.
+.It Ar 7
+Unrecognized argument flag. Make sure that you are not using an incorrect flag. If your pattern starts with a dash, use '--' to separate command-line flags from your pattern.
+.It Ar 8
+Preset not found. Make sure that the preset you have specified exists. When it doubt, use the
+.Fl -list
+command to see the full list of all presets that the tool knows about.
+.El
 .Sh SEE ALSO
 .Xr apg 1 ,
 .Xr passwd 1 ,

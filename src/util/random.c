@@ -111,6 +111,29 @@ passgen_random_open_xorshift(passgen_random *random, uint64_t seed) {
     return random;
 }
 
+size_t passgen_random_read_zero(void *dest, size_t size, void *data) {
+    (void) data;
+    memset(dest, 0, size);
+    return size;
+}
+
+void passgen_random_close_zero(void *data) {
+}
+
+passgen_random *passgen_random_open_zero(passgen_random *random) {
+    random->data = NULL;
+    random->read = passgen_random_read_zero;
+    random->close = passgen_random_close_zero;
+    passgen_random_reload(random);
+    return random;
+}
+
+passgen_random *passgen_random_new_zero() {
+    passgen_random *random = malloc(sizeof(passgen_random));
+    if(!random) return NULL;
+    return passgen_random_open_zero(random);
+}
+
 #ifdef PASSGEN_RANDOM_HAVE_SYSTEM
 passgen_random *passgen_random_open_system(passgen_random *random) {
     random->data = NULL;
@@ -193,9 +216,13 @@ passgen_random *passgen_random_open(passgen_random *random) {
 #ifdef PASSGEN_RANDOM_HAVE_SYSTEM
     return passgen_random_open_system(random);
 #else
-    passgen_random *rand = passgen_random_open_path(random, passgen_random_default_device);
+    passgen_random *rand =
+        passgen_random_open_path(random, passgen_random_default_device);
     if(!rand) {
-        fprintf(stderr, "error: cannot open system randomness device '%s'\n", passgen_random_default_device);
+        fprintf(
+            stderr,
+            "error: cannot open system randomness device '%s'\n",
+            passgen_random_default_device);
     }
     return rand;
 #endif

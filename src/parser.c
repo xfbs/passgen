@@ -210,8 +210,8 @@ int passgen_parse_set(
 
     struct passgen_pattern_range *range = passgen_pattern_set_new_range(set);
 
-    range->start = token->codepoint;
-    range->end = token->codepoint;
+    range->start = token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT;
+    range->end = token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT;
 
     state->data.set.range = range;
 

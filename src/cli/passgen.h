@@ -16,14 +16,17 @@
 /// return code.
 typedef enum {
     PASSGEN_ERROR_NONE,
-    PASSGEN_ERROR_HELP,
-    PASSGEN_ERROR_VERSION,
     PASSGEN_ERROR_MULTIPLE_FORMATS,
     PASSGEN_ERROR_RANDOM_ALLOC,
     PASSGEN_ERROR_PATTERN_PARSE,
     PASSGEN_ERROR_ALLOC,
     PASSGEN_ERROR_ILLEGAL_AMOUNT,
     PASSGEN_ERROR_ILLEGAL_MARKOV_LENGTH,
+    PASSGEN_ERROR_UNRECOGNIZED,
+    PASSGEN_ERROR_PRESET_NOT_FOUND,
+
+    PASSGEN_SHOW_HELP,
+    PASSGEN_SHOW_VERSION,
 } passgen_cli_error;
 
 /// Options parsed from the command line.
@@ -86,17 +89,17 @@ void passgen_cli_usage(const char *executable);
 void passgen_cli_show_version(void);
 
 /// Exit the program early using the specified error and data.
-void passgen_cli_bail(passgen_cli_error error, void *data);
+int passgen_cli_bail(passgen_cli_error error, const void *data);
 
 /// Parse the options passed on the command line, @p argc and @p argv, and
 /// return the parsed result.
 int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]);
 
 /// Run passgen with @p opts.
-void passgen_cli_run(passgen_cli_opts opts);
+int passgen_cli_run(passgen_cli_opts opts);
 
 /// Generate passgen passwords.
-void passgen_cli_generate(passgen_cli_opts opts, struct passgen_pattern *pattern);
+int passgen_cli_generate(passgen_cli_opts opts, struct passgen_pattern *pattern);
 
 /// Free data from passgen ops.
 void passgen_cli_opts_free(passgen_cli_opts *opts);
