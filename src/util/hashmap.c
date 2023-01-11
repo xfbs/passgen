@@ -201,32 +201,8 @@ passgen_hashmap_lookup(passgen_hashmap *map, const void *key) {
     return NULL;
 }
 
-void passgen_hashmap_foreach_key(
-    passgen_hashmap *map,
-    void (*func)(void *key)) {
-    if(map->len) {
-        for(size_t i = 0; i < map->capacity; i++) {
-            if(map->data[i].key) {
-                func(map->data[i].key);
-            }
-        }
-    }
-}
-
-void passgen_hashmap_foreach_value(
-    passgen_hashmap *map,
-    void (*func)(void *value)) {
-    if(map->len) {
-        for(size_t i = 0; i < map->capacity; i++) {
-            if(map->data[i].key) {
-                func(map->data[i].value);
-            }
-        }
-    }
-}
-
 int passgen_hashmap_foreach(
-    passgen_hashmap *map,
+    const passgen_hashmap *map,
     void *user,
     int (*func)(void *user, passgen_hashmap_entry *entry)) {
     if(map->len) {
