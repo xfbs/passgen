@@ -12,7 +12,7 @@ void load(passgen_wordlist *wordlist, const char *filename) {
     FILE *file = fopen(filename, "r");
     passgen_assert(file);
 
-    passgen_wordlist_load(wordlist, file);
+    passgen_wordlist_load(wordlist, file, 3);
     fclose(file);
 }
 

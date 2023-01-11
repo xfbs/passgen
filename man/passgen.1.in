@@ -23,7 +23,7 @@
 .Op Fl j
 | -v | -h
 .Sh DESCRIPTION
-Given preset name or a custom pattern, this tool will generate a random
+Given a preset name or a custom pattern, this tool will generate a random
 sequence matching that pattern. Used to generate secure passphrases or keys of any shape.
 .Pp
 List of flags and their descriptions:
@@ -34,6 +34,8 @@ Set the amount of sequences to generate. By default, only a single sequence is g
 Overrides the randomness source. See the RANDOM section for more information.
 .It Fl w, Fl -wordlist Ar WORDLIST
 Load an additional wordlist. Wordlists can be referenced in patterns, this is used to generate passphrases that are easier to remember.
+.It Fl m, Fl -markov-length Ar LENGTH
+Set the markov chain length for the next wordlist. Every wordlist can be parsed into a markov chain in order to generate pronounceable, but random sequences. The default is 3, longer markov chains might be able to generate more realistic words, at the expense of taking longer to parse.
 .It Fl j, Fl -json
 Outputs result as JSON instead of as unformatted text. This option can be used when generating random phrases, or when listing presets.
 .It Fl l, Fl -list
@@ -88,7 +90,7 @@ Generate a password using the "apple" preset.
     $ passgen -p apple1
     fnK-Nvo-Ipj-W3M
 .Pp
-Generate 5 lowercase alphanumeric passwords with length 12.
+Generate five lowercase alphanumeric passwords with length 12.
 .Pp
     $ passgen -a 5 "[a-z0-9]{12}"
     k8taknzsj324

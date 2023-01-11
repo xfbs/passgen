@@ -25,7 +25,7 @@ typedef struct passgen_wordlist {
 
 /// Initialise a wordlist, must be called before it can be used.
 /// this scans the file for words and adds them as file offets into the wordlist
-void passgen_wordlist_load(passgen_wordlist *wordlist, FILE *file);
+void passgen_wordlist_load(passgen_wordlist *wordlist, FILE *file, size_t markov_depth);
 
 /// Generate random word from this wordlist.
 const char *

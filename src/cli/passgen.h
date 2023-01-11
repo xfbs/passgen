@@ -15,36 +15,39 @@
 /// The kinds of errors that cause the binary to exit early and with a nonzero
 /// return code.
 typedef enum {
-     PASSGEN_ERROR_NONE,
-     PASSGEN_ERROR_HELP,
-     PASSGEN_ERROR_VERSION,
-     PASSGEN_ERROR_MULTIPLE_FORMATS,
-     PASSGEN_ERROR_RANDOM_ALLOC,
-     PASSGEN_ERROR_PATTERN_PARSE,
-     PASSGEN_ERROR_ALLOC,
-     PASSGEN_ERROR_ILLEGAL_AMOUNT,
+    PASSGEN_ERROR_NONE,
+    PASSGEN_ERROR_HELP,
+    PASSGEN_ERROR_VERSION,
+    PASSGEN_ERROR_MULTIPLE_FORMATS,
+    PASSGEN_ERROR_RANDOM_ALLOC,
+    PASSGEN_ERROR_PATTERN_PARSE,
+    PASSGEN_ERROR_ALLOC,
+    PASSGEN_ERROR_ILLEGAL_AMOUNT,
+    PASSGEN_ERROR_ILLEGAL_MARKOV_LENGTH,
 } passgen_cli_error;
 
 /// Options parsed from the command line.
 typedef struct {
-     /// How many passwords to generate.
-     size_t amount;
-     /// The pattern to use when generating passwords.
-     const char *pattern;
-     /// The source of randomness to use.
-     passgen_random *random;
-     /// Separate output with null characters.
-     bool null;
-     /// Output as JSON.
-     bool json;
-     /// Parsing depth.
-     size_t depth;
-     /// Output complexity.
-     bool complexity;
-     /// Wordlists that are to be loaded.
-     passgen_hashmap wordlists;
-     /// Presets to choose from.
-     passgen_hashmap presets;
+    /// How many passwords to generate.
+    size_t amount;
+    /// The pattern to use when generating passwords.
+    const char *pattern;
+    /// The source of randomness to use.
+    passgen_random *random;
+    /// Separate output with null characters.
+    bool null;
+    /// Output as JSON.
+    bool json;
+    /// Parsing depth.
+    size_t depth;
+    /// Output complexity.
+    bool complexity;
+    /// Length of markov chain
+    size_t markov_length;
+    /// Wordlists that are to be loaded.
+    passgen_hashmap wordlists;
+    /// Presets to choose from.
+    passgen_hashmap presets;
 } passgen_cli_opts;
 
 /// Initialize passgen_cli_opts to default values.

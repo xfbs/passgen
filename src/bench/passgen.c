@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     passgen_assert(patterns_file);
 
     passgen_wordlist patterns;
-    passgen_wordlist_load(&patterns, patterns_file);
+    passgen_wordlist_load(&patterns, patterns_file, 3);
     fclose(patterns_file);
 
     // double unicode_time;

@@ -7,8 +7,8 @@
 #define ALLOC_INITIAL  256
 #define ALLOC_INCREASE 2
 
-void passgen_wordlist_load(passgen_wordlist *wordlist, FILE *file) {
-    passgen_markov_init(&wordlist->markov, 3);
+void passgen_wordlist_load(passgen_wordlist *wordlist, FILE *file, size_t markov_depth) {
+    passgen_markov_init(&wordlist->markov, markov_depth);
     passgen_stack_init(&wordlist->stack, sizeof(uint32_t *));
 
     uint8_t buffer[1024];

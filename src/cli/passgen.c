@@ -223,7 +223,7 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
 
     passgen_wordlist *wordlist = malloc(sizeof(passgen_wordlist));
     passgen_hashmap_insert(&opt->wordlists, name, wordlist);
-    passgen_wordlist_load(wordlist, file);
+    passgen_wordlist_load(wordlist, file, opt->markov_length);
 
     return 0;
 }
@@ -252,6 +252,7 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->complexity = false;
     opts->random = NULL;
     opts->json = false;
+    opts->markov_length = 3;
     passgen_hashmap_init(&opts->wordlists, &passgen_hashmap_context_unicode);
     passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_default);
 
@@ -279,11 +280,11 @@ int passgen_cli_preset_show(void *data, passgen_hashmap_entry *entry) {
 }
 
 void passgen_cli_presets_list(const passgen_cli_opts *opts) {
-    passgen_hashmap_foreach(&opts->presets, NULL, passgen_cli_preset_show);
+    passgen_hashmap_foreach(&opts->presets, (void *) opts, passgen_cli_preset_show);
 }
 
 int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
-    const char *short_opts = "a:p:P:d:w:r:ezhvjl";
+    const char *short_opts = "a:p:P:d:w:r:m:ezhvjl";
     const char *preset = NULL;
 
     static struct option long_opts[] = {
@@ -299,6 +300,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
         {"list", no_argument, NULL, 'l'},
         {"define-preset", required_argument, NULL, 'P'},
         {"json", no_argument, NULL, 'j'},
+        {"markov-length", required_argument, NULL, 'm'},
         {NULL, no_argument, NULL, 0}};
 
     while(true) {
@@ -341,6 +343,13 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 exit(0);
             case 'w':
                 ret = passgen_cli_opts_wordlist(opts, optarg);
+                break;
+            case 'm':
+                opt = atoi(optarg);
+                if(opt < 1) {
+                    bail(ILLEGAL_MARKOV_LENGTH, &opt);
+                }
+                opts->markov_length = opt;
                 break;
             case 'r':
                 ret = passgen_cli_opts_random(opts, optarg);
@@ -427,6 +436,8 @@ void passgen_cli_usage(const char *executable) {
         "seed.\n"
         "    -w, --wordlist NAME:PATH\n"
         "                       Load wordlist NAME from PATH\n"
+        "    -m, --markov-length LENGTH\n"
+        "                       Specify markov chain length for next wordlist\n"
         "    -z, --null         Use NUL instead of newline to separate outputs\n"
         "\n"
         "PRESETS\n"
@@ -460,21 +471,28 @@ void passgen_cli_bail(passgen_cli_error error, void *data) {
             exit(0);
         case PASSGEN_ERROR_MULTIPLE_FORMATS:
             printf(
-                "Error: multiple patterns specified (%s).\n",
+                "error: multiple patterns specified (%s).\n",
                 (const char *) data);
             exit(-2);
         case PASSGEN_ERROR_RANDOM_ALLOC:
-            printf("Error: couldn't open random object.\n");
+            printf("error: couldn't open random object.\n");
             exit(-3);
         case PASSGEN_ERROR_PATTERN_PARSE:
             // printf("Error: couldn't parse pattern '%s'.\n", (const char
             // *)data);
             exit(-4);
         case PASSGEN_ERROR_ILLEGAL_AMOUNT:
-            printf("Error: illegal amount entered (%i).\n", *((int *) data));
+            printf(
+                "\033[1;31merror\033[0m: illegal amount entered (%i)\n",
+                *((int *) data));
+            exit(-5);
+        case PASSGEN_ERROR_ILLEGAL_MARKOV_LENGTH:
+            printf(
+                "\033[1;31merror\033[0m: illegal markov chain length entered (%i)\n",
+                *((int *) data));
             exit(-5);
         default:
-            printf("Error: unknown error.\n");
+            printf("error: unknown error.\n");
             exit(-100);
     }
 }

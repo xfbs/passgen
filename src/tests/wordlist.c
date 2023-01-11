@@ -12,7 +12,7 @@ test_result test_wordlist_load(void) {
     assert(file);
 
     passgen_wordlist wordlist;
-    passgen_wordlist_load(&wordlist, file);
+    passgen_wordlist_load(&wordlist, file, 3);
     fclose(file);
 
     assert(wordlist.count == 3);
@@ -33,7 +33,7 @@ test_result test_wordlist_random(void) {
     assert(file);
 
     passgen_wordlist wordlist;
-    passgen_wordlist_load(&wordlist, file);
+    passgen_wordlist_load(&wordlist, file, 3);
     fclose(file);
 
     passgen_random random;
