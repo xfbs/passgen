@@ -46,7 +46,6 @@
         assert(0 == passgen_parse_finish(&parser));                        \
         size_t len = passgen_generate_fill_unicode(                        \
             &parser.pattern,                                               \
-            &random,                                                       \
             &env,                                                          \
             output,                                                        \
             sizeof(output));                                               \

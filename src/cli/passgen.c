@@ -122,12 +122,8 @@ int passgen_cli_generate_normal(
 
     for(size_t i = 0; i < opts.amount; ++i) {
         // get a NULL-terminated, random pass.
-        size_t written = passgen_generate_fill_utf8(
-            pattern,
-            opts.random,
-            &env,
-            pass,
-            pass_len);
+        size_t written =
+            passgen_generate_fill_utf8(pattern, &env, pass, pass_len);
         pass[written] = '\0';
 
         if(opts.complexity) {
@@ -170,12 +166,8 @@ int passgen_cli_generate_json(
     printf("[");
     for(size_t i = 0; i < opts.amount; ++i) {
         // get a NULL-terminated, random pass.
-        size_t written = passgen_generate_fill_json_utf8(
-            pattern,
-            opts.random,
-            &env,
-            pass,
-            pass_len);
+        size_t written =
+            passgen_generate_fill_json_utf8(pattern, &env, pass, pass_len);
         pass[written] = '\0';
         printf("%s{\"output\":\"%s\"", (i == 0) ? "" : ",", pass);
 

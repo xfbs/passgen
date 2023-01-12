@@ -35,12 +35,8 @@ double complexity(const char *p) {
     env.random = &random;
     env.find_complexity = true;
     env.complexity = 0.0;
-    int length = passgen_generate_fill_utf8(
-        &pattern,
-        &random,
-        &env,
-        &buffer[0],
-        buffer_len);
+    int length =
+        passgen_generate_fill_utf8(&pattern, &env, &buffer[0], buffer_len);
     buffer[length] = 0;
     passgen_pattern_free(&pattern);
 
