@@ -1,5 +1,6 @@
 #include <passgen/assert.h>
 #include <passgen/parser/parser.h>
+#include <passgen/util/try.h>
 #include <passgen/util/utf8.h>
 #include <passgen/wordlist.h>
 #include <stdio.h>
@@ -11,6 +12,8 @@
 #define GENERATIONS 10
 
 int main(int argc, char *argv[]) {
+    (void) argc;
+
     passgen_assert(argc == 2);
 
     const char *patterns_path = argv[1];
@@ -40,16 +43,14 @@ int main(int argc, char *argv[]) {
             size_t format_bytes_read = 0;
             size_t format_input_len = strlen(pattern);
 
-            int ret = passgen_utf8_decode(
+            try(passgen_utf8_decode(
                 format_decoded,
                 256,
                 &format_decoded_len,
                 NULL,
                 (unsigned char *) pattern,
                 format_input_len,
-                &format_bytes_read);
-
-            passgen_assert(ret == 0);
+                &format_bytes_read));
         }
     }
 

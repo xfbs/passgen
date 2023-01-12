@@ -118,6 +118,7 @@ size_t passgen_random_read_zero(void *dest, size_t size, void *data) {
 }
 
 void passgen_random_close_zero(void *data) {
+    (void) data;
 }
 
 passgen_random *passgen_random_open_zero(passgen_random *random) {

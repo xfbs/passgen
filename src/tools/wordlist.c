@@ -17,6 +17,8 @@ void load(passgen_wordlist *wordlist, const char *filename) {
 }
 
 void dump(const char **args, size_t args_len) {
+    (void) args_len;
+
     passgen_assert(args_len == 3);
     const char *filename = args[2];
     passgen_assert(filename);
@@ -35,6 +37,8 @@ void dump(const char **args, size_t args_len) {
 }
 
 void random_word(const char **args, size_t args_len) {
+    (void) args_len;
+
     passgen_assert(args_len == 3);
     const char *filename = args[2];
     passgen_assert(filename);

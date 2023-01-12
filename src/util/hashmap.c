@@ -287,4 +287,5 @@ int passgen_hashmap_entry_free(void *user, passgen_hashmap_entry *entry) {
     (void) user;
     free(entry->key);
     free(entry->value);
+    return 0;
 }
