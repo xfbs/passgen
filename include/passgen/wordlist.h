@@ -3,7 +3,6 @@
 /// Utilities for parsing wordlists, with markov chain generation.
 #pragma once
 #include "passgen/util/random.h"
-#include "passgen/util/stack.h"
 #include "passgen/markov.h"
 #include <stdio.h>
 
@@ -19,7 +18,6 @@ typedef struct passgen_wordlist {
     /// count of words in wordlist
     size_t count;
 
-    passgen_stack stack;
     passgen_markov markov;
 } passgen_wordlist;
 

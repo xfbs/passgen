@@ -12,7 +12,6 @@ void passgen_wordlist_load(
     FILE *file,
     size_t markov_depth) {
     passgen_markov_init(&wordlist->markov, markov_depth);
-    passgen_stack_init(&wordlist->stack, sizeof(uint32_t *));
 
     uint8_t buffer[1024];
     size_t buffer_len = 0;
@@ -53,7 +52,6 @@ void passgen_wordlist_load(
                         word,
                         &utf8_buffer[utf8_buffer_pos],
                         i * sizeof(uint32_t));
-                    passgen_stack_push(&wordlist->stack, &word);
                     utf8_buffer_pos += i + 1;
                     success = true;
                     break;
@@ -138,8 +136,6 @@ static void free_word(void *element) {
 
 void passgen_wordlist_free(passgen_wordlist *wordlist) {
     passgen_markov_free(&wordlist->markov);
-    passgen_stack_foreach(&wordlist->stack, free_word);
-    passgen_stack_free(&wordlist->stack);
     free(wordlist->words);
     free(wordlist->data);
 }
