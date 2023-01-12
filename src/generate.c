@@ -333,6 +333,12 @@ int passgen_generate_special_pronounceable(
         return -1;
     }
     passgen_wordlist *wordlist = entry->value;
+    if(!wordlist->parsed) {
+        passgen_wordlist_parse(wordlist);
+    }
+    if(!wordlist->parsed_markov) {
+        passgen_wordlist_parse_markov(wordlist);
+    }
     passgen_markov *markov = &wordlist->markov;
     uint32_t word[128];
     size_t pos = markov->level;
@@ -362,20 +368,15 @@ int passgen_generate_special_wordlist(
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
-    // TODO: implement
-    (void) special;
-    (void) rand;
-    (void) env;
-    (void) data;
-    (void) func;
-
-    // passgen_wordlist *wordlist;
     passgen_hashmap_entry *entry =
         passgen_hashmap_lookup(&env->wordlists, special->parameters);
     if(!entry) {
         return -1;
     }
     passgen_wordlist *wordlist = entry->value;
+    if(!wordlist->parsed) {
+        passgen_wordlist_parse(wordlist);
+    }
     const char *word = passgen_wordlist_random(wordlist, rand);
     while(*word) {
         func(data, *word);

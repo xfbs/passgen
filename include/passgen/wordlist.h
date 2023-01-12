@@ -37,13 +37,13 @@ typedef struct passgen_wordlist {
 void passgen_wordlist_load(passgen_wordlist *wordlist, FILE *file, size_t markov_length);
 
 /// Initialize a wordlist with a file object.
-void passgen_wordlist_init(passgen_wordlist *wordlist, FILE *file);
+void passgen_wordlist_init(passgen_wordlist *wordlist, FILE *file, size_t markov_length);
 
 /// Load words from wordlist. After running this, the file object can be closed.
 int passgen_wordlist_parse(passgen_wordlist *wordlist);
 
 /// Generate markov chain from wordlist.
-void passgen_wordlist_parse_markov(passgen_wordlist *wordlist, size_t markov_length);
+void passgen_wordlist_parse_markov(passgen_wordlist *wordlist);
 
 /// Generate random word from this wordlist.
 const char *

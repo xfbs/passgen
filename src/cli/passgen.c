@@ -238,7 +238,7 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
 
     passgen_wordlist *wordlist = malloc(sizeof(passgen_wordlist));
     passgen_hashmap_insert(&opt->wordlists, name, wordlist);
-    passgen_wordlist_load(wordlist, file, opt->markov_length);
+    passgen_wordlist_init(wordlist, file, opt->markov_length);
 
     return 0;
 }

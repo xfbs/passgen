@@ -14,10 +14,14 @@
         }                    \
     } while(0)
 
-void passgen_wordlist_init(passgen_wordlist *wordlist, FILE *file) {
+void passgen_wordlist_init(
+    passgen_wordlist *wordlist,
+    FILE *file,
+    size_t markov_length) {
     wordlist->parsed = false;
     wordlist->parsed_markov = false;
     wordlist->file = file;
+    passgen_markov_init(&wordlist->markov, markov_length);
 }
 
 int passgen_wordlist_parse(passgen_wordlist *wordlist) {
@@ -28,14 +32,14 @@ int passgen_wordlist_parse(passgen_wordlist *wordlist) {
     return 0;
 }
 
-void passgen_wordlist_parse_markov(passgen_wordlist *wordlist, size_t markov_length) {
+void passgen_wordlist_parse_markov(passgen_wordlist *wordlist) {
     passgen_assert(!wordlist->parsed_markov);
     wordlist->parsed_markov = true;
-    passgen_markov_init(&wordlist->markov, markov_length);
 
     uint32_t unicode_buffer[256];
-    size_t unicode_buffer_len = 0;
+    size_t unicode_buffer_len;
     for(size_t i = 0; i < wordlist->count; i++) {
+        unicode_buffer_len = 0;
         size_t word_length = strlen(wordlist->words[i]);
         size_t word_pos = 0;
         passgen_utf8_decode(
@@ -58,9 +62,9 @@ void passgen_wordlist_load(
     passgen_wordlist *wordlist,
     FILE *file,
     size_t markov_length) {
-    passgen_wordlist_init(wordlist, file);
+    passgen_wordlist_init(wordlist, file, markov_length);
     passgen_wordlist_parse(wordlist);
-    passgen_wordlist_parse_markov(wordlist, markov_length);
+    passgen_wordlist_parse_markov(wordlist);
 }
 
 int passgen_wordlist_read(passgen_wordlist *wordlist, FILE *file) {
@@ -116,15 +120,15 @@ void passgen_wordlist_scan(passgen_wordlist *wordlist) {
 
 const char *
 passgen_wordlist_random(passgen_wordlist *wordlist, passgen_random *random) {
-    passgen_assert(wordlist->parsed);
+    if(!wordlist->parsed) {
+        return NULL;
+    }
     size_t index = passgen_random_u64_max(random, wordlist->count);
     return wordlist->words[index];
 }
 
 void passgen_wordlist_free(passgen_wordlist *wordlist) {
-    if(wordlist->parsed_markov) {
-        passgen_markov_free(&wordlist->markov);
-    }
+    passgen_markov_free(&wordlist->markov);
 
     if(wordlist->parsed) {
         free(wordlist->words);
