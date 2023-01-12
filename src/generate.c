@@ -168,7 +168,7 @@ size_t passgen_generate_fill_unicode(
 
     try(passgen_generate(
         pattern,
-        rand,
+        env->random,
         env,
         &fillpos,
         passgen_generate_write_buffer));
@@ -190,7 +190,7 @@ size_t passgen_generate_fill_utf8(
 
     try(passgen_generate(
         pattern,
-        rand,
+        env->random,
         env,
         &fillpos,
         passgen_generate_write_buffer_utf8));
@@ -212,7 +212,7 @@ size_t passgen_generate_fill_json_utf8(
 
     try(passgen_generate(
         pattern,
-        rand,
+        env->random,
         env,
         &fillpos,
         passgen_generate_write_buffer_json_utf8));
@@ -232,7 +232,7 @@ size_t passgen_generate_repeat(
     }
 
     // get random number to choose from the range
-    size_t choice = passgen_random_u64_max(rand, difference + 1);
+    size_t choice = passgen_random_u64_max(env->random, difference + 1);
 
     // keep track of complexity
     if(env->find_complexity) {
@@ -259,7 +259,7 @@ int passgen_generate_set(
 
     passgen_assert(possible != 0);
 
-    size_t choice = passgen_random_u64_max(rand, possible);
+    size_t choice = passgen_random_u64_max(env->random, possible);
 
     // keep track of complexity
     if(env->find_complexity) {
@@ -333,7 +333,7 @@ int passgen_generate_special_pronounceable(
         word[pos] = passgen_markov_generate(
             markov,
             &word[pos - markov->level],
-            rand,
+            env->random,
             complexity);
         pos++;
     } while(word[pos - 1]);
@@ -362,7 +362,7 @@ int passgen_generate_special_wordlist(
     if(!wordlist->parsed) {
         passgen_wordlist_parse(wordlist);
     }
-    const char *word = passgen_wordlist_random(wordlist, rand);
+    const char *word = passgen_wordlist_random(wordlist, env->random);
     while(*word) {
         func(data, *word);
         word++;
@@ -385,7 +385,7 @@ int passgen_generate_special(
         case PASSGEN_PATTERN_SPECIAL_MARKOV:
             return passgen_generate_special_pronounceable(
                 special,
-                rand,
+                env->random,
                 env,
                 data,
                 func);
@@ -393,7 +393,7 @@ int passgen_generate_special(
         case PASSGEN_PATTERN_SPECIAL_WORDLIST:
             return passgen_generate_special_wordlist(
                 special,
-                rand,
+                env->random,
                 env,
                 data,
                 func);
@@ -414,20 +414,20 @@ int passgen_generate_item(
     // if it is a maybe (has a question mark following it), decide first if we
     // want to emit it or not.
     if(item->maybe) {
-        if(!passgen_random_bool(rand)) {
+        if(!passgen_random_bool(env->random)) {
             return 0;
         }
     }
 
     // compute random number of repetitions
-    size_t reps = passgen_generate_repeat(rand, env, &item->repeat);
+    size_t reps = passgen_generate_repeat(env->random, env, &item->repeat);
 
     for(size_t i = 0; i < reps; i++) {
         switch(item->kind) {
             case PASSGEN_PATTERN_SET:
                 try(passgen_generate_set(
                     &item->data.set,
-                    rand,
+                    env->random,
                     env,
                     data,
                     func));
@@ -435,7 +435,7 @@ int passgen_generate_item(
             case PASSGEN_PATTERN_CHAR:
                 try(passgen_generate_character(
                     &item->data.chars,
-                    rand,
+                    env->random,
                     env,
                     data,
                     func));
@@ -443,7 +443,7 @@ int passgen_generate_item(
             case PASSGEN_PATTERN_SPECIAL:
                 try(passgen_generate_special(
                     &item->data.special,
-                    rand,
+                    env->random,
                     env,
                     data,
                     func));
@@ -451,7 +451,7 @@ int passgen_generate_item(
             case PASSGEN_PATTERN_GROUP:
                 try(passgen_generate_group(
                     &item->data.group,
-                    rand,
+                    env->random,
                     env,
                     data,
                     func));
@@ -476,7 +476,7 @@ int passgen_generate_segment(
         struct passgen_pattern_item *item =
             passgen_stack_get(&segment->items, i);
 
-        try(passgen_generate_item(item, rand, env, data, func));
+        try(passgen_generate_item(item, env->random, env, data, func));
     }
 
     return 0;
@@ -489,7 +489,7 @@ int passgen_generate_group(
     void *data,
     passgen_generate_cb *func) {
     // choose random segment from segments
-    size_t segment = passgen_random_u64_max(rand, group->segments.len);
+    size_t segment = passgen_random_u64_max(env->random, group->segments.len);
 
     // keep track of complexity
     if(env->find_complexity) {
@@ -500,7 +500,7 @@ int passgen_generate_group(
     struct passgen_pattern_segment *segments;
     segments = passgen_stack_get(&group->segments, segment);
 
-    return passgen_generate_segment(segments, rand, env, data, func);
+    return passgen_generate_segment(segments, env->random, env, data, func);
 }
 
 int passgen_generate(
@@ -518,5 +518,10 @@ int passgen_generate(
         env->complexity = 1;
     }
 
-    return passgen_generate_group(&pattern->group, rand, env, data, func);
+    return passgen_generate_group(
+        &pattern->group,
+        env->random,
+        env,
+        data,
+        func);
 }

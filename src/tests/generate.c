@@ -23,9 +23,10 @@
     struct passgen_parser parser;                   \
     struct passgen_token_parser token_parser = {0}; \
     struct passgen_token token = {0};               \
+    struct passgen_env env = {0};                   \
     const char *pattern;                            \
     passgen_random random;                          \
-    assert(passgen_random_open_xorshift(&random, SEED))
+    assert(passgen_random_open_xorshift(&random, SEED)) env.random = &random
 
 #define GENERATE(output, pattern)                                          \
     do {                                                                   \
@@ -46,7 +47,7 @@
         size_t len = passgen_generate_fill_unicode(                        \
             &parser.pattern,                                               \
             &random,                                                       \
-            NULL,                                                          \
+            &env,                                                          \
             output,                                                        \
             sizeof(output));                                               \
         output[len] = 0;                                                   \

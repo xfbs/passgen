@@ -1,14 +1,17 @@
 #include "passgen/wordlist.h"
 #include "passgen/assert.h"
-#include "passgen/util/utf8.h"
 #include "passgen/util/try.h"
+#include "passgen/util/utf8.h"
 #include <stdlib.h>
 #include <string.h>
 
 #define ALLOC_INITIAL  256
 #define ALLOC_INCREASE 2
 
-void passgen_wordlist_init(passgen_wordlist *wordlist, FILE *file, size_t markov_length) {
+void passgen_wordlist_init(
+    passgen_wordlist *wordlist,
+    FILE *file,
+    size_t markov_length) {
     wordlist->parsed = false;
     wordlist->parsed_markov = false;
     wordlist->file = file;
