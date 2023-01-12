@@ -15,6 +15,7 @@
 #include "passgen/pattern/special_kind.h"
 #include "passgen/util/hashmap.h"
 #include "passgen/util/stack.h"
+#include "passgen/util/try.h"
 #include "passgen/wordlist.h"
 
 #include <string.h>
@@ -165,16 +166,12 @@ size_t passgen_generate_fill_unicode(
         .cur = 0,
     };
 
-    int ret = passgen_generate(
+    try(passgen_generate(
         pattern,
         rand,
         env,
         &fillpos,
-        passgen_generate_write_buffer);
-
-    if(0 != ret) {
-        return 0;
-    }
+        passgen_generate_write_buffer));
 
     return fillpos.cur;
 }
@@ -191,16 +188,12 @@ size_t passgen_generate_fill_utf8(
         .cur = 0,
     };
 
-    int ret = passgen_generate(
+    try(passgen_generate(
         pattern,
         rand,
         env,
         &fillpos,
-        passgen_generate_write_buffer_utf8);
-
-    if(0 != ret) {
-        return 0;
-    }
+        passgen_generate_write_buffer_utf8));
 
     return fillpos.cur;
 }
@@ -217,16 +210,12 @@ size_t passgen_generate_fill_json_utf8(
         .cur = 0,
     };
 
-    int ret = passgen_generate(
+    try(passgen_generate(
         pattern,
         rand,
         env,
         &fillpos,
-        passgen_generate_write_buffer_json_utf8);
-
-    if(0 != ret) {
-        return 0;
-    }
+        passgen_generate_write_buffer_json_utf8));
 
     return fillpos.cur;
 }
@@ -311,11 +300,7 @@ int passgen_generate_character(
     passgen_assert(character->count < 8);
 
     for(size_t i = 0; i < character->count; i++) {
-        int ret = func(data, character->codepoints[i]);
-
-        if(ret != 0) {
-            return ret;
-        }
+        try(func(data, character->codepoints[i]));
     }
 
     return 0;
@@ -438,47 +423,43 @@ int passgen_generate_item(
     size_t reps = passgen_generate_repeat(rand, env, &item->repeat);
 
     for(size_t i = 0; i < reps; i++) {
-        int ret;
         switch(item->kind) {
             case PASSGEN_PATTERN_SET:
-                ret = passgen_generate_set(
+                try(passgen_generate_set(
                     &item->data.set,
                     rand,
                     env,
                     data,
-                    func);
+                    func));
                 break;
             case PASSGEN_PATTERN_CHAR:
-                ret = passgen_generate_character(
+                try(passgen_generate_character(
                     &item->data.chars,
                     rand,
                     env,
                     data,
-                    func);
+                    func));
                 break;
             case PASSGEN_PATTERN_SPECIAL:
-                ret = passgen_generate_special(
+                try(passgen_generate_special(
                     &item->data.special,
                     rand,
                     env,
                     data,
-                    func);
+                    func));
                 break;
             case PASSGEN_PATTERN_GROUP:
-                ret = passgen_generate_group(
+                try(passgen_generate_group(
                     &item->data.group,
                     rand,
                     env,
                     data,
-                    func);
+                    func));
                 break;
             default:
                 passgen_assert(false);
                 break;
         }
-
-        // exit early on error
-        if(ret != 0) return ret;
     }
 
     // unreachable
@@ -495,11 +476,7 @@ int passgen_generate_segment(
         struct passgen_pattern_item *item =
             passgen_stack_get(&segment->items, i);
 
-        int ret = passgen_generate_item(item, rand, env, data, func);
-
-        if(0 != ret) {
-            return ret;
-        }
+        try(passgen_generate_item(item, rand, env, data, func));
     }
 
     return 0;

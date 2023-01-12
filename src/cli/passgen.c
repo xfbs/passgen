@@ -27,16 +27,10 @@
 #include "passgen/util/utf8.h"
 #include "passgen/version.h"
 #include "passgen/wordlist.h"
+#include "passgen/util/try.h"
 
 #define UNUSED(x)              (void) x
 #define strprefix(prefix, str) memcmp(prefix, str, strlen(prefix))
-#define try(statement)            \
-    do {                          \
-        int ret = statement;      \
-        if(ret != EXIT_SUCCESS) { \
-            return ret;           \
-        }                         \
-    } while(0)
 
 int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
     if(opts->random) {
@@ -221,15 +215,14 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
     uint32_t *name = calloc(256, sizeof(int32_t));
     size_t name_len_out = 0;
     size_t input_pos = 0;
-    int ret = passgen_utf8_decode(
+    try(passgen_utf8_decode(
         name,
         256,
         &name_len_out,
         NULL,
         (unsigned char *) input,
         name_len,
-        &input_pos);
-    assert(ret == 0);
+        &input_pos));
 
     FILE *file = fopen(colon + 1, "r");
     if(!file) {
@@ -326,7 +319,6 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 
     while(true) {
         int opt = getopt_long(argc, argv, short_opts, long_opts, NULL);
-        int ret = 0;
 
         if(opt < 0) break;
 
@@ -361,7 +353,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 passgen_cli_presets_list(opts);
                 exit(0);
             case 'w':
-                ret = passgen_cli_opts_wordlist(opts, optarg);
+                try(passgen_cli_opts_wordlist(opts, optarg));
                 break;
             case 'm':
                 opt = atoi(optarg);
@@ -373,10 +365,10 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 opts->markov_length = opt;
                 break;
             case 'r':
-                ret = passgen_cli_opts_random(opts, optarg);
+                try(passgen_cli_opts_random(opts, optarg));
                 break;
             case 'P':
-                ret = passgen_cli_opts_preset(opts, optarg);
+                try(passgen_cli_opts_preset(opts, optarg));
                 break;
             case 'j':
                 opts->json = true;
@@ -386,10 +378,6 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 return passgen_cli_bail(
                     PASSGEN_ERROR_UNRECOGNIZED,
                     argv[optind]);
-        }
-
-        if(ret != 0) {
-            return ret;
         }
     }
 
