@@ -21,7 +21,6 @@ option(USE_BACKTRACE "Use backtrace() for debug builds (not always available)." 
 option(USE_LIBEXECINFO
        "Use libexecinfo. For systems that don't have backtrace in libc." OFF)
 
-option(PASSGEN_CLDR "Include code for parsing the CLDR" OFF)
 option(PASSGEN_MEMORY "Build with option to override memory management" ON)
 option(PASSGEN_SECCOMP "Build with seccomp filters" OFF)
 
@@ -29,10 +28,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     option(PASSGEN_DEBUG "Include debugging features for passgen" ON)
 else()
     option(PASSGEN_DEBUG "Include debugging features for passgen" OFF)
-endif()
-
-if(PASSGEN_CLDR)
-    include(FindEXPAT)
 endif()
 
 # against what do we link tools?
