@@ -19,8 +19,13 @@ markdown_extensions:
   - md_in_html
   - tables
   - admonition
-  - codehilite:
-      guess_lang: false
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  #- codehilite:
+  #    guess_lang: false
   - toc:
       permalink: true
   - pymdownx.emoji:
@@ -38,10 +43,14 @@ nav:
     - Entropy: entropy.md
     - Security: security.md
     - Syntax: syntax.md
-    - Development: development.md
   - Releases:
     - Releases: releases.md
     - Installation: install.md
+  - Development:
+    - Development: development.md
+    - Building: building.md
+    - Tooling: tooling.md
+    - Testing: testing.md
   - About: about.md
 
 extra_css:

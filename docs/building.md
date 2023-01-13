@@ -1,37 +1,77 @@
 # Building
 
-This project uses the CMake build system. Basic building is done by creating a build folder, running CMake to set up the build system, and then executing it.
-
-    mkdir build
-    cd build
-    cmake ..
-    make
-
-When setting up the build system with CMake, it can be given 
+If you want to work on Passgen, you can compile it from source. If you just want to 
+try it, you can download pre-built and signed binaries from the [Releases](releases.md) page.
 
 ## Dependencies
 
 To build, some dependencies are necessary.
 
-- C compiler (clang or gcc are recommended)
-- cmake (at least 3.10)
-- build system (make or ninja are recommended)
-- libjansson
-- libexecinfo (when building for musl instead of libc, such as with Alpine Linux)
-- ruby
-- git (optional)
-- coverage reporting tool (llvm-cov or lcov, optional)
-- libutf8proc (optional)
+- C compiler (for example `clang` or `gcc`),
+- CMake (at least v3.10),
+- Build system (for example `make` or `ninja`),
+- libjansson,
+- libexecinfo (when building for musl instead of libc, such as with Alpine Linux),
+- Ruby,
+- Git (optional),
+- Coverage reporting tool (`llvm-cov` or `lcov`, optional),
+- [libutf8proc][utf8proc] (optional).
 
 On Ubuntu or Debian, the base dependencies can be installed by running the following.
 
     sudo apt install gcc make cmake libjansson-dev ruby
 
+On Alpine Linux, this should do the trick:
+
+    apk add build-base cmake make jansson-dev git ruby llvm clang bash
+
 On other systems, these packages should also be easily available.
 
-## Setting Compiler
+## Cloning the Repository
 
-The compiler to use can be set with the `CC` environment variable. Recommended compilers are `gcc` and `clang`.
+Before you can set up the build system, you must clone the Passgen repository.
+You can do this using Git. If you want to use the bundled version of [libutf8proc][utf8proc],
+which is recommended, you have to make sure to also update the Git submodules.
+
+    git clone https://gitlab.com/xfbs/passgen
+    git submodule update --init
+
+[utf8proc]: https://juliastrings.github.io/utf8proc/
+
+## Build System
+
+This project uses the CMake build system. Basic building is done by creating a build folder, running CMake to set up the build system, and then executing it. For example:
+
+    mkdir build
+    cd build
+    cmake ..
+    make -j
+
+The CMake-based build system can take some build configuration as command-line arguments. These are set using the `-D` flag. For example, to set the build type, you can run CMake like this:
+
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+
+Note that you usually have to delete and recreate the build folder if you want to change settings. These are all of the settings that it takes:
+
+| Setting | Description |
+| --- | --- |
+| `BUILD_UTF8PROC` | Build utf8proc, the library used to decode UTF-8. If set to false, it will attempt to use the system version of libutf8proc. |
+| `BUILD_TOOLS` | Build utility binaries. These are only really needed for testing. |
+| `BUILD_BENCH` | Build benchmark utilities. |
+| `BUILD_TESTING` | Build the `passgen-test` executable, which will run unit tests. It is recommended to always build this and run it to make sure there are no obvious issues with the build. |
+| `LIBPASSGEN_STATIC` | Build the static libpassgen library. |
+| `LIBPASSGEN_SHARED` | Build the shared libpassgen library. |
+| `PASSGEN_STATIC` | Link the passgen utility against the static library rather than the dynamic one. |
+| `PASSGEN_SECCOMP` | Enable [seccomp][] filters. These will run at startup to lock passgen down into a sandbox-like mode, used to enhance security, but can be fragile. |
+| `USE_SANITIZER` | Enables use of one of the [LLVM sanitizers][asan]. |
+| `CODE_COVERAGE` | Enable instrumentation for generating code coverage reports. |
+
+[asan]: https://clang.llvm.org/docs/AddressSanitizer.html
+[seccomp]: https://www.kernel.org/doc/html/v4.19/userspace-api/seccomp_filter.html
+
+## Overriding Compiler
+
+CMake will pick out the default C compiler on your system automatically. If you have multiple compilers installed (such as `gcc` and `clang`, for example), this might not do what you want. You can override the C compiler used by setting the `CC` environment variable when you initially set up the build system.
 
     CC=clang cmake ..
 
@@ -41,103 +81,30 @@ CMake supports different build types. The *Debug* build type is recommended for 
 
     cmake -DCMAKE_BUILD_TYPE=Debug
 
-Other supported values are *Release* (enables optimisations), *RelWithDebInfo* (release mode with debug info) and *MinSizeRel*.
+The supported build types are:
 
-## Enabling Sanitizers
+| Type | Description |
+| --- | --- |
+| Release | Builds with optimisations. |
+| Debug | Builds without optimizations. |
+| RelWithDebInfo | Build with optimisations. |
+| MinSizeRel | Minimal executable size. |
 
-There is also support for enabling LLVM Sanitizers. This can be done by setting the `USE_SANITIZER` variable. These sanitizers add comprehensive checks at runtime at the expense of speed and memory usage.
+## After Building
 
-    cmake -DUSE_SANITIZER=Address
+You may want to run tests after building:
 
-Supported Sanitizers and Sanitizer combinations are *Address*, *Memory*, *MemoryWithOrigins*, *Undefined*, *Thread*, *Leak*, *Address;Undefined*.
-
-There is a script for compiling the code with a sanitizer in a temporary folder and running tests, this can be done by running the following, using the Address sanitizer for example:
-
-    ./scripts/run_sanitizer.sh Address
-
-## Formatting Code
-
-If `clang-format` is present on the system, the *clangformat* target can be used to format the code.
-
-    cmake ..
-    make clangformat
-
-This is recommended to do before commiting code changes.
-
-## Formatting CMake Lists
-
-The `CMakeLists.txt` that are part of the build system can be formatted as well. For this, cmake-format needs to be present on the system. This can be installed by running
-
-    pip install cmake_format
-
-Then, to run it, simply run
-
-    make cmakeformat
-
-Which will automatically format the files of the CMake build system. This only needs to be done if they are changed.
-
-## Running Include-What-You-Use
-
-Set the option `ENABLE_IWYU` to YES to turn it on. For example, when setting up the build folder, run something like
-
-    cmake -S . -B build-iwyu -DENABLE_IWYU=YES
-    cmake --build build-iwyu
-
-To generate a build folder and do the build with include-what-you-use
-activated.
-
-If you just want to run Include-What-You-Use and apply the suggested fixes,
-there is a bash script that will do just that. Run
-
-    ./scripts/fix-includes.sh
-
-From within the root of the project, it will generate a build folder in a
-temporary directory, run include-what-you-use on all files, and apply the fixes
-automatically.
-
-## Running Tests
-
-Tests can be run by using the `test` target of the build system.
-
-    cmake ..
     make test
+	# or
+	./src/test/passgen-test -v
 
-These should be run and pass before committing.
+If the tests work, you can use the build passgen:
 
-## Checking Symbols
+    ./src/cli/passgen -h
 
-The library should only export symbols starting with `passgen_` in order to
-avoid conflicts with other libraries.
+If you want to install the version of Passgen that you have installed locally, it is recommended that you do so by building a package from it and installing that package. That way, you get all of the data (man page, libraries, CLI) and it is simple to remove it again.
 
-There is a target to check for this, simply running the following:
+    cpack -G DEB
+    apt install ./passgen_*_amd64.deb
 
-    make check-symbols
-
-If there are symbols that don't match the expected name, an error message and
-the name of the file will be printed.
-
-## Generating Test Coverage
-
-Enabling test coverage requires either the GCC or Clang compilers and having the LLVM coverage tools installed (`lcov`, `llvm-cov`, `llvm-profdata`). Enabling it is done by setting `CODE_COVERAGE` to a true value.
-
-This enables the `ccov-passgen-test` target, which runs tests and generates a test coverage report.
-
-    cmake -DCODE_COVERAGE=YES ..
-    make ccov-passgen-test
-
-The resulting coverage is placed in `ccov/passgen-test/index.html` in the build folder.
-
-## Generating Documentation
-
-Documentation is generated using doxygen. Both `doxygen` and the `graphviz` packages need to be installed for it to work. To generate it, run doxygen in the root of the project:
-
-    doxygen Doxyfile
-
-The resulting documentation is placed in `docs/html`.
-
-## Packaging
-
-CPack is supported for generating packages from the built code.
-
-    cpack -G TXZ
-
+See the [Tooling](tooling.md) section for more tooling options.
