@@ -29,13 +29,14 @@ command-line utility takes the `--random RANDOM` flag, which allows for
 specifying an alternate source of randomness. Some randomness sources take an
 argument.
 
-| Name | Syntax | Description |
-| --- | --- | --- |
-| System | `system` | Use the system random number generator (default). |
-| File | `file:/path/to/file` | Read randomness from the specified file. This can be used to read randomness from a different device, such as `/dev/random`, or a hardware randomness generator. |
-| Zero | `zero` | Does not return any random data, instead simply returns zeroes. Used only for testing. |
-| XORShift | `xor:seed` | Takes a non-zero number as seed. Produces very poor quality randomness. |
+| Syntax | Description |
+| --- | --- |
+| `system` | Use the system random number generator (default). |
+| `file:/path/to/file` | Read randomness from the specified file. This can be used to read randomness from a different device, such as `/dev/random`, or a hardware randomness generator. |
+| `zero` | Does not return any random data, instead simply returns zeroes. Used only for testing. |
+| `xor:seed` | [XorShift][xorshift]. Takes a non-zero number as seed. Produces very poor quality randomness. |
 
+[xorshift]: https://en.wikipedia.org/wiki/Xorshift
 [getrandom]: https://man7.org/linux/man-pages/man2/getrandom.2.html
 [arc4random]: https://www.freebsd.org/cgi/man.cgi?query=arc4random_buf&sektion=3&n=1
 [linuxrandom]: https://www.2uo.de/myths-about-urandom/
