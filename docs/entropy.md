@@ -1,7 +1,7 @@
 # Entropy
 
 <figure markdown>
-[![Chaos](images/chaos.jpg){ width="500px" }](https://unsplash.com/photos/XRNSn4gt8Hs)
+[![Chaos](images/chaos.jpg){ width="600px" }](https://unsplash.com/photos/XRNSn4gt8Hs)
 <figcaption>Chaos is the natural state of the universe.</figcaption>
 </figure>
 
@@ -39,7 +39,7 @@ Given some public data, it is possible to estimate how much time an adversary wo
 | Name | Value |
 | :-- | --- |
 | Entropy | <input type="range" min="0" max="256" value="100" class="slider" id="entropy-input"><br /><span id="entropy-value"></span> |
-| Algorithm | <select name="algorithm" id="algorithm-input"><option value="sha256" default>SHA256</option><option value="md5">MD5</option><option value="script">SCrypt</option></select> |
+| Algorithm | <select name="algorithm" id="algorithm-input"><option value="sha256" default>SHA256</option><option value="md5">MD5</option><option value="scrypt">SCrypt</option></select> |
 | Budget | <input type="range" min="0" max="1000" value="750" class="slider" id="budget-input"><br /><span id="budget-value"></span> |
 | Time | <span id="time-value"></span> |
 

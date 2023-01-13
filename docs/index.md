@@ -21,7 +21,7 @@ a command-line utility. For a quick overview of how it works, see
 
     Passgen uses a custom language to be able to generate any kinds of sequences.
 
-    [:octicons-arrow-right-24: Grammar](grammar.md)
+    [:octicons-arrow-right-24: Grammar][grammar]
 
 -   :material-speedometer:{ .lg .middle } **Simple**
 
@@ -29,9 +29,9 @@ a command-line utility. For a quick overview of how it works, see
 
     Passgen comes with many useful and secure presets out-of-the box.
 
-    [:octicons-arrow-right-24: Presets](presets.md)
+    [:octicons-arrow-right-24: Presets][presets]
 
--   :material-scale-balance:{ .lg .middle } **Open Source, MIT**
+-   :material-scale-balance:{ .lg .middle } **Open Source (MIT)**
 
     ---
 
@@ -39,7 +39,9 @@ a command-line utility. For a quick overview of how it works, see
 
     [:octicons-arrow-right-24: License][license]
 
-[security]: #
+[grammar]: grammar.md
+[security]: security.md
+[presets]: presets.md
 [repo]: https://gitlab.com/xfbs/passgen
 [license]: https://gitlab.com/xfbs/passgen/-/blob/master/LICENSE.md
 

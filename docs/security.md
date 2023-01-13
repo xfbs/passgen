@@ -1,7 +1,8 @@
 # Security
 
 <figure markdown>
-[![Artist's rendition of randomness, dice](images/randomness.jpg)](https://unsplash.com/photos/kgRBoAKq-4E)
+[![Artist's rendition of randomness, dice](images/randomness.jpg){ width="600px" }](https://unsplash.com/photos/kgRBoAKq-4E)
+<figcaption>Artist's rendition of randomness.</figcaption>
 </figure>
 
 Passgen generates random sequences, and in order to do so, it needs access to
@@ -23,9 +24,10 @@ such as jitter, interrupt timings and the CPU's built-in randomness generator.
     any userspace PRNG. Do this only if you know what you are doing, for example if you have a 
     hardware random number generator.
 
-Passgen can also use other source of randomness if instructed.
-The command-line utility takes the `--random RANDOM` flag, which allows for specifying
-an alternate source of randomness. Some randomness sources take an argument.
+Passgen can also use other source of randomness if instructed.  The
+command-line utility takes the `--random RANDOM` flag, which allows for
+specifying an alternate source of randomness. Some randomness sources take an
+argument.
 
 | Name | Syntax | Description |
 | --- | --- | --- |

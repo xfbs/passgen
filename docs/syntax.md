@@ -1,4 +1,4 @@
-# Grammar
+# Syntax
 
 The grammar for passgen is, at first glance, similar to that of regular expressions, 
 however it is much simplified.
