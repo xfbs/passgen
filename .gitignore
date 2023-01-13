@@ -2,3 +2,4 @@ build/
 build*/
 docs/html
 docs/xml
+mkdocs.yml
