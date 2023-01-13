@@ -4,6 +4,12 @@ As of right now, there are no real releases for passgen, but there are nightly b
 
 ## Downloads
 
+!!! warning "Windows and macOS builds are currently broken"
+
+    The Windows and macOS builds are currently broken. We are working on fixing them. Please
+    try using the Linux builds inside WSL2 or a VM or give the WebAssembly builds a try in the
+    meantime.
+
 | Architecture | Links |
 | --- | --- |
 | Linux amd64 | [passgen-linux-amd64.tar.xz][] ([sig][passgen-linux-amd64.tar.xz.sig])<br />[passgen-linux-amd64.deb][] ([sig][passgen-linux-amd64.deb.sig])<br />[passgen-linux-amd64-musl.tar.xz][] ([sig][passgen-linux-amd64-musl.tar.xz.sig])<br />[passgen-linux-amd64-musl.bin][] ([sig][passgen-linux-amd64-musl.bin.sig]) |

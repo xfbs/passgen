@@ -1,0 +1,43 @@
+site_name: Passgen
+site_url: https://passgen.it
+
+copyright: 'Copyright &copy; 2023 Patrick M. Elsen'
+
+repo_name: 'xfbs/passgen'
+repo_url: 'https://gitlab.com/xfbs/passgen'
+
+theme:
+  name: 'material'
+  custom_dir: overrides
+  features:
+    - navigation.instant
+    - navigation.tracking
+
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - tables
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Security: security.md
+  - Entropy: entropy.md
+  - Usage: usage.md
+  - Grammar: grammar.md
+  - Releases: releases.md
+  - Development: development.md
+  - About: about.md
+
+extra_css:
+  - stylesheets/extra.css
