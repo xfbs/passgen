@@ -51,6 +51,7 @@ nav:
     - Building: building.md
     - Tooling: tooling.md
     - Testing: testing.md
+    - CI/CD: ci.md
   - About: about.md
 
 extra_css:
