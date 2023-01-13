@@ -1,5 +1,10 @@
 # Building
 
+<figure markdown>
+![Building Passgen](media/building.svg){ width="600px" }
+<figcaption>Building passgen from source</figcaption>
+</figure>
+
 If you want to work on Passgen, you can compile it from source. If you just want to 
 try it, you can download pre-built and signed binaries from the [Releases](releases.md) page.
 

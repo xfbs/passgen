@@ -1,18 +1,20 @@
 # Testing
 
-The folder `tests/` contains the testing framework, comprised of `tests.h` and
-`tests.c`, as well as unit tests in other C files. The unit testing system is a
-very basic homegrown one, which only offers an `assert()` function.
+The folder [`src/tests/`][tests-folder] contains the testing framework, consisting of
+[`tests.h`][tests.h] and [`tests.c`][tests.c] as well as the unit tests
+themselves. The unit testing system is a very basic homegrown one which offers
+`assert()` and `assert_eq()` macros and does some reporting.
 
-Every file containing tests is listed in `tests/CMakeLists.txt`. Any test
-sources listed there are automatically scanned by `scripts/generate_test_list.rb`,
-which looks for function definitions such as
+[tests-folder]: https://gitlab.com/xfbs/passgen/-/tree/master/src/tests
+[tests.h]: https://gitlab.com/xfbs/passgen/-/blob/master/src/tests/tests.h
+[tests.c]: https://gitlab.com/xfbs/passgen/-/blob/master/src/tests/tests.c
 
-```c
-test_result test_some_part(void) {
-  // ...
-}
-```
+Every file containing tests is listed in the [`CMakeLists.txt`][cmakelists] in the tests folder. Any test
+sources listed there are automatically scanned for unit tests by 
+[`scripts/generate_test_list.rb`][generate-test-list].
+
+[cmakelists]: https://gitlab.com/xfbs/passgen/-/blob/master/src/tests/CMakeLists.txt
+[generate-test-list]: https://gitlab.com/xfbs/passgen/-/blob/master/scripts/generate-test-list.rb
 
 At build time, a list of these functions is automatically generated in
 `<build-folder>/tests/test_list.c`. This means that adding a new test function
@@ -22,25 +24,31 @@ scanned as well.
 
 ### Structure
 
-The basic structure of a test should be that it needs to return `test_result`,
-it's name should start with `test_`, it should not take any arguments and it
-should return `test_ok`.
+Every unit test must return the `test_result` type, and end with a `return
+test_ok;` statement. The name of the unit test must start with `test_` and
+should not take any arguments.
 
 ```c
 test_result test_some_name(void) {
-  // ...
-  assert(2 == 2);
-  // ...
+    assert_eq(2, 2);
+    assert(true);
 
-  return test_ok;
+    return test_ok;
 }
 ```
+
+Any functions that do not match these requirements will not be picked up
+automatically by the unit testing framework and will not run. This is so that
+you can define helper functions that are not treated as tests themselves.
+
+It is probably easiest to take a look at the other tests that already exist for
+some reference on how to write your own unit tests.
 
 ### Tests binary
 
 By default, when building the code, the tests binary is generated and found in
-`<build-dir>/tests/passgen-test`. This should be run after every recompilation
-to ensure that no breaking changes were introduced.
+`<build-dir>/src/tests/passgen-test`. This should be run after every
+recompilation to ensure that no breaking changes were introduced.
 
     $ ./build/tests/passgen-test
     ...
@@ -77,10 +85,10 @@ anyways, but can be useful when certain tests are broken during a refactoring.
 ### Recommendations
 
 It usually makes sure to run tests with some kind of sanitizer, such as valgrind.
-This catches illegal memory accesses.
+This catches illegal memory accesses, at the expense of runtime speed.
 
     $ valgrind ./tests/passgen-test
 
 Another recommendation is using the LLVM sanitizers. To do this, the code needs
 to be compiled specially with them enabled, instructions on how to do that can
-be found at [Building](building.md).
+be found at the [Tooling](tooling.md) page.
