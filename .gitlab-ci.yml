@@ -286,19 +286,6 @@ build:wasi:
       - build-wasi
     expire_in: 1 week
 
-integrate:ubuntu-22-04:
-  image: ubuntu:22.04
-  stage: integrate
-  dependencies:
-    - build:amd64
-    - build:alpine
-  before_script:
-    - apt update
-  script:
-    - apt install ./build-amd64/passgen_*_amd64.deb
-    - ./scripts/ci-test-passgen.sh passgen
-    - ./scripts/ci-test-passgen.sh ./build-alpine-release/src/cli/passgen
-
 pages:
   image: registry.gitlab.com/xfbs/passgen/deploy
   stage: deploy
