@@ -8,7 +8,6 @@ repo_url: 'https://gitlab.com/xfbs/passgen'
 
 theme:
   name: 'material'
-  custom_dir: overrides
   features:
     - navigation.instant
     - navigation.tracking
