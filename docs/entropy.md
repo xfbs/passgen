@@ -16,7 +16,21 @@ possibilities of the latter.
 Passgen can calculate the entropy of the passphrases it generates. This can
 give you a useful estimate of how much computing power would be required to
 crack the passphrase, if an adversary knew the exact pattern you were using to
-generate it.
+generate it. You can use the `--entropy` flag to tell passgen to compute
+the entropy as it is generating passwords. For example:
+
+```
+$ passgen -e '[a-z]{8}'
+entropy: 37.603518 bits
+frjnqaip
+$ passgen -e '[A-Za-z0-9]{8}'
+entropy: 47.633570 bits
+Q5cO12sF
+```
+
+In general, the longer a passphrase is, or the more choice it has (more
+possible letters, longer wordlist), the higher the entropy it, and therefore
+the more secure it is.
 
 ## Calculator
 
