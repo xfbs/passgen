@@ -271,6 +271,14 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
         "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
     passgen_hashmap_insert(&opts->presets, "edge", "[A-Za-f0-9:_\\-]{15}");
     passgen_hashmap_insert(&opts->presets, "firefox", "[a-zA-Z0-9]{15}");
+    passgen_hashmap_insert(&opts->presets, "proquint16", "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){0}");
+    passgen_hashmap_insert(&opts->presets, "proquint32", "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){1}");
+    passgen_hashmap_insert(&opts->presets, "proquint48", "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){2}");
+    passgen_hashmap_insert(&opts->presets, "proquint64", "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){3}");
+    passgen_hashmap_insert(&opts->presets, "proquint80", "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){4}");
+    passgen_hashmap_insert(&opts->presets, "proquint96", "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){5}");
+    passgen_hashmap_insert(&opts->presets, "proquint112", "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){6}");
+    passgen_hashmap_insert(&opts->presets, "proquint128", "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){7}");
 }
 
 int passgen_cli_preset_show(void *data, passgen_hashmap_entry *entry) {
