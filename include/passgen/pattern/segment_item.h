@@ -2,7 +2,7 @@
 #include <stdbool.h>
 
 #include "passgen/util/stack.h"
-#include "passgen/pattern/chars.h"
+#include "passgen/pattern/literal.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/pattern_kind.h"
 #include "passgen/pattern/repeat.h"
@@ -13,10 +13,10 @@ typedef struct passgen_pattern_item {
     enum passgen_pattern_kind kind;
 
     union {
-        struct passgen_pattern_set set;
+        passgen_pattern_set set;
         passgen_pattern_group group;
-        passgen_chars chars;
-        struct passgen_pattern_special special;
+        passgen_pattern_literal chars;
+        passgen_pattern_special special;
     } data;
 
     struct passgen_pattern_repeat repeat;

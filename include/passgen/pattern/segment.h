@@ -6,12 +6,6 @@
 
 #include "passgen/util/stack.h"
 
-struct passgen_pattern_item;
-struct passgen_pattern_set;
-struct passgen_pattern_char;
-struct passgen_pattern_group;
-struct passgen_pattern_special;
-
 /// Represents a single segment of a pattern. 
 ///
 /// For example, in the group
@@ -29,7 +23,7 @@ void passgen_pattern_segment_free(passgen_pattern_segment *segment);
 struct passgen_pattern_item *
 passgen_pattern_segment_new_item(passgen_pattern_segment *segment);
 
-struct passgen_chars *
+struct passgen_pattern_literal *
 passgen_pattern_segment_new_char(passgen_pattern_segment *segment);
 struct passgen_pattern_set *
 passgen_pattern_segment_new_set(passgen_pattern_segment *segment);

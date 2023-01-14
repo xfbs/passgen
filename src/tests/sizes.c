@@ -1,6 +1,6 @@
 #include "passgen/markov.h"
-#include "passgen/pattern/chars.h"
 #include "passgen/pattern/group.h"
+#include "passgen/pattern/literal.h"
 #include "passgen/pattern/parser.h"
 #include "passgen/pattern/parser_state.h"
 #include "passgen/pattern/pattern.h"
@@ -17,7 +17,6 @@
 #include "passgen/util/hashmap.h"
 #include "passgen/util/stack.h"
 #include "passgen/wordlist.h"
-#include "passgen/markov.h"
 #include "tests.h"
 #include <string.h>
 
@@ -46,7 +45,7 @@ test_result test_sizes_pattern(void) {
     assert_eq(sizeof(passgen_pattern_segment), 32);
     assert_eq(sizeof(passgen_pattern_item), 72);
     assert_eq(sizeof(passgen_pattern_range), 16);
-    assert_eq(sizeof(passgen_chars), 32);
+    assert_eq(sizeof(passgen_pattern_literal), 32);
     assert_eq(sizeof(passgen_pattern_set), 40);
     assert_eq(sizeof(passgen_pattern_special), 24);
     return test_ok;
@@ -69,4 +68,3 @@ test_result test_sizes_util(void) {
     assert_eq(sizeof(passgen_array), 24);
     return test_ok;
 }
-

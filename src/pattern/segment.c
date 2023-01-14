@@ -1,5 +1,6 @@
 #include "passgen/pattern/segment.h"
 #include "passgen/pattern/group.h"
+#include "passgen/pattern/literal.h"
 #include "passgen/pattern/pattern_kind.h"
 #include "passgen/pattern/repeat.h"
 #include "passgen/pattern/segment_item.h"
@@ -30,7 +31,7 @@ passgen_pattern_segment_new_item(struct passgen_pattern_segment *segment) {
     return item;
 }
 
-struct passgen_chars *
+struct passgen_pattern_literal *
 passgen_pattern_segment_new_char(struct passgen_pattern_segment *segment) {
     struct passgen_pattern_item *item =
         passgen_pattern_segment_new_item(segment);

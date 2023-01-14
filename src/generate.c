@@ -2,8 +2,8 @@
 
 #include "passgen/assert.h"
 #include "passgen/markov.h"
-#include "passgen/pattern/chars.h"
 #include "passgen/pattern/group.h"
+#include "passgen/pattern/literal.h"
 #include "passgen/pattern/pattern.h"
 #include "passgen/pattern/pattern_kind.h"
 #include "passgen/pattern/range.h"
@@ -280,7 +280,7 @@ int passgen_generate_set(
 }
 
 int passgen_generate_character(
-    passgen_chars_t *character,
+    passgen_pattern_literal *character,
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {

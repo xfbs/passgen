@@ -1,7 +1,7 @@
 #include "passgen/parser/parser.h"
 #include "passgen/parser/token.h"
-#include "passgen/pattern/chars.h"
 #include "passgen/pattern/group.h"
+#include "passgen/pattern/literal.h"
 #include "passgen/pattern/parser.h"
 #include "passgen/pattern/pattern.h"
 #include "passgen/pattern/pattern_kind.h"

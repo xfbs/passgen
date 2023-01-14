@@ -2,8 +2,8 @@
 #include <string.h>
 
 #include "passgen/markov.h"
-#include "passgen/pattern/chars.h"
 #include "passgen/pattern/group.h"
+#include "passgen/pattern/literal.h"
 #include "passgen/pattern/parser.h"
 #include "passgen/pattern/parser_state.h"
 #include "passgen/pattern/pattern.h"
@@ -45,7 +45,7 @@ static const struct size_info struct_sizes[] = {
     add_struct(passgen_pattern_group),
     add_struct(passgen_pattern_segment),
     add_struct(passgen_pattern_item),
-    add_struct(passgen_chars),
+    add_struct(passgen_pattern_literal),
     add_struct(passgen_pattern_set),
     add_struct(passgen_pattern_special),
     add_struct(passgen_token),

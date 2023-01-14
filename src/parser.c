@@ -5,8 +5,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "passgen/pattern/chars.h"
 #include "passgen/pattern/group.h"
+#include "passgen/pattern/literal.h"
 #include "passgen/pattern/parser.h"
 #include "passgen/pattern/parser_state.h"
 #include "passgen/pattern/pattern.h"
@@ -171,7 +171,7 @@ int passgen_parse_group(
         }
     }
 
-    struct passgen_chars *chr =
+    struct passgen_pattern_literal *chr =
         passgen_pattern_segment_new_char(state->data.group.segment);
     chr->count = 1;
     chr->tainted = 0;
