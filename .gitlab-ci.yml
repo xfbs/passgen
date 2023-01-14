@@ -165,6 +165,7 @@ test:amd64:
     paths:
       - build-clang/ccov/passgen-test
       - build-gcc/ccov/passgen-test
+      - make symbols-check
     expire_in: 1 week
 
 test:alpine:
@@ -175,6 +176,7 @@ test:alpine:
     - cmake --build build
     - ./build/src/tests/passgen-test -v
     - valgrind ./build/src/tests/passgen-test -v
+    - ninja -C build symbols-check
 
 test:riscv64:
   image: registry.gitlab.com/xfbs/passgen/riscv64

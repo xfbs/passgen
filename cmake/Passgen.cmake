@@ -21,13 +21,12 @@ endfunction()
 function(passgen_check_symbols target)
   add_custom_target(${target}-symbols-check
     COMMAND
-    ruby ${PROJECT_SOURCE_DIR}/scripts/check_symbols.rb
+    ruby ${PROJECT_SOURCE_DIR}/scripts/symbols-check.rb
       -n ${NM_PATH}
       -p passgen
-      -p pattern
-      -p reader
-      -p unicode
       -p utf8
+      -e _init
+      -e _fini
       $<TARGET_FILE:${target}>
     DEPENDS ${target}
     VERBATIM)

@@ -4,6 +4,7 @@ require 'optparse'
 options = {}
 options[:prefix] = []
 options[:regex] = []
+options[:exact] = []
 
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: check_symbols.rb [options]"
@@ -14,6 +15,10 @@ parser = OptionParser.new do |opts|
 
   opts.on("-pPREFIX", "--prefix=PREFIX", "Prefix to allow") do |prefix|
     options[:prefix] << prefix
+  end
+
+  opts.on("-eNAME", "--exact=NAME", "Exact symbol to allow") do |name|
+    options[:exact] << name
   end
 
   opts.on("-rREGEX", "--regex=REGEX", "Regex to allow") do |regex|
@@ -55,6 +60,10 @@ def check_symbol options, file, symbol
     end
   end
 
+  if options[:exact].member? symbol
+    match = true
+  end
+
   unless match
     puts "error: symbol #{symbol} in #{file} doesn't match!"
     options[:okay] = false
@@ -75,6 +84,10 @@ ARGV.each do |file|
     case symbol
     when /^(.+):$/
       current_file = $1
+    when /^\s+U/
+      # ignore
+    when /^\s+w/
+      # ignore
     when /^\s*$/
       # ignore
     when /^([0-9a-f]+|\s+) ([a-zA-Z?]) ([a-zA-Z_][a-zA-Z0-9_]*)$/
