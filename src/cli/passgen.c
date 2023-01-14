@@ -115,7 +115,7 @@ int passgen_cli_generate_normal(
     }
 
     struct passgen_env env = {
-        .find_complexity = opts.complexity,
+        .find_entropy = opts.entropy,
         .wordlists = opts.wordlists,
         .random = opts.random,
     };
@@ -126,11 +126,11 @@ int passgen_cli_generate_normal(
             passgen_generate_fill_utf8(pattern, &env, pass, pass_len);
         pass[written] = '\0';
 
-        if(opts.complexity) {
+        if(opts.entropy) {
             fprintf(
                 stderr,
                 "entropy: %lf bits\n",
-                log(env.complexity) / log(2));
+                log(env.entropy) / log(2));
         }
 
         if(i == 0) {
@@ -158,7 +158,7 @@ int passgen_cli_generate_json(
     }
 
     struct passgen_env env = {
-        .find_complexity = opts.complexity,
+        .find_entropy = opts.entropy,
         .wordlists = opts.wordlists,
         .random = opts.random,
     };
@@ -171,8 +171,8 @@ int passgen_cli_generate_json(
         pass[written] = '\0';
         printf("%s{\"output\":\"%s\"", (i == 0) ? "" : ",", pass);
 
-        if(opts.complexity) {
-            printf(",\"entropy\":%lf", log(env.complexity) / log(2));
+        if(opts.entropy) {
+            printf(",\"entropy\":%lf", log(env.entropy) / log(2));
         }
 
         printf("}");
@@ -249,7 +249,7 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->amount = 1;
     opts->depth = 100;
     opts->null = false;
-    opts->complexity = false;
+    opts->entropy = false;
     opts->random = NULL;
     opts->json = false;
     opts->markov_length = 3;
@@ -337,7 +337,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 opts->null = true;
                 break;
             case 'e':
-                opts->complexity = true;
+                opts->entropy = true;
                 break;
             case 'v':
                 return PASSGEN_SHOW_VERSION;

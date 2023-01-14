@@ -12,8 +12,8 @@
 /// This allows for passing data to the generation functions, such as the available wordlists
 /// for word-based patterns and the randomness generator.
 struct passgen_env {
-  bool find_complexity;
-  double complexity;
+  bool find_entropy;
+  double entropy;
   passgen_hashmap wordlists;
   passgen_random *random;
 };

@@ -43,8 +43,8 @@ typedef struct {
     bool json;
     /// Parsing depth.
     size_t depth;
-    /// Output complexity.
-    bool complexity;
+    /// Output entropy.
+    bool entropy;
     /// Length of markov chain
     size_t markov_length;
     /// Wordlists that are to be loaded.

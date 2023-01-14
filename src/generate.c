@@ -34,7 +34,7 @@ struct fillpos_utf8 {
 };
 
 static struct passgen_env passgen_env_default = {
-    .find_complexity = false,
+    .find_entropy = false,
     .random = NULL,
 };
 
@@ -227,9 +227,9 @@ size_t passgen_generate_repeat(
     // get random number to choose from the range
     size_t choice = passgen_random_u64_max(env->random, difference + 1);
 
-    // keep track of complexity
-    if(env->find_complexity) {
-        env->complexity *= difference + 1;
+    // keep track of entropy
+    if(env->find_entropy) {
+        env->entropy *= difference + 1;
     }
 
     return repeat->min + choice;
@@ -253,9 +253,9 @@ int passgen_generate_set(
 
     size_t choice = passgen_random_u64_max(env->random, possible);
 
-    // keep track of complexity
-    if(env->find_complexity) {
-        env->complexity *= possible;
+    // keep track of entropy
+    if(env->find_entropy) {
+        env->entropy *= possible;
     }
 
     // locate choice in list of choices.
@@ -317,13 +317,13 @@ int passgen_generate_special_pronounceable(
     uint32_t word[128];
     size_t pos = markov->level;
     memset(word, 0, pos * sizeof(uint32_t));
-    double *complexity = env->find_complexity ? &env->complexity : NULL;
+    double *entropy = env->find_entropy ? &env->entropy : NULL;
     do {
         word[pos] = passgen_markov_generate(
             markov,
             &word[pos - markov->level],
             env->random,
-            complexity);
+            entropy);
         pos++;
     } while(word[pos - 1]);
 
@@ -356,8 +356,8 @@ int passgen_generate_special_wordlist(
         word++;
     }
 
-    if(env->find_complexity) {
-        env->complexity *= passgen_wordlist_count(wordlist);
+    if(env->find_entropy) {
+        env->entropy *= passgen_wordlist_count(wordlist);
     }
 
     return 0;
@@ -457,9 +457,9 @@ int passgen_generate_group(
     // choose random segment from segments
     size_t segment = passgen_random_u64_max(env->random, group->segments.len);
 
-    // keep track of complexity
-    if(env->find_complexity) {
-        env->complexity *= group->segments.len;
+    // keep track of entropy
+    if(env->find_entropy) {
+        env->entropy *= group->segments.len;
     }
 
     // get segment from array
@@ -479,8 +479,8 @@ int passgen_generate(
         env = &passgen_env_default;
     }
 
-    if(env->find_complexity) {
-        env->complexity = 1;
+    if(env->find_entropy) {
+        env->entropy = 1;
     }
 
     return passgen_generate_group(&pattern->group, env, data, func);
