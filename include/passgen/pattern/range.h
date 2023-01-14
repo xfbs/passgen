@@ -20,4 +20,4 @@ typedef struct passgen_pattern_range {
     uint32_t end;
 
     size_t multiplier;
-} passgen_pattern_range_t;
+} passgen_pattern_range;

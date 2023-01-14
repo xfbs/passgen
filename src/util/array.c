@@ -6,14 +6,14 @@
 
 #define SIZE_INITIAL 4
 
-void passgen_array_realloc(passgen_array_t *array, size_t capacity) {
+void passgen_array_realloc(passgen_array *array, size_t capacity) {
     array->data = realloc(array->data, capacity * sizeof(void *));
     array->capacity = capacity;
 }
 
 // Initialize array. Optionally takes a capacity, if so, memory that is
 // sufficiently large to hold `capacity` items will be allocated.
-void passgen_array_init(passgen_array_t *array, size_t capacity) {
+void passgen_array_init(passgen_array *array, size_t capacity) {
     memset(array, 0, sizeof(*array));
 
     if(capacity) {
@@ -22,7 +22,7 @@ void passgen_array_init(passgen_array_t *array, size_t capacity) {
 }
 
 // Push an item to the back of the array.
-void passgen_array_push(passgen_array_t *array, void *pointer) {
+void passgen_array_push(passgen_array *array, void *pointer) {
     if(!array->data) {
         passgen_array_realloc(array, SIZE_INITIAL);
     }
@@ -36,7 +36,7 @@ void passgen_array_push(passgen_array_t *array, void *pointer) {
 }
 
 // Retrieve an item from the array.
-void *passgen_array_get(passgen_array_t *array, size_t pos) {
+void *passgen_array_get(passgen_array *array, size_t pos) {
 #ifdef PASSGEN_DEBUG
     passgen_assert(pos <= array->items);
 #endif
@@ -45,13 +45,13 @@ void *passgen_array_get(passgen_array_t *array, size_t pos) {
 }
 
 // Frees an array.
-void passgen_array_free(passgen_array_t *array) {
+void passgen_array_free(passgen_array *array) {
     free(array->data);
     memset(array, 0, sizeof(*array));
 }
 
 // Pops the last item off the array and returns it.
-void *passgen_array_pop(passgen_array_t *array) {
+void *passgen_array_pop(passgen_array *array) {
     if(!array->items) {
         return NULL;
     }

@@ -12,12 +12,12 @@
 
 /// Represents a parser. Contains a parsing stack, as well as a pattern, which
 /// is dynamically built, and should not be used until the parsing is finalized.
-struct passgen_parser {
+typedef struct passgen_parser {
     /// Current state of the parser, as a stack.
     passgen_stack state;
     /// The current, possibly incomplete parsed pattern.
-    passgen_pattern_t pattern;
-};
+    passgen_pattern pattern;
+} passgen_parser;
 
 /// Get the nth memeber of the parsing stack.
 struct passgen_parser_state *

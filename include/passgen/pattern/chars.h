@@ -9,4 +9,4 @@ typedef struct passgen_chars {
     uint8_t count;
     uint8_t tainted;
     int32_t codepoints[7];
-} passgen_chars_t;
+} passgen_chars;

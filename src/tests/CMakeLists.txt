@@ -12,6 +12,7 @@ set(TEST_LIST
     "markov.c"
     "parser.c"
     "random.c"
+    "sizes.c"
     "stack.c"
     "token.c"
     "utf8.c"

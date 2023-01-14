@@ -8,7 +8,7 @@
 /// it does not need to be enclosed in parentheses.
 typedef struct passgen_pattern {
     struct passgen_pattern_group group;
-} passgen_pattern_t;
+} passgen_pattern;
 
-void passgen_pattern_init(passgen_pattern_t *pattern);
-void passgen_pattern_free(passgen_pattern_t *pattern);
+void passgen_pattern_init(passgen_pattern *pattern);
+void passgen_pattern_free(passgen_pattern *pattern);

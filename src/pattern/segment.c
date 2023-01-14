@@ -7,7 +7,7 @@
 #include "passgen/util/stack.h"
 
 void passgen_pattern_segment_init(struct passgen_pattern_segment *segment) {
-    passgen_stack_init(&segment->items, sizeof(passgen_pattern_item_t));
+    passgen_stack_init(&segment->items, sizeof(passgen_pattern_item));
 }
 
 void passgen_pattern_segment_free(struct passgen_pattern_segment *segment) {

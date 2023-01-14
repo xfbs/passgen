@@ -48,7 +48,7 @@ enum passgen_token_state {
 /// could be written as `\x{0a}`. To make this possible, the parser needs to keep track of the length of
 /// the payload (the hexadecimal data), since that has an upper bound, and the current parsed codepoint
 /// value.
-struct passgen_token_parser {
+typedef struct passgen_token_parser {
     /// Current state of the parser.
     enum passgen_token_state state;
     /// Current codepoint offset in parsing.
@@ -63,7 +63,7 @@ struct passgen_token_parser {
             uint32_t codepoint;
         } unicode_payload;
     } data;
-};
+} passgen_token_parser;
 
 /// Parsed passgen token.
 ///
@@ -74,11 +74,11 @@ struct passgen_token_parser {
 ///
 /// Also contains the byte offset of this token in the input string (useful if the input is
 /// UTF-8 encoded) and the codepoint offset of this token.
-struct passgen_token {
+typedef struct passgen_token {
     uint32_t codepoint;
     size_t offset;
     size_t byte_offset;
-};
+} passgen_token;
 
 /// Initialize a @ref passgen_token_parser.
 void passgen_token_parser_init(struct passgen_token_parser *token_parser);

@@ -14,14 +14,14 @@ typedef struct passgen_pattern_item {
 
     union {
         struct passgen_pattern_set set;
-        struct passgen_pattern_group group;
-        passgen_chars_t chars;
+        passgen_pattern_group group;
+        passgen_chars chars;
         struct passgen_pattern_special special;
     } data;
 
     struct passgen_pattern_repeat repeat;
     bool maybe;
-} passgen_pattern_item_t;
+} passgen_pattern_item;
 
-void passgen_pattern_item_init(struct passgen_pattern_item *item);
-void passgen_pattern_item_free(struct passgen_pattern_item *item);
+void passgen_pattern_item_init(passgen_pattern_item *item);
+void passgen_pattern_item_free(passgen_pattern_item *item);

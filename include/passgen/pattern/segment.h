@@ -21,23 +21,23 @@ struct passgen_pattern_special;
 typedef struct passgen_pattern_segment {
     // array of segment_items
     passgen_stack items;
-} passgen_pattern_segment_t;
+} passgen_pattern_segment;
 
-void passgen_pattern_segment_init(struct passgen_pattern_segment *segment);
-void passgen_pattern_segment_free(struct passgen_pattern_segment *segment);
+void passgen_pattern_segment_init(passgen_pattern_segment *segment);
+void passgen_pattern_segment_free(passgen_pattern_segment *segment);
 
 struct passgen_pattern_item *
-passgen_pattern_segment_new_item(struct passgen_pattern_segment *segment);
+passgen_pattern_segment_new_item(passgen_pattern_segment *segment);
 
 struct passgen_chars *
-passgen_pattern_segment_new_char(struct passgen_pattern_segment *segment);
+passgen_pattern_segment_new_char(passgen_pattern_segment *segment);
 struct passgen_pattern_set *
-passgen_pattern_segment_new_set(struct passgen_pattern_segment *segment);
+passgen_pattern_segment_new_set(passgen_pattern_segment *segment);
 struct passgen_pattern_group *
-passgen_pattern_segment_new_group(struct passgen_pattern_segment *segment);
+passgen_pattern_segment_new_group(passgen_pattern_segment *segment);
 struct passgen_pattern_special *
-passgen_pattern_segment_new_special(struct passgen_pattern_segment *segment);
+passgen_pattern_segment_new_special(passgen_pattern_segment *segment);
 
 struct passgen_pattern_item *passgen_pattern_segment_get_item(
-    struct passgen_pattern_segment *segment,
+    passgen_pattern_segment *segment,
     size_t n);

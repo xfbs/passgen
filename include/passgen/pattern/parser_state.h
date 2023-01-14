@@ -2,7 +2,7 @@
 
 #include "passgen/pattern/pattern.h"
 
-enum passgen_parser_state_type {
+typedef enum passgen_parser_state_type {
     PASSGEN_PARSER_GROUP,
     PASSGEN_PARSER_SET,
     PASSGEN_PARSER_SET_RANGE,
@@ -11,7 +11,7 @@ enum passgen_parser_state_type {
     PASSGEN_PARSER_SPECIAL,
     PASSGEN_PARSER_SPECIAL_NAME,
     PASSGEN_PARSER_DONE,
-};
+} passgen_parser_state_type;
 
 /// Represents the current state of the parser.
 ///
@@ -19,7 +19,7 @@ enum passgen_parser_state_type {
 /// what it is currently doing. This allows for introspection of the parser,
 /// limiting the depth (by limiting the stack size) and for giving useful error
 /// messages.
-struct passgen_parser_state {
+typedef struct passgen_parser_state {
     enum passgen_parser_state_type type;
     union {
         struct {
@@ -37,6 +37,6 @@ struct passgen_parser_state {
             struct passgen_pattern_special *special;
         } special;
     } data;
-};
+} passgen_parser_state;
 
-void passgen_parser_state_free(struct passgen_parser_state *state);
+void passgen_parser_state_free(passgen_parser_state *state);

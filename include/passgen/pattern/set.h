@@ -18,13 +18,13 @@ typedef struct passgen_pattern_set {
     // how many choices to choose from. for efficient generation. improved
     // locality.
     size_t *choices_list;
-} passgen_pattern_set_t;
+} passgen_pattern_set;
 
-void passgen_pattern_set_init(struct passgen_pattern_set *set);
-void passgen_pattern_set_free(struct passgen_pattern_set *set);
-
-struct passgen_pattern_range *
-passgen_pattern_set_new_range(struct passgen_pattern_set *set);
+void passgen_pattern_set_init(passgen_pattern_set *set);
+void passgen_pattern_set_free(passgen_pattern_set *set);
 
 struct passgen_pattern_range *
-passgen_pattern_set_get_range(struct passgen_pattern_set *set, size_t n);
+passgen_pattern_set_new_range(passgen_pattern_set *set);
+
+struct passgen_pattern_range *
+passgen_pattern_set_get_range(passgen_pattern_set *set, size_t n);

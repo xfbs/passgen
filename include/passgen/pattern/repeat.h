@@ -17,4 +17,4 @@ typedef struct passgen_pattern_repeat {
     size_t min;
     /// Maximum number of repetitions
     size_t max;
-} passgen_repeat_t;
+} passgen_pattern_repeat;

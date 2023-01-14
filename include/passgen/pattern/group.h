@@ -16,18 +16,18 @@
 typedef struct passgen_pattern_group {
     /// Segments that make up this group
     passgen_stack segments;
-} passgen_pattern_group_t;
+} passgen_pattern_group;
 
 /// Initialize a @ref passgen_pattern_group.
-void passgen_pattern_group_init(passgen_pattern_group_t *group);
+void passgen_pattern_group_init(passgen_pattern_group *group);
 
 /// Free a @ref passgen_pattern_group.
-void passgen_pattern_group_free(passgen_pattern_group_t *group);
+void passgen_pattern_group_free(passgen_pattern_group *group);
 
 /// Add a new segment to an existing @ref passgen_pattern_group.
 struct passgen_pattern_segment *
-passgen_pattern_group_new_segment(passgen_pattern_group_t *group);
+passgen_pattern_group_new_segment(passgen_pattern_group *group);
 
 /// Get a specific segment from a @ref passgen_pattern_group by index.
 struct passgen_pattern_segment *
-passgen_pattern_group_get_segment(passgen_pattern_group_t *group, size_t n);
+passgen_pattern_group_get_segment(passgen_pattern_group *group, size_t n);

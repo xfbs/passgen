@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 void passgen_pattern_set_init(struct passgen_pattern_set *set) {
-    passgen_stack_init(&set->items, sizeof(passgen_pattern_range_t));
+    passgen_stack_init(&set->items, sizeof(passgen_pattern_range));
 
     set->choices_list = NULL;
 }

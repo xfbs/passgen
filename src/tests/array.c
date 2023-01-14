@@ -4,7 +4,7 @@
 
 test_result test_array_init(void) {
     size_t capacity = 15;
-    passgen_array_t array;
+    passgen_array array;
     passgen_array_init(&array, capacity);
     assert_eq(array.capacity, capacity);
     assert_eq(array.items, 0);
@@ -17,7 +17,7 @@ test_result test_array_init(void) {
 
 test_result test_array_push(void) {
     size_t capacity = 15;
-    passgen_array_t array;
+    passgen_array array;
     passgen_array_init(&array, capacity);
     assert_eq(array.capacity, capacity);
     assert_eq(array.items, 0);
@@ -42,7 +42,7 @@ test_result test_array_push(void) {
 
 test_result test_array_get(void) {
     size_t capacity = 15;
-    passgen_array_t array;
+    passgen_array array;
     passgen_array_init(&array, capacity);
     assert_eq(array.capacity, capacity);
     assert_eq(array.items, 0);
@@ -66,7 +66,7 @@ test_result test_array_get(void) {
 
 test_result test_array_pop(void) {
     size_t capacity = 15;
-    passgen_array_t array;
+    passgen_array array;
     passgen_array_init(&array, capacity);
     assert_eq(array.capacity, capacity);
     assert_eq(array.items, 0);
@@ -97,7 +97,7 @@ test_result test_array_pop(void) {
 
 test_result test_array_realloc(void) {
     size_t capacity = 15;
-    passgen_array_t array;
+    passgen_array array;
     passgen_array_init(&array, capacity);
     assert_eq(array.capacity, capacity);
     assert_eq(array.items, 0);

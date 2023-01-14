@@ -4,11 +4,11 @@
 #include "passgen/pattern/repeat.h"
 #include "passgen/pattern/special_kind.h"
 
-struct passgen_pattern_special {
+typedef struct passgen_pattern_special {
     enum passgen_pattern_special_kind kind;
     size_t parameters_len;
     int32_t *parameters;
-};
+} passgen_pattern_special;
 
 /// Initialise a pattern special with the given char.
 ///
