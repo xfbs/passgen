@@ -18,12 +18,6 @@
 #define passgen_markov_node_codepoint(node, index) \
     node->entries[0].codepoint[index % node->capacity]
 
-#define passgen_markov_leaf_count(leaf, codepoint) \
-    leaf->entries[leaf->capacity].count[codepoint % leaf->capacity]
-
-#define passgen_markov_leaf_codepoint(leaf, index) \
-    leaf->entries[0].codepoint[index % leaf->capacity]
-
 /// Markov chain, containing a tree of unicode codepoints and frequency data.
 ///
 /// This data structure answers the question "given the previous characters x and y,
@@ -109,6 +103,9 @@ void passgen_markov_leaf_free(passgen_markov_leaf *leaf);
 
 /// Insert a final codepoint and weight into a Markov leaf node.
 passgen_markov_leaf *passgen_markov_leaf_insert(passgen_markov_leaf *leaf, uint32_t codepoint, size_t weight);
+
+/// Given a codepoint, return a count or zero if the codepoint does not exist.
+uint32_t passgen_markov_leaf_count(passgen_markov_leaf *leaf, uint32_t codepoint);
 
 /// Initialize new markov chain with a given level
 void passgen_markov_init(passgen_markov *markov, uint8_t level);

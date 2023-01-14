@@ -9,6 +9,12 @@
 #define MARKOV_LEAF_INITIAL    4
 #define MARKOV_LEAF_MULTIPLIER 2
 
+#define passgen_markov_leaf_count_raw(leaf, codepoint) \
+    leaf->entries[leaf->capacity].count[codepoint % leaf->capacity]
+
+#define passgen_markov_leaf_codepoint_raw(leaf, index) \
+    leaf->entries[0].codepoint[index % leaf->capacity]
+
 /// Sizes for the leaf and node hash maps. These are all prime numbers, with the
 /// property that every number is greater than double the previous one.
 /// Generated with Ruby with:
@@ -47,6 +53,9 @@ passgen_markov_node *passgen_markov_node_new(size_t size_index) {
 
 passgen_markov_leaf *passgen_markov_leaf_new(size_t size_index) {
     size_t capacity = markov_sizes[size_index];
+    if(capacity == 0) {
+        return NULL;
+    }
     size_t size = passgen_markov_leaf_size(capacity);
     passgen_markov_leaf *leaf = calloc(1, size);
     memset(leaf, 0, size);
@@ -114,9 +123,9 @@ passgen_markov_leaf *passgen_markov_leaf_realloc(passgen_markov_leaf *leaf) {
 
     // re-insert old elements
     for(size_t i = 0; i < leaf->capacity; i++) {
-        if(passgen_markov_leaf_count(leaf, i)) {
-            uint32_t codepoint = passgen_markov_leaf_codepoint(leaf, i);
-            uint32_t count = passgen_markov_leaf_count(leaf, i);
+        if(passgen_markov_leaf_count_raw(leaf, i)) {
+            uint32_t codepoint = passgen_markov_leaf_codepoint_raw(leaf, i);
+            uint32_t count = passgen_markov_leaf_count_raw(leaf, i);
             new = passgen_markov_leaf_insert(new, codepoint, count);
         }
     }
@@ -130,14 +139,19 @@ passgen_markov_leaf *passgen_markov_leaf_insert(
     passgen_markov_leaf *leaf,
     uint32_t codepoint,
     size_t weight) {
-    while(passgen_markov_leaf_count(leaf, codepoint) &&
-          passgen_markov_leaf_codepoint(leaf, codepoint) != codepoint) {
+    // don't do anything if asked to insert a codepoint with an empty weight.
+    if(weight == 0) {
+        return leaf;
+    }
+
+    while(passgen_markov_leaf_count_raw(leaf, codepoint) &&
+          passgen_markov_leaf_codepoint_raw(leaf, codepoint) != codepoint) {
         leaf = passgen_markov_leaf_realloc(leaf);
     }
 
     // set codepoint
-    passgen_markov_leaf_codepoint(leaf, codepoint) = codepoint;
-    passgen_markov_leaf_count(leaf, codepoint) += weight;
+    passgen_markov_leaf_codepoint_raw(leaf, codepoint) = codepoint;
+    passgen_markov_leaf_count_raw(leaf, codepoint) += weight;
     leaf->total_count += weight;
 
     return leaf;
@@ -289,7 +303,7 @@ uint32_t passgen_markov_generate(
 
     size_t choice = passgen_random_u64_max(random, leaf->total_count);
     for(size_t i = 0; i < leaf->capacity; i++) {
-        uint32_t count = passgen_markov_leaf_count(leaf, i);
+        uint32_t count = passgen_markov_leaf_count_raw(leaf, i);
         if(count) {
             if(choice < count) {
                 // record bucket (reduces total choices).
@@ -297,7 +311,7 @@ uint32_t passgen_markov_generate(
                     *complexity /= (double) count;
                 }
 
-                return passgen_markov_leaf_codepoint(leaf, i);
+                return passgen_markov_leaf_codepoint_raw(leaf, i);
             } else {
                 choice -= count;
             }
@@ -307,4 +321,12 @@ uint32_t passgen_markov_generate(
     assert(false);
 
     return 0;
+}
+
+uint32_t passgen_markov_leaf_count(passgen_markov_leaf *leaf, uint32_t codepoint) {
+    if(passgen_markov_leaf_codepoint_raw(leaf, codepoint) == codepoint) {
+        return passgen_markov_leaf_count_raw(leaf, codepoint);
+    } else {
+        return 0;
+    }
 }
