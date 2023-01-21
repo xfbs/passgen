@@ -10,7 +10,29 @@
 #define MAX(a, b) ((a > b) ? (a) : (b))
 #define MIN(a, b) ((a > b) ? (b) : (a))
 
-static int show_help(const char *prog) {
+typedef enum mode {
+    MODE_BENCH,
+    MODE_ONESHOT,
+    MODE_LIST,
+} mode;
+
+typedef struct options {
+    const bench **benches;
+    bool *enabled;
+    passgen_hashmap options;
+    mode mode;
+    double time;
+    uint64_t iter;
+    bool verbose;
+    size_t name_col;
+    FILE *write;
+    passgen_hashmap *checkpoint;
+    const char *valgrind;
+    const char *program;
+} options;
+
+static int show_help(const options *options) {
+    const char *prog = options->program;
     printf("Usage: %s [-t TIME] [-i ITER] [-o NAME=VALUE...] [NAME...]\n", prog);
     printf("       %s -s [-o NAME=VALUE...] NAME\n", prog);
     printf("       %s -l [NAME...]\n", prog);
@@ -44,19 +66,13 @@ static int show_help(const char *prog) {
     printf("        is detected. It is recommended to only use checkpoints generated on the\n");
     printf("        same machine or to use the --valgrind flag to get machine-independent\n");
     printf("        data.\n");
-    printf("    -t, --valgrind PATH\n");
+    printf("    -c, --valgrind PATH\n");
     printf("        Use the valgrind tool at the given PATH to compute machine-indepdendent\n");
     printf("        benchmark statistics, used to detect regressions.\n");
     printf("    -v, --verbose\n");
     printf("        Enables verbose logging output.\n");
     return EXIT_SUCCESS;
 }
-
-typedef enum mode {
-    MODE_BENCH,
-    MODE_ONESHOT,
-    MODE_LIST,
-} mode;
 
 static void *dummy_iterate(void *data) {
     return NULL;
@@ -90,7 +106,6 @@ extern bench random_zero_read;
 extern bench hashmap_insert;
 
 const bench *benches[] = {
-    &hashmap_insert,
     &dummy,
     &stack_push,
     &stack_pop,
@@ -109,19 +124,9 @@ const bench *benches[] = {
     &random_zero_u32,
     &random_zero_u64,
     &random_zero_read,
+    &hashmap_insert,
     NULL,
 };
-
-typedef struct options {
-    const bench **benches;
-    bool *enabled;
-    passgen_hashmap options;
-    mode mode;
-    double time;
-    uint64_t iter;
-    bool verbose;
-    size_t name_col;
-} options;
 
 static double parse_time(const char *str) {
     double number;
@@ -336,7 +341,7 @@ void add_option(options *options, const char *arg) {
 
 int main(int argc, char *argv[]) {
     // define command-line options
-    const char *short_opts = "o:t:i:hlvs";
+    const char *short_opts = "o:t:i:w:r:c:hlvs";
     static struct option long_opts[] = {
         {"list", no_argument, NULL, 'l'},
         {"oneshot", no_argument, NULL, 's'},
@@ -345,6 +350,9 @@ int main(int argc, char *argv[]) {
         {"time", required_argument, NULL, 't'},
         {"option", required_argument, NULL, 'o'},
         {"iterations", required_argument, NULL, 'i'},
+        {"valgrind", required_argument, NULL, 'c'},
+        {"checkpoint", required_argument, NULL, 'w'},
+        {"check", required_argument, NULL, 'r'},
         {NULL, no_argument, NULL, 0}};
 
     size_t benchlen = bench_len(benches);
@@ -357,6 +365,7 @@ int main(int argc, char *argv[]) {
         .iter = 100,
         .time = 1.0,
         .verbose = false,
+        .program = argv[0],
     };
 
     passgen_hashmap_init(&options.options, &passgen_hashmap_context_default);
@@ -376,7 +385,7 @@ int main(int argc, char *argv[]) {
 
         switch(opt) {
             case 'h':
-                return show_help(argv[0]);
+                return show_help(&options);
             case 's':
                 options.mode = MODE_ONESHOT;
                 break;
@@ -396,6 +405,14 @@ int main(int argc, char *argv[]) {
                 break;
             case 'v':
                 options.verbose = true;
+                break;
+            case 'c':
+                options.valgrind = optarg;
+                break;
+            case 'r':
+                break;
+            case 'w':
+                options.checkpoint = fopen(optarg, "w");
                 break;
             case 'l':
                 options.mode = MODE_LIST;
