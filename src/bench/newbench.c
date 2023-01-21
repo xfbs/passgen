@@ -35,6 +35,18 @@ static int show_help(const char *prog) {
     printf("    -o, --option NAME=VALUE\n");
     printf("        Overrides the benchmark option NAME with VALUE. This option can be set\n");
     printf("        multiple times to override multiple options.\n");
+    printf("    -w, --checkpoint FILE\n");
+    printf("        Write a checkpoint to the given FILE. This will write out the current\n");
+    printf("        benchmark stats to the file in a CSV format for detecting regressions.\n");
+    printf("        Recommended to use with the --valgrind flag.\n");
+    printf("    -r, --check FILE\n");
+    printf("        Read current benchmark state from the given FILE and warn if a regression\n");
+    printf("        is detected. It is recommended to only use checkpoints generated on the\n");
+    printf("        same machine or to use the --valgrind flag to get machine-independent\n");
+    printf("        data.\n");
+    printf("    -t, --valgrind PATH\n");
+    printf("        Use the valgrind tool at the given PATH to compute machine-indepdendent\n");
+    printf("        benchmark statistics, used to detect regressions.\n");
     printf("    -v, --verbose\n");
     printf("        Enables verbose logging output.\n");
     return EXIT_SUCCESS;
