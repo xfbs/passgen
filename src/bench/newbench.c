@@ -75,8 +75,10 @@ extern bench random_zero_u16;
 extern bench random_zero_u32;
 extern bench random_zero_u64;
 extern bench random_zero_read;
+extern bench hashmap_insert;
 
 const bench *benches[] = {
+    &hashmap_insert,
     &dummy,
     &stack_push,
     &stack_pop,
