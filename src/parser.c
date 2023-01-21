@@ -99,6 +99,7 @@ int passgen_parse_group(
                 // should be treated as text
                 break;
             case 'm':
+            case 'p':
             case 'w':
                 // special token
                 special = passgen_pattern_segment_new_special(

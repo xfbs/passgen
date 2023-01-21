@@ -363,6 +363,14 @@ int passgen_generate_special_wordlist(
     return 0;
 }
 
+int passgen_generate_special_preset(
+    struct passgen_pattern_special *special,
+    struct passgen_env *env,
+    void *data,
+    passgen_generate_cb *func) {
+    return 0;
+}
+
 int passgen_generate_special(
     struct passgen_pattern_special *special,
     struct passgen_env *env,
@@ -375,13 +383,12 @@ int passgen_generate_special(
                 env,
                 data,
                 func);
-            break;
         case PASSGEN_PATTERN_SPECIAL_WORDLIST:
             return passgen_generate_special_wordlist(special, env, data, func);
-            break;
+        case PASSGEN_PATTERN_SPECIAL_PRESET:
+            return passgen_generate_special_preset(special, env, data, func);
         default:
-            passgen_assert(false);
-            break;
+            return 1;
     }
     return 0;
 }
