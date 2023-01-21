@@ -22,6 +22,10 @@ add_executable(passgen-random-bench "random.c")
 passgen_target_defaults(passgen-random-bench)
 target_link_libraries(passgen-random-bench PUBLIC ${PASSGEN_LIB})
 
+add_executable(passgen-bench-new newbench.c)
+passgen_target_defaults(passgen-bench-new)
+target_link_libraries(passgen-bench-new PUBLIC ${PASSGEN_LIB})
+
 add_executable(passgen-stack-bench stack.c)
 passgen_target_defaults(passgen-stack-bench)
 target_link_libraries(passgen-stack-bench PUBLIC ${PASSGEN_LIB})
