@@ -58,10 +58,36 @@ const bench dummy = {
 };
 
 extern bench stack_push;
+extern bench stack_pop;
+extern bench random_xorshift_u8;
+extern bench random_xorshift_u16;
+extern bench random_xorshift_u32;
+extern bench random_xorshift_u64;
+extern bench random_system_u8;
+extern bench random_system_u16;
+extern bench random_system_u32;
+extern bench random_system_u64;
+extern bench random_zero_u8;
+extern bench random_zero_u16;
+extern bench random_zero_u32;
+extern bench random_zero_u64;
 
 const bench *benches[] = {
     &dummy,
     &stack_push,
+    &stack_pop,
+    &random_system_u8,
+    &random_system_u16,
+    &random_system_u32,
+    &random_system_u64,
+    &random_xorshift_u8,
+    &random_xorshift_u16,
+    &random_xorshift_u32,
+    &random_xorshift_u64,
+    &random_zero_u8,
+    &random_zero_u16,
+    &random_zero_u32,
+    &random_zero_u64,
     NULL,
 };
 
@@ -194,7 +220,6 @@ int passgen_bench_run(const options *options) {
         size_t iterations = 0;
         for(; iterations < options->iter || (after - start) < target; iterations++) {
             if(bench->consumes) {
-                bench->release(data);
                 data = bench->prepare(&options->options);
             }
 
@@ -214,7 +239,7 @@ int passgen_bench_run(const options *options) {
             }
         }
 
-        if(data) {
+        if(data && !bench->consumes) {
             bench->release(data);
         }
 
