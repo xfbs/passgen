@@ -5,6 +5,10 @@
 #include <stdint.h>
 #include <math.h>
 #include <string.h>
+#include <time.h>
+
+#define MAX(a, b) ((a > b) ? (a) : (b))
+#define MIN(a, b) ((a > b) ? (b) : (a))
 
 static int show_help(const char *prog) {
     printf("Usage: %s [-t TIME] [-i ITER] [-o NAME=VALUE...] [NAME...]\n", prog);
@@ -42,33 +46,28 @@ typedef enum mode {
     MODE_LIST,
 } mode;
 
-const bench test1 = {
-    .group = "bench",
-    .name = "testlong1",
-    .desc = "This is another description of a benchmark, this one running somewhat longer and needing to be line-broken. This is some filler text that is inserted to make this description super verbose.",
+static void *dummy_iterate(void *data) {
+    return NULL;
+}
+
+const bench dummy = {
+    .group = "test",
+    .name = "dummy",
+    .desc = "Dummy benchmark, does not do anything.",
+    .iterate = &dummy_iterate,
 };
 
-const bench test2 = {
-    .group = "bench",
-    .name = "test2",
-    .desc = "This is an example description of a benchmark.",
-};
-
-const bench test3 = {
-    .group = "stack",
-    .name = "push_pop",
-    .desc = "This is an example description of a benchmark.",
-};
+extern bench stack_push;
 
 const bench *benches[] = {
-    &test1,
-    &test2,
-    &test3,
+    &dummy,
+    &stack_push,
     NULL,
 };
 
 typedef struct options {
     const bench **benches;
+    bool *enabled;
     mode mode;
     double time;
     uint64_t iter;
@@ -117,8 +116,11 @@ static double parse_time(const char *str) {
     return NAN;
 }
 
-#define MAX(a, b) ((a > b) ? (a) : (b))
-#define MIN(a, b) ((a > b) ? (b) : (a))
+static size_t bench_len(const bench *benches[]) {
+    size_t len = 0;
+    while(benches[len]) len++;
+    return len;
+}
 
 int passgen_bench_list(const options *options) {
     int name_col = 1;
@@ -165,9 +167,106 @@ int passgen_bench_list(const options *options) {
     return EXIT_SUCCESS;
 }
 
+int passgen_bench_run(const options *options) {
+    for(size_t b = 0; options->benches[b]; b++) {
+        if(!options->enabled[b]) {
+            continue;
+        }
+
+        bench *bench = options->benches[b];
+
+        if(options->verbose) {
+            fprintf(stderr, "Running benchmark %s\n", bench->name);
+        }
+
+        void *data = NULL;
+        if(bench->prepare) {
+            data = bench->prepare(NULL);
+        }
+
+        double total_time = 0;
+
+        size_t iterations = 0;
+        for(; iterations < options->iter || total_time < options->time; iterations++) {
+            if(bench->consumes) {
+                bench->release(data);
+                data = bench->prepare(NULL);
+            }
+
+            clock_t before = clock();
+            void *output = bench->iterate(data);
+            clock_t after = clock();
+
+            total_time += (after - before) / (double) CLOCKS_PER_SEC;
+
+            if(output) {
+                bench->cleanup(output);
+            }
+        }
+
+        if(data) {
+            bench->release(data);
+        }
+
+        printf("%s:%s: %lf it/s\n", bench->group, bench->name, iterations / total_time);
+    }
+
+    free(options->enabled);
+
+    return EXIT_SUCCESS;
+}
+
+int passgen_bench_oneshot(const options *options) {
+    for(size_t b = 0; options->benches[b]; b++) {
+        if(!options->enabled[b]) {
+            continue;
+        }
+
+        bench *bench = options->benches[b];
+
+        if(options->verbose) {
+            fprintf(stderr, "Running benchmark %s\n", bench->name);
+        }
+
+        void *data = NULL;
+        if(bench->prepare) {
+            data = bench->prepare(NULL);
+        }
+
+        //double total_time = 0;
+
+        for(size_t i = 0; i < options->iter; i++) {
+            if(bench->consumes) {
+                bench->release(data);
+                data = bench->prepare(NULL);
+            }
+
+            //clock_t before = clock();
+            void *output = bench->iterate(data);
+            //clock_t after = clock();
+
+            //total_time += (after - before) / (double) CLOCKS_PER_SEC;
+
+            if(output) {
+                bench->cleanup(output);
+            }
+        }
+
+        if(data) {
+            bench->release(data);
+        }
+
+        //printf("%s:%s: %lf it/s\n", bench->group, bench->name, options->iter / total_time);
+    }
+
+    free(options->enabled);
+
+    return EXIT_SUCCESS;
+}
+
 int main(int argc, char *argv[]) {
     // define command-line options
-    const char *short_opts = "s:t:i:hlv";
+    const char *short_opts = "st:i:hlv";
     static struct option long_opts[] = {
         {"list", no_argument, NULL, 'l'},
         {"oneshot", no_argument, NULL, 's'},
@@ -177,9 +276,12 @@ int main(int argc, char *argv[]) {
         {"iterations", required_argument, NULL, 'i'},
         {NULL, no_argument, NULL, 0}};
 
+    size_t benchlen = bench_len(benches);
+
     // parse command-line options
     options options = {
         .benches = benches,
+        .enabled = calloc(benchlen, sizeof(bool)),
         .mode = MODE_BENCH,
         .iter = 100,
         .time = 1.0,
@@ -207,14 +309,14 @@ int main(int argc, char *argv[]) {
             case 'i':
                 options.iter = atoi(optarg);
                 if(options.iter == 0) {
-                    printf("Error: iter '%s' is invalid\n", optarg);
+                    fprintf(stderr, "Error: iter '%s' is invalid\n", optarg);
                     return EXIT_FAILURE;
                 }
                 break;
             case 't':
                 options.time = parse_time(optarg);
                 if(isnan(options.time)) {
-                    printf("Error: time '%s' is invalid\n", optarg);
+                    fprintf(stderr, "Error: time '%s' is invalid\n", optarg);
                     return EXIT_FAILURE;
                 }
                 break;
@@ -231,6 +333,18 @@ int main(int argc, char *argv[]) {
     }
 
     if(options.verbose) {
+        fprintf(stderr, "Loaded %zu benches\n", benchlen);
+    }
+
+    // initialize enabled
+    for(size_t i = 0; i < benchlen; i++) {
+        options.enabled[i] = optind >= argc;
+    }
+
+    while(optind < argc) {
+    }
+
+    if(options.verbose) {
         if(options.mode == MODE_BENCH) {
             fprintf(stderr, "Running benchmark\n");
             fprintf(stderr, "Iterations %zu\n", options.iter);
@@ -243,8 +357,10 @@ int main(int argc, char *argv[]) {
 
     switch(options.mode) {
         case MODE_BENCH:
+            passgen_bench_run(&options);
             break;
         case MODE_ONESHOT:
+            passgen_bench_oneshot(&options);
             break;
         case MODE_LIST:
             passgen_bench_list(&options);
