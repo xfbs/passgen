@@ -225,7 +225,7 @@ int passgen_bench_run(const options *options) {
         clock_t start = clock();
         clock_t before, after;
         clock_t target = options->time * CLOCKS_PER_SEC;
-        clock_t progress = start + CLOCKS_PER_SEC / 10;
+        clock_t progress = 0;
 
         size_t padding = options->name_col - strlen(bench->group) - strlen(bench->name);
 
@@ -246,7 +246,7 @@ int passgen_bench_run(const options *options) {
             }
 
             if(after >= progress) {
-                fprintf(stderr, "\r%s:%s:%*c %20.6lf %s/s", bench->group, bench->name, padding, ' ', multiplier * iterations / total_time, bench->unit);
+                fprintf(stderr, "\r%s:%s:%*c %20.2lf %s/s", bench->group, bench->name, padding, ' ', multiplier * iterations / total_time, bench->unit);
                 progress = after + CLOCKS_PER_SEC / 10;
             }
         }
@@ -255,7 +255,7 @@ int passgen_bench_run(const options *options) {
             bench->release(data);
         }
 
-        printf("\r%s:%s:%*c %20.6lf %s/s\n", bench->group, bench->name, padding, ' ', multiplier * iterations / total_time, bench->unit);
+        printf("\r%s:%s:%*c %20.2lf %s/s\n", bench->group, bench->name, padding, ' ', multiplier * iterations / total_time, bench->unit);
     }
 
     free(options->enabled);

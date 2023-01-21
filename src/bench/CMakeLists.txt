@@ -9,3 +9,8 @@ target_link_libraries(passgen-random-bench PUBLIC ${PASSGEN_LIB})
 add_executable(passgen-bench-new newbench.c newstack.c newrandom.c hashmap.c)
 passgen_target_defaults(passgen-bench-new)
 target_link_libraries(passgen-bench-new PUBLIC ${PASSGEN_LIB})
+
+add_custom_target(bench
+    COMMAND
+    passgen-bench-new
+    DEPENDS passgen-bench-new)
