@@ -1,21 +1,14 @@
 #pragma once
 #include <stdbool.h>
-
-/// Benchmark argument
-typedef struct bench_arg {
-    const char *name;
-    const char *desc;
-    const char *value;
-} bench_arg;
+#include <passgen/util/hashmap.h>
 
 /// Benchmark definition
 typedef struct bench {
     const char *group;
     const char *name;
     const char *desc;
-    bench_arg *args;
     bool consumes;
-    void *(*prepare)(const char *args[]);
+    void *(*prepare)(const passgen_hashmap *opts);
     void *(*iterate)(void *data);
     void (*cleanup)(void *data);
     void (*release)(void *data);

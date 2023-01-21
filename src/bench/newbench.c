@@ -68,6 +68,7 @@ const bench *benches[] = {
 typedef struct options {
     const bench **benches;
     bool *enabled;
+    passgen_hashmap options;
     mode mode;
     double time;
     uint64_t iter;
@@ -181,26 +182,35 @@ int passgen_bench_run(const options *options) {
 
         void *data = NULL;
         if(bench->prepare) {
-            data = bench->prepare(NULL);
+            data = bench->prepare(&options->options);
         }
 
         double total_time = 0;
+        clock_t start = clock();
+        clock_t before, after;
+        clock_t target = options->time * CLOCKS_PER_SEC;
+        clock_t progress = start + CLOCKS_PER_SEC / 10;
 
         size_t iterations = 0;
-        for(; iterations < options->iter || total_time < options->time; iterations++) {
+        for(; iterations < options->iter || (after - start) < target; iterations++) {
             if(bench->consumes) {
                 bench->release(data);
-                data = bench->prepare(NULL);
+                data = bench->prepare(&options->options);
             }
 
-            clock_t before = clock();
+            before = clock();
             void *output = bench->iterate(data);
-            clock_t after = clock();
+            after = clock();
 
             total_time += (after - before) / (double) CLOCKS_PER_SEC;
 
             if(output) {
                 bench->cleanup(output);
+            }
+
+            if(after >= progress) {
+                fprintf(stderr, "\r%s:%s: %lf it/s", bench->group, bench->name, iterations / total_time);
+                progress = after + CLOCKS_PER_SEC / 10;
             }
         }
 
@@ -208,7 +218,7 @@ int passgen_bench_run(const options *options) {
             bench->release(data);
         }
 
-        printf("%s:%s: %lf it/s\n", bench->group, bench->name, iterations / total_time);
+        printf("\r%s:%s: %lf it/s\n", bench->group, bench->name, iterations / total_time);
     }
 
     free(options->enabled);
@@ -233,19 +243,13 @@ int passgen_bench_oneshot(const options *options) {
             data = bench->prepare(NULL);
         }
 
-        //double total_time = 0;
-
         for(size_t i = 0; i < options->iter; i++) {
             if(bench->consumes) {
                 bench->release(data);
                 data = bench->prepare(NULL);
             }
 
-            //clock_t before = clock();
             void *output = bench->iterate(data);
-            //clock_t after = clock();
-
-            //total_time += (after - before) / (double) CLOCKS_PER_SEC;
 
             if(output) {
                 bench->cleanup(output);
@@ -255,8 +259,6 @@ int passgen_bench_oneshot(const options *options) {
         if(data) {
             bench->release(data);
         }
-
-        //printf("%s:%s: %lf it/s\n", bench->group, bench->name, options->iter / total_time);
     }
 
     free(options->enabled);
@@ -264,15 +266,26 @@ int passgen_bench_oneshot(const options *options) {
     return EXIT_SUCCESS;
 }
 
+void add_option(options *options, const char *arg) {
+    char *value = strchr(arg, '=');
+    *value = 0;
+    value++;
+    if(options->verbose) {
+        fprintf(stderr, "Parsed option '%s' as '%s'\n", arg, value);
+    }
+    passgen_hashmap_insert(&options->options, arg, value);
+}
+
 int main(int argc, char *argv[]) {
     // define command-line options
-    const char *short_opts = "st:i:hlv";
+    const char *short_opts = "o:t:i:hlvs";
     static struct option long_opts[] = {
         {"list", no_argument, NULL, 'l'},
         {"oneshot", no_argument, NULL, 's'},
         {"help", no_argument, NULL, 'h'},
         {"verbose", no_argument, NULL, 'v'},
         {"time", required_argument, NULL, 't'},
+        {"option", required_argument, NULL, 'o'},
         {"iterations", required_argument, NULL, 'i'},
         {NULL, no_argument, NULL, 0}};
 
@@ -287,6 +300,8 @@ int main(int argc, char *argv[]) {
         .time = 1.0,
         .verbose = false,
     };
+
+    passgen_hashmap_init(&options.options, &passgen_hashmap_context_default);
 
     while(true) {
         // parse next command-line option
@@ -326,6 +341,9 @@ int main(int argc, char *argv[]) {
             case 'l':
                 options.mode = MODE_LIST;
                 break;
+            case 'o':
+                add_option(&options, optarg);
+                break;
             case '?':
             default:
                 return EXIT_FAILURE;
@@ -346,12 +364,11 @@ int main(int argc, char *argv[]) {
 
     if(options.verbose) {
         if(options.mode == MODE_BENCH) {
-            fprintf(stderr, "Running benchmark\n");
-            fprintf(stderr, "Iterations %zu\n", options.iter);
-            fprintf(stderr, "Time %lfs\n", options.time);
+            fprintf(stderr, "Mode: Benchmark (%zu it, %lfs\n", options.iter, options.time);
         }
+
         if(options.mode == MODE_ONESHOT) {
-            fprintf(stderr, "Running oneshot\n");
+            fprintf(stderr, "Mode: Oneshot (%zu it)\n", options.iter);
         }
     }
 
