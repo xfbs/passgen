@@ -11,6 +11,7 @@ struct bench_data {
     passgen_random random;
     uint64_t seed;
     size_t count;
+    unsigned char *data;
     size_t max;
 };
 
@@ -27,7 +28,6 @@ static void *bench_data_prepare_system(const passgen_hashmap *opts) {
     struct bench_data *data = malloc(sizeof(struct bench_data));
     data->count = 100000;
     data->max = 100000;
-    data->seed = XORSHIFT_SEED;
     passgen_random_open(&data->random);
     return data;
 }
@@ -36,7 +36,31 @@ static void *bench_data_prepare_zero(const passgen_hashmap *opts) {
     struct bench_data *data = malloc(sizeof(struct bench_data));
     data->count = 100000;
     data->max = 100000;
+    passgen_random_open_zero(&data->random);
+    return data;
+}
+
+static void *bench_data_prepare_xorshift_data(const passgen_hashmap *opts) {
+    struct bench_data *data = malloc(sizeof(struct bench_data));
+    data->count = 100000;
     data->seed = XORSHIFT_SEED;
+    data->data = malloc(data->count);
+    passgen_random_open_xorshift(&data->random, data->seed);
+    return data;
+}
+
+static void *bench_data_prepare_system_data(const passgen_hashmap *opts) {
+    struct bench_data *data = malloc(sizeof(struct bench_data));
+    data->count = 100000;
+    data->data = malloc(data->count);
+    passgen_random_open(&data->random);
+    return data;
+}
+
+static void *bench_data_prepare_zero_data(const passgen_hashmap *opts) {
+    struct bench_data *data = malloc(sizeof(struct bench_data));
+    data->count = 100000;
+    data->data = malloc(data->count);
     passgen_random_open_zero(&data->random);
     return data;
 }
@@ -77,10 +101,36 @@ static void *bench_random_u64(void *raw_data) {
     return NULL;
 }
 
+static void *bench_random_read(void *raw_data) {
+    struct bench_data *data = raw_data;
+    passgen_random_read(&data->random, data->data, data->count);
+    return NULL;
+}
+
 static void bench_data_release(void *raw_data) {
     struct bench_data *data = raw_data;
     passgen_random_close(&data->random);
     free(data);
+}
+
+static double bench_mult_u8(void *raw_data) {
+    struct bench_data *data = raw_data;
+    return data->count;
+}
+
+static double bench_mult_u16(void *raw_data) {
+    struct bench_data *data = raw_data;
+    return data->count * 2;
+}
+
+static double bench_mult_u32(void *raw_data) {
+    struct bench_data *data = raw_data;
+    return data->count * 4;
+}
+
+static double bench_mult_u64(void *raw_data) {
+    struct bench_data *data = raw_data;
+    return data->count * 8;
 }
 
 const bench random_xorshift_u8 = {
@@ -91,7 +141,9 @@ const bench random_xorshift_u8 = {
     .iterate = &bench_random_u8,
     .cleanup = NULL,
     .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
     .consumes = false,
+    .unit = "B",
 };
 
 const bench random_xorshift_u16 = {
@@ -102,7 +154,9 @@ const bench random_xorshift_u16 = {
     .iterate = &bench_random_u16,
     .cleanup = NULL,
     .release = &bench_data_release,
+    .multiplier = &bench_mult_u16,
     .consumes = false,
+    .unit = "B",
 };
 
 const bench random_xorshift_u32 = {
@@ -113,7 +167,9 @@ const bench random_xorshift_u32 = {
     .iterate = &bench_random_u32,
     .cleanup = NULL,
     .release = &bench_data_release,
+    .multiplier = &bench_mult_u32,
     .consumes = false,
+    .unit = "B",
 };
 
 const bench random_xorshift_u64 = {
@@ -124,7 +180,22 @@ const bench random_xorshift_u64 = {
     .iterate = &bench_random_u64,
     .cleanup = NULL,
     .release = &bench_data_release,
+    .multiplier = &bench_mult_u64,
     .consumes = false,
+    .unit = "B",
+};
+
+const bench random_xorshift_read = {
+    .group = "random",
+    .name = "xorshift_read",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_xorshift_data,
+    .iterate = &bench_random_read,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
+    .consumes = false,
+    .unit = "B",
 };
 
 
@@ -136,7 +207,9 @@ const bench random_system_u8 = {
     .iterate = &bench_random_u8,
     .cleanup = NULL,
     .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
     .consumes = false,
+    .unit = "B",
 };
 
 const bench random_system_u16 = {
@@ -147,7 +220,9 @@ const bench random_system_u16 = {
     .iterate = &bench_random_u16,
     .cleanup = NULL,
     .release = &bench_data_release,
+    .multiplier = &bench_mult_u16,
     .consumes = false,
+    .unit = "B",
 };
 
 const bench random_system_u32 = {
@@ -158,7 +233,9 @@ const bench random_system_u32 = {
     .iterate = &bench_random_u32,
     .cleanup = NULL,
     .release = &bench_data_release,
+    .multiplier = &bench_mult_u32,
     .consumes = false,
+    .unit = "B",
 };
 
 const bench random_system_u64 = {
@@ -169,9 +246,23 @@ const bench random_system_u64 = {
     .iterate = &bench_random_u64,
     .cleanup = NULL,
     .release = &bench_data_release,
+    .multiplier = &bench_mult_u64,
     .consumes = false,
+    .unit = "B",
 };
 
+const bench random_system_read = {
+    .group = "random",
+    .name = "system_read",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_system_data,
+    .iterate = &bench_random_read,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
+    .consumes = false,
+    .unit = "B",
+};
 
 const bench random_zero_u8 = {
     .group = "random",
@@ -181,7 +272,9 @@ const bench random_zero_u8 = {
     .iterate = &bench_random_u8,
     .cleanup = NULL,
     .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
     .consumes = false,
+    .unit = "B",
 };
 
 const bench random_zero_u16 = {
@@ -192,7 +285,9 @@ const bench random_zero_u16 = {
     .iterate = &bench_random_u16,
     .cleanup = NULL,
     .release = &bench_data_release,
+    .multiplier = &bench_mult_u16,
     .consumes = false,
+    .unit = "B",
 };
 
 const bench random_zero_u32 = {
@@ -203,7 +298,9 @@ const bench random_zero_u32 = {
     .iterate = &bench_random_u32,
     .cleanup = NULL,
     .release = &bench_data_release,
+    .multiplier = &bench_mult_u32,
     .consumes = false,
+    .unit = "B",
 };
 
 const bench random_zero_u64 = {
@@ -214,6 +311,21 @@ const bench random_zero_u64 = {
     .iterate = &bench_random_u64,
     .cleanup = NULL,
     .release = &bench_data_release,
+    .multiplier = &bench_mult_u64,
     .consumes = false,
+    .unit = "B",
+};
+
+const bench random_zero_read = {
+    .group = "random",
+    .name = "zero_read",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_zero_data,
+    .iterate = &bench_random_read,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
+    .consumes = false,
+    .unit = "B",
 };
 

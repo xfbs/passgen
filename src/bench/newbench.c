@@ -54,23 +54,27 @@ const bench dummy = {
     .group = "test",
     .name = "dummy",
     .desc = "Dummy benchmark, does not do anything.",
+    .unit = "it",
     .iterate = &dummy_iterate,
 };
 
 extern bench stack_push;
 extern bench stack_pop;
-extern bench random_xorshift_u8;
-extern bench random_xorshift_u16;
-extern bench random_xorshift_u32;
-extern bench random_xorshift_u64;
 extern bench random_system_u8;
 extern bench random_system_u16;
 extern bench random_system_u32;
 extern bench random_system_u64;
+extern bench random_system_read;
+extern bench random_xorshift_u8;
+extern bench random_xorshift_u16;
+extern bench random_xorshift_u32;
+extern bench random_xorshift_u64;
+extern bench random_xorshift_read;
 extern bench random_zero_u8;
 extern bench random_zero_u16;
 extern bench random_zero_u32;
 extern bench random_zero_u64;
+extern bench random_zero_read;
 
 const bench *benches[] = {
     &dummy,
@@ -80,14 +84,17 @@ const bench *benches[] = {
     &random_system_u16,
     &random_system_u32,
     &random_system_u64,
+    &random_system_read,
     &random_xorshift_u8,
     &random_xorshift_u16,
     &random_xorshift_u32,
     &random_xorshift_u64,
+    &random_xorshift_read,
     &random_zero_u8,
     &random_zero_u16,
     &random_zero_u32,
     &random_zero_u64,
+    &random_zero_read,
     NULL,
 };
 
@@ -99,6 +106,7 @@ typedef struct options {
     double time;
     uint64_t iter;
     bool verbose;
+    size_t name_col;
 } options;
 
 static double parse_time(const char *str) {
@@ -150,12 +158,7 @@ static size_t bench_len(const bench *benches[]) {
 }
 
 int passgen_bench_list(const options *options) {
-    int name_col = 1;
-    for(size_t i = 0; options->benches[i]; i++) {
-        bench *bench = options->benches[i];
-        int current = strlen(bench->name) + strlen(bench->group) + 1;
-        name_col = MAX(name_col, current);
-    }
+    int name_col = options->name_col;
 
     size_t line_len = 80;
     char line[line_len + 1];
@@ -211,11 +214,18 @@ int passgen_bench_run(const options *options) {
             data = bench->prepare(&options->options);
         }
 
+        double multiplier = 1.0;
+        if(bench->multiplier) {
+            multiplier = bench->multiplier(data);
+        }
+
         double total_time = 0;
         clock_t start = clock();
         clock_t before, after;
         clock_t target = options->time * CLOCKS_PER_SEC;
         clock_t progress = start + CLOCKS_PER_SEC / 10;
+
+        size_t padding = options->name_col - strlen(bench->group) - strlen(bench->name);
 
         size_t iterations = 0;
         for(; iterations < options->iter || (after - start) < target; iterations++) {
@@ -234,7 +244,7 @@ int passgen_bench_run(const options *options) {
             }
 
             if(after >= progress) {
-                fprintf(stderr, "\r%s:%s: %lf it/s", bench->group, bench->name, iterations / total_time);
+                fprintf(stderr, "\r%s:%s:%*c %20.6lf %s/s", bench->group, bench->name, padding, ' ', multiplier * iterations / total_time, bench->unit);
                 progress = after + CLOCKS_PER_SEC / 10;
             }
         }
@@ -243,7 +253,7 @@ int passgen_bench_run(const options *options) {
             bench->release(data);
         }
 
-        printf("\r%s:%s: %lf it/s\n", bench->group, bench->name, iterations / total_time);
+        printf("\r%s:%s:%*c %20.6lf %s/s\n", bench->group, bench->name, padding, ' ', multiplier * iterations / total_time, bench->unit);
     }
 
     free(options->enabled);
@@ -291,6 +301,15 @@ int passgen_bench_oneshot(const options *options) {
     return EXIT_SUCCESS;
 }
 
+void measure_name_col(options *options) {
+    options->name_col = 1;
+    for(size_t i = 0; options->benches[i]; i++) {
+        bench *bench = options->benches[i];
+        int current = strlen(bench->name) + strlen(bench->group) + 1;
+        options->name_col = MAX(options->name_col, current);
+    }
+}
+
 void add_option(options *options, const char *arg) {
     char *value = strchr(arg, '=');
     *value = 0;
@@ -327,6 +346,7 @@ int main(int argc, char *argv[]) {
     };
 
     passgen_hashmap_init(&options.options, &passgen_hashmap_context_default);
+    measure_name_col(&options);
 
     while(true) {
         // parse next command-line option

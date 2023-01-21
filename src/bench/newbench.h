@@ -12,6 +12,8 @@ typedef struct bench {
     const char *name;
     /// Description of benchmark
     const char *desc;
+    /// Unit that this benchmark measures
+    const char *unit;
     /// Benchmark consumes data
     ///
     /// When this is set to true, every iteration will use a
@@ -35,4 +37,7 @@ typedef struct bench {
     void (*cleanup)(void *data);
     /// Cleanup a prepared input of the benchmark.
     void (*release)(void *data);
+
+    /// Multiplier for this benchmark
+    double (*multiplier)(void *data);
 } bench;
