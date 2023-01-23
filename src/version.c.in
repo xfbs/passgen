@@ -3,28 +3,36 @@
 #include <stddef.h>
 
 passgen_version passgen_version_get() {
-  return (passgen_version) {
-    .major = @PROJECT_VERSION_MAJOR@,
-    .minor = @PROJECT_VERSION_MINOR@,
-    .patch = @PROJECT_VERSION_PATCH@,
-    .build = "@PROJECT_GIT_DESCRIBE@-@PROJECT_GIT_COMMIT@",
-    .prerelease = NULL,
-  };
+    return (passgen_version) {
+        .major = @PROJECT_VERSION_MAJOR@,
+        .minor = @PROJECT_VERSION_MINOR@,
+        .patch = @PROJECT_VERSION_PATCH@,
+        .build = "@PROJECT_GIT_DESCRIBE@-@PROJECT_GIT_COMMIT@",
+        .prerelease = NULL,
+    };
 }
 
-const char *passgen_version_str() {
-  return "@PROJECT_VERSION@";
+bool passgen_version_compatible(passgen_version version) {
+    // get current version
+    passgen_version current = passgen_version_get();
+
+    // major version must match exactly
+    if(current.major != version.major) {
+        return false;
+    }
+
+    // minor version must not be smaller
+    if(current.minor < version.minor) {
+        return false;
+    }
+
+    // if minor version is same, patch must not be smaller
+    if(current.minor == version.minor && current.patch < version.patch) {
+        return false;
+    }
+
+    return true;
 }
-
-bool passgen_version_min(passgen_version version) {
-  // TODO: implement
-  (void) version;
-
-  return false;
-}
-
-const char *passgen_git_commit = "@PROJECT_GIT_COMMIT@";
-const char *passgen_git_describe = "@PROJECT_GIT_DESCRIBE@";
 
 bool passgen_is_debug(void) {
 #ifdef PASSGEN_DEBUG

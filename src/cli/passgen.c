@@ -422,9 +422,13 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 }
 
 void passgen_cli_usage(const char *executable) {
+    passgen_version version = passgen_version_get();
+    fprintf(stderr, "passgen version v%hu.%hu.%hu\n",
+            version.major,
+            version.minor,
+            version.patch);
     fprintf(
         stderr,
-        "passgen version %s\n"
         "Generate random sequences from a regex-like pattern.\n"
         "Usage: %s [OPTIONS] [PATTERN]\n\n"
         "PATTERN is a regex-like string describing the password.\n"
@@ -458,12 +462,16 @@ void passgen_cli_usage(const char *executable) {
         "    firefox           Generate passwords like 'aKTKyS9pPgAQ8Oz'\n"
         "    uuid              Generate UUIDv4 like "
         "0072ca58-5966-497c-8657-a59fca93bf25\n",
-        passgen_version_str(),
         executable);
 }
 
 void passgen_cli_show_version(void) {
-    fprintf(stderr, "passgen, version %s\n", passgen_version_str());
+    passgen_version version = passgen_version_get();
+    fprintf(stderr, "passgen version v%hu.%hu.%hu (build %s)\n",
+            version.major,
+            version.minor,
+            version.patch,
+            version.build);
 
     if(passgen_is_debug()) {
         fprintf(stderr, "debug build\n");
