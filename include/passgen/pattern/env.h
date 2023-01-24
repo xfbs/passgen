@@ -33,7 +33,7 @@ typedef struct passgen_env {
 void passgen_env_init(passgen_env *env, passgen_random *random);
 
 /// Loads the given wordlist.
-int passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file, size_t markov_length);
+int passgen_env_wordlist_add(passgen_env *env, char *name, FILE *file, size_t markov_length);
 
 /// Loads the given configuration.
 int passgen_env_config(passgen_env env, FILE *file);

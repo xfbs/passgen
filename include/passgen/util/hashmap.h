@@ -44,7 +44,7 @@ typedef struct passgen_hashmap {
 
 /// Represents a single entry. If the *key* pointer is NULL, it is unoccupied.
 typedef struct passgen_hashmap_entry {
-    void *key;
+    const void *key;
     void *value;
 } passgen_hashmap_entry;
 
@@ -79,11 +79,11 @@ void passgen_hashmap_free(passgen_hashmap *map);
 /// Insert new item into the hashmap. If there was a previous entry with the
 /// same key, it will return it so that it can be deallocated. Will overwrite
 /// both key and value.
-passgen_hashmap_entry passgen_hashmap_insert(passgen_hashmap *map, void *key, void *value);
+passgen_hashmap_entry passgen_hashmap_insert(passgen_hashmap *map, const void *key, void *value);
 
 /// Remove an entry from the hashmap. Returns the entry if found, else returns
 /// an empty entry (where `key` == NULL).
-passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, void *key);
+passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, const void *key);
 
 /// Lookup an entry in the hashmap. Returns NULL if not found.
 ///

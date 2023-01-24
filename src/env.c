@@ -33,7 +33,7 @@ void passgen_env_free(passgen_env *env) {
     passgen_hashmap_free(&env->presets);
 }
 
-int passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file, size_t markov_length) {
+int passgen_env_wordlist_add(passgen_env *env, char *name, FILE *file, size_t markov_length) {
     passgen_wordlist *wordlist = malloc(sizeof(passgen_wordlist));
     passgen_hashmap_insert(&env->wordlists, name, wordlist);
     passgen_wordlist_init(wordlist, file, markov_length);

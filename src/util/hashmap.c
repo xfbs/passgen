@@ -92,7 +92,7 @@ static inline size_t next_capacity(passgen_hashmap *map) {
 }
 
 passgen_hashmap_entry
-passgen_hashmap_insert(passgen_hashmap *map, void *key, void *value) {
+passgen_hashmap_insert(passgen_hashmap *map, const void *key, void *value) {
     if(map->capacity == 0) {
         passgen_hashmap_realloc(map, hashmap_sizes[0]);
     }
@@ -143,7 +143,7 @@ passgen_hashmap_insert(passgen_hashmap *map, void *key, void *value) {
     return passgen_hashmap_insert(map, key, value);
 }
 
-passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, void *key) {
+passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, const void *key) {
     size_t hash;
 
     // if this key exists

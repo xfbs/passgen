@@ -328,17 +328,6 @@ int passgen_parse_finish(struct passgen_parser *parser) {
     return 0;
 }
 
-int passgen_parser_utf8(
-    struct passgen_parser *parser,
-    uint8_t *data,
-    size_t length) {
-    // FIXME: todo!
-    (void) parser;
-    (void) data;
-    (void) length;
-    return 1;
-}
-
 int passgen_parser_unicode(
     struct passgen_parser *parser,
     uint32_t *data,
