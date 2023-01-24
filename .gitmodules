@@ -1,6 +1,3 @@
-[submodule "external/utf8proc"]
+[submodule "utf8proc"]
 	path = extern/utf8proc
 	url = https://github.com/JuliaStrings/utf8proc
-[submodule "extern/jansson"]
-	path = extern/jansson
-	url = https://github.com/akheron/jansson
