@@ -291,12 +291,16 @@ passgen_random *passgen_random_open_file(passgen_random *random, FILE *file) {
 }
 
 void passgen_random_close(passgen_random *random) {
-    if(random != NULL) {
-        random->close(random->data);
-        random->data = NULL;
-        random->read = NULL;
-        random->close = NULL;
-    }
+    // close randomness source
+    random->close(random->data);
+
+    // reset members to prevent accidental use-after-free
+    random->data = NULL;
+    random->read = NULL;
+    random->close = NULL;
+
+    // overwrite random buffer with zeroes to remove sensitive data
+    memset(random->buffer, 0, PASSGEN_RANDOM_BUFFER_LENGTH);
 }
 
 void passgen_random_free(passgen_random *random) {
