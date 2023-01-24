@@ -231,8 +231,8 @@ passgen_random *passgen_random_open_parse(passgen_random *random, const char *de
     }
 
     // check if we should use the xorshift PRNG with the given seed
-    if(strprefix("xor:", desc) == 0) {
-        const char *seed_str = &desc[4];
+    if(strprefix("xorshift:", desc) == 0) {
+        const char *seed_str = &desc[9];
         uint64_t seed = atoll(seed_str);
         if(seed == 0) {
             return NULL;

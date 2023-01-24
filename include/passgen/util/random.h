@@ -49,7 +49,7 @@ typedef struct passgen_random {
 /// ```c
 /// passgen_random *random_default = passgen_random_new(NULL);
 /// passgen_random *random_system = passgen_random_new("system");
-/// passgen_random *random_xorshift = passgen_random_new("xor:1234");
+/// passgen_random *random_xorshift = passgen_random_new("xorshift:1234");
 /// passgen_random *random_file = passgen_random_new("file:/dev/urandom");
 /// passgen_random *random_zero = passgen_random_new("zero");
 /// passgen_random_free(random_default);

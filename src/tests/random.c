@@ -188,7 +188,7 @@ test_result test_random_new(void) {
     assert_eq(passgen_random_u64(random), 0);
     passgen_random_free(random);
 
-    random = passgen_random_new("xor:1234");
+    random = passgen_random_new("xorshift:1234");
     assert(random);
     assert(random->read);
     assert(random->close);
@@ -210,8 +210,8 @@ test_result test_random_new(void) {
     passgen_random_free(random);
 
     assert(!passgen_random_new("other"));
-    assert(!passgen_random_new("xor:abc"));
-    assert(!passgen_random_new("xor:"));
+    assert(!passgen_random_new("xorshift:abc"));
+    assert(!passgen_random_new("xorshift:"));
     assert(!passgen_random_new("file:"));
     assert(!passgen_random_new("file:/dev/nonexistant"));
 
@@ -249,7 +249,7 @@ test_result test_random_open(void) {
     assert(random.close);
     passgen_random_close(&random);
 
-    assert(passgen_random_open(&random, "xor:1234"));
+    assert(passgen_random_open(&random, "xorshift:1234"));
     assert(random.read);
     assert(random.close);
     passgen_random_close(&random);
@@ -266,8 +266,8 @@ test_result test_random_open(void) {
 
     assert(!passgen_random_open(&random, "other"));
     assert(!passgen_random_open(&random, "file:/dev/notexists"));
-    assert(!passgen_random_open(&random, "xor:"));
-    assert(!passgen_random_open(&random, "xor:abc"));
+    assert(!passgen_random_open(&random, "xorshift:"));
+    assert(!passgen_random_open(&random, "xorshift:abc"));
 
     return test_ok;
 }

@@ -40,7 +40,7 @@ $passgen -z "a"
 $passgen --entropy "a"
 $passgen -e "a"
 
-$passgen --random "xor:1234" "a"
+$passgen --random "xorshift:1234" "a"
 $passgen --random "zero" "a"
 $passgen --random "system" "a"
 

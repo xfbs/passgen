@@ -34,7 +34,7 @@ argument.
 | `system` | Use the system random number generator (default). |
 | `file:/path/to/file` | Read randomness from the specified file. This can be used to read randomness from a different device, such as `/dev/random`, or a hardware randomness generator. |
 | `zero` | Does not return any random data, instead simply returns zeroes. Used only for testing. |
-| `xor:seed` | [XorShift][xorshift]. Takes a non-zero number as seed. Produces very poor quality randomness. |
+| `xorshift:seed` | [XorShift][xorshift]. Takes a non-zero number as seed. Produces very poor quality randomness. |
 
 [xorshift]: https://en.wikipedia.org/wiki/Xorshift
 [getrandom]: https://man7.org/linux/man-pages/man2/getrandom.2.html

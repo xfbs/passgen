@@ -69,7 +69,7 @@ system call. On macOS, it uses the
 .Xr arc4random_buf 2
 system call to read secure, random data. Alternatively, it falls back to reading from
 .Ar /dev/urandom .
-.It Ar xor:seed
+.It Ar xorshift:seed
 Use the xorshift pseudorandom number generator. This is not recommended to produce random sequences, but has the advantage of being deterministic (using the same seed value with the same flags always produces the same output). The seed should be a large, nonzero number.
 .It Ar file:/path/to/file
 Read the file as source of randomness. This can be useful on systems where the source of randomness has a nonstandard path.
