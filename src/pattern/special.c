@@ -21,6 +21,9 @@ void passgen_pattern_special_init_char(
         case 'w':
             special->kind = PASSGEN_PATTERN_SPECIAL_WORDLIST;
             break;
+        case 'p':
+            special->kind = PASSGEN_PATTERN_SPECIAL_PRESET;
+            break;
         default:
             passgen_assert(false);
             break;
