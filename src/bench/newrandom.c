@@ -1,11 +1,12 @@
-#include <passgen/util/random.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
 #include "newbench.h"
+#include <passgen/util/random.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define XORSHIFT_SEED 23456945749UL
+#define UNUSED(x) (void) x
 
 struct bench_data {
     passgen_random random;
@@ -16,6 +17,7 @@ struct bench_data {
 };
 
 static void *bench_data_prepare_xorshift(const passgen_hashmap *opts) {
+    UNUSED(opts);
     struct bench_data *data = malloc(sizeof(struct bench_data));
     data->count = 100000;
     data->max = 100000;
@@ -25,14 +27,16 @@ static void *bench_data_prepare_xorshift(const passgen_hashmap *opts) {
 }
 
 static void *bench_data_prepare_system(const passgen_hashmap *opts) {
+    UNUSED(opts);
     struct bench_data *data = malloc(sizeof(struct bench_data));
     data->count = 100000;
     data->max = 100000;
-    passgen_random_open(&data->random);
+    passgen_random_open(&data->random, NULL);
     return data;
 }
 
 static void *bench_data_prepare_zero(const passgen_hashmap *opts) {
+    UNUSED(opts);
     struct bench_data *data = malloc(sizeof(struct bench_data));
     data->count = 100000;
     data->max = 100000;
@@ -41,6 +45,7 @@ static void *bench_data_prepare_zero(const passgen_hashmap *opts) {
 }
 
 static void *bench_data_prepare_xorshift_data(const passgen_hashmap *opts) {
+    UNUSED(opts);
     struct bench_data *data = malloc(sizeof(struct bench_data));
     data->count = 100000;
     data->seed = XORSHIFT_SEED;
@@ -50,14 +55,16 @@ static void *bench_data_prepare_xorshift_data(const passgen_hashmap *opts) {
 }
 
 static void *bench_data_prepare_system_data(const passgen_hashmap *opts) {
+    UNUSED(opts);
     struct bench_data *data = malloc(sizeof(struct bench_data));
     data->count = 100000;
     data->data = malloc(data->count);
-    passgen_random_open(&data->random);
+    passgen_random_open(&data->random, NULL);
     return data;
 }
 
 static void *bench_data_prepare_zero_data(const passgen_hashmap *opts) {
+    UNUSED(opts);
     struct bench_data *data = malloc(sizeof(struct bench_data));
     data->count = 100000;
     data->data = malloc(data->count);
@@ -198,7 +205,6 @@ const bench random_xorshift_read = {
     .unit = "B",
 };
 
-
 const bench random_system_u8 = {
     .group = "random",
     .name = "system_u8",
@@ -328,4 +334,3 @@ const bench random_zero_read = {
     .consumes = false,
     .unit = "B",
 };
-

@@ -14,7 +14,7 @@ void passgen_env_init(passgen_env *env, passgen_random *random) {
 
 static int wordlist_entry_free(void *user, passgen_hashmap_entry *entry) {
     (void) user;
-    free(entry->key);
+    free((void *) entry->key);
     passgen_wordlist_free(entry->value);
     free(entry->value);
     return 0;
@@ -43,5 +43,8 @@ int passgen_env_wordlist_add(
 }
 
 int passgen_env_config(passgen_env env, FILE *file) {
+    (void) env;
+    (void) file;
+    // TODO: implement
     return 1;
 }

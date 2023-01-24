@@ -1,9 +1,9 @@
 #include "newbench.h"
-#include <stdlib.h>
-#include <stdio.h>
 #include <getopt.h>
-#include <stdint.h>
 #include <math.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -33,7 +33,9 @@ typedef struct options {
 
 static int show_help(const options *options) {
     const char *prog = options->program;
-    printf("Usage: %s [-t TIME] [-i ITER] [-o NAME=VALUE...] [NAME...]\n", prog);
+    printf(
+        "Usage: %s [-t TIME] [-i ITER] [-o NAME=VALUE...] [NAME...]\n",
+        prog);
     printf("       %s -s [-o NAME=VALUE...] NAME\n", prog);
     printf("       %s -l [NAME...]\n", prog);
     printf("Runs the benchmarks, generating a report.\n\n");
@@ -41,33 +43,48 @@ static int show_help(const options *options) {
     printf("    -l, --list\n");
     printf("        List available benchmarks and quit.\n");
     printf("    -s, --oneshot\n");
-    printf("        Run in oneshot mode. This will run the benchmark only once and will not\n");
-    printf("        generate a report. Useful for running a benchmark under Cachegrind to\n");
+    printf("        Run in oneshot mode. This will run the benchmark only once "
+           "and will not\n");
+    printf("        generate a report. Useful for running a benchmark under "
+           "Cachegrind to\n");
     printf("        measure instructions and cache behaviour.\n");
     printf("    -t, --time TIME\n");
-    printf("        Runs benchmark for specified TIME. This will increase the iteration count\n");
-    printf("        until the benchmark has run for the specified time, in order to generate\n");
-    printf("        more samples and have more confidence in the measured throughput. It will\n");
-    printf("        never decrease the number of iterations. Can be set to zero to strictly\n");
+    printf("        Runs benchmark for specified TIME. This will increase the "
+           "iteration count\n");
+    printf("        until the benchmark has run for the specified time, in "
+           "order to generate\n");
+    printf("        more samples and have more confidence in the measured "
+           "throughput. It will\n");
+    printf("        never decrease the number of iterations. Can be set to "
+           "zero to strictly\n");
     printf("        run benchmarks ITER times. Defaults to 1s.\n");
     printf("    -i, --iterations ITER\n");
-    printf("        Run the benchmarks for at least the specified iteration count. Benchmarks\n");
-    printf("        will run longer if the alotted TIME has not been used up. Has to be a\n");
+    printf("        Run the benchmarks for at least the specified iteration "
+           "count. Benchmarks\n");
+    printf("        will run longer if the alotted TIME has not been used up. "
+           "Has to be a\n");
     printf("        positive, non-zero integer. Defaults to 100.\n");
     printf("    -o, --option NAME=VALUE\n");
-    printf("        Overrides the benchmark option NAME with VALUE. This option can be set\n");
+    printf("        Overrides the benchmark option NAME with VALUE. This "
+           "option can be set\n");
     printf("        multiple times to override multiple options.\n");
     printf("    -w, --checkpoint FILE\n");
-    printf("        Write a checkpoint to the given FILE. This will write out the current\n");
-    printf("        benchmark stats to the file in a CSV format for detecting regressions.\n");
+    printf("        Write a checkpoint to the given FILE. This will write out "
+           "the current\n");
+    printf("        benchmark stats to the file in a CSV format for detecting "
+           "regressions.\n");
     printf("        Recommended to use with the --valgrind flag.\n");
     printf("    -r, --check FILE\n");
-    printf("        Read current benchmark state from the given FILE and warn if a regression\n");
-    printf("        is detected. It is recommended to only use checkpoints generated on the\n");
-    printf("        same machine or to use the --valgrind flag to get machine-independent\n");
+    printf("        Read current benchmark state from the given FILE and warn "
+           "if a regression\n");
+    printf("        is detected. It is recommended to only use checkpoints "
+           "generated on the\n");
+    printf("        same machine or to use the --valgrind flag to get "
+           "machine-independent\n");
     printf("        data.\n");
     printf("    -c, --valgrind PATH\n");
-    printf("        Use the valgrind tool at the given PATH to compute machine-indepdendent\n");
+    printf("        Use the valgrind tool at the given PATH to compute "
+           "machine-indepdendent\n");
     printf("        benchmark statistics, used to detect regressions.\n");
     printf("    -v, --verbose\n");
     printf("        Enables verbose logging output.\n");
@@ -75,6 +92,7 @@ static int show_help(const options *options) {
 }
 
 static void *dummy_iterate(void *data) {
+    (void) data;
     return NULL;
 }
 
@@ -182,13 +200,13 @@ int passgen_bench_list(const options *options) {
     size_t line_len = 80;
     char line[line_len + 1];
     for(size_t i = 0; options->benches[i]; i++) {
-        bench *bench = options->benches[i];
+        const bench *bench = options->benches[i];
         size_t desc_offset = 0;
         size_t desc_len = strlen(bench->desc);
 
         size_t pos = 0;
         pos += sprintf(line, "%s:%s", bench->group, bench->name);
-        pos += sprintf(line + pos, "%*c", name_col + 2 - pos, ' ');
+        pos += sprintf(line + pos, "%*c", (int) (name_col + 2 - pos), ' ');
 
         if(desc_len > (line_len - pos)) {
             while((desc_len - desc_offset) > (line_len - pos)) {
@@ -205,7 +223,12 @@ int passgen_bench_list(const options *options) {
             }
 
             if(desc_offset != desc_len) {
-                sprintf(line, "%*c%s", name_col + 1, ' ', bench->desc + desc_offset);
+                sprintf(
+                    line,
+                    "%*c%s",
+                    name_col + 1,
+                    ' ',
+                    bench->desc + desc_offset);
                 printf("%s\n", line);
             }
         } else {
@@ -222,7 +245,7 @@ int passgen_bench_run(const options *options) {
             continue;
         }
 
-        bench *bench = options->benches[b];
+        const bench *bench = options->benches[b];
 
         if(options->verbose) {
             fprintf(stderr, "Running benchmark %s\n", bench->name);
@@ -244,10 +267,12 @@ int passgen_bench_run(const options *options) {
         clock_t target = options->time * CLOCKS_PER_SEC;
         clock_t progress = 0;
 
-        size_t padding = options->name_col - strlen(bench->group) - strlen(bench->name);
+        size_t padding =
+            options->name_col - strlen(bench->group) - strlen(bench->name);
 
         size_t iterations = 0;
-        for(; iterations < options->iter || (after - start) < target; iterations++) {
+        for(; iterations < options->iter || (after - start) < target;
+            iterations++) {
             if(bench->consumes) {
                 data = bench->prepare(&options->options);
             }
@@ -263,7 +288,15 @@ int passgen_bench_run(const options *options) {
             }
 
             if(after >= progress) {
-                fprintf(stderr, "\r%s:%s:%*c %20.2lf %s/s", bench->group, bench->name, padding, ' ', multiplier * iterations / total_time, bench->unit);
+                fprintf(
+                    stderr,
+                    "\r%s:%s:%*c %20.2lf %s/s",
+                    bench->group,
+                    bench->name,
+                    (int) padding,
+                    ' ',
+                    multiplier * iterations / total_time,
+                    bench->unit);
                 progress = after + CLOCKS_PER_SEC / 10;
             }
         }
@@ -272,7 +305,14 @@ int passgen_bench_run(const options *options) {
             bench->release(data);
         }
 
-        printf("\r%s:%s:%*c %20.2lf %s/s\n", bench->group, bench->name, padding, ' ', multiplier * iterations / total_time, bench->unit);
+        printf(
+            "\r%s:%s:%*c %20.2lf %s/s\n",
+            bench->group,
+            bench->name,
+            (int) padding,
+            ' ',
+            multiplier * iterations / total_time,
+            bench->unit);
     }
 
     free(options->enabled);
@@ -286,7 +326,7 @@ int passgen_bench_oneshot(const options *options) {
             continue;
         }
 
-        bench *bench = options->benches[b];
+        const bench *bench = options->benches[b];
 
         if(options->verbose) {
             fprintf(stderr, "Running benchmark %s\n", bench->name);
@@ -323,8 +363,8 @@ int passgen_bench_oneshot(const options *options) {
 void measure_name_col(options *options) {
     options->name_col = 1;
     for(size_t i = 0; options->benches[i]; i++) {
-        bench *bench = options->benches[i];
-        int current = strlen(bench->name) + strlen(bench->group) + 1;
+        const bench *bench = options->benches[i];
+        size_t current = strlen(bench->name) + strlen(bench->group) + 1;
         options->name_col = MAX(options->name_col, current);
     }
 }
@@ -373,12 +413,7 @@ int main(int argc, char *argv[]) {
 
     while(true) {
         // parse next command-line option
-        int opt = getopt_long(
-            argc,
-            argv,
-            short_opts,
-            long_opts,
-            NULL);
+        int opt = getopt_long(argc, argv, short_opts, long_opts, NULL);
 
         // done parsing options
         if(opt < 0) break;
@@ -412,7 +447,7 @@ int main(int argc, char *argv[]) {
             case 'r':
                 break;
             case 'w':
-                options.checkpoint = fopen(optarg, "w");
+                options.write = fopen(optarg, "w");
                 break;
             case 'l':
                 options.mode = MODE_LIST;
@@ -440,7 +475,11 @@ int main(int argc, char *argv[]) {
 
     if(options.verbose) {
         if(options.mode == MODE_BENCH) {
-            fprintf(stderr, "Mode: Benchmark (%zu it, %lfs\n", options.iter, options.time);
+            fprintf(
+                stderr,
+                "Mode: Benchmark (%zu it, %lfs\n",
+                options.iter,
+                options.time);
         }
 
         if(options.mode == MODE_ONESHOT) {

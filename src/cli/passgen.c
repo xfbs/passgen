@@ -499,14 +499,6 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
     return error;
 }
 
-int passgen_cli_opts_wordlist_free(void *user, passgen_hashmap_entry *entry) {
-    (void) user;
-    free(entry->key);
-    passgen_wordlist_free(entry->value);
-    free(entry->value);
-    return 0;
-}
-
 void passgen_cli_opts_free(passgen_cli_opts *opts) {
     passgen_hashmap_free(&opts->presets);
     passgen_env_free(&opts->env);

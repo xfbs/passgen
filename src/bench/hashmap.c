@@ -1,13 +1,13 @@
-#include <passgen/util/hashmap.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
 #include "newbench.h"
+#include <passgen/util/hashmap.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 struct bench_data {
     passgen_hashmap map;
-    const char **data;
+    char **data;
     size_t count;
 };
 
@@ -17,6 +17,7 @@ static double bench_mult(void *raw_data) {
 }
 
 static void *data_prepare(const passgen_hashmap *opts) {
+    (void) opts;
     struct bench_data *data = malloc(sizeof(struct bench_data));
     data->count = 50000;
     data->data = calloc(sizeof(const char *), data->count);
@@ -61,4 +62,3 @@ const bench hashmap_insert = {
     .consumes = true,
     .unit = "items",
 };
-

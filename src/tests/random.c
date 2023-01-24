@@ -9,28 +9,30 @@
 #define XORSHIFT_SEED 234720984723
 
 /// Tests that a given function covers all possible outputs (0..max, inclusive).
-#define TEST_COVERAGE(max, collate, function)                             \
-    do {                                                                  \
-        size_t coverage_len = ((size_t) max) / (collate) + 1ULL;          \
-        uint8_t *coverage = calloc((coverage_len + 7) / 8, sizeof(bool)); \
-        bool full_coverage = false;                                       \
-        while(!full_coverage) {                                           \
-            for(size_t i = 0; i < 256; i++) {                             \
-                size_t pos = function / (collate);                        \
-                coverage[pos / 8] |= 1 << (pos % 8);                      \
-            }                                                             \
-            full_coverage = true;                                         \
-            for(size_t i = 0; i <= (max / (collate)); i++) {              \
-                if(!coverage[i / 8] & 1 << (i % 8)) {                     \
-                    full_coverage = false;                                \
-                    break;                                                \
-                }                                                         \
-            }                                                             \
-        }                                                                 \
-        free(coverage);                                                   \
+#define TEST_COVERAGE(max, collate, function)                    \
+    do {                                                         \
+        size_t coverage_len = ((size_t) max) / (collate) + 1ULL; \
+        uint8_t *coverage = calloc((coverage_len + 7) / 8, 1);   \
+        bool full_coverage = false;                              \
+        while(!full_coverage) {                                  \
+            for(size_t i = 0; i < 256; i++) {                    \
+                size_t pos = function / (collate);               \
+                coverage[pos / 8] |= 1 << (pos % 8);             \
+            }                                                    \
+            full_coverage = true;                                \
+            for(size_t i = 0; i <= (max / (collate)); i++) {     \
+                if(!(coverage[i / 8] & (1 << (i % 8)))) {        \
+                    full_coverage = false;                       \
+                    break;                                       \
+                }                                                \
+            }                                                    \
+        }                                                        \
+        free(coverage);                                          \
     } while(false)
 
 double standard_deviation(size_t count, uint32_t *elements) {
+    (void) count;
+    (void) elements;
     // TODO: determine deviation
     return 0;
 }

@@ -52,6 +52,7 @@ passgen_parser_state *passgen_parser_state_push_multiplier(
     state->type = PASSGEN_PARSER_MULTIPLIER;
     *multiplier = 0;
     state->data.multiplier = multiplier;
+    return state;
 }
 
 passgen_parser_state *passgen_parser_state_push_special(
@@ -60,7 +61,6 @@ passgen_parser_state *passgen_parser_state_push_special(
     passgen_parser_state *state = passgen_stack_push(&parser->state, NULL);
     state->type = PASSGEN_PARSER_SPECIAL;
     state->data.special.special = special;
-
     return state;
 }
 

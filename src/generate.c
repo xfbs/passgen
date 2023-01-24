@@ -368,6 +368,11 @@ int passgen_generate_special_preset(
     struct passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
+    (void) special;
+    (void) env;
+    (void) data;
+    (void) func;
+    // TODO: implement
     return 0;
 }
 

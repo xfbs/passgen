@@ -61,12 +61,12 @@ void passgen_hashmap_realloc(passgen_hashmap *map, size_t capacity) {
 }
 
 static inline size_t
-passgen_hashmap_position(passgen_hashmap *map, const void *key, bool first) {
+passgen_hashmap_position(const passgen_hashmap *map, const void *key, bool first) {
     return map->context->hash(map, key, first) % map->capacity;
 }
 
 static inline bool passgen_hashmap_move(passgen_hashmap *map, size_t pos) {
-    void *key = map->data[pos].key;
+    const void *key = map->data[pos].key;
     bool first = passgen_hashmap_position(map, key, true) == pos;
     size_t other_pos = passgen_hashmap_position(map, key, !first);
     if(!map->data[other_pos].key) {
@@ -177,7 +177,7 @@ passgen_hashmap_remove(passgen_hashmap *map, const void *key) {
 }
 
 passgen_hashmap_entry *
-passgen_hashmap_lookup(passgen_hashmap *map, const void *key) {
+passgen_hashmap_lookup(const passgen_hashmap *map, const void *key) {
     // make sure the hashmap is not empty
     if(!map->data) {
         return NULL;
@@ -286,7 +286,7 @@ const passgen_hashmap_context passgen_hashmap_context_unicode = {
 
 int passgen_hashmap_entry_free(void *user, passgen_hashmap_entry *entry) {
     (void) user;
-    free(entry->key);
+    free((void *) entry->key);
     free(entry->value);
     return 0;
 }

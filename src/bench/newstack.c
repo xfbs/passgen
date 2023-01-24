@@ -1,9 +1,9 @@
-#include <passgen/util/stack.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
 #include "newbench.h"
+#include <passgen/util/stack.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct payload {
     size_t integer;
