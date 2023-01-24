@@ -1,4 +1,4 @@
-#include "newbench.h"
+#include "bench.h"
 #include <passgen/util/stack.h>
 #include <stdbool.h>
 #include <stdio.h>

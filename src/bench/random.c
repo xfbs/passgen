@@ -1,168 +1,336 @@
-#include "passgen/util/random.h"
+#include "bench.h"
+#include <passgen/util/random.h>
+#include <stdbool.h>
 #include <stdio.h>
-#include <time.h>
+#include <stdlib.h>
+#include <string.h>
 
-typedef void bench_func(void *data, size_t ops);
-void bench_passgen_random_data();
-void bench_passgen_random_u8();
-void bench_passgen_random_u16();
-void bench_passgen_random_u32();
-void bench_passgen_random_u64();
+#define XORSHIFT_SEED 23456945749UL
+#define UNUSED(x)     (void) x
 
-void bench_passgen_random_u8_max();
-void bench_passgen_random_u16_max();
-void bench_passgen_random_u32_max();
-void bench_passgen_random_u64_max();
+struct bench_data {
+    passgen_random random;
+    uint64_t seed;
+    size_t count;
+    unsigned char *data;
+    size_t max;
+};
 
-void bench(
-    const char *name,
-    bench_func func,
-    void *data,
-    size_t mult,
-    size_t count);
-
-int main() {
-    passgen_random *rand = passgen_random_new(NULL);
-    bench("passgen_random_data", &bench_passgen_random_data, rand, 1024, 2000);
-    bench("passgen_random_u8", &bench_passgen_random_u8, rand, 1, 2000000);
-    bench("passgen_random_u16", &bench_passgen_random_u16, rand, 2, 1000000);
-    bench("passgen_random_u32", &bench_passgen_random_u32, rand, 4, 500000);
-    bench("passgen_random_u64", &bench_passgen_random_u64, rand, 8, 200000);
-
-    bench(
-        "passgen_random_u8_max",
-        &bench_passgen_random_u8_max,
-        rand,
-        1,
-        1000000);
-    bench(
-        "passgen_random_u16_max",
-        &bench_passgen_random_u16_max,
-        rand,
-        2,
-        500000);
-    bench(
-        "passgen_random_u32_max",
-        &bench_passgen_random_u32_max,
-        rand,
-        4,
-        300000);
-    bench(
-        "passgen_random_u64_max",
-        &bench_passgen_random_u64_max,
-        rand,
-        8,
-        150000);
-
-    passgen_random_close(rand);
-    return 0;
+static void *bench_data_prepare_xorshift(const passgen_hashmap *opts) {
+    UNUSED(opts);
+    struct bench_data *data = malloc(sizeof(struct bench_data));
+    data->count = 100000;
+    data->max = 100000;
+    data->seed = XORSHIFT_SEED;
+    passgen_random_open_xorshift(&data->random, data->seed);
+    return data;
 }
 
-void bench_passgen_random_data(void *data, size_t count) {
-    passgen_random *rand = data;
-
-    for(size_t i = 0; i < count; i++) {
-        char data[1024];
-        passgen_random_read(rand, data, 1024);
-    }
+static void *bench_data_prepare_system(const passgen_hashmap *opts) {
+    UNUSED(opts);
+    struct bench_data *data = malloc(sizeof(struct bench_data));
+    data->count = 100000;
+    data->max = 100000;
+    passgen_random_open(&data->random, NULL);
+    return data;
 }
 
-void bench_passgen_random_u8(void *data, size_t count) {
-    passgen_random *rand = data;
-    volatile uint8_t sum = 0;
-
-    for(size_t i = 0; i < count; i++) {
-        sum += passgen_random_u8(rand);
-    }
+static void *bench_data_prepare_zero(const passgen_hashmap *opts) {
+    UNUSED(opts);
+    struct bench_data *data = malloc(sizeof(struct bench_data));
+    data->count = 100000;
+    data->max = 100000;
+    passgen_random_open_zero(&data->random);
+    return data;
 }
 
-void bench_passgen_random_u8_max(void *data, size_t count) {
-    passgen_random *rand = data;
-    volatile uint8_t sum = 0;
-
-    for(size_t i = 0; i < count; i++) {
-        sum += passgen_random_u8_max(rand, 213);
-    }
+static void *bench_data_prepare_xorshift_data(const passgen_hashmap *opts) {
+    UNUSED(opts);
+    struct bench_data *data = malloc(sizeof(struct bench_data));
+    data->count = 100000;
+    data->seed = XORSHIFT_SEED;
+    data->data = malloc(data->count);
+    passgen_random_open_xorshift(&data->random, data->seed);
+    return data;
 }
 
-void bench_passgen_random_u16(void *data, size_t count) {
-    passgen_random *rand = data;
-    volatile uint16_t sum = 0;
-
-    for(size_t i = 0; i < count; i++) {
-        sum += passgen_random_u16(rand);
-    }
+static void *bench_data_prepare_system_data(const passgen_hashmap *opts) {
+    UNUSED(opts);
+    struct bench_data *data = malloc(sizeof(struct bench_data));
+    data->count = 100000;
+    data->data = malloc(data->count);
+    passgen_random_open(&data->random, NULL);
+    return data;
 }
 
-void bench_passgen_random_u16_max(void *data, size_t count) {
-    passgen_random *rand = data;
-    volatile uint16_t sum = 0;
-
-    for(size_t i = 0; i < count; i++) {
-        sum += passgen_random_u16_max(rand, 10000);
-    }
+static void *bench_data_prepare_zero_data(const passgen_hashmap *opts) {
+    UNUSED(opts);
+    struct bench_data *data = malloc(sizeof(struct bench_data));
+    data->count = 100000;
+    data->data = malloc(data->count);
+    passgen_random_open_zero(&data->random);
+    return data;
 }
 
-void bench_passgen_random_u32_max(void *data, size_t count) {
-    passgen_random *rand = data;
-    volatile uint32_t sum = 0;
-
-    for(size_t i = 0; i < count; i++) {
-        sum += passgen_random_u32_max(rand, 128924398);
-    }
-}
-
-void bench_passgen_random_u64_max(void *data, size_t count) {
-    passgen_random *rand = data;
-    volatile uint64_t sum = 0;
-
-    for(size_t i = 0; i < count; i++) {
-        sum += passgen_random_u64_max(rand, 10000000000);
-    }
-}
-
-void bench_passgen_random_u32(void *data, size_t count) {
-    passgen_random *rand = data;
-    volatile uint32_t sum = 0;
-
-    for(size_t i = 0; i < count; i++) {
-        sum += passgen_random_u32(rand);
-    }
-}
-
-void bench_passgen_random_u64(void *data, size_t count) {
-    passgen_random *rand = data;
-    volatile uint64_t sum = 0;
-
-    for(size_t i = 0; i < count; i++) {
-        sum += passgen_random_u64(rand);
-    }
-}
-
-void bench(
-    const char *name,
-    bench_func func,
-    void *data,
-    size_t mult,
-    size_t count) {
-    // do benchmark
-    clock_t before = clock();
-    func(data, count);
-    clock_t after = clock();
-
-    // calculate
-    double time = (after - before) / (CLOCKS_PER_SEC / 1.0);
-    double ops = mult * count / time;
-    const char *prefix = "";
-
-    // make it human readable.
-    if(ops > 1000000) {
-        ops /= 1000000;
-        prefix = "M";
-    } else if(ops > 1000) {
-        ops /= 1000;
-        prefix = "K";
+static void *bench_random_u8(void *raw_data) {
+    struct bench_data *data = raw_data;
+    for(size_t i = 0; i < data->count; i++) {
+        passgen_random_u8(&data->random);
     }
 
-    printf("%-25s %6.2lf %sBps/s (in %0.2lfs)\n", name, ops, prefix, time);
+    return NULL;
 }
+
+static void *bench_random_u16(void *raw_data) {
+    struct bench_data *data = raw_data;
+    for(size_t i = 0; i < data->count; i++) {
+        passgen_random_u16(&data->random);
+    }
+
+    return NULL;
+}
+
+static void *bench_random_u32(void *raw_data) {
+    struct bench_data *data = raw_data;
+    for(size_t i = 0; i < data->count; i++) {
+        passgen_random_u32(&data->random);
+    }
+
+    return NULL;
+}
+
+static void *bench_random_u64(void *raw_data) {
+    struct bench_data *data = raw_data;
+    for(size_t i = 0; i < data->count; i++) {
+        passgen_random_u64(&data->random);
+    }
+
+    return NULL;
+}
+
+static void *bench_random_read(void *raw_data) {
+    struct bench_data *data = raw_data;
+    passgen_random_read(&data->random, data->data, data->count);
+    return NULL;
+}
+
+static void bench_data_release(void *raw_data) {
+    struct bench_data *data = raw_data;
+    passgen_random_close(&data->random);
+    free(data);
+}
+
+static double bench_mult_u8(void *raw_data) {
+    struct bench_data *data = raw_data;
+    return data->count;
+}
+
+static double bench_mult_u16(void *raw_data) {
+    struct bench_data *data = raw_data;
+    return data->count * 2;
+}
+
+static double bench_mult_u32(void *raw_data) {
+    struct bench_data *data = raw_data;
+    return data->count * 4;
+}
+
+static double bench_mult_u64(void *raw_data) {
+    struct bench_data *data = raw_data;
+    return data->count * 8;
+}
+
+const bench random_xorshift_u8 = {
+    .group = "random",
+    .name = "xorshift_u8",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_xorshift,
+    .iterate = &bench_random_u8,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_xorshift_u16 = {
+    .group = "random",
+    .name = "xorshift_u16",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_xorshift,
+    .iterate = &bench_random_u16,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u16,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_xorshift_u32 = {
+    .group = "random",
+    .name = "xorshift_u32",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_xorshift,
+    .iterate = &bench_random_u32,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u32,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_xorshift_u64 = {
+    .group = "random",
+    .name = "xorshift_u64",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_xorshift,
+    .iterate = &bench_random_u64,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u64,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_xorshift_read = {
+    .group = "random",
+    .name = "xorshift_read",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_xorshift_data,
+    .iterate = &bench_random_read,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_system_u8 = {
+    .group = "random",
+    .name = "system_u8",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_system,
+    .iterate = &bench_random_u8,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_system_u16 = {
+    .group = "random",
+    .name = "system_u16",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_system,
+    .iterate = &bench_random_u16,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u16,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_system_u32 = {
+    .group = "random",
+    .name = "system_u32",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_system,
+    .iterate = &bench_random_u32,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u32,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_system_u64 = {
+    .group = "random",
+    .name = "system_u64",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_system,
+    .iterate = &bench_random_u64,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u64,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_system_read = {
+    .group = "random",
+    .name = "system_read",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_system_data,
+    .iterate = &bench_random_read,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_zero_u8 = {
+    .group = "random",
+    .name = "zero_u8",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_zero,
+    .iterate = &bench_random_u8,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_zero_u16 = {
+    .group = "random",
+    .name = "zero_u16",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_zero,
+    .iterate = &bench_random_u16,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u16,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_zero_u32 = {
+    .group = "random",
+    .name = "zero_u32",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_zero,
+    .iterate = &bench_random_u32,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u32,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_zero_u64 = {
+    .group = "random",
+    .name = "zero_u64",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_zero,
+    .iterate = &bench_random_u64,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u64,
+    .consumes = false,
+    .unit = "B",
+};
+
+const bench random_zero_read = {
+    .group = "random",
+    .name = "zero_read",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_zero_data,
+    .iterate = &bench_random_read,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
+    .consumes = false,
+    .unit = "B",
+};

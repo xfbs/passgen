@@ -1,359 +1,150 @@
-#include <assert.h>
+#include "bench.h"
 #include <getopt.h>
-#include <jansson.h>
 #include <math.h>
-#include <pthread.h>
-#include <regex.h>
-#include <stdatomic.h>
-#include <stdbool.h>
-#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-#include "bench.h"
+#define MAX(a, b) ((a > b) ? (a) : (b))
+#define MIN(a, b) ((a > b) ? (b) : (a))
 
-struct bench_options {
+typedef enum mode {
+    MODE_BENCH,
+    MODE_ONESHOT,
+    MODE_LIST,
+} mode;
+
+typedef struct options {
+    const bench **benches;
+    bool *enabled;
+    passgen_hashmap options;
+    mode mode;
     double time;
-    size_t threads;
-    regex_t *regex;
-    bool json;
-    bool help;
-    bool version;
-    bool error;
-    bool list;
-};
+    uint64_t iter;
+    bool verbose;
+    size_t name_col;
+    FILE *write;
+    passgen_hashmap *checkpoint;
+    const char *valgrind;
+    const char *program;
+} options;
 
-struct bench_result {
-    bool enabled;
-    size_t amount;
-    clock_t *time;
-};
+static int show_help(const options *options) {
+    const char *prog = options->program;
+    printf(
+        "Usage: %s [-t TIME] [-i ITER] [-o NAME=VALUE...] [NAME...]\n",
+        prog);
+    printf("       %s -s [-o NAME=VALUE...] NAME\n", prog);
+    printf("       %s -l [NAME...]\n", prog);
+    printf("Runs the benchmarks, generating a report.\n\n");
+    printf("OPTIONS\n");
+    printf("    -l, --list\n");
+    printf("        List available benchmarks and quit.\n");
+    printf("    -s, --oneshot\n");
+    printf("        Run in oneshot mode. This will run the benchmark only once "
+           "and will not\n");
+    printf("        generate a report. Useful for running a benchmark under "
+           "Cachegrind to\n");
+    printf("        measure instructions and cache behaviour.\n");
+    printf("    -t, --time TIME\n");
+    printf("        Runs benchmark for specified TIME. This will increase the "
+           "iteration count\n");
+    printf("        until the benchmark has run for the specified time, in "
+           "order to generate\n");
+    printf("        more samples and have more confidence in the measured "
+           "throughput. It will\n");
+    printf("        never decrease the number of iterations. Can be set to "
+           "zero to strictly\n");
+    printf("        run benchmarks ITER times. Defaults to 1s.\n");
+    printf("    -i, --iterations ITER\n");
+    printf("        Run the benchmarks for at least the specified iteration "
+           "count. Benchmarks\n");
+    printf("        will run longer if the alotted TIME has not been used up. "
+           "Has to be a\n");
+    printf("        positive, non-zero integer. Defaults to 100.\n");
+    printf("    -o, --option NAME=VALUE\n");
+    printf("        Overrides the benchmark option NAME with VALUE. This "
+           "option can be set\n");
+    printf("        multiple times to override multiple options.\n");
+    printf("    -w, --checkpoint FILE\n");
+    printf("        Write a checkpoint to the given FILE. This will write out "
+           "the current\n");
+    printf("        benchmark stats to the file in a CSV format for detecting "
+           "regressions.\n");
+    printf("        Recommended to use with the --valgrind flag.\n");
+    printf("    -r, --check FILE\n");
+    printf("        Read current benchmark state from the given FILE and warn "
+           "if a regression\n");
+    printf("        is detected. It is recommended to only use checkpoints "
+           "generated on the\n");
+    printf("        same machine or to use the --valgrind flag to get "
+           "machine-independent\n");
+    printf("        data.\n");
+    printf("    -c, --valgrind PATH\n");
+    printf("        Use the valgrind tool at the given PATH to compute "
+           "machine-indepdendent\n");
+    printf("        benchmark statistics, used to detect regressions.\n");
+    printf("    -v, --verbose\n");
+    printf("        Enables verbose logging output.\n");
+    return EXIT_SUCCESS;
+}
 
-struct bench_times {
-    double mean;
-    double median;
-    double min;
-    double max;
-    double dev;
-};
-
-struct bench_state {
-    size_t item_count;
-    clock_t target;
-    const struct bench_options *opts;
-    const struct bench_item *items;
-    struct bench_result *results;
-
-    atomic_size_t pos;
-};
-
-void *bench_thread(void *data) {
-    struct bench_state *state = data;
-
-    // fetch the next item.
-    size_t cur;
-    while((cur = atomic_fetch_add(&state->pos, 1)) < state->item_count) {
-        struct bench_result *result = &state->results[cur];
-        const struct bench_item *item = &state->items[cur];
-
-        if(!result->enabled) {
-            continue;
-        }
-
-        clock_t total = 0;
-        result->amount = 0;
-
-        size_t capacity = 1000;
-        result->time = malloc(capacity * sizeof(clock_t));
-        assert(result->time);
-
-        // setup state.
-        void *data = NULL;
-        if(item->setup) {
-            data = item->setup(NULL);
-        }
-
-        while(total < state->target) {
-            // run benchmark
-            clock_t before = clock();
-            item->func(data);
-            clock_t after = clock();
-
-            // save time
-            result->time[result->amount] = after - before;
-            total += after - before;
-
-            // save amount
-            result->amount += 1;
-
-            // make space
-            if(result->amount == capacity) {
-                capacity *= 3;
-                result->time =
-                    realloc(result->time, capacity * sizeof(clock_t));
-                assert(result->time);
-            }
-        }
-
-        // clean up state
-        if(item->free) {
-            item->free(data);
-        }
-    }
-
+static void *dummy_iterate(void *data) {
+    (void) data;
     return NULL;
 }
 
-int compare_clock(const void *a, const void *b) {
-    const clock_t *lhs = a;
-    const clock_t *rhs = b;
+const bench dummy = {
+    .group = "bench",
+    .name = "iteration",
+    .desc = "Benchmark iterations.",
+    .unit = "it",
+    .iterate = &dummy_iterate,
+};
 
-    if(*lhs < *rhs) {
-        return -1;
-    } else if(*lhs > *rhs) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
+extern const bench stack_push;
+extern const bench stack_pop;
+extern const bench random_system_u8;
+extern const bench random_system_u16;
+extern const bench random_system_u32;
+extern const bench random_system_u64;
+extern const bench random_system_read;
+extern const bench random_xorshift_u8;
+extern const bench random_xorshift_u16;
+extern const bench random_xorshift_u32;
+extern const bench random_xorshift_u64;
+extern const bench random_xorshift_read;
+extern const bench random_zero_u8;
+extern const bench random_zero_u16;
+extern const bench random_zero_u32;
+extern const bench random_zero_u64;
+extern const bench random_zero_read;
+extern const bench hashmap_insert;
 
-struct bench_times bench_process(const struct bench_result *result) {
-    struct bench_times times = {
-        .mean = 0,
-        .median = 0,
-        .min = result->time[0],
-        .max = result->time[0],
-        .dev = 0,
-    };
-
-    // find mean, min and max
-    for(size_t i = 0; i < result->amount; i++) {
-        clock_t time = result->time[i];
-
-        times.mean += time;
-
-        if(time < times.min) {
-            times.min = time;
-        }
-
-        if(time > times.max) {
-            times.max = time;
-        }
-    }
-
-    // find real mean
-    times.mean /= result->amount;
-
-    // find stddev
-    for(size_t i = 0; i < result->amount; i++) {
-        clock_t time = result->time[i];
-
-        times.dev += (time - times.mean) * (time - times.mean);
-    }
-
-    times.dev /= result->amount;
-    times.dev = sqrt(times.dev);
-
-    // find median by copying data first
-    clock_t *copy = malloc(result->amount * sizeof(clock_t));
-    assert(copy);
-    memcpy(copy, result->time, result->amount * sizeof(clock_t));
-    qsort(copy, result->amount, sizeof(clock_t), &compare_clock);
-    times.median = copy[result->amount / 2];
-    free(copy);
-
-    times.mean = times.mean / CLOCKS_PER_SEC;
-    times.median = times.median / CLOCKS_PER_SEC;
-    times.min = times.min / CLOCKS_PER_SEC;
-    times.max = times.max / CLOCKS_PER_SEC;
-    times.dev /= CLOCKS_PER_SEC;
-
-    return times;
-}
-
-void bench_output_json(const struct bench_state *state) {
-    json_t *output = json_object();
-    json_object_set_new(output, "time", json_real(state->opts->time));
-    json_object_set_new(output, "threads", json_integer(state->opts->threads));
-    json_t *results = json_array();
-    json_object_set_new(output, "results", results);
-
-    for(size_t i = 0; i < state->item_count; i++) {
-        const struct bench_item *item = &state->items[i];
-        const struct bench_result *res = &state->results[i];
-
-        if(!res->enabled) {
-            continue;
-        }
-
-        struct bench_times times = bench_process(res);
-
-        json_t *result = json_object();
-        json_object_set_new(result, "name", json_string(item->name));
-        json_object_set_new(result, "amount", json_integer(res->amount));
-        json_object_set_new(result, "mean", json_real(times.mean));
-        json_object_set_new(result, "median", json_real(times.median));
-        json_object_set_new(result, "min", json_real(times.min));
-        json_object_set_new(result, "max", json_real(times.max));
-        json_object_set_new(result, "dev", json_real(times.dev));
-        json_array_append_new(results, result);
-    }
-
-    char *str = json_dumps(output, JSON_INDENT(4));
-    printf("%s\n", str);
-    free(str);
-    json_decref(output);
-}
-
-void bench(const struct bench_options *opts, const struct bench_item *items) {
-    struct bench_state state = {
-        .item_count = 0,
-        .target = opts->time * CLOCKS_PER_SEC,
-        .opts = opts,
-        .items = items,
-        .results = NULL,
-    };
-
-    // find out how many we have to test.
-    while(items[state.item_count].name) {
-        state.item_count += 1;
-    }
-
-    // allocate memory for the results.
-    state.results = calloc(state.item_count, sizeof(struct bench_result));
-    assert(state.results);
-
-    // enable all tests that match the regex if one exists.
-    if(opts->regex) {
-        for(size_t i = 0; i < state.item_count; i++) {
-            if(0 == regexec(opts->regex, items[i].name, 0, NULL, 0)) {
-                state.results[i].enabled = true;
-
-                printf("enabling %s\n", items[i].name);
-            }
-        }
-    } else {
-        // enable all
-        for(size_t i = 0; i < state.item_count; i++) {
-            state.results[i].enabled = true;
-        }
-    }
-
-    // init state
-    atomic_store(&state.pos, 0);
-
-    // initialise threads
-    pthread_t threads[opts->threads];
-    for(size_t i = 0; i < opts->threads; i++) {
-        pthread_create(&threads[i], NULL, bench_thread, &state);
-    }
-
-    // wait for threads to finish
-    for(size_t i = 0; i < opts->threads; i++) {
-        pthread_join(threads[i], NULL);
-    }
-
-    if(opts->json) {
-        bench_output_json(&state);
-    } else {
-        // print stats
-        for(size_t i = 0; i < state.item_count; i++) {
-            const struct bench_result *res = &state.results[i];
-
-            if(!res->enabled) {
-                continue;
-            }
-
-            struct bench_times times = bench_process(res);
-
-            printf("%s got %zu iterations\n", items[i].name, res->amount);
-            printf(
-                "  mean %f median %f min %f max %f dev %f\n",
-                1000 * times.mean,
-                1000 * times.median,
-                1000 * times.min,
-                1000 * times.max,
-                1000 * times.dev);
-        }
-    }
-
-    // clean up memory
-    for(size_t i = 0; i < state.item_count; i++) {
-        free(state.results[i].time);
-    }
-
-    free(state.results);
-}
-
-void bench_list_json(
-    const struct bench_options *opts,
-    const struct bench_item *items) {
-    (void) opts;
-
-    json_t *list = json_array();
-
-    for(size_t i = 0; items[i].name; i++) {
-        json_t *item = json_object();
-        json_object_set_new(item, "name", json_string(items[i].name));
-        json_object_set_new(item, "info", json_string(items[i].info));
-        json_array_append_new(list, item);
-    }
-
-    char *out = json_dumps(list, JSON_INDENT(4));
-    printf("%s\n", out);
-
-    free(out);
-    json_decref(list);
-}
-
-void bench_list_text(
-    const struct bench_options *opts,
-    const struct bench_item *items) {
-    // FIXME
-    (void) opts;
-    for(size_t i = 0; items[i].name; i++) {
-        printf("%s  %s\n", items[i].name, items[i].info);
-    }
-}
-
-void bench_list(
-    const struct bench_options *opts,
-    const struct bench_item *items) {
-    if(opts->json) {
-        bench_list_json(opts, items);
-    } else {
-        bench_list_text(opts, items);
-    }
-}
-
-void bench_help(const char *prog) {
-    fprintf(
-        stderr,
-        "passgen_bench\n"
-        "Run benchmarks against libpassgen.\n"
-        "Usage: %s [OPTIONS] [FILTER]\n\n"
-        "OPTIONS\n"
-        "  -l, --list         List all available benchmarks.\n"
-        "  -d, --duration     The duration to run each test. Default is 50ms. "
-        "Can be any length,\n"
-        "                     accepted units are h, m, s, ms, us, ns.\n"
-        "  -t, --threads      How many threads to launch to run benchmarks. "
-        "Using too many threads\n"
-        "                     will slow down the benchmarks.\n"
-        "  -v, --version      Show the version of this build.\n"
-        "  -h, --help         Show this help text.\n\n"
-        "FILTER\n"
-        "  A regular expression that is used to filter which benchmarks are "
-        "to "
-        "be run.\n",
-        prog);
-}
-
-void bench_version(void) {
-    fprintf(stderr, "passgen_bench version %s\n", "0000");
-}
+const bench *benches[] = {
+    &dummy,
+    &stack_push,
+    &stack_pop,
+    &random_system_u8,
+    &random_system_u16,
+    &random_system_u32,
+    &random_system_u64,
+    &random_system_read,
+    &random_xorshift_u8,
+    &random_xorshift_u16,
+    &random_xorshift_u32,
+    &random_xorshift_u64,
+    &random_xorshift_read,
+    &random_zero_u8,
+    &random_zero_u16,
+    &random_zero_u32,
+    &random_zero_u64,
+    &random_zero_read,
+    &hashmap_insert,
+    NULL,
+};
 
 static double parse_time(const char *str) {
     double number;
@@ -367,10 +158,15 @@ static double parse_time(const char *str) {
 
     if(ret == 2) {
         switch(prefix[0]) {
+            case 'd':
+                number *= 24;
+                // fall through
             case 'h':
                 number *= 60;
+                // fall through
             case 'm':
                 number *= 60;
+                // fall through
             case 's':
                 return number;
             default:
@@ -382,8 +178,10 @@ static double parse_time(const char *str) {
         switch(prefix[0]) {
             case 'n':
                 number /= 1000;
+                // fall through
             case 'u':
                 number /= 1000;
+                // fall through
             case 'm':
                 number /= 1000;
                 return number;
@@ -395,108 +193,316 @@ static double parse_time(const char *str) {
     return NAN;
 }
 
-struct bench_options bench_parse_opts(int argc, char *argv[]) {
-    struct bench_options opts = {
-        .time = 0.05,
-        .threads = 1,
-        .regex = NULL,
-        .json = false,
-        .list = false,
-        .help = false,
-        .version = false,
-        .error = false,
-    };
+static size_t bench_len(const bench *benches[]) {
+    size_t len = 0;
+    while(benches[len]) len++;
+    return len;
+}
 
-    const char *short_opts = "d:t:ljhv";
-    static struct option long_opts[] = {
-        {"duration", required_argument, NULL, 'd'},
-        {"threads", required_argument, NULL, 't'},
-        {"list", no_argument, NULL, 'l'},
-        {"json", no_argument, NULL, 'j'},
-        {"help", no_argument, NULL, 'h'},
-        {"version", no_argument, NULL, 'v'},
-        {NULL, no_argument, NULL, 0}};
+int passgen_bench_list(const options *options) {
+    int name_col = options->name_col;
 
-    while(true) {
-        int opt = getopt_long(argc, argv, short_opts, long_opts, NULL);
+    size_t line_len = 80;
+    char line[line_len + 1];
+    for(size_t i = 0; options->benches[i]; i++) {
+        const bench *bench = options->benches[i];
+        size_t desc_offset = 0;
+        size_t desc_len = strlen(bench->desc);
 
-        if(opt < 0) break;
-        switch(opt) {
-            case 0:
-                break;
-            case 'h':
-                opts.help = true;
-                break;
-            case 't':
-                opt = atoi(optarg);
-                if(opt < 1) {
-                }
-                opts.threads = opt;
-                break;
-            case 'd':
-                opts.time = parse_time(optarg);
-                if(isnan(opts.time)) {
-                    fprintf(stderr, "Error parsing time '%s'.\n", optarg);
-                    opts.error = true;
-                }
-                break;
-            case 'v':
-                opts.version = true;
-                break;
-            case 'l':
-                opts.list = true;
-                break;
-            case 'j':
-                opts.json = true;
-                break;
-            case '?':
-            default:
-                opts.error = true;
-                break;
+        size_t pos = 0;
+        pos += sprintf(line, "%s:%s", bench->group, bench->name);
+        pos += sprintf(line + pos, "%*c", (int) (name_col + 2 - pos), ' ');
+
+        if(desc_len > (line_len - pos)) {
+            while((desc_len - desc_offset) > (line_len - pos)) {
+                size_t copy_bytes = MIN(line_len - pos, desc_len - desc_offset);
+                memcpy(line + pos, bench->desc + desc_offset, copy_bytes);
+                size_t break_pos = line_len - pos;
+                while(break_pos && line[pos + break_pos] != ' ') break_pos--;
+                while(break_pos && line[pos + break_pos] == ' ') break_pos--;
+                break_pos++;
+                line[pos + break_pos] = 0;
+                printf("%s\n", line);
+                desc_offset += break_pos;
+                pos = sprintf(line, "%*c", name_col + 1, ' ');
+            }
+
+            if(desc_offset != desc_len) {
+                sprintf(
+                    line,
+                    "%*c%s",
+                    name_col + 1,
+                    ' ',
+                    bench->desc + desc_offset);
+                printf("%s\n", line);
+            }
+        } else {
+            printf("%s%s\n", line, bench->desc);
         }
     }
 
-    // parse optional regex.
-    if(optind < argc) {
-        opts.regex = calloc(1, sizeof(regex_t));
-        assert(opts.regex);
-        int ret = regcomp(
-            opts.regex,
-            argv[optind],
-            REG_EXTENDED | REG_ICASE | REG_NOSUB);
-        if(ret != 0) {
-            fprintf(stderr, "Error parsing regex '%s'.\n", argv[optind]);
-            opts.error = true;
-            return opts;
+    return EXIT_SUCCESS;
+}
+
+int passgen_bench_run(const options *options) {
+    for(size_t b = 0; options->benches[b]; b++) {
+        if(!options->enabled[b]) {
+            continue;
+        }
+
+        const bench *bench = options->benches[b];
+
+        if(options->verbose) {
+            fprintf(stderr, "Running benchmark %s\n", bench->name);
+        }
+
+        void *data = NULL;
+        if(bench->prepare) {
+            data = bench->prepare(&options->options);
+        }
+
+        double multiplier = 1.0;
+        if(bench->multiplier) {
+            multiplier = bench->multiplier(data);
+        }
+
+        double total_time = 0;
+        clock_t start = clock();
+        clock_t before, after;
+        clock_t target = options->time * CLOCKS_PER_SEC;
+        clock_t progress = 0;
+
+        size_t padding =
+            options->name_col - strlen(bench->group) - strlen(bench->name);
+
+        size_t iterations = 0;
+        for(; iterations < options->iter || (after - start) < target;
+            iterations++) {
+            if(bench->consumes) {
+                data = bench->prepare(&options->options);
+            }
+
+            before = clock();
+            void *output = bench->iterate(data);
+            after = clock();
+
+            total_time += (after - before) / (double) CLOCKS_PER_SEC;
+
+            if(output) {
+                bench->cleanup(output);
+            }
+
+            if(after >= progress) {
+                fprintf(
+                    stderr,
+                    "\r%s:%s:%*c %20.2lf %s/s",
+                    bench->group,
+                    bench->name,
+                    (int) padding,
+                    ' ',
+                    multiplier * iterations / total_time,
+                    bench->unit);
+                progress = after + CLOCKS_PER_SEC / 10;
+            }
+        }
+
+        if(data && !bench->consumes) {
+            bench->release(data);
+        }
+
+        printf(
+            "\r%s:%s:%*c %20.2lf %s/s\n",
+            bench->group,
+            bench->name,
+            (int) padding,
+            ' ',
+            multiplier * iterations / total_time,
+            bench->unit);
+    }
+
+    free(options->enabled);
+
+    return EXIT_SUCCESS;
+}
+
+int passgen_bench_oneshot(const options *options) {
+    for(size_t b = 0; options->benches[b]; b++) {
+        if(!options->enabled[b]) {
+            continue;
+        }
+
+        const bench *bench = options->benches[b];
+
+        if(options->verbose) {
+            fprintf(stderr, "Running benchmark %s\n", bench->name);
+        }
+
+        void *data = NULL;
+        if(bench->prepare) {
+            data = bench->prepare(NULL);
+        }
+
+        for(size_t i = 0; i < options->iter; i++) {
+            if(bench->consumes) {
+                bench->release(data);
+                data = bench->prepare(NULL);
+            }
+
+            void *output = bench->iterate(data);
+
+            if(output) {
+                bench->cleanup(output);
+            }
+        }
+
+        if(data) {
+            bench->release(data);
         }
     }
 
-    return opts;
+    free(options->enabled);
+
+    return EXIT_SUCCESS;
+}
+
+void measure_name_col(options *options) {
+    options->name_col = 1;
+    for(size_t i = 0; options->benches[i]; i++) {
+        const bench *bench = options->benches[i];
+        size_t current = strlen(bench->name) + strlen(bench->group) + 1;
+        options->name_col = MAX(options->name_col, current);
+    }
+}
+
+void add_option(options *options, const char *arg) {
+    char *value = strchr(arg, '=');
+    *value = 0;
+    value++;
+    if(options->verbose) {
+        fprintf(stderr, "Parsed option '%s' as '%s'\n", arg, value);
+    }
+    passgen_hashmap_insert(&options->options, arg, value);
 }
 
 int main(int argc, char *argv[]) {
-    struct bench_options opts = bench_parse_opts(argc, argv);
+    // define command-line options
+    const char *short_opts = "o:t:i:w:r:c:hlvs";
+    static struct option long_opts[] = {
+        {"list", no_argument, NULL, 'l'},
+        {"oneshot", no_argument, NULL, 's'},
+        {"help", no_argument, NULL, 'h'},
+        {"verbose", no_argument, NULL, 'v'},
+        {"time", required_argument, NULL, 't'},
+        {"option", required_argument, NULL, 'o'},
+        {"iterations", required_argument, NULL, 'i'},
+        {"valgrind", required_argument, NULL, 'c'},
+        {"checkpoint", required_argument, NULL, 'w'},
+        {"check", required_argument, NULL, 'r'},
+        {NULL, no_argument, NULL, 0}};
 
-    if(opts.error) {
-        exit(-1);
+    size_t benchlen = bench_len(benches);
+
+    // parse command-line options
+    options options = {
+        .benches = benches,
+        .enabled = calloc(benchlen, sizeof(bool)),
+        .mode = MODE_BENCH,
+        .iter = 100,
+        .time = 1.0,
+        .verbose = false,
+        .program = argv[0],
+    };
+
+    passgen_hashmap_init(&options.options, &passgen_hashmap_context_default);
+    measure_name_col(&options);
+
+    while(true) {
+        // parse next command-line option
+        int opt = getopt_long(argc, argv, short_opts, long_opts, NULL);
+
+        // done parsing options
+        if(opt < 0) break;
+
+        switch(opt) {
+            case 'h':
+                return show_help(&options);
+            case 's':
+                options.mode = MODE_ONESHOT;
+                break;
+            case 'i':
+                options.iter = atoi(optarg);
+                if(options.iter == 0) {
+                    fprintf(stderr, "Error: iter '%s' is invalid\n", optarg);
+                    return EXIT_FAILURE;
+                }
+                break;
+            case 't':
+                options.time = parse_time(optarg);
+                if(isnan(options.time)) {
+                    fprintf(stderr, "Error: time '%s' is invalid\n", optarg);
+                    return EXIT_FAILURE;
+                }
+                break;
+            case 'v':
+                options.verbose = true;
+                break;
+            case 'c':
+                options.valgrind = optarg;
+                break;
+            case 'r':
+                break;
+            case 'w':
+                options.write = fopen(optarg, "w");
+                break;
+            case 'l':
+                options.mode = MODE_LIST;
+                break;
+            case 'o':
+                add_option(&options, optarg);
+                break;
+            case '?':
+            default:
+                return EXIT_FAILURE;
+        }
     }
 
-    if(opts.help) {
-        bench_help(argv[0]);
-        exit(0);
+    if(options.verbose) {
+        fprintf(stderr, "Loaded %zu benches\n", benchlen);
     }
 
-    if(opts.version) {
-        bench_version();
-        exit(0);
+    // initialize enabled
+    for(size_t i = 0; i < benchlen; i++) {
+        options.enabled[i] = optind >= argc;
     }
 
-    if(opts.list) {
-        bench_list(&opts, items);
-        exit(0);
+    while(optind < argc) {
     }
 
-    bench(&opts, items);
+    if(options.verbose) {
+        if(options.mode == MODE_BENCH) {
+            fprintf(
+                stderr,
+                "Mode: Benchmark (%zu it, %lfs\n",
+                options.iter,
+                options.time);
+        }
 
-    return 0;
+        if(options.mode == MODE_ONESHOT) {
+            fprintf(stderr, "Mode: Oneshot (%zu it)\n", options.iter);
+        }
+    }
+
+    switch(options.mode) {
+        case MODE_BENCH:
+            passgen_bench_run(&options);
+            break;
+        case MODE_ONESHOT:
+            passgen_bench_oneshot(&options);
+            break;
+        case MODE_LIST:
+            passgen_bench_list(&options);
+            break;
+    }
+
+    return EXIT_SUCCESS;
 }

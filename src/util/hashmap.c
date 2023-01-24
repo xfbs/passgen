@@ -60,8 +60,10 @@ void passgen_hashmap_realloc(passgen_hashmap *map, size_t capacity) {
     free(old.data);
 }
 
-static inline size_t
-passgen_hashmap_position(const passgen_hashmap *map, const void *key, bool first) {
+static inline size_t passgen_hashmap_position(
+    const passgen_hashmap *map,
+    const void *key,
+    bool first) {
     return map->context->hash(map, key, first) % map->capacity;
 }
 
