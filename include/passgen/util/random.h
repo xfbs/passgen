@@ -10,14 +10,17 @@
 #include <stdio.h>
 
 /// Size of the random data ring buffer.
-/// Requests for more than this result in a direct call to read(),
+/// Requests for more than this result in a direct call to the @ref passgen_random_close_fun,
 /// requests smaller than this are read from the buffer.
 #define PASSGEN_RANDOM_BUFFER_LENGTH 1024
 
+/// Type of function used to read more random data.
 typedef size_t passgen_random_read_func(void *dest, size_t size, void *data);
+
+/// Type of function used to close the randomness source.
 typedef void passgen_random_close_func(void *data);
 
-/// Random object. Caches some random data to reduce read() syscalls.
+/// Randomness source.
 typedef struct passgen_random {
     /// Ring buffer to hold random data in.
     uint8_t buffer[PASSGEN_RANDOM_BUFFER_LENGTH];
@@ -28,23 +31,32 @@ typedef struct passgen_random {
     /// Device to read random data from.
     void *data;
 
+    /// Function used to read more random data.
     passgen_random_read_func *read;
+
+    /// Function used to close randomness source.
     passgen_random_close_func *close;
 } passgen_random;
 
-/// Allocates and opens new random object. Returns `NULL` on error. Uses
-/// `/dev/urandom` as random device.
+/// Allocates and opens new random object.
+///
+/// @param desc String description of which randomness source to allocate. When `NULL`, uses
+/// system randomness source.
+/// @returns Returns `NULL` on error.
 ///
 /// @par Example
 ///
 /// ```c
-/// passgen_random *random = passgen_random_new();
-///
-/// assert(random != NULL);
-///
-/// // use random
-///
-/// passgen_random_free(random);
+/// passgen_random *random_default = passgen_random_new(NULL);
+/// passgen_random *random_system = passgen_random_new("system");
+/// passgen_random *random_xorshift = passgen_random_new("xor:1234");
+/// passgen_random *random_file = passgen_random_new("file:/dev/urandom");
+/// passgen_random *random_zero = passgen_random_new("zero");
+/// passgen_random_free(random_default);
+/// passgen_random_free(random_system);
+/// passgen_random_free(random_xorshift);
+/// passgen_random_free(random_file);
+/// passgen_random_free(random_zero);
 /// ```
 passgen_random *passgen_random_new(const char *desc);
 

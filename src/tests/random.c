@@ -2,154 +2,218 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "tests.h"
 
-#define SEED 234720984723
+#define XORSHIFT_SEED 234720984723
+
+/// Tests that a given function covers all possible outputs (0..max, inclusive).
+#define TEST_COVERAGE(max, collate, function) \
+    do { \
+        size_t coverage_len = ((size_t) max) / (collate) + 1ULL; \
+        uint8_t *coverage = calloc((coverage_len + 7) / 8, sizeof(bool)); \
+        bool full_coverage = false; \
+        while(!full_coverage) { \
+            for(size_t i = 0; i < 256; i++) { \
+                size_t pos = function / (collate); \
+                coverage[pos / 8] |= 1 << (pos % 8); \
+            } \
+            full_coverage = true; \
+            for(size_t i = 0; i <= (max / (collate)); i++) { \
+                if(!coverage[i / 8] & 1 << (i % 8)) { \
+                    full_coverage = false; \
+                    break; \
+                } \
+            } \
+        } \
+        free(coverage); \
+    } while(false)
+
+double standard_deviation(size_t count, uint32_t *elements) {
+    // TODO: determine deviation
+    return 0;
+}
+
+/// Tests that a given function has an even distribution
+#define TEST_DISTRIBUTION(max, bucket_num, target, function) \
+    uint32_t *buckets = calloc(bucket_num, sizeof(uint32_t)); \
+    while(true) { \
+        size_t bucket = function / ((max) / (bucket_num) + 1); \
+        buckets[bucket] += 1; \
+        if(buckets[bucket] == target) { \
+            break; \
+        } \
+    } \
+    assert(standard_deviation(bucket_num, buckets) < 10); \
+    free(buckets)
 
 test_result test_random_u8(void) {
-    passgen_random *rand = passgen_random_new_xorshift(SEED);
-    assert(rand);
+    passgen_random random;
+    assert(passgen_random_open(&random, NULL));
 
-    // generate random nubers until we got almost all of them.
-    bool gotten[UINT8_MAX + 1] = {false};
-    for(size_t i = 0; i < (32 * UINT8_MAX); ++i) {
-        gotten[passgen_random_u8(rand)] = true;
-    }
+    TEST_COVERAGE(UINT8_MAX, 1, passgen_random_u8(&random));
 
-    // there's still a (255/256)^(8*256) = 0.03% chance this fails.
-    for(size_t i = 0; i < UINT8_MAX; ++i) {
-        assert(gotten[i]);
-    }
-
-    passgen_random_free(rand);
+    passgen_random_close(&random);
 
     return test_ok;
 }
 
 test_result test_random_u8_max(void) {
-    passgen_random *rand = passgen_random_new_xorshift(SEED);
-    assert(rand);
+    passgen_random random;
+    assert(passgen_random_open(&random, NULL));
 
-    for(size_t max = 1; max < UINT8_MAX; ++max) {
-        // generate random nubers until we got almost all of them.
-        bool gotten[UINT8_MAX] = {false};
-        for(size_t i = 0; i < (16 * UINT8_MAX); ++i) {
-            uint8_t r = passgen_random_u8_max(rand, max);
-            assert(r < max);
-            gotten[r] = true;
-        }
-
-        // there's still a (255/256)^(8*256) = 0.03% chance this fails.
-        for(size_t i = 0; i < max; ++i) {
-            assert(gotten[i]);
-        }
+    for(size_t max = 1; max < UINT8_MAX; max++) {
+        TEST_COVERAGE(max - 1, 1, passgen_random_u8_max(&random, max));
     }
 
-    passgen_random_free(rand);
+    passgen_random_close(&random);
 
     return test_ok;
 }
 
 test_result test_random_u16(void) {
-    passgen_random *rand = passgen_random_new_xorshift(SEED);
-    assert(rand);
+    passgen_random random;
+    assert(passgen_random_open(&random, NULL));
 
-    // generate random nubers until we got almost all of them.
-    bool gotten[UINT16_MAX + 1] = {false};
-    for(size_t i = 0; i < (32 * UINT16_MAX); ++i) {
-        gotten[passgen_random_u16(rand)] = true;
-    }
+    TEST_COVERAGE(UINT16_MAX, 1, passgen_random_u16(&random));
 
-    // there's still a (255/256)^(8*256) = 0.03% chance this fails.
-    for(size_t i = 0; i < UINT16_MAX; ++i) {
-        assert(gotten[i]);
-    }
-
-    passgen_random_free(rand);
+    passgen_random_close(&random);
 
     return test_ok;
 }
 
 test_result test_random_u16_max(void) {
-    passgen_random *rand = passgen_random_new_xorshift(SEED);
-    assert(rand);
+    passgen_random random;
+    assert(passgen_random_open(&random, NULL));
 
-    size_t max[] = {
-        1,
-        2,
-        3,
-        4,
-        5,
-        100,
-        200,
-        500,
-        1000,
-        1500,
-        2000,
-        5000,
-        10000,
-        15000,
-        20000,
-        30000,
-        45000,
-        60000,
-        0};
-
-    for(size_t n = 1; max[n]; ++n) {
-        bool gotten[UINT16_MAX] = {false};
-        for(size_t i = 0; i < (16 * max[n]); ++i) {
-            uint16_t r = passgen_random_u16_max(rand, max[n]);
-            assert(r < max[n]);
-            gotten[r] = true;
-        }
-
-        for(size_t i = 0; i < max[n]; ++i) {
-            assert(gotten[i]);
-        }
+    for(size_t max = 1; max < UINT8_MAX; max++) {
+        TEST_COVERAGE(max - 1, 1, passgen_random_u16_max(&random, max));
     }
 
-    passgen_random_free(rand);
+    for(size_t max = 1; max < UINT16_MAX; max *= 3) {
+        TEST_COVERAGE(max - 1, 1, passgen_random_u16_max(&random, max));
+    }
+
+    passgen_random_close(&random);
+
+    return test_ok;
+}
+
+test_result test_random_u32(void) {
+    passgen_random random;
+    assert(passgen_random_open(&random, NULL));
+
+    TEST_COVERAGE(UINT32_MAX, 1 << 16, passgen_random_u32(&random));
+    TEST_DISTRIBUTION(UINT32_MAX, 1 << 10, 1 << 10, passgen_random_u32(&random));
+
+    passgen_random_close(&random);
 
     return test_ok;
 }
 
 test_result test_random_u32_max(void) {
-    passgen_random *rand = passgen_random_new_xorshift(SEED);
-    assert(rand);
+    passgen_random random;
+    assert(passgen_random_open(&random, NULL));
 
-    for(size_t i = 1; i < 1000000; i++) {
-        uint32_t max = passgen_random_u32(rand);
-
-        assert(passgen_random_u32_max(rand, max) < max);
+    for(size_t max = 1; max < UINT8_MAX; max++) {
+        TEST_COVERAGE(max - 1, 1, passgen_random_u32_max(&random, max));
     }
 
-    passgen_random_free(rand);
+    for(size_t max = 1; max < UINT16_MAX; max *= 3) {
+        TEST_COVERAGE(max - 1, 1, passgen_random_u32_max(&random, max));
+    }
+
+    passgen_random_close(&random);
+
+    return test_ok;
+}
+
+test_result test_random_u64(void) {
+    passgen_random random;
+    assert(passgen_random_open(&random, NULL));
+
+    // FIXME
+    //TEST_COVERAGE(UINT64_MAX, 1ULL << 48, 1024, passgen_random_u32(&random));
+    TEST_DISTRIBUTION(UINT64_MAX, 1 << 10, 1 << 10, passgen_random_u64(&random));
+
+    passgen_random_close(&random);
 
     return test_ok;
 }
 
 test_result test_random_u64_max(void) {
-    passgen_random *rand = passgen_random_new_xorshift(SEED);
-    assert(rand);
+    passgen_random random;
+    assert(passgen_random_open(&random, NULL));
 
-    for(size_t i = 1; i < 1000000; i++) {
-        uint32_t max = passgen_random_u64(rand);
-
-        assert(passgen_random_u64_max(rand, max) < max);
+    for(size_t max = 1; max < UINT8_MAX; max++) {
+        TEST_COVERAGE(max - 1, 1, passgen_random_u64_max(&random, max));
     }
 
-    passgen_random_free(rand);
+    for(size_t max = 1; max < UINT16_MAX; max *= 3) {
+        TEST_COVERAGE(max - 1, 1, passgen_random_u64_max(&random, max));
+    }
+
+    for(size_t i = 1; i < 1000000; i++) {
+        uint32_t max = passgen_random_u64(&random);
+
+        assert(passgen_random_u64_max(&random, max) < max);
+    }
+
+    passgen_random_close(&random);
 
     return test_ok;
 }
 
 test_result test_random_new(void) {
-    passgen_random *random = passgen_random_new(NULL);
+    passgen_random *random_default = passgen_random_new(NULL);
+    assert(random_default);
+    assert(random_default->read);
+    assert(random_default->close);
+
+    passgen_random *random = passgen_random_new("system");
+    assert(random);
+    assert_eq(random->read, random_default->read);
+    assert_eq(random->close, random_default->close);
+    passgen_random_free(random);
+    passgen_random_free(random_default);
+
+    random = passgen_random_new("zero");
     assert(random);
     assert(random->read);
     assert(random->close);
+    assert_eq(passgen_random_u8(random), 0);
+    assert_eq(passgen_random_u16(random), 0);
+    assert_eq(passgen_random_u32(random), 0);
+    assert_eq(passgen_random_u64(random), 0);
     passgen_random_free(random);
+
+    random = passgen_random_new("xor:1234");
+    assert(random);
+    assert(random->read);
+    assert(random->close);
+    assert_eq(passgen_random_u8(random), 91);
+    assert_eq(passgen_random_u16(random), 11632);
+    assert_eq(passgen_random_u32(random), 79584);
+    assert_eq(passgen_random_u64(random), 3801598356675656448ULL);
+    assert_eq(passgen_random_u64_max(random, 999999999), 851051297);
+    passgen_random_free(random);
+
+    random = passgen_random_new("file:/dev/zero");
+    assert(random);
+    assert(random->read);
+    assert(random->close);
+    assert_eq(passgen_random_u8(random), 0);
+    assert_eq(passgen_random_u16(random), 0);
+    assert_eq(passgen_random_u32(random), 0);
+    assert_eq(passgen_random_u64(random), 0);
+    passgen_random_free(random);
+
+    assert(!passgen_random_new("other"));
+    assert(!passgen_random_new("xor:abc"));
+    assert(!passgen_random_new("xor:"));
+    assert(!passgen_random_new("file:"));
+    assert(!passgen_random_new("file:/dev/nonexistant"));
 
     return test_ok;
 }
@@ -180,6 +244,31 @@ test_result test_random_open(void) {
     passgen_random_close(&random);
     assert(!random.read);
 
+    assert(passgen_random_open(&random, "system"));
+    assert(random.read);
+    assert(random.close);
+    passgen_random_close(&random);
+
+    assert(passgen_random_open(&random, "xor:1234"));
+    assert(random.read);
+    assert(random.close);
+    passgen_random_close(&random);
+
+    assert(passgen_random_open(&random, "zero"));
+    assert(random.read);
+    assert(random.close);
+    passgen_random_close(&random);
+
+    assert(passgen_random_open(&random, "file:/dev/random"));
+    assert(random.read);
+    assert(random.close);
+    passgen_random_close(&random);
+
+    assert(!passgen_random_open(&random, "other"));
+    assert(!passgen_random_open(&random, "file:/dev/notexists"));
+    assert(!passgen_random_open(&random, "xor:"));
+    assert(!passgen_random_open(&random, "xor:abc"));
+
     return test_ok;
 }
 
@@ -201,7 +290,7 @@ test_result test_random_open_path(void) {
 
 test_result test_random_read(void) {
     passgen_random random;
-    assert(passgen_random_open_xorshift(&random, SEED));
+    assert(passgen_random_open_xorshift(&random, XORSHIFT_SEED));
 
     uint8_t data[2000] = {0};
 
@@ -283,4 +372,4 @@ test_result test_random_xorshift(void) {
     return test_ok;
 }
 
-#undef SEED
+#undef XORSHIFT_SEED

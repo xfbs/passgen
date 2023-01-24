@@ -232,19 +232,16 @@ passgen_random *passgen_random_open_parse(passgen_random *random, const char *de
 
     // check if we should use the xorshift PRNG with the given seed
     if(strprefix("xor:", desc) == 0) {
-        const char *seed_str = &random[4];
+        const char *seed_str = &desc[4];
         uint64_t seed = atoll(seed_str);
         if(seed == 0) {
-            printf(
-                "\033[1;31merror\033[0m: invalid xorshift seed '%s'\n",
-                seed_str);
             return NULL;
         }
         return passgen_random_open_xorshift(random, seed);
     }
 
     // check if we should use the system default
-    if(0 == strcmp(random, "system")) {
+    if(0 == strcmp(desc, "system")) {
         return passgen_random_open_system(random);
     }
 
@@ -356,10 +353,6 @@ inline uint8_t passgen_random_u8_max(passgen_random *random, uint8_t max) {
 inline uint16_t passgen_random_u16_max(passgen_random *random, uint16_t max) {
     passgen_assert(max);
 
-    if(max <= UINT8_MAX) {
-        return passgen_random_u8_max(random, max);
-    }
-
     uint16_t mask = max;
     mask |= mask >> 8;
     mask |= mask >> 4;
@@ -377,10 +370,6 @@ inline uint16_t passgen_random_u16_max(passgen_random *random, uint16_t max) {
 
 inline uint32_t passgen_random_u32_max(passgen_random *random, uint32_t max) {
     passgen_assert(max);
-
-    if(max < UINT16_MAX) {
-        return passgen_random_u16_max(random, max);
-    }
 
     uint32_t mask = max;
     mask |= mask >> 16;
@@ -400,10 +389,6 @@ inline uint32_t passgen_random_u32_max(passgen_random *random, uint32_t max) {
 
 inline uint64_t passgen_random_u64_max(passgen_random *random, uint64_t max) {
     passgen_assert(max);
-
-    if(max < UINT32_MAX) {
-        return passgen_random_u32_max(random, max);
-    }
 
     uint64_t mask = max;
     mask |= mask >> 32;
