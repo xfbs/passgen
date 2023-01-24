@@ -44,7 +44,7 @@ void random_word(const char **args, size_t args_len) {
     passgen_assert(filename);
 
     passgen_random random;
-    passgen_random_open(&random);
+    passgen_random_open(&random, NULL);
     passgen_wordlist wordlist;
     load(&wordlist, filename);
 

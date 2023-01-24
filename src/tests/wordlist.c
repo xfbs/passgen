@@ -35,7 +35,7 @@ test_result test_wordlist_random(void) {
     passgen_wordlist_load(&wordlist, file, 3);
 
     passgen_random random;
-    passgen_random_open(&random);
+    passgen_random_open(&random, NULL);
 
     for(size_t i = 0; i < wordlist.count; i++) {
         const char *word = passgen_wordlist_random(&wordlist, &random);

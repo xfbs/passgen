@@ -873,7 +873,7 @@ test_result test_parser_can_parse_random(void) {
     // Storage for the string plus NULL-terminator.
     char string[string_length + 1];
     // Source of randomness.
-    passgen_random *random = passgen_random_new();
+    passgen_random *random = passgen_random_new(NULL);
 
     // Generate random strings and parse them.
     for(size_t i = 0; i < iterations; i++) {

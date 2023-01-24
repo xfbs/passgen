@@ -15,7 +15,7 @@ double entropy(const char *p) {
     uint8_t buffer[buffer_len];
     buffer[0] = 0;
     passgen_random random;
-    passgen_random_open(&random);
+    passgen_random_open(&random, NULL);
     passgen_env env;
     env.random = &random;
     env.find_entropy = true;

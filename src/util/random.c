@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define strprefix(prefix, str) memcmp(prefix, str, strlen(prefix))
+
 #ifdef __linux__
 #define PASSGEN_RANDOM_HAVE_SYSTEM
 #include <sys/random.h>
@@ -185,11 +187,16 @@ void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
     }
 }
 
-passgen_random *passgen_random_new() {
+passgen_random *passgen_random_new(const char *desc) {
     passgen_random *random = malloc(sizeof(passgen_random));
     passgen_assert(random);
 
-    return passgen_random_open(random);
+    passgen_random *ret = passgen_random_open(random, desc);
+    if(!ret) {
+        free(random);
+    }
+
+    return ret;
 }
 
 passgen_random *passgen_random_new_path(const char *path) {
@@ -213,7 +220,42 @@ passgen_random *passgen_random_new_file(FILE *file) {
     return random;
 }
 
-passgen_random *passgen_random_open(passgen_random *random) {
+passgen_random *passgen_random_open_parse(passgen_random *random, const char *desc) {
+    if(strcmp("zero", desc) == 0) {
+        return passgen_random_open_zero(random);
+    }
+
+    // check if we should read randomness from this file
+    if(strprefix("file:", desc) == 0) {
+        return passgen_random_open_path(random, &desc[5]);
+    }
+
+    // check if we should use the xorshift PRNG with the given seed
+    if(strprefix("xor:", desc) == 0) {
+        const char *seed_str = &random[4];
+        uint64_t seed = atoll(seed_str);
+        if(seed == 0) {
+            printf(
+                "\033[1;31merror\033[0m: invalid xorshift seed '%s'\n",
+                seed_str);
+            return NULL;
+        }
+        return passgen_random_open_xorshift(random, seed);
+    }
+
+    // check if we should use the system default
+    if(0 == strcmp(random, "system")) {
+        return passgen_random_open_system(random);
+    }
+
+    return NULL;
+}
+
+passgen_random *passgen_random_open(passgen_random *random, const char *desc) {
+    if(desc) {
+        return passgen_random_open_parse(random, desc);
+    }
+
 #ifdef PASSGEN_RANDOM_HAVE_SYSTEM
     return passgen_random_open_system(random);
 #else

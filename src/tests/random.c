@@ -145,7 +145,7 @@ test_result test_random_u64_max(void) {
 }
 
 test_result test_random_new(void) {
-    passgen_random *random = passgen_random_new();
+    passgen_random *random = passgen_random_new(NULL);
     assert(random);
     assert(random->read);
     assert(random->close);
@@ -174,7 +174,7 @@ test_result test_random_new_path(void) {
 
 test_result test_random_open(void) {
     passgen_random random;
-    assert(passgen_random_open(&random));
+    assert(passgen_random_open(&random, NULL));
     assert(random.read);
     assert(random.close);
     passgen_random_close(&random);

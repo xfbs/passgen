@@ -46,7 +46,7 @@ typedef struct passgen_random {
 ///
 /// passgen_random_free(random);
 /// ```
-passgen_random *passgen_random_new();
+passgen_random *passgen_random_new(const char *desc);
 
 /// Allocates and opens a new random object using @p path as random device.
 /// Not recommended to use `/dev/random` as randomness device, use the default
@@ -76,7 +76,7 @@ passgen_random *passgen_random_new_zero();
 ///
 /// passgen_random_close(&random);
 /// ```
-passgen_random *passgen_random_open(passgen_random *random);
+passgen_random *passgen_random_open(passgen_random *random, const char *desc);
 
 /// Opens a new, existing random object using @p path as random device.
 passgen_random *

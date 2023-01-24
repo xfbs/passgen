@@ -65,7 +65,7 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
 
     // check if we should use the system default
     if(0 == strcmp(random, "system")) {
-        opts->env.random = passgen_random_new();
+        opts->env.random = passgen_random_new(NULL);
         return 0;
     }
 
@@ -380,7 +380,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 
     // fallback to system randomness if nothing else is defined
     if(!opts->env.random) {
-        opts->env.random = passgen_random_new();
+        opts->env.random = passgen_random_new(NULL);
         assert(opts->env.random);
     }
 

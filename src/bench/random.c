@@ -22,7 +22,7 @@ void bench(
     size_t count);
 
 int main() {
-    passgen_random *rand = passgen_random_new();
+    passgen_random *rand = passgen_random_new(NULL);
     bench("passgen_random_data", &bench_passgen_random_data, rand, 1024, 2000);
     bench("passgen_random_u8", &bench_passgen_random_u8, rand, 1, 2000000);
     bench("passgen_random_u16", &bench_passgen_random_u16, rand, 2, 1000000);
