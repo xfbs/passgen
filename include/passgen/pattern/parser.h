@@ -36,24 +36,24 @@ passgen_parser_state_push(passgen_parser *parser);
 /// Push a group item onto the parsing stack.
 passgen_parser_state *passgen_parser_state_push_group(
     passgen_parser *parser,
-    struct passgen_pattern_group *group,
-    struct passgen_pattern_segment *segment);
+    passgen_pattern_group *group,
+    passgen_pattern_segment *segment);
 
 /// Push a set item onto the parsing stack.
 passgen_parser_state *passgen_parser_state_push_set(
     passgen_parser *parser,
-    struct passgen_pattern_set *set,
-    struct passgen_pattern_range *range);
+    passgen_pattern_set *set,
+    passgen_pattern_range *range);
 
 /// Push a repeat item onto the parsing stack.
 passgen_parser_state *passgen_parser_state_push_repeat(
     passgen_parser *parser,
-    struct passgen_pattern_repeat *repeat);
+    passgen_pattern_repeat *repeat);
 
 /// Push a special item into the parsing stack.
 passgen_parser_state *passgen_parser_state_push_special(
     passgen_parser *parser,
-    struct passgen_pattern_special *special);
+    passgen_pattern_special *special);
 
 /// Initialize the parsing structure. Must be called once before the parser can
 /// be used.
