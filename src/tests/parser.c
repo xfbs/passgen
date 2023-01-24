@@ -761,10 +761,6 @@ const char *pattern_broken[] = {
     // unicode literal payload too long
     "\\u{0000000000000",
     "\\u{123456789abcdef",
-    // unicode literal payload wrong chars
-
-    // repeat without anything before
-    "{0}",
     // invalid utf8 sequences, taken from:
     // https://stackoverflow.com/questions/1301402/example-invalid-utf8-string
     // invalid 2-octet utf8

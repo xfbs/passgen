@@ -4,6 +4,7 @@
 
 typedef enum passgen_parser_state_type {
     PASSGEN_PARSER_GROUP,
+    PASSGEN_PARSER_MULTIPLIER,
     PASSGEN_PARSER_SET,
     PASSGEN_PARSER_SET_RANGE,
     PASSGEN_PARSER_REPEAT,
@@ -36,6 +37,7 @@ typedef struct passgen_parser_state {
         struct {
             struct passgen_pattern_special *special;
         } special;
+        size_t *multiplier;
     } data;
 } passgen_parser_state;
 

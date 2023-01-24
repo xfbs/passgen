@@ -39,6 +39,11 @@ passgen_parser_state *passgen_parser_state_push_group(
     passgen_pattern_group *group,
     passgen_pattern_segment *segment);
 
+/// Push a multiplier item onto the parsing stack.
+passgen_parser_state *passgen_parser_state_push_multiplier(
+    passgen_parser *parser,
+    size_t *multiplier);
+
 /// Push a set item onto the parsing stack.
 passgen_parser_state *passgen_parser_state_push_set(
     passgen_parser *parser,

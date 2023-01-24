@@ -18,10 +18,18 @@ typedef struct passgen_pattern_segment passgen_pattern_segment;
 typedef struct passgen_pattern_group {
     /// Segments that make up this group
     passgen_stack segments;
+
+    /// Sum of multipliers
+    size_t multiplier_sum;
 } passgen_pattern_group;
 
 /// Initialize a @ref passgen_pattern_group.
 void passgen_pattern_group_init(passgen_pattern_group *group);
+
+/// Finishes a @ref passgen_pattern_group.
+///
+/// This will compute the multiplier_sum from the segments inside the group.
+void passgen_pattern_group_finish(passgen_pattern_group *group);
 
 /// Free a @ref passgen_pattern_group.
 void passgen_pattern_group_free(passgen_pattern_group *group);

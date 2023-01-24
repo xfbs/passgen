@@ -462,18 +462,23 @@ int passgen_generate_group(
     void *data,
     passgen_generate_cb *func) {
     // choose random segment from segments
-    size_t segment = passgen_random_u64_max(env->random, group->segments.len);
+    size_t choice = passgen_random_u64_max(env->random, group->multiplier_sum);
+    size_t segment_index = 0;
+    passgen_pattern_segment *segment = passgen_stack_get(&group->segments, segment_index);
+
+    while(choice >= segment->multiplier) {
+        choice -= segment->multiplier;
+        segment_index += 1;
+        segment = passgen_stack_get(&group->segments, segment_index);
+    }
 
     // keep track of entropy
     if(env->find_entropy) {
-        env->entropy *= group->segments.len;
+        env->entropy *= group->multiplier_sum;
+        env->entropy /= segment->multiplier;
     }
 
-    // get segment from array
-    struct passgen_pattern_segment *segments;
-    segments = passgen_stack_get(&group->segments, segment);
-
-    return passgen_generate_segment(segments, env, data, func);
+    return passgen_generate_segment(segment, env, data, func);
 }
 
 int passgen_generate(

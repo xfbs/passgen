@@ -49,6 +49,16 @@ passgen_parser_state *passgen_parser_state_push_repeat(
     return state;
 }
 
+passgen_parser_state *passgen_parser_state_push_multiplier(
+    passgen_parser *parser,
+    size_t *multiplier) {
+    passgen_parser_state *state =
+        passgen_stack_push(&parser->state, NULL);
+    state->type = PASSGEN_PARSER_MULTIPLIER;
+    *multiplier = 0;
+    state->data.multiplier = multiplier;
+}
+
 passgen_parser_state *passgen_parser_state_push_special(
     passgen_parser *parser,
     passgen_pattern_special *special) {

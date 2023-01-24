@@ -59,6 +59,8 @@ int passgen_parse_token(
     switch(state->type) {
         case PASSGEN_PARSER_GROUP:
             return passgen_parse_group(parser, token, state);
+        case PASSGEN_PARSER_MULTIPLIER:
+            return passgen_parse_multiplier(parser, token, state);
         case PASSGEN_PARSER_SET:
             return passgen_parse_set(parser, token, state);
         case PASSGEN_PARSER_SET_RANGE:
@@ -120,6 +122,7 @@ int passgen_parse_group(
                 return 0;
             case ')':
                 if(parser->state.len > 1) {
+                    passgen_pattern_group_finish(state->data.group.group);
                     passgen_stack_pop(&parser->state, NULL);
                 } else {
                     return -1;
@@ -143,11 +146,14 @@ int passgen_parse_group(
             case '{':
                 item = last_single_item_taint(state->data.group.segment);
                 // error, there was no item
-                if(!item) {
-                    return -1;
+                if(item) {
+                    passgen_parser_state_push_repeat(parser, &item->repeat);
+                    return 0;
+                } else {
+                    state->data.group.segment->multiplier = 0;
+                    passgen_parser_state_push_multiplier(parser, &state->data.group.segment->multiplier);
+                    return 0;
                 }
-                passgen_parser_state_push_repeat(parser, &item->repeat);
-                return 0;
             case '?':
                 item = last_single_item_taint(state->data.group.segment);
                 item->maybe = true;
@@ -236,6 +242,27 @@ int passgen_parse_set_range(
     state->type = PASSGEN_PARSER_SET;
 
     return 0;
+}
+
+int passgen_parse_multiplier(
+    struct passgen_parser *parser,
+    struct passgen_token *token,
+    struct passgen_parser_state *state) {
+    if(token->codepoint == '}') {
+        passgen_stack_pop(&parser->state, NULL);
+        return 0;
+    }
+
+    if(token->codepoint >= '0' && token->codepoint <= '9') {
+        uint8_t digit = token->codepoint - '0';
+
+        *state->data.multiplier *= 10;
+        *state->data.multiplier += digit;
+
+        return 0;
+    }
+
+    return -1;
 }
 
 int passgen_parse_repeat(

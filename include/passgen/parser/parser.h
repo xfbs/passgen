@@ -52,6 +52,11 @@ int passgen_parse_group(
     struct passgen_token *token,
     struct passgen_parser_state *state);
 
+int passgen_parse_multiplier(
+    struct passgen_parser *parser,
+    struct passgen_token *token,
+    struct passgen_parser_state *state);
+
 int passgen_parse_set(
     struct passgen_parser *parser,
     struct passgen_token *token,
