@@ -12,7 +12,7 @@
 /// Size of the random data ring buffer.
 /// Requests for more than this result in a direct call to read(),
 /// requests smaller than this are read from the buffer.
-#define RANDOM_H_BUFEN 1024
+#define PASSGEN_RANDOM_BUFFER_LENGTH 1024
 
 typedef size_t passgen_random_read_func(void *dest, size_t size, void *data);
 typedef void passgen_random_close_func(void *data);
@@ -20,7 +20,7 @@ typedef void passgen_random_close_func(void *data);
 /// Random object. Caches some random data to reduce read() syscalls.
 typedef struct passgen_random {
     /// Ring buffer to hold random data in.
-    uint8_t buffer[RANDOM_H_BUFEN];
+    uint8_t buffer[PASSGEN_RANDOM_BUFFER_LENGTH];
 
     /// Current position in the ring buffer.
     size_t pos;
