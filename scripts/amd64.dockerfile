@@ -8,7 +8,6 @@ RUN apt update \
         git \
         git \
         lcov \
-        libjansson-dev \
         make \
         ninja-build \
         pkg-config \

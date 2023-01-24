@@ -15,7 +15,6 @@ To build, some dependencies are necessary.
 - C compiler (for example `clang` or `gcc`),
 - CMake (at least v3.10),
 - Build system (for example `make` or `ninja`),
-- libjansson,
 - libexecinfo (when building for musl instead of libc, such as with Alpine Linux),
 - Ruby,
 - Git (optional),
