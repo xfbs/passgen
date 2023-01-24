@@ -6,7 +6,8 @@
 
 typedef struct passgen_pattern_special {
     enum passgen_pattern_special_kind kind;
-    size_t parameters_len;
+    int32_t parameters_len;
+    int32_t parameters_cap;
     int32_t *parameters;
 } passgen_pattern_special;
 
