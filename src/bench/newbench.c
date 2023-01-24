@@ -97,31 +97,31 @@ static void *dummy_iterate(void *data) {
 }
 
 const bench dummy = {
-    .group = "test",
-    .name = "dummy",
-    .desc = "Dummy benchmark, does not do anything.",
+    .group = "bench",
+    .name = "iteration",
+    .desc = "Benchmark iterations.",
     .unit = "it",
     .iterate = &dummy_iterate,
 };
 
-extern bench stack_push;
-extern bench stack_pop;
-extern bench random_system_u8;
-extern bench random_system_u16;
-extern bench random_system_u32;
-extern bench random_system_u64;
-extern bench random_system_read;
-extern bench random_xorshift_u8;
-extern bench random_xorshift_u16;
-extern bench random_xorshift_u32;
-extern bench random_xorshift_u64;
-extern bench random_xorshift_read;
-extern bench random_zero_u8;
-extern bench random_zero_u16;
-extern bench random_zero_u32;
-extern bench random_zero_u64;
-extern bench random_zero_read;
-extern bench hashmap_insert;
+extern const bench stack_push;
+extern const bench stack_pop;
+extern const bench random_system_u8;
+extern const bench random_system_u16;
+extern const bench random_system_u32;
+extern const bench random_system_u64;
+extern const bench random_system_read;
+extern const bench random_xorshift_u8;
+extern const bench random_xorshift_u16;
+extern const bench random_xorshift_u32;
+extern const bench random_xorshift_u64;
+extern const bench random_xorshift_read;
+extern const bench random_zero_u8;
+extern const bench random_zero_u16;
+extern const bench random_zero_u32;
+extern const bench random_zero_u64;
+extern const bench random_zero_read;
+extern const bench hashmap_insert;
 
 const bench *benches[] = {
     &dummy,
