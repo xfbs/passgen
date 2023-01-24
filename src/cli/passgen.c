@@ -156,19 +156,23 @@ int passgen_cli_generate(
     }
 }
 
-int passgen_cli_opts_wordlist(passgen_cli_opts *opt, char *input) {
+int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
     char *colon = strstr(input, ":");
     if(!colon) {
         return 1;
     }
-    *colon = 0;
+    size_t offset = colon - input;
+
+    char *name = malloc(offset + 1);
+    memcpy(name, input, offset);
+    name[offset] = 0;
 
     FILE *file = fopen(colon + 1, "r");
     if(!file) {
         return 1;
     }
 
-    return passgen_env_wordlist_add(&opt->env, input, file, opt->markov_length);
+    return passgen_env_wordlist_add(&opt->env, name, file, opt->markov_length);
 }
 
 int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {

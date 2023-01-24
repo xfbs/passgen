@@ -1,5 +1,6 @@
 #include "passgen/pattern/special.h"
 #include "passgen/assert.h"
+#include "utf8proc.h"
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -35,15 +36,19 @@ void passgen_pattern_special_add_parameter_cp(
     int32_t codepoint) {
 
     if(special->parameters_cap == 0) {
-        special->parameters = calloc(PARAMETERS_INITIAL_SIZE, sizeof(int32_t));
         special->parameters_cap = PARAMETERS_INITIAL_SIZE;
+        special->parameters = malloc(special->parameters_cap);
     }
 
-    if(special->parameters_len == special->parameters_cap) {
-        size_t new_size = special->parameters_cap * PARAMETERS_MULTIPLIER * sizeof(int32_t);
-        special->parameters = realloc(special->parameters, new_size);
+    // always leave enough space for a full UTF8 character (4 bytes) plus a NULL.
+    if((special->parameters_len + 5) < special->parameters_cap) {
+        special->parameters_cap *= PARAMETERS_MULTIPLIER;
+        special->parameters = realloc(special->parameters, special->parameters_cap);
     }
 
-    special->parameters[special->parameters_len] = codepoint;
-    special->parameters_len++;
+    size_t bytes = utf8proc_encode_char(codepoint, (unsigned char *) &special->parameters[special->parameters_len]);
+    special->parameters_len += bytes;
+
+    // always NULL-terminate the string.
+    special->parameters[special->parameters_len] = 0;
 }
