@@ -4,9 +4,11 @@ set(SOURCE_LIST
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
     "assert.c"
     "context.c"
-    "util/stack.c"
+    "env.c"
+    "generate.c"
+    "markov.c"
+    "parser.c"
     "passgen.c"
-    "util/array.c"
     "pattern/group.c"
     "pattern/parser.c"
     "pattern/parser_state.c"
@@ -16,15 +18,15 @@ set(SOURCE_LIST
     "pattern/set.c"
     "pattern/special.c"
     "pattern/token.c"
-    "generate.c"
-    "markov.c"
-    "parser.c"
-    "util/random.c"
     "token.c"
+    "util/array.c"
+    "util/hashmap.c"
+    "util/random.c"
+    "util/siphash.c"
+    "util/stack.c"
     "util/utf8.c"
     "wordlist.c"
-    "util/siphash.c"
-    "util/hashmap.c")
+)
 
 configure_file(version.c.in version.c)
 configure_file(../include/passgen/config.h.in passgen/config.h)

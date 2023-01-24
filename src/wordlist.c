@@ -23,6 +23,8 @@ int passgen_wordlist_parse(passgen_wordlist *wordlist) {
     wordlist->parsed = true;
     try(passgen_wordlist_read(wordlist, wordlist->file));
     passgen_wordlist_scan(wordlist);
+    fclose(wordlist->file);
+    wordlist->file = NULL;
     return 0;
 }
 

@@ -33,19 +33,19 @@
 #define strprefix(prefix, str) memcmp(prefix, str, strlen(prefix))
 
 int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
-    if(opts->random) {
-        passgen_random_free(opts->random);
-        opts->random = NULL;
+    if(opts->env.random) {
+        passgen_random_free(opts->env.random);
+        opts->env.random = NULL;
     }
 
     if(strcmp("zero", random) == 0) {
-        opts->random = passgen_random_new_zero();
+        opts->env.random = passgen_random_new_zero();
         return 0;
     }
 
     // check if we should read randomness from this file
     if(strprefix("file:", random) == 0) {
-        opts->random = passgen_random_new_path(&random[5]);
+        opts->env.random = passgen_random_new_path(&random[5]);
         return 0;
     }
 
@@ -59,13 +59,13 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
                 seed_str);
             return 1;
         }
-        opts->random = passgen_random_new_xorshift(seed);
+        opts->env.random = passgen_random_new_xorshift(seed);
         return 0;
     }
 
     // check if we should use the system default
     if(0 == strcmp(random, "system")) {
-        opts->random = passgen_random_new();
+        opts->env.random = passgen_random_new();
         return 0;
     }
 
@@ -115,9 +115,9 @@ int passgen_cli_generate_normal(
     }
 
     struct passgen_env env = {
-        .find_entropy = opts.entropy,
+        .find_entropy = opts.env.entropy,
         .wordlists = opts.wordlists,
-        .random = opts.random,
+        .random = opts.env.random,
     };
 
     for(size_t i = 0; i < opts.amount; ++i) {
@@ -126,10 +126,10 @@ int passgen_cli_generate_normal(
             passgen_generate_fill_utf8(pattern, &env, pass, pass_len);
         pass[written] = '\0';
 
-        if(opts.entropy) {
+        if(opts.env.entropy) {
             fprintf(
                 stderr,
-                "entropy: %lf bits\n",
+                "entropy: %.2lf bits\n",
                 log(env.entropy) / log(2));
         }
 
@@ -158,9 +158,9 @@ int passgen_cli_generate_json(
     }
 
     struct passgen_env env = {
-        .find_entropy = opts.entropy,
+        .find_entropy = opts.env.entropy,
         .wordlists = opts.wordlists,
-        .random = opts.random,
+        .random = opts.env.random,
     };
 
     printf("[");
@@ -171,7 +171,7 @@ int passgen_cli_generate_json(
         pass[written] = '\0';
         printf("%s{\"output\":\"%s\"", (i == 0) ? "" : ",", pass);
 
-        if(opts.entropy) {
+        if(opts.env.entropy) {
             printf(",\"entropy\":%lf", log(env.entropy) / log(2));
         }
 
@@ -249,12 +249,11 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->amount = 1;
     opts->depth = 100;
     opts->null = false;
-    opts->entropy = false;
-    opts->random = NULL;
     opts->json = false;
     opts->markov_length = 3;
     passgen_hashmap_init(&opts->wordlists, &passgen_hashmap_context_unicode);
     passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_default);
+    passgen_env_init(&opts->env, NULL);
 
     // some defaults
     passgen_hashmap_insert(
@@ -345,7 +344,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 opts->null = true;
                 break;
             case 'e':
-                opts->entropy = true;
+                opts->env.entropy = true;
                 break;
             case 'v':
                 return PASSGEN_SHOW_VERSION;
@@ -413,9 +412,9 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     }
 
     // fallback to system randomness if nothing else is defined
-    if(!opts->random) {
-        opts->random = passgen_random_new();
-        assert(opts->random);
+    if(!opts->env.random) {
+        opts->env.random = passgen_random_new();
+        assert(opts->env.random);
     }
 
     return 0;
@@ -522,17 +521,18 @@ int passgen_cli_opts_wordlist_free(void *user, passgen_hashmap_entry *entry) {
     (void) user;
     free(entry->key);
     passgen_wordlist_free(entry->value);
+    free(entry->value);
     return 0;
 }
 
 void passgen_cli_opts_free(passgen_cli_opts *opts) {
-    passgen_random_free(opts->random);
     passgen_hashmap_free(&opts->presets);
     passgen_hashmap_foreach(
         &opts->wordlists,
         NULL,
         passgen_cli_opts_wordlist_free);
     passgen_hashmap_free(&opts->wordlists);
+    passgen_env_free(&opts->env);
 }
 
 int passgen_cli_opts_config_load(passgen_cli_opts *opts, FILE *file) {

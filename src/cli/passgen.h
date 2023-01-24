@@ -11,6 +11,7 @@
 #include <passgen/util/random.h>
 #include <passgen/util/hashmap.h>
 #include "passgen/pattern/pattern.h"
+#include "passgen/pattern/env.h"
 
 /// The kinds of errors that cause the binary to exit early and with a nonzero
 /// return code.
@@ -35,22 +36,20 @@ typedef struct {
     size_t amount;
     /// The pattern to use when generating passwords.
     const char *pattern;
-    /// The source of randomness to use.
-    passgen_random *random;
     /// Separate output with null characters.
     bool null;
     /// Output as JSON.
     bool json;
     /// Parsing depth.
     size_t depth;
-    /// Output entropy.
-    bool entropy;
     /// Length of markov chain
     size_t markov_length;
     /// Wordlists that are to be loaded.
     passgen_hashmap wordlists;
     /// Presets to choose from.
     passgen_hashmap presets;
+    /// Environment for passgen
+    passgen_env env;
 } passgen_cli_opts;
 
 /// Initialize passgen_cli_opts to default values.
