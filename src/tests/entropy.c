@@ -68,7 +68,6 @@ test_result test_entropy_range(void) {
     return test_ok;
 }
 
-
 test_result test_entropy_repeat(void) {
     assert(equals(3.0, entropy("[abc]{1}")));
     assert(equals(3.0 * 3.0, entropy("[abc]{2}")));

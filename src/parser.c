@@ -151,7 +151,9 @@ int passgen_parse_group(
                     return 0;
                 } else {
                     state->data.group.segment->multiplier = 0;
-                    passgen_parser_state_push_multiplier(parser, &state->data.group.segment->multiplier);
+                    passgen_parser_state_push_multiplier(
+                        parser,
+                        &state->data.group.segment->multiplier);
                     return 0;
                 }
             case '?':

@@ -323,7 +323,8 @@ uint32_t passgen_markov_generate(
     return 0;
 }
 
-uint32_t passgen_markov_leaf_count(passgen_markov_leaf *leaf, uint32_t codepoint) {
+uint32_t
+passgen_markov_leaf_count(passgen_markov_leaf *leaf, uint32_t codepoint) {
     if(passgen_markov_leaf_codepoint_raw(leaf, codepoint) == codepoint) {
         return passgen_markov_leaf_count_raw(leaf, codepoint);
     } else {

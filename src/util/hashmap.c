@@ -143,7 +143,8 @@ passgen_hashmap_insert(passgen_hashmap *map, const void *key, void *value) {
     return passgen_hashmap_insert(map, key, value);
 }
 
-passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, const void *key) {
+passgen_hashmap_entry
+passgen_hashmap_remove(passgen_hashmap *map, const void *key) {
     size_t hash;
 
     // if this key exists

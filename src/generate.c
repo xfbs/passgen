@@ -464,7 +464,8 @@ int passgen_generate_group(
     // choose random segment from segments
     size_t choice = passgen_random_u64_max(env->random, group->multiplier_sum);
     size_t segment_index = 0;
-    passgen_pattern_segment *segment = passgen_stack_get(&group->segments, segment_index);
+    passgen_pattern_segment *segment =
+        passgen_stack_get(&group->segments, segment_index);
 
     while(choice >= segment->multiplier) {
         choice -= segment->multiplier;

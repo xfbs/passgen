@@ -220,7 +220,8 @@ passgen_random *passgen_random_new_file(FILE *file) {
     return random;
 }
 
-passgen_random *passgen_random_open_parse(passgen_random *random, const char *desc) {
+passgen_random *
+passgen_random_open_parse(passgen_random *random, const char *desc) {
     if(strcmp("zero", desc) == 0) {
         return passgen_random_open_zero(random);
     }

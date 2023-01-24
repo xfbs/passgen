@@ -9,25 +9,25 @@
 #define XORSHIFT_SEED 234720984723
 
 /// Tests that a given function covers all possible outputs (0..max, inclusive).
-#define TEST_COVERAGE(max, collate, function) \
-    do { \
-        size_t coverage_len = ((size_t) max) / (collate) + 1ULL; \
+#define TEST_COVERAGE(max, collate, function)                             \
+    do {                                                                  \
+        size_t coverage_len = ((size_t) max) / (collate) + 1ULL;          \
         uint8_t *coverage = calloc((coverage_len + 7) / 8, sizeof(bool)); \
-        bool full_coverage = false; \
-        while(!full_coverage) { \
-            for(size_t i = 0; i < 256; i++) { \
-                size_t pos = function / (collate); \
-                coverage[pos / 8] |= 1 << (pos % 8); \
-            } \
-            full_coverage = true; \
-            for(size_t i = 0; i <= (max / (collate)); i++) { \
-                if(!coverage[i / 8] & 1 << (i % 8)) { \
-                    full_coverage = false; \
-                    break; \
-                } \
-            } \
-        } \
-        free(coverage); \
+        bool full_coverage = false;                                       \
+        while(!full_coverage) {                                           \
+            for(size_t i = 0; i < 256; i++) {                             \
+                size_t pos = function / (collate);                        \
+                coverage[pos / 8] |= 1 << (pos % 8);                      \
+            }                                                             \
+            full_coverage = true;                                         \
+            for(size_t i = 0; i <= (max / (collate)); i++) {              \
+                if(!coverage[i / 8] & 1 << (i % 8)) {                     \
+                    full_coverage = false;                                \
+                    break;                                                \
+                }                                                         \
+            }                                                             \
+        }                                                                 \
+        free(coverage);                                                   \
     } while(false)
 
 double standard_deviation(size_t count, uint32_t *elements) {
@@ -36,16 +36,16 @@ double standard_deviation(size_t count, uint32_t *elements) {
 }
 
 /// Tests that a given function has an even distribution
-#define TEST_DISTRIBUTION(max, bucket_num, target, function) \
-    uint32_t *buckets = calloc(bucket_num, sizeof(uint32_t)); \
-    while(true) { \
+#define TEST_DISTRIBUTION(max, bucket_num, target, function)   \
+    uint32_t *buckets = calloc(bucket_num, sizeof(uint32_t));  \
+    while(true) {                                              \
         size_t bucket = function / ((max) / (bucket_num) + 1); \
-        buckets[bucket] += 1; \
-        if(buckets[bucket] == target) { \
-            break; \
-        } \
-    } \
-    assert(standard_deviation(bucket_num, buckets) < 10); \
+        buckets[bucket] += 1;                                  \
+        if(buckets[bucket] == target) {                        \
+            break;                                             \
+        }                                                      \
+    }                                                          \
+    assert(standard_deviation(bucket_num, buckets) < 10);      \
     free(buckets)
 
 test_result test_random_u8(void) {
@@ -105,7 +105,11 @@ test_result test_random_u32(void) {
     assert(passgen_random_open(&random, NULL));
 
     TEST_COVERAGE(UINT32_MAX, 1 << 16, passgen_random_u32(&random));
-    TEST_DISTRIBUTION(UINT32_MAX, 1 << 10, 1 << 10, passgen_random_u32(&random));
+    TEST_DISTRIBUTION(
+        UINT32_MAX,
+        1 << 10,
+        1 << 10,
+        passgen_random_u32(&random));
 
     passgen_random_close(&random);
 
@@ -134,8 +138,12 @@ test_result test_random_u64(void) {
     assert(passgen_random_open(&random, NULL));
 
     // FIXME
-    //TEST_COVERAGE(UINT64_MAX, 1ULL << 48, 1024, passgen_random_u32(&random));
-    TEST_DISTRIBUTION(UINT64_MAX, 1 << 10, 1 << 10, passgen_random_u64(&random));
+    // TEST_COVERAGE(UINT64_MAX, 1ULL << 48, 1024, passgen_random_u32(&random));
+    TEST_DISTRIBUTION(
+        UINT64_MAX,
+        1 << 10,
+        1 << 10,
+        passgen_random_u64(&random));
 
     passgen_random_close(&random);
 

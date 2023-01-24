@@ -376,14 +376,18 @@ test_result test_markov_leaf_insert_sequential(void) {
 
 test_result test_markov_generate(void) {
     passgen_random *rand = passgen_random_new_xorshift(SEED);
-    //passgen_random_open_xorshift(&rand, SEED);
+    // passgen_random_open_xorshift(&rand, SEED);
 
     passgen_markov markov;
     passgen_markov_init(&markov, 2);
 
     passgen_markov_add(&markov, &(const uint32_t[]){'a', 'b'}[0], 2, 1);
     passgen_markov_add(&markov, &(const uint32_t[]){'b'}[0], 1, 1);
-    passgen_markov_add(&markov, &(const uint32_t[]){'c', 'd', 'e', 'f'}[0], 4, 1);
+    passgen_markov_add(
+        &markov,
+        &(const uint32_t[]){'c', 'd', 'e', 'f'}[0],
+        4,
+        1);
 
     /*
     uint32_t next, word[32];

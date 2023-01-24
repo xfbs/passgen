@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #define PARAMETERS_INITIAL_SIZE 16
-#define PARAMETERS_MULTIPLIER 2
+#define PARAMETERS_MULTIPLIER   2
 
 void passgen_pattern_special_init_char(
     struct passgen_pattern_special *special,
@@ -37,19 +37,22 @@ void passgen_pattern_special_free(struct passgen_pattern_special *special) {
 void passgen_pattern_special_add_parameter_cp(
     struct passgen_pattern_special *special,
     int32_t codepoint) {
-
     if(special->parameters_cap == 0) {
         special->parameters_cap = PARAMETERS_INITIAL_SIZE;
         special->parameters = malloc(special->parameters_cap);
     }
 
-    // always leave enough space for a full UTF8 character (4 bytes) plus a NULL.
+    // always leave enough space for a full UTF8 character (4 bytes) plus a
+    // NULL.
     if((special->parameters_len + 5) < special->parameters_cap) {
         special->parameters_cap *= PARAMETERS_MULTIPLIER;
-        special->parameters = realloc(special->parameters, special->parameters_cap);
+        special->parameters =
+            realloc(special->parameters, special->parameters_cap);
     }
 
-    size_t bytes = utf8proc_encode_char(codepoint, (unsigned char *) &special->parameters[special->parameters_len]);
+    size_t bytes = utf8proc_encode_char(
+        codepoint,
+        (unsigned char *) &special->parameters[special->parameters_len]);
     special->parameters_len += bytes;
 
     // always NULL-terminate the string.
