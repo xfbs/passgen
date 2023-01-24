@@ -38,41 +38,16 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
         opts->env.random = NULL;
     }
 
-    if(strcmp("zero", random) == 0) {
-        opts->env.random = passgen_random_new_zero();
-        return 0;
+    opts->env.random = passgen_random_new(random);
+
+    if(!opts->env.random) {
+        printf(
+            "\033[1;31merror\033[0m: invalid randomness source '%s'\n",
+            random);
+        return 1;
     }
 
-    // check if we should read randomness from this file
-    if(strprefix("file:", random) == 0) {
-        opts->env.random = passgen_random_new_path(&random[5]);
-        return 0;
-    }
-
-    // check if we should use the xorshift PRNG with the given seed
-    if(strprefix("xor:", random) == 0) {
-        const char *seed_str = &random[4];
-        uint64_t seed = atoll(seed_str);
-        if(seed == 0) {
-            printf(
-                "\033[1;31merror\033[0m: invalid xorshift seed '%s'\n",
-                seed_str);
-            return 1;
-        }
-        opts->env.random = passgen_random_new_xorshift(seed);
-        return 0;
-    }
-
-    // check if we should use the system default
-    if(0 == strcmp(random, "system")) {
-        opts->env.random = passgen_random_new(NULL);
-        return 0;
-    }
-
-    printf(
-        "\033[1;31merror\033[0m: unrecognized randomness definition: `%s`\n",
-        random);
-    return 1;
+    return 0;
 }
 
 int passgen_cli_run(passgen_cli_opts opts) {
