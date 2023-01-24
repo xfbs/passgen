@@ -44,8 +44,6 @@ typedef struct {
     size_t depth;
     /// Length of markov chain
     size_t markov_length;
-    /// Wordlists that are to be loaded.
-    passgen_hashmap wordlists;
     /// Presets to choose from.
     passgen_hashmap presets;
     /// Environment for passgen
@@ -59,7 +57,7 @@ void passgen_cli_opts_init(passgen_cli_opts *opts);
 int passgen_cli_opts_define_preset(passgen_cli_opts *opt, const char *arg);
 
 /// Define a wordlist, with an argument like `name:path`.
-int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input);
+int passgen_cli_opts_wordlist(passgen_cli_opts *opt, char *input);
 
 /// Parse a randomness definition, like `system` or `xor:2342322`
 int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random);

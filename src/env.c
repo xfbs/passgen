@@ -2,6 +2,7 @@
 #include "passgen/wordlist.h"
 #include "passgen/util/utf8.h"
 #include <stdlib.h>
+#include <string.h>
 
 void passgen_env_init(passgen_env *env, passgen_random *random) {
     env->entropy = 0;
@@ -44,7 +45,7 @@ int passgen_env_wordlist_add(passgen_env *env, const char *input, FILE *file, si
         &name_len_out,
         NULL,
         (unsigned char *) input,
-        0,
+        strlen(input),
         &input_pos);
     if(ret != 0) {
         free(name);

@@ -114,23 +114,17 @@ int passgen_cli_generate_normal(
         sep = '\0';
     }
 
-    struct passgen_env env = {
-        .find_entropy = opts.env.entropy,
-        .wordlists = opts.wordlists,
-        .random = opts.env.random,
-    };
-
     for(size_t i = 0; i < opts.amount; ++i) {
         // get a NULL-terminated, random pass.
         size_t written =
-            passgen_generate_fill_utf8(pattern, &env, pass, pass_len);
+            passgen_generate_fill_utf8(pattern, &opts.env, pass, pass_len);
         pass[written] = '\0';
 
         if(opts.env.entropy) {
             fprintf(
                 stderr,
                 "entropy: %.2lf bits\n",
-                log(env.entropy) / log(2));
+                log(opts.env.entropy) / log(2));
         }
 
         if(i == 0) {
@@ -157,22 +151,16 @@ int passgen_cli_generate_json(
         return passgen_cli_bail(PASSGEN_ERROR_ALLOC, NULL);
     }
 
-    struct passgen_env env = {
-        .find_entropy = opts.env.entropy,
-        .wordlists = opts.wordlists,
-        .random = opts.env.random,
-    };
-
     printf("[");
     for(size_t i = 0; i < opts.amount; ++i) {
         // get a NULL-terminated, random pass.
         size_t written =
-            passgen_generate_fill_json_utf8(pattern, &env, pass, pass_len);
+            passgen_generate_fill_json_utf8(pattern, &opts.env, pass, pass_len);
         pass[written] = '\0';
         printf("%s{\"output\":\"%s\"", (i == 0) ? "" : ",", pass);
 
         if(opts.env.entropy) {
-            printf(",\"entropy\":%lf", log(env.entropy) / log(2));
+            printf(",\"entropy\":%lf", log(opts.env.entropy) / log(2));
         }
 
         printf("}");
@@ -193,39 +181,19 @@ int passgen_cli_generate(
     }
 }
 
-int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
-    const char *colon = strstr(input, ":");
+int passgen_cli_opts_wordlist(passgen_cli_opts *opt, char *input) {
+    char *colon = strstr(input, ":");
     if(!colon) {
         return 1;
     }
-    size_t name_len = colon - input;
-    if(name_len == 0) {
-        return 1;
-    }
-
-    // copy name
-    uint32_t *name = calloc(256, sizeof(int32_t));
-    size_t name_len_out = 0;
-    size_t input_pos = 0;
-    try(passgen_utf8_decode(
-        name,
-        256,
-        &name_len_out,
-        NULL,
-        (unsigned char *) input,
-        name_len,
-        &input_pos));
+    *colon = 0;
 
     FILE *file = fopen(colon + 1, "r");
     if(!file) {
         return 1;
     }
 
-    passgen_wordlist *wordlist = malloc(sizeof(passgen_wordlist));
-    passgen_hashmap_insert(&opt->wordlists, name, wordlist);
-    passgen_wordlist_init(wordlist, file, opt->markov_length);
-
-    return 0;
+    return passgen_env_wordlist_add(&opt->env, input, file, opt->markov_length);
 }
 
 int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
@@ -251,7 +219,6 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->null = false;
     opts->json = false;
     opts->markov_length = 3;
-    passgen_hashmap_init(&opts->wordlists, &passgen_hashmap_context_unicode);
     passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_default);
     passgen_env_init(&opts->env, NULL);
 
@@ -344,7 +311,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 opts->null = true;
                 break;
             case 'e':
-                opts->env.entropy = true;
+                opts->env.find_entropy = true;
                 break;
             case 'v':
                 return PASSGEN_SHOW_VERSION;
@@ -527,11 +494,6 @@ int passgen_cli_opts_wordlist_free(void *user, passgen_hashmap_entry *entry) {
 
 void passgen_cli_opts_free(passgen_cli_opts *opts) {
     passgen_hashmap_free(&opts->presets);
-    passgen_hashmap_foreach(
-        &opts->wordlists,
-        NULL,
-        passgen_cli_opts_wordlist_free);
-    passgen_hashmap_free(&opts->wordlists);
     passgen_env_free(&opts->env);
 }
 

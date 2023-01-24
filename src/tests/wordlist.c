@@ -13,7 +13,6 @@ test_result test_wordlist_load(void) {
 
     passgen_wordlist wordlist;
     passgen_wordlist_load(&wordlist, file, 3);
-    fclose(file);
 
     assert(wordlist.count == 3);
     assert(0 == strcmp(wordlist.words[0], "abacus"));
@@ -34,7 +33,6 @@ test_result test_wordlist_random(void) {
 
     passgen_wordlist wordlist;
     passgen_wordlist_load(&wordlist, file, 3);
-    fclose(file);
 
     passgen_random random;
     passgen_random_open(&random);

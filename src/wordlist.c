@@ -15,6 +15,7 @@ void passgen_wordlist_init(
     wordlist->parsed = false;
     wordlist->parsed_markov = false;
     wordlist->file = file;
+    wordlist->should_close_file = true;
     passgen_markov_init(&wordlist->markov, markov_length);
 }
 
@@ -23,7 +24,6 @@ int passgen_wordlist_parse(passgen_wordlist *wordlist) {
     wordlist->parsed = true;
     try(passgen_wordlist_read(wordlist, wordlist->file));
     passgen_wordlist_scan(wordlist);
-    fclose(wordlist->file);
     wordlist->file = NULL;
     return 0;
 }
@@ -81,6 +81,10 @@ int passgen_wordlist_read(passgen_wordlist *wordlist, FILE *file) {
 
     // null-terminate wordlist
     wordlist->data[wordlist->size] = 0;
+
+    if(wordlist->should_close_file) {
+        fclose(file);
+    }
 
     return 0;
 }

@@ -14,6 +14,9 @@ typedef struct passgen_wordlist {
     /// Wordlist is parsed into markov chain.
     bool parsed_markov;
 
+    /// Should close file when done reading.
+    bool should_close_file;
+
     /// File of the wordlist
     FILE *file;
 
