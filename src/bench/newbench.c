@@ -160,10 +160,13 @@ static double parse_time(const char *str) {
         switch(prefix[0]) {
             case 'd':
                 number *= 24;
+                // fall through
             case 'h':
                 number *= 60;
+                // fall through
             case 'm':
                 number *= 60;
+                // fall through
             case 's':
                 return number;
             default:
@@ -175,8 +178,10 @@ static double parse_time(const char *str) {
         switch(prefix[0]) {
             case 'n':
                 number /= 1000;
+                // fall through
             case 'u':
                 number /= 1000;
+                // fall through
             case 'm':
                 number /= 1000;
                 return number;
