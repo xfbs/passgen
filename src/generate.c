@@ -100,37 +100,29 @@ passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
         return -1;
     }
 
-    size_t buffer[4];
-    buffer[0] = '\\';
-    size_t bytes = 0;
+    unsigned char buffer[4] = {'\\', 0};
+    size_t bytes = 2;
     switch(codepoint) {
         case '"':
             buffer[1] = '"';
-            bytes = 2;
             break;
         case '\\':
             buffer[1] = '\\';
-            bytes = 2;
             break;
         case '\b':
             buffer[1] = 'b';
-            bytes = 2;
             break;
         case '\f':
             buffer[1] = 'f';
-            bytes = 2;
             break;
         case '\r':
             buffer[1] = 'r';
-            bytes = 2;
             break;
         case '\n':
             buffer[1] = 'n';
-            bytes = 2;
             break;
         case '\t':
             buffer[1] = 't';
-            bytes = 2;
             break;
         default:
             bytes = utf8proc_encode_char(
