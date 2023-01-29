@@ -14,6 +14,7 @@
 typedef enum mode {
     MODE_BENCH,
     MODE_ONESHOT,
+    MODE_VALGRIND,
     MODE_LIST,
 } mode;
 
@@ -281,7 +282,7 @@ int passgen_bench_run(const options *options) {
         size_t iterations = 0;
         for(; iterations < options->iter || (after - start) < target;
             iterations++) {
-            if(bench->consumes) {
+            if(iterations && bench->consumes) {
                 data = bench->prepare(&options->options);
             }
 
@@ -320,8 +321,6 @@ int passgen_bench_run(const options *options) {
             multiplier * iterations / total_time,
             bench->unit);
     }
-
-    free(options->enabled);
 
     return EXIT_SUCCESS;
 }
@@ -364,8 +363,10 @@ int passgen_bench_oneshot(const options *options) {
         bench->release(data);
     }
 
-    free(options->enabled);
+    return EXIT_SUCCESS;
+}
 
+int passgen_bench_valgrind(const options *options) {
     return EXIT_SUCCESS;
 }
 
@@ -452,6 +453,7 @@ int main(int argc, char *argv[]) {
                 options.verbose = true;
                 break;
             case 'c':
+                options.mode = MODE_VALGRIND;
                 options.valgrind = optarg;
                 break;
             case 'r':
@@ -503,17 +505,24 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    int ret;
     switch(options.mode) {
         case MODE_BENCH:
-            passgen_bench_run(&options);
+            ret = passgen_bench_run(&options);
             break;
         case MODE_ONESHOT:
-            passgen_bench_oneshot(&options);
+            ret = passgen_bench_oneshot(&options);
+            break;
+        case MODE_VALGRIND:
+            ret = passgen_bench_valgrind(&options);
             break;
         case MODE_LIST:
-            passgen_bench_list(&options);
+            ret = passgen_bench_list(&options);
             break;
     }
 
-    return EXIT_SUCCESS;
+    free(options.enabled);
+    passgen_hashmap_free(&options.options);
+
+    return ret;
 }

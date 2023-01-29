@@ -10,65 +10,57 @@
 
 struct bench_data {
     passgen_random random;
-    uint64_t seed;
     size_t count;
     unsigned char *data;
     size_t max;
 };
 
-static void *bench_data_prepare_xorshift(const passgen_hashmap *opts) {
+static void *bench_data_prepare(const passgen_hashmap *opts) {
     UNUSED(opts);
     struct bench_data *data = malloc(sizeof(struct bench_data));
     data->count = 100000;
     data->max = 100000;
-    data->seed = XORSHIFT_SEED;
-    passgen_random_open_xorshift(&data->random, data->seed);
+    data->data = NULL;
+    return data;
+}
+
+static void *bench_data_prepare_xorshift(const passgen_hashmap *opts) {
+    struct bench_data *data = bench_data_prepare(opts);
+    passgen_random_open_xorshift(&data->random, XORSHIFT_SEED);
     return data;
 }
 
 static void *bench_data_prepare_system(const passgen_hashmap *opts) {
-    UNUSED(opts);
-    struct bench_data *data = malloc(sizeof(struct bench_data));
-    data->count = 100000;
-    data->max = 100000;
+    struct bench_data *data = bench_data_prepare(opts);
     passgen_random_open(&data->random, NULL);
     return data;
 }
 
 static void *bench_data_prepare_zero(const passgen_hashmap *opts) {
-    UNUSED(opts);
-    struct bench_data *data = malloc(sizeof(struct bench_data));
-    data->count = 100000;
-    data->max = 100000;
+    struct bench_data *data = bench_data_prepare(opts);
     passgen_random_open_zero(&data->random);
     return data;
 }
 
-static void *bench_data_prepare_xorshift_data(const passgen_hashmap *opts) {
-    UNUSED(opts);
-    struct bench_data *data = malloc(sizeof(struct bench_data));
-    data->count = 100000;
-    data->seed = XORSHIFT_SEED;
+static void bench_prepare_data(struct bench_data *data) {
     data->data = malloc(data->count);
-    passgen_random_open_xorshift(&data->random, data->seed);
+}
+
+static void *bench_data_prepare_xorshift_data(const passgen_hashmap *opts) {
+    struct bench_data *data = bench_data_prepare_xorshift(opts);
+    bench_prepare_data(data);
     return data;
 }
 
 static void *bench_data_prepare_system_data(const passgen_hashmap *opts) {
-    UNUSED(opts);
-    struct bench_data *data = malloc(sizeof(struct bench_data));
-    data->count = 100000;
-    data->data = malloc(data->count);
-    passgen_random_open(&data->random, NULL);
+    struct bench_data *data = bench_data_prepare_system(opts);
+    bench_prepare_data(data);
     return data;
 }
 
 static void *bench_data_prepare_zero_data(const passgen_hashmap *opts) {
-    UNUSED(opts);
-    struct bench_data *data = malloc(sizeof(struct bench_data));
-    data->count = 100000;
-    data->data = malloc(data->count);
-    passgen_random_open_zero(&data->random);
+    struct bench_data *data = bench_data_prepare_zero(opts);
+    bench_prepare_data(data);
     return data;
 }
 
@@ -117,6 +109,9 @@ static void *bench_random_read(void *raw_data) {
 static void bench_data_release(void *raw_data) {
     struct bench_data *data = raw_data;
     passgen_random_close(&data->random);
+    if(data->data) {
+        free(data->data);
+    }
     free(data);
 }
 
