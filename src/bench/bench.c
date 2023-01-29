@@ -98,8 +98,7 @@ static void *dummy_iterate(void *data) {
 }
 
 const bench dummy = {
-    .group = "bench",
-    .name = "iteration",
+    .name = "dummy_iteration",
     .desc = "Benchmark iterations.",
     .unit = "it",
     .iterate = &dummy_iterate,
@@ -211,7 +210,7 @@ int passgen_bench_list(const options *options) {
         size_t desc_len = strlen(bench->desc);
 
         size_t pos = 0;
-        pos += sprintf(line, "%s:%s", bench->group, bench->name);
+        pos += sprintf(line, "%s", bench->name);
         pos += sprintf(line + pos, "%*c", (int) (name_col + 2 - pos), ' ');
 
         if(desc_len > (line_len - pos)) {
@@ -274,7 +273,7 @@ int passgen_bench_run(const options *options) {
         clock_t progress = 0;
 
         size_t padding =
-            options->name_col - strlen(bench->group) - strlen(bench->name);
+            options->name_col - strlen(bench->name);
 
         size_t iterations = 0;
         for(; iterations < options->iter || (after - start) < target;
@@ -296,8 +295,7 @@ int passgen_bench_run(const options *options) {
             if(after >= progress) {
                 fprintf(
                     stderr,
-                    "\r%s:%s:%*c %20.2lf %s/s",
-                    bench->group,
+                    "\r%s:%*c %20.2lf %s/s",
                     bench->name,
                     (int) padding,
                     ' ',
@@ -312,8 +310,7 @@ int passgen_bench_run(const options *options) {
         }
 
         printf(
-            "\r%s:%s:%*c %20.2lf %s/s\n",
-            bench->group,
+            "\r%s:%*c %20.2lf %s/s\n",
             bench->name,
             (int) padding,
             ' ',
@@ -373,7 +370,7 @@ void measure_name_col(options *options) {
     options->name_col = 1;
     for(size_t i = 0; options->benches[i]; i++) {
         const bench *bench = options->benches[i];
-        size_t current = strlen(bench->name) + strlen(bench->group) + 1;
+        size_t current = strlen(bench->name) + 1;
         options->name_col = MAX(options->name_col, current);
     }
 }

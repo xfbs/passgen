@@ -141,8 +141,7 @@ static double bench_mult_u64(void *raw_data) {
 }
 
 const bench random_xorshift_u8 = {
-    .group = "random",
-    .name = "xorshift_u8",
+    .name = "random_xorshift_u8",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_xorshift,
     .iterate = &bench_random_u8,
@@ -154,8 +153,7 @@ const bench random_xorshift_u8 = {
 };
 
 const bench random_xorshift_u16 = {
-    .group = "random",
-    .name = "xorshift_u16",
+    .name = "random_xorshift_u16",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_xorshift,
     .iterate = &bench_random_u16,
@@ -167,8 +165,7 @@ const bench random_xorshift_u16 = {
 };
 
 const bench random_xorshift_u32 = {
-    .group = "random",
-    .name = "xorshift_u32",
+    .name = "random_xorshift_u32",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_xorshift,
     .iterate = &bench_random_u32,
@@ -180,8 +177,7 @@ const bench random_xorshift_u32 = {
 };
 
 const bench random_xorshift_u64 = {
-    .group = "random",
-    .name = "xorshift_u64",
+    .name = "random_xorshift_u64",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_xorshift,
     .iterate = &bench_random_u64,
@@ -193,8 +189,7 @@ const bench random_xorshift_u64 = {
 };
 
 const bench random_xorshift_read = {
-    .group = "random",
-    .name = "xorshift_read",
+    .name = "random_xorshift_read",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_xorshift_data,
     .iterate = &bench_random_read,
@@ -206,8 +201,7 @@ const bench random_xorshift_read = {
 };
 
 const bench random_system_u8 = {
-    .group = "random",
-    .name = "system_u8",
+    .name = "random_system_u8",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_system,
     .iterate = &bench_random_u8,
@@ -219,8 +213,7 @@ const bench random_system_u8 = {
 };
 
 const bench random_system_u16 = {
-    .group = "random",
-    .name = "system_u16",
+    .name = "random_system_u16",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_system,
     .iterate = &bench_random_u16,
@@ -232,8 +225,7 @@ const bench random_system_u16 = {
 };
 
 const bench random_system_u32 = {
-    .group = "random",
-    .name = "system_u32",
+    .name = "random_system_u32",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_system,
     .iterate = &bench_random_u32,
@@ -245,8 +237,7 @@ const bench random_system_u32 = {
 };
 
 const bench random_system_u64 = {
-    .group = "random",
-    .name = "system_u64",
+    .name = "random_system_u64",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_system,
     .iterate = &bench_random_u64,
@@ -258,8 +249,7 @@ const bench random_system_u64 = {
 };
 
 const bench random_system_read = {
-    .group = "random",
-    .name = "system_read",
+    .name = "random_system_read",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_system_data,
     .iterate = &bench_random_read,
@@ -271,8 +261,7 @@ const bench random_system_read = {
 };
 
 const bench random_zero_u8 = {
-    .group = "random",
-    .name = "zero_u8",
+    .name = "random_zero_u8",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_zero,
     .iterate = &bench_random_u8,
@@ -284,8 +273,7 @@ const bench random_zero_u8 = {
 };
 
 const bench random_zero_u16 = {
-    .group = "random",
-    .name = "zero_u16",
+    .name = "random_zero_u16",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_zero,
     .iterate = &bench_random_u16,
@@ -297,8 +285,7 @@ const bench random_zero_u16 = {
 };
 
 const bench random_zero_u32 = {
-    .group = "random",
-    .name = "zero_u32",
+    .name = "random_zero_u32",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_zero,
     .iterate = &bench_random_u32,
@@ -310,8 +297,7 @@ const bench random_zero_u32 = {
 };
 
 const bench random_zero_u64 = {
-    .group = "random",
-    .name = "zero_u64",
+    .name = "random_zero_u64",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_zero,
     .iterate = &bench_random_u64,
@@ -323,8 +309,7 @@ const bench random_zero_u64 = {
 };
 
 const bench random_zero_read = {
-    .group = "random",
-    .name = "zero_read",
+    .name = "random_zero_read",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_zero_data,
     .iterate = &bench_random_read,

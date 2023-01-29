@@ -6,8 +6,6 @@
 
 /// Benchmark definition
 typedef struct bench {
-    /// Name of benchmark group
-    const char *group;
     /// Name of benchmark
     const char *name;
     /// Description of benchmark

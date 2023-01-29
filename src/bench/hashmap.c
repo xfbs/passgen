@@ -51,8 +51,7 @@ static void *bench_hashmap_insert(void *raw_data) {
 }
 
 const bench hashmap_insert = {
-    .group = "hashmap",
-    .name = "insert",
+    .name = "hashmap_insert",
     .desc = "Insert data into a hashmap",
     .prepare = &hashmap_prepare,
     .iterate = &bench_hashmap_insert,
