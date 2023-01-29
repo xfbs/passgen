@@ -144,7 +144,7 @@ const bench random_xorshift_u8 = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u8,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_xorshift_u16 = {
@@ -156,7 +156,7 @@ const bench random_xorshift_u16 = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u16,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_xorshift_u32 = {
@@ -168,7 +168,7 @@ const bench random_xorshift_u32 = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u32,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_xorshift_u64 = {
@@ -180,7 +180,7 @@ const bench random_xorshift_u64 = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u64,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_xorshift_read = {
@@ -192,7 +192,7 @@ const bench random_xorshift_read = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u8,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_system_u8 = {
@@ -204,7 +204,7 @@ const bench random_system_u8 = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u8,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_system_u16 = {
@@ -216,7 +216,7 @@ const bench random_system_u16 = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u16,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_system_u32 = {
@@ -228,7 +228,7 @@ const bench random_system_u32 = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u32,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_system_u64 = {
@@ -240,7 +240,7 @@ const bench random_system_u64 = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u64,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_system_read = {
@@ -252,7 +252,7 @@ const bench random_system_read = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u8,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_zero_u8 = {
@@ -264,7 +264,7 @@ const bench random_zero_u8 = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u8,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_zero_u16 = {
@@ -276,7 +276,7 @@ const bench random_zero_u16 = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u16,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_zero_u32 = {
@@ -288,7 +288,7 @@ const bench random_zero_u32 = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u32,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_zero_u64 = {
@@ -300,7 +300,7 @@ const bench random_zero_u64 = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u64,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };
 
 const bench random_zero_read = {
@@ -312,5 +312,5 @@ const bench random_zero_read = {
     .release = &bench_data_release,
     .multiplier = &bench_mult_u8,
     .consumes = false,
-    .unit = "B",
+    .unit = "bytes",
 };

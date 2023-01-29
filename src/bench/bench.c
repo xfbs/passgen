@@ -102,7 +102,7 @@ static void *dummy_iterate(void *data) {
 const bench dummy = {
     .name = "dummy_iteration",
     .desc = "Benchmark iterations.",
-    .unit = "it",
+    .unit = "runs",
     .iterate = &dummy_iterate,
 };
 
@@ -124,6 +124,8 @@ extern const bench random_zero_u32;
 extern const bench random_zero_u64;
 extern const bench random_zero_read;
 extern const bench hashmap_insert;
+extern const bench hashmap_lookup;
+extern const bench token_parse;
 
 const bench *benches[] = {
     &dummy,
@@ -145,6 +147,8 @@ const bench *benches[] = {
     &random_zero_u64,
     &random_zero_read,
     &hashmap_insert,
+    &hashmap_lookup,
+    &token_parse,
     NULL,
 };
 
@@ -265,6 +269,12 @@ int passgen_bench_run(const options *options) {
             data = bench->prepare(&options->options);
         }
 
+        // warmup
+        void *output = bench->iterate(data);
+        if(output) {
+            bench->cleanup(output);
+        }
+
         double multiplier = 1.0;
         if(bench->multiplier) {
             multiplier = bench->multiplier(data);
@@ -282,7 +292,7 @@ int passgen_bench_run(const options *options) {
         size_t iterations = 0;
         for(; iterations < options->iter || (after - start) < target;
             iterations++) {
-            if(iterations && bench->consumes) {
+            if(bench->consumes) {
                 data = bench->prepare(&options->options);
             }
 

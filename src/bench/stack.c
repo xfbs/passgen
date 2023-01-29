@@ -18,7 +18,7 @@ struct stack_bench_data {
 
 static double bench_mult(void *raw_data) {
     struct stack_bench_data *data = raw_data;
-    return data->count * sizeof(struct payload);
+    return data->count;
 }
 
 static void *stack_push_prepare(const passgen_hashmap *opts) {
@@ -97,7 +97,7 @@ const bench stack_push = {
     .release = NULL,
     .consumes = true,
     .multiplier = &bench_mult,
-    .unit = "B",
+    .unit = "items",
 };
 
 const bench stack_pop = {
@@ -109,5 +109,5 @@ const bench stack_pop = {
     .release = NULL,
     .multiplier = &bench_mult,
     .consumes = true,
-    .unit = "B",
+    .unit = "items",
 };
