@@ -29,6 +29,7 @@ typedef struct options {
     passgen_hashmap *checkpoint;
     const char *valgrind;
     const char *program;
+    const char *oneshot;
 } options;
 
 static int show_help(const options *options) {
@@ -326,38 +327,41 @@ int passgen_bench_run(const options *options) {
 }
 
 int passgen_bench_oneshot(const options *options) {
+    const bench *bench = NULL;
     for(size_t b = 0; options->benches[b]; b++) {
-        if(!options->enabled[b]) {
-            continue;
+        if(0 == strcmp(options->oneshot, options->benches[b]->name)) {
+            bench = options->benches[b];
+        }
+    }
+
+    if(!bench) {
+        fprintf(stderr, "Error: benchmark '%s' not found\n", options->oneshot);
+        return EXIT_FAILURE;
+    }
+
+    if(options->verbose) {
+        fprintf(stderr, "Running benchmark %s\n", bench->name);
+    }
+
+    void *data = NULL;
+    if(bench->prepare) {
+        data = bench->prepare(&options->options);
+    }
+
+    for(size_t i = 0; i < options->iter; i++) {
+        if(bench->consumes) {
+            data = bench->prepare(&options->options);
         }
 
-        const bench *bench = options->benches[b];
+        void *output = bench->iterate(data);
 
-        if(options->verbose) {
-            fprintf(stderr, "Running benchmark %s\n", bench->name);
+        if(output) {
+            bench->cleanup(output);
         }
+    }
 
-        void *data = NULL;
-        if(bench->prepare) {
-            data = bench->prepare(NULL);
-        }
-
-        for(size_t i = 0; i < options->iter; i++) {
-            if(bench->consumes) {
-                bench->release(data);
-                data = bench->prepare(NULL);
-            }
-
-            void *output = bench->iterate(data);
-
-            if(output) {
-                bench->cleanup(output);
-            }
-        }
-
-        if(data) {
-            bench->release(data);
-        }
+    if(data && !bench->consumes) {
+        bench->release(data);
     }
 
     free(options->enabled);
@@ -386,10 +390,10 @@ void add_option(options *options, const char *arg) {
 
 int main(int argc, char *argv[]) {
     // define command-line options
-    const char *short_opts = "o:t:i:w:r:c:hlvs";
+    const char *short_opts = "o:t:i:w:r:c:s:hlv";
     static struct option long_opts[] = {
         {"list", no_argument, NULL, 'l'},
-        {"oneshot", no_argument, NULL, 's'},
+        {"oneshot", required_argument, NULL, 's'},
         {"help", no_argument, NULL, 'h'},
         {"verbose", no_argument, NULL, 'v'},
         {"time", required_argument, NULL, 't'},
@@ -428,6 +432,7 @@ int main(int argc, char *argv[]) {
                 return show_help(&options);
             case 's':
                 options.mode = MODE_ONESHOT;
+                options.oneshot = optarg;
                 break;
             case 'i':
                 options.iter = atoi(optarg);
@@ -476,6 +481,12 @@ int main(int argc, char *argv[]) {
     }
 
     while(optind < argc) {
+        for(size_t i = 0; i < benchlen; i++) {
+            if(strstr(options.benches[i]->name, argv[optind])) {
+                options.enabled[i] = true;
+            }
+        }
+        optind++;
     }
 
     if(options.verbose) {
