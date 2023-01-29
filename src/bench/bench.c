@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <locale.h>
 
 #define MAX(a, b) ((a > b) ? (a) : (b))
 #define MIN(a, b) ((a > b) ? (b) : (a))
@@ -245,6 +246,8 @@ int passgen_bench_list(const options *options) {
 }
 
 int passgen_bench_run(const options *options) {
+    setlocale(LC_NUMERIC, "");
+    fprintf(stderr, "BENCHMARK NAME                 BENCHMARK RESULT         CHANGE\n");
     for(size_t b = 0; options->benches[b]; b++) {
         if(!options->enabled[b]) {
             continue;
@@ -295,7 +298,7 @@ int passgen_bench_run(const options *options) {
             if(after >= progress) {
                 fprintf(
                     stderr,
-                    "\r%s:%*c %20.2lf %s/s",
+                    "\r%s:%*c %'24.2lf %s/s",
                     bench->name,
                     (int) padding,
                     ' ',
@@ -310,7 +313,7 @@ int passgen_bench_run(const options *options) {
         }
 
         printf(
-            "\r%s:%*c %20.2lf %s/s\n",
+            "\r%s:%*c %'24.2lf %s/s\n",
             bench->name,
             (int) padding,
             ' ',
