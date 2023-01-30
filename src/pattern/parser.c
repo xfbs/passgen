@@ -6,7 +6,7 @@
 #include "passgen/pattern/parser.h"
 #include "passgen/pattern/parser_state.h"
 
-passgen_parser_state *passgen_parser_state_push(passgen_parser *parser) {
+inline passgen_parser_state *passgen_parser_state_push(passgen_parser *parser) {
     return passgen_stack_push(&parser->state, NULL);
 }
 
@@ -14,7 +14,7 @@ passgen_parser_state *passgen_parser_state_push_group(
     passgen_parser *parser,
     passgen_pattern_group *group,
     passgen_pattern_segment *segment) {
-    passgen_parser_state *state = passgen_stack_push(&parser->state, NULL);
+    passgen_parser_state *state = passgen_parser_state_push(parser);
     state->type = PASSGEN_PARSER_GROUP;
     state->data.group.group = group;
     state->data.group.segment = segment;
@@ -26,7 +26,7 @@ passgen_parser_state *passgen_parser_state_push_set(
     passgen_parser *parser,
     passgen_pattern_set *set,
     passgen_pattern_range *range) {
-    passgen_parser_state *state = passgen_stack_push(&parser->state, NULL);
+    passgen_parser_state *state = passgen_parser_state_push(parser);
     state->type = PASSGEN_PARSER_SET;
     state->data.set.set = set;
     state->data.set.range = range;
@@ -37,7 +37,7 @@ passgen_parser_state *passgen_parser_state_push_set(
 passgen_parser_state *passgen_parser_state_push_repeat(
     passgen_parser *parser,
     passgen_pattern_repeat *repeat) {
-    passgen_parser_state *state = passgen_stack_push(&parser->state, NULL);
+    passgen_parser_state *state = passgen_parser_state_push(parser);
     state->type = PASSGEN_PARSER_REPEAT;
     repeat->min = 0;
     repeat->max = 0;
@@ -49,7 +49,7 @@ passgen_parser_state *passgen_parser_state_push_repeat(
 passgen_parser_state *passgen_parser_state_push_multiplier(
     passgen_parser *parser,
     size_t *multiplier) {
-    passgen_parser_state *state = passgen_stack_push(&parser->state, NULL);
+    passgen_parser_state *state = passgen_parser_state_push(parser);
     state->type = PASSGEN_PARSER_MULTIPLIER;
     *multiplier = 0;
     state->data.multiplier = multiplier;
@@ -59,7 +59,7 @@ passgen_parser_state *passgen_parser_state_push_multiplier(
 passgen_parser_state *passgen_parser_state_push_special(
     passgen_parser *parser,
     passgen_pattern_special *special) {
-    passgen_parser_state *state = passgen_stack_push(&parser->state, NULL);
+    passgen_parser_state *state = passgen_parser_state_push(parser);
     state->type = PASSGEN_PARSER_SPECIAL;
     state->data.special.special = special;
     return state;

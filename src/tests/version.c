@@ -29,3 +29,9 @@ test_result test_version_compatible(void) {
 
     return test_ok;
 }
+
+test_result test_version_debug(void) {
+    passgen_is_debug();
+
+    return test_ok;
+}

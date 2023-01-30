@@ -352,3 +352,25 @@ test_result test_token_multi_offsets(void) {
 
     return test_ok;
 }
+
+// Test that parsing any character in an error state simply returns that error
+// state.
+test_result test_token_error_propagation(void) {
+    struct passgen_token_parser parser;
+    struct passgen_token token;
+    int errors[] = {
+        PASSGEN_TOKEN_ERROR_UNICODE_START,
+        PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD,
+        PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN,
+        0
+    };
+
+    for(size_t i = 0; errors[i]; i++) {
+        passgen_token_parser_init(&parser);
+        parser.state = errors[i];
+        assert_eq(passgen_token_parse(&parser, &token, 1, 'a'),
+                errors[i]);
+    }
+
+    return test_ok;
+}
