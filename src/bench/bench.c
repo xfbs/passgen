@@ -126,6 +126,7 @@ extern const bench random_zero_read;
 extern const bench hashmap_insert;
 extern const bench hashmap_lookup;
 extern const bench token_parse;
+extern const bench bench_passgen_parse;
 
 const bench *benches[] = {
     &dummy,
@@ -149,6 +150,7 @@ const bench *benches[] = {
     &hashmap_insert,
     &hashmap_lookup,
     &token_parse,
+    &bench_passgen_parse,
     NULL,
 };
 
@@ -271,15 +273,15 @@ int passgen_bench_run(const options *options) {
             data = bench->prepare(&options->options);
         }
 
+        double multiplier = 1.0;
+        if(bench->multiplier) {
+            multiplier = bench->multiplier(data);
+        }
+
         // warmup
         void *output = bench->iterate(data);
         if(output) {
             bench->cleanup(output);
-        }
-
-        double multiplier = 1.0;
-        if(bench->multiplier) {
-            multiplier = bench->multiplier(data);
         }
 
         double total_time = 0;

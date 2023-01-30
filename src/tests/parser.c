@@ -838,6 +838,17 @@ const char *pattern_working[] = {
     "\\u{FC}",
     "\\u{00fc}",
     "\\u{00FC}",
+    "\\u{10ffff}",
+    // special wordlist
+    "\\w{english}",
+    "\\m{english}",
+    "\\p{pattern}",
+    "\\w{englishenglish}",
+    // very long pattern
+    "abababababababababababababababababababababababababababababababababababab"
+    "abababababababababababababababababababababababababababababababababababab"
+    "abababababababababababababababababababababababababababababababababababab"
+    "abababababababababababababababababababababababababababababababababababab",
     NULL,
 };
 

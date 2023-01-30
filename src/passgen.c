@@ -30,6 +30,7 @@ int passgen_parse(
 
     do {
         // decode input utf8 into unicode codepoints
+        pattern_pos = 0;
         decode_ret = passgen_utf8_decode(
             pattern,
             pattern_max,
