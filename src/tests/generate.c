@@ -24,13 +24,14 @@
     struct passgen_token_parser token_parser = {0}; \
     struct passgen_token token = {0};               \
     struct passgen_env env = {0};                   \
+    passgen_pattern parsed_pattern;                 \
     const char *pattern;                            \
     passgen_random random;                          \
     assert(passgen_random_open_xorshift(&random, SEED)) env.random = &random
 
 #define GENERATE(output, pattern)                                          \
     do {                                                                   \
-        passgen_parser_init(&parser);                                      \
+        passgen_parser_init(&parser, &parsed_pattern);                     \
         passgen_token_parser_init(&token_parser);                          \
                                                                            \
         int token_parser_state = PASSGEN_TOKEN_INIT;                       \
@@ -52,6 +53,7 @@
         output[len] = 0;                                                   \
                                                                            \
         passgen_parser_free(&parser);                                      \
+        passgen_pattern_free(&parsed_pattern);                             \
     } while(0)
 
 #define POSTAMBLE() passgen_random_close(&random)

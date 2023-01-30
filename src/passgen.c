@@ -16,7 +16,7 @@ int passgen_parse(
     struct passgen_parser parser;
     struct passgen_token_parser token_parser = {0};
     struct passgen_token token = {0};
-    passgen_parser_init(&parser);
+    passgen_parser_init(&parser, output);
 
     size_t pattern_max = 256;
     uint32_t pattern[pattern_max];
@@ -101,8 +101,7 @@ int passgen_parse(
         return -1;
     }
 
-    passgen_stack_free(&parser.state);
-    *output = *parser.pattern;
+    passgen_parser_free(&parser);
 
     return 0;
 }

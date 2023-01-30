@@ -62,7 +62,7 @@ passgen_parser_state *passgen_parser_state_push_special(
 
 /// Initialize the parsing structure. Must be called once before the parser can
 /// be used.
-void passgen_parser_init(passgen_parser *parser);
+void passgen_parser_init(passgen_parser *parser, passgen_pattern *pattern);
 
 /// Release memory used by the parser.
-void passgen_parser_free(passgen_parser *parser);
+passgen_pattern *passgen_parser_free(passgen_parser *parser);

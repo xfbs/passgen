@@ -65,9 +65,12 @@ passgen_parser_state *passgen_parser_state_push_special(
     return state;
 }
 
-void passgen_parser_init(passgen_parser *parser) {
+void passgen_parser_init(passgen_parser *parser, passgen_pattern *pattern) {
     passgen_stack_init(&parser->state, sizeof(passgen_parser_state));
-    parser->pattern = malloc(sizeof(passgen_pattern));
+    parser->pattern = pattern;
+    if(!pattern) {
+        parser->pattern = malloc(sizeof(passgen_pattern));
+    }
     passgen_pattern_init(parser->pattern);
     passgen_parser_state_push_group(
         parser,
@@ -75,10 +78,11 @@ void passgen_parser_init(passgen_parser *parser) {
         passgen_pattern_group_new_segment(&parser->pattern->group));
 }
 
-void passgen_parser_free(passgen_parser *parser) {
+passgen_pattern *passgen_parser_free(passgen_parser *parser) {
     passgen_stack_free(&parser->state);
-    passgen_pattern_free(parser->pattern);
-    free(parser->pattern);
+    passgen_pattern *pattern = parser->pattern;
+    parser->pattern = NULL;
+    return pattern;
 }
 
 passgen_parser_state *

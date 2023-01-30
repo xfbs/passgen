@@ -23,11 +23,13 @@
     struct passgen_token token = {0};               \
     struct passgen_pattern_segment *segment;        \
     struct passgen_pattern_item *item;              \
-    passgen_parser_init(&parser);
+    passgen_pattern parsed_pattern;                 \
+    passgen_parser_init(&parser, &parsed_pattern);
 
 #define POSTAMBLE()                              \
     assert_eq(0, passgen_parse_finish(&parser)); \
-    passgen_parser_free(&parser)
+    passgen_parser_free(&parser);                \
+    passgen_pattern_free(&parsed_pattern);
 
 #define PARSE_CODEPOINT(codepoint)                                  \
     assert(                                                         \
@@ -43,9 +45,7 @@
     assert_eq(0, passgen_parse_token(&parser, &token))
 
 test_result test_parser_empty(void) {
-    struct passgen_parser parser;
-    struct passgen_pattern_segment *segment;
-    passgen_parser_init(&parser);
+    PREAMBLE();
 
     // single empty segment
     assert(1 == parser.pattern->group.segments.len);
@@ -390,6 +390,7 @@ test_result test_parser_char_repeat(void) {
     assert(item->repeat.max == 2);
 
     passgen_parser_free(&parser);
+    passgen_pattern_free(&parsed_pattern);
 
     return test_ok;
 }
@@ -789,6 +790,7 @@ test_result test_parser_can_parse_broken(void) {
         struct passgen_pattern pattern;
         passgen_error error;
         int ret = passgen_parse(&pattern, &error, pattern_broken[i]);
+        passgen_pattern_free(&pattern);
         assert(ret != 0);
     }
 
@@ -887,9 +889,7 @@ test_result test_parser_can_parse_random(void) {
         struct passgen_pattern pattern;
         passgen_error error;
         int ret = passgen_parse(&pattern, &error, string);
-        if(ret == 0) {
-            passgen_pattern_free(&pattern);
-        }
+        passgen_pattern_free(&pattern);
     }
 
     passgen_random_free(random);
