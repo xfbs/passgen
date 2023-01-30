@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euxo pipefail
+set -euo pipefail
 
 function run_sanitizer() {
     sanitizer="$1"
@@ -14,6 +14,8 @@ function run_sanitizer() {
         -DBUILD_GIT_INFO=NO
 
     ninja -C "$build_dir" test
+    ninja -C "$build_dir" passgen-bin
+    ./scripts/ci-test-passgen.sh ./$build_dir/src/cli/passgen
 }
 
 if test "$#" -lt 1; then

@@ -31,9 +31,11 @@ int main(int argc, char *argv[]) {
     ret = passgen_cli_opts_parse(&opts, argc, argv);
     if(ret == PASSGEN_SHOW_HELP) {
         passgen_cli_usage(argv[0]);
+        passgen_cli_opts_free(&opts);
         return 0;
     } else if(ret == PASSGEN_SHOW_VERSION) {
         passgen_cli_show_version();
+        passgen_cli_opts_free(&opts);
         return 0;
     } else if(ret != PASSGEN_ERROR_NONE) {
         return ret;
