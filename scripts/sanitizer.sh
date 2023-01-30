@@ -14,8 +14,7 @@ function run_sanitizer() {
         -DBUILD_GIT_INFO=NO
 
     ninja -C "$build_dir" test
-    ninja -C "$build_dir" passgen-cli
-    ./scripts/ci-test-passgen.sh ./$build_dir/src/cli/passgen
+    ninja -C "$build_dir" test-cli
 }
 
 if test "$#" -lt 1; then
