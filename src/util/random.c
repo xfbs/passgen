@@ -3,7 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define strprefix(prefix, str) memcmp(prefix, str, strlen(prefix))
+static bool _strprefix(const char *prefix, const char *string) {
+    size_t prefix_len = strlen(prefix);
+    for(size_t i = 0; i < prefix_len; i++) {
+        if(prefix[i] != string[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 
 #ifdef __linux__
 #define PASSGEN_RANDOM_HAVE_SYSTEM
@@ -227,17 +235,22 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
     }
 
     // check if we should read randomness from this file
-    if(strprefix("file:", desc) == 0) {
+    if(_strprefix("file:", desc)) {
         return passgen_random_open_path(random, &desc[5]);
     }
 
     // check if we should use the xorshift PRNG with the given seed
-    if(strprefix("xorshift:", desc) == 0) {
+    if(_strprefix("xorshift:", desc)) {
         const char *seed_str = &desc[9];
+        if(*seed_str == 0) {
+            return NULL;
+        }
+
         uint64_t seed = atoll(seed_str);
         if(seed == 0) {
             return NULL;
         }
+
         return passgen_random_open_xorshift(random, seed);
     }
 

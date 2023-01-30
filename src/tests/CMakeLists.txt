@@ -37,6 +37,5 @@ add_executable(passgen-test ${CMAKE_CURRENT_BINARY_DIR}/test_list.c
 target_link_libraries(passgen-test PRIVATE ${PASSGEN_LIB} passgen-test-lib)
 passgen_target_defaults(passgen-test)
 
-#add_test(NAME passgen-test COMMAND passgen-test)
 add_custom_target(test passgen-test -v
     DEPENDS passgen-test USES_TERMINAL)

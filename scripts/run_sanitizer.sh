@@ -1,26 +1,23 @@
 #!/bin/bash
-set -euo pipefail
+set -euxo pipefail
 
 function run_sanitizer() {
-  source_dir="${2:-.}"
-  sanitizer="$1"
-  tmp_dir=$(mktemp -d)
+    sanitizer="$1"
+    sanitizer_lower="${sanitizer,,}"
+    sanitizer_first="${sanitizer_lower:0:1}"
+    build_dir="${2:-build-${sanitizer_first}san}"
 
-  ctest --build-and-test \
-    "$source_dir" \
-    "$tmp_dir" \
-    --build-generator Ninja \
-    --build-options \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DUSE_SANITIZER=$sanitizer \
-    -DBUILD_GIT_INFO=NO \
-    --test-command ctest --output-on-failure
+    cmake -S . -B "$build_dir" \
+        -G Ninja \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DUSE_SANITIZER=$sanitizer \
+        -DBUILD_GIT_INFO=NO
 
-  rm -rf "$tmp_dir"
+    ninja -C "$build_dir" test
 }
 
 if test "$#" -lt 1; then
-  echo "$0 <sanitizer> [<path to source>]"
+  echo "$0 <sanitizer> [<build-folder>]"
   echo
   echo "Builds the code with the given sanitizer enabled in a temporary directory"
   echo "and runs the tests. Possible values for the sanitizer are:"
