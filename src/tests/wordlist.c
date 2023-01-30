@@ -1,6 +1,7 @@
 #include "passgen/wordlist.h"
 #include "tests.h"
 #include <string.h>
+#include <stdlib.h>
 
 const char example_wordlist[] = "abacus\nbrother\nculling";
 size_t example_wordlist_size = sizeof(example_wordlist);
