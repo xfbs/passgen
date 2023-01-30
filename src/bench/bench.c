@@ -380,6 +380,8 @@ int passgen_bench_oneshot(const options *options) {
 }
 
 int passgen_bench_valgrind(const options *options) {
+    (void) options;
+    printf("Not implemented\n");
     return EXIT_SUCCESS;
 }
 

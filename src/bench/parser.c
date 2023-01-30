@@ -18,6 +18,7 @@ static double bench_parser_mult(void *raw_data) {
 }
 
 static void *bench_parser_prepare(const passgen_hashmap *opts) {
+    (void) opts;
     struct bench_parser_data *data = malloc(sizeof(struct bench_parser_data));
     data->repeat = 750;
     size_t input_len = data->repeat * strlen(pattern_fragment) + 1;
@@ -42,7 +43,7 @@ static void *bench_parser_iterate(void *raw_data) {
 
 static void bench_parser_cleanup(void *raw_data) {
     struct bench_parser_data *data = raw_data;
-    free(data->input);
+    free((void *) data->input);
     passgen_pattern_free(&data->pattern);
     memset(data, 0, sizeof(*data));
     free(data);

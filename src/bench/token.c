@@ -102,6 +102,7 @@ static double bench_token_mult(void *raw_data) {
 }
 
 static void *bench_token_prepare(const passgen_hashmap *opts) {
+    (void) opts;
     struct bench_token_data *data = malloc(sizeof(struct bench_token_data));
     data->repeat = 1000;
     return data;

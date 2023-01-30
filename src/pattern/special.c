@@ -2,6 +2,7 @@
 #include "passgen/assert.h"
 #include "utf8proc.h"
 #include <stdbool.h>
+#include <assert.h>
 #include <stdlib.h>
 
 #define PARAMETERS_INITIAL_SIZE 16
@@ -44,7 +45,7 @@ void passgen_pattern_special_add_parameter_cp(
 
     // always leave enough space for a full UTF8 character (4 bytes) plus a
     // NULL.
-    if((special->parameters_len + 5) < special->parameters_cap) {
+    if((special->parameters_len + 5) >= special->parameters_cap) {
         special->parameters_cap *= PARAMETERS_MULTIPLIER;
         special->parameters =
             realloc(special->parameters, special->parameters_cap);
@@ -54,6 +55,8 @@ void passgen_pattern_special_add_parameter_cp(
         codepoint,
         (unsigned char *) &special->parameters[special->parameters_len]);
     special->parameters_len += bytes;
+
+    assert(special->parameters_len < special->parameters_cap);
 
     // always NULL-terminate the string.
     special->parameters[special->parameters_len] = 0;

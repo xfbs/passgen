@@ -46,6 +46,9 @@
 
 test_result test_parser_empty(void) {
     PREAMBLE();
+    (void) item;
+    (void) token;
+    (void) token_parser;
 
     // single empty segment
     assert(1 == parser.pattern->group.segments.len);
@@ -844,6 +847,9 @@ const char *pattern_working[] = {
     "\\m{english}",
     "\\p{pattern}",
     "\\w{englishenglish}",
+    "\\w{englishenglishenglishenglish}",
+    "\\w{englishenglishenglishenglishenglishenglishenglish}",
+    "\\w{veryveryveryveryveryveryveryveryveryveryveryveryveryveryvery}",
     // very long pattern
     "abababababababababababababababababababababababababababababababababababab"
     "abababababababababababababababababababababababababababababababababababab"
@@ -874,7 +880,7 @@ test_result test_parser_can_parse_random(void) {
     // Characters to choose from. Must be zero-terminated for `strlen` to work
     // on it.
     const char characters[] =
-        {'(', ')', '[', ']', '|', '{', '}', ',', 'a', 'z', '0', '9', '\\', 0};
+        {'(', ')', '[', ']', '|', '{', '}', ',', 'a', 'w', 'm', 'p', 'z', '0', '9', '\\', 0};
     // Find out how many possible characters there are.
     size_t characters_len = strlen(characters);
     // Maximum length of the string to try parsing.
@@ -899,7 +905,7 @@ test_result test_parser_can_parse_random(void) {
         // Parse the string.
         struct passgen_pattern pattern;
         passgen_error error;
-        int ret = passgen_parse(&pattern, &error, string);
+        passgen_parse(&pattern, &error, string);
         passgen_pattern_free(&pattern);
     }
 
