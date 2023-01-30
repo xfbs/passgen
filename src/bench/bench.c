@@ -1,12 +1,12 @@
 #include "bench.h"
 #include <getopt.h>
+#include <locale.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <locale.h>
 
 #define MAX(a, b) ((a > b) ? (a) : (b))
 #define MIN(a, b) ((a > b) ? (b) : (a))
@@ -252,7 +252,9 @@ int passgen_bench_list(const options *options) {
 
 int passgen_bench_run(const options *options) {
     setlocale(LC_NUMERIC, "");
-    fprintf(stderr, "BENCHMARK NAME                 BENCHMARK RESULT         CHANGE\n");
+    fprintf(
+        stderr,
+        "BENCHMARK NAME                 BENCHMARK RESULT         CHANGE\n");
     for(size_t b = 0; options->benches[b]; b++) {
         if(!options->enabled[b]) {
             continue;
@@ -286,8 +288,7 @@ int passgen_bench_run(const options *options) {
         clock_t target = options->time * CLOCKS_PER_SEC;
         clock_t progress = 0;
 
-        size_t padding =
-            options->name_col - strlen(bench->name);
+        size_t padding = options->name_col - strlen(bench->name);
 
         size_t iterations = 0;
         for(; iterations < options->iter || (after - start) < target;

@@ -18,7 +18,7 @@ typedef struct passgen_parser {
     /// Current state of the parser, as a stack.
     passgen_stack state;
     /// The current, possibly incomplete parsed pattern.
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
 } passgen_parser;
 
 /// Get the nth memeber of the parsing stack.

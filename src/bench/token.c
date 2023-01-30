@@ -1,13 +1,13 @@
 #include "bench.h"
+#include <assert.h>
 #include <passgen/parser/token.h>
 #include <passgen/pattern/token.h>
 #include <stdlib.h>
-#include <assert.h>
 
-#define CODEPOINT_CHAR(c) c
+#define CODEPOINT_CHAR(c)         c
 #define CODEPOINT_ESCAPED_CHAR(c) '\\', c
-#define CODEPOINT_UNICODE(...) '\\', 'u', '{', __VA_ARGS__, '}'
-#define BENCH_TOKEN_LINE_LEN 135
+#define CODEPOINT_UNICODE(...)    '\\', 'u', '{', __VA_ARGS__, '}'
+#define BENCH_TOKEN_LINE_LEN      135
 
 static uint32_t bench_token_chars[BENCH_TOKEN_LINE_LEN] = {
     // 34 simple chars (34 bytes)

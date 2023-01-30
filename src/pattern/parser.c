@@ -1,6 +1,7 @@
 #include "passgen/parser/parser.h"
 
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "passgen/pattern/parser.h"
 #include "passgen/pattern/parser_state.h"
@@ -66,16 +67,18 @@ passgen_parser_state *passgen_parser_state_push_special(
 
 void passgen_parser_init(passgen_parser *parser) {
     passgen_stack_init(&parser->state, sizeof(passgen_parser_state));
-    passgen_pattern_init(&parser->pattern);
+    parser->pattern = malloc(sizeof(passgen_pattern));
+    passgen_pattern_init(parser->pattern);
     passgen_parser_state_push_group(
         parser,
-        &parser->pattern.group,
-        passgen_pattern_group_new_segment(&parser->pattern.group));
+        &parser->pattern->group,
+        passgen_pattern_group_new_segment(&parser->pattern->group));
 }
 
 void passgen_parser_free(passgen_parser *parser) {
     passgen_stack_free(&parser->state);
-    passgen_pattern_free(&parser->pattern);
+    passgen_pattern_free(parser->pattern);
+    free(parser->pattern);
 }
 
 passgen_parser_state *

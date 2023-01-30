@@ -2,187 +2,123 @@
 #include "passgen/parser/token.h"
 #include "tests.h"
 
+#define CODEPOINT_MAX 0x10FFFF
+
+// Test that normal (non-escaped) tokens are parsed corredly. They should
+// just be fed through.
 test_result test_token_normal(void) {
-    struct passgen_token_parser parser = {0};
-    struct passgen_token token = {0};
+    struct passgen_token_parser parser;
+    struct passgen_token token;
+    passgen_token_parser_init(&parser);
 
-    // test that normal tokens (that are not special escaped ones) get parsed
-    // just the way they are.
-
-#define TEST_NORMAL(cp)                                                        \
-    assert(passgen_token_parse(&parser, &token, 1, cp) == PASSGEN_TOKEN_INIT); \
-    assert(parser.state == PASSGEN_TOKEN_INIT);                                \
-    assert(token.codepoint == cp);
-
-    TEST_NORMAL('a');
-    TEST_NORMAL('b');
-    TEST_NORMAL('c');
-    TEST_NORMAL(' ');
-    TEST_NORMAL('!');
-    TEST_NORMAL('[');
-    TEST_NORMAL(']');
-
-#undef TEST_NORMAL
+    for(uint32_t codepoint = 0; codepoint < CODEPOINT_MAX; codepoint++) {
+        if(codepoint == '\\') {
+            continue;
+        }
+        int ret = passgen_token_parse(&parser, &token, 1, codepoint);
+        assert_eq(ret, PASSGEN_TOKEN_INIT);
+        assert_eq(parser.state, PASSGEN_TOKEN_INIT);
+        assert_eq(token.codepoint, codepoint);
+    }
 
     return test_ok;
 }
 
+// Test that regular escapes are handled correctly: they should resolve
+// to the appropriate characters.
 test_result test_token_escaped(void) {
-    struct passgen_token_parser parser = {0};
-    struct passgen_token token = {0};
+    struct passgen_token_parser parser;
+    struct passgen_token token;
+    passgen_token_parser_init(&parser);
 
-    // test that simple escaped tokens get parsed correctly.
+    uint32_t escapes[][2] = {
+        {'\\', '\\'},
+        {'a', '\a'},
+        {'b', '\b'},
+        {'f', '\f'},
+        {'r', '\r'},
+        {'n', '\n'},
+        {'t', '\t'},
+        {'v', '\v'},
+        {'e', '\033'},
+        {0, 0}
+    };
 
-#define TEST_ESCAPED(in, out)                                                  \
-    assert(                                                                    \
-        passgen_token_parse(&parser, &token, 1, '\\') ==                       \
-        PASSGEN_TOKEN_ESCAPED);                                                \
-    assert(parser.state == PASSGEN_TOKEN_ESCAPED);                             \
-    assert(passgen_token_parse(&parser, &token, 1, in) == PASSGEN_TOKEN_INIT); \
-    assert(parser.state == PASSGEN_TOKEN_INIT);                                \
-    assert(token.codepoint == out);
-
-    TEST_ESCAPED('\\', '\\');
-    TEST_ESCAPED('a', '\a');
-    TEST_ESCAPED('b', '\b');
-    TEST_ESCAPED('f', '\f');
-    TEST_ESCAPED('r', '\r');
-    TEST_ESCAPED('n', '\n');
-    TEST_ESCAPED('e', '\033');
-
-#undef TEST_ESCAPED
+    for(size_t i = 0; escapes[i][0]; i++) {
+        assert_eq(
+            passgen_token_parse(&parser, &token, 1, '\\'),
+            PASSGEN_TOKEN_ESCAPED);
+        assert_eq(parser.state, PASSGEN_TOKEN_ESCAPED);
+        assert_eq(
+            passgen_token_parse(&parser, &token, 1, escapes[i][0]),
+            PASSGEN_TOKEN_INIT);
+        assert_eq(parser.state, PASSGEN_TOKEN_INIT);
+        assert_eq(token.codepoint, escapes[i][1]);
+    }
 
     return test_ok;
 }
 
+// Test that regular characters have the escape bit set when parsed with
+// leading backslashes.
 test_result test_token_special_escaped(void) {
     struct passgen_token_parser parser;
     struct passgen_token token;
     passgen_token_parser_init(&parser);
 
-    // make sure that regular escaped characters have the escaped bit set
+    for(uint32_t codepoint = 0; codepoint < CODEPOINT_MAX; codepoint++) {
+        switch(codepoint) {
+            case '\\':
+            case 'a':
+            case 'b':
+            case 'f':
+            case 'r':
+            case 'n':
+            case 't':
+            case 'v':
+            case 'u':
+            case 'e':
+                continue;
+            default:
+                break;
+        }
+        int ret = passgen_token_parse(&parser, &token, 1, '\\');
+        assert_eq(ret, PASSGEN_TOKEN_ESCAPED);
+        assert_eq(parser.state, PASSGEN_TOKEN_ESCAPED);
 
-#define TEST_SPECIAL_ESCAPED(chr)                                            \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, '\\') ==                     \
-        PASSGEN_TOKEN_ESCAPED);                                              \
-    assert(parser.state == PASSGEN_TOKEN_ESCAPED);                           \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, chr) == PASSGEN_TOKEN_INIT); \
-    assert(parser.state == PASSGEN_TOKEN_INIT);                              \
-    assert(token.codepoint == (chr | PASSGEN_TOKEN_ESCAPED_BIT));
-
-    TEST_SPECIAL_ESCAPED('p');
-    TEST_SPECIAL_ESCAPED('w');
-    TEST_SPECIAL_ESCAPED('|');
-    TEST_SPECIAL_ESCAPED('[');
-    TEST_SPECIAL_ESCAPED(']');
-    TEST_SPECIAL_ESCAPED('(');
-
-#undef TEST_SPECIAL_ESCAPED
+        ret = passgen_token_parse(&parser, &token, 1, codepoint);
+        assert_eq(ret, PASSGEN_TOKEN_INIT);
+        assert_eq(parser.state, PASSGEN_TOKEN_INIT);
+        assert_eq(token.codepoint, (codepoint | PASSGEN_TOKEN_ESCAPED_BIT));
+    }
 
     return test_ok;
 }
 
+// Test that escaped unicode tokens (eg: \u{ffff}) get parsed correctly.
 test_result test_token_unicode(void) {
     struct passgen_token_parser parser = {0};
     struct passgen_token token = {0};
 
-    // test that simple escaped tokens get parsed correctly.
-
-#define TEST_UNICODE(a, b, out)                                              \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, '\\') ==                     \
-        PASSGEN_TOKEN_ESCAPED);                                              \
-    assert(parser.state == PASSGEN_TOKEN_ESCAPED);                           \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, 'u') ==                      \
-        PASSGEN_TOKEN_UNICODE);                                              \
-    assert(parser.state == PASSGEN_TOKEN_UNICODE);                           \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, '{') ==                      \
-        PASSGEN_TOKEN_UNICODE_PAYLOAD);                                      \
-    assert(parser.state == PASSGEN_TOKEN_UNICODE_PAYLOAD);                   \
-    assert(parser.data.unicode_payload.length == 0);                         \
-    assert(parser.data.unicode_payload.codepoint == 0);                      \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, a) ==                        \
-        PASSGEN_TOKEN_UNICODE_PAYLOAD);                                      \
-    assert(parser.state == PASSGEN_TOKEN_UNICODE_PAYLOAD);                   \
-    assert(parser.data.unicode_payload.length == 1);                         \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, b) ==                        \
-        PASSGEN_TOKEN_UNICODE_PAYLOAD);                                      \
-    assert(parser.state == PASSGEN_TOKEN_UNICODE_PAYLOAD);                   \
-    assert(parser.data.unicode_payload.length == 2);                         \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, '}') == PASSGEN_TOKEN_INIT); \
-    assert(parser.state == PASSGEN_TOKEN_INIT);                              \
-    assert(token.codepoint == out)
-
-    TEST_UNICODE('f', 'a', 0xFA);
-    TEST_UNICODE('a', '4', 0xA4);
-    TEST_UNICODE('F', '1', 0xF1);
-    TEST_UNICODE('F', 'c', 0xFC);
-    TEST_UNICODE('d', '9', 0xD9);
-
-#undef TEST_UNICODE
-
-#define TEST_UNICODE(a, b, c, d, e, f, out)                                  \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, '\\') ==                     \
-        PASSGEN_TOKEN_ESCAPED);                                              \
-    assert(parser.state == PASSGEN_TOKEN_ESCAPED);                           \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, 'u') ==                      \
-        PASSGEN_TOKEN_UNICODE);                                              \
-    assert(parser.state == PASSGEN_TOKEN_UNICODE);                           \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, '{') ==                      \
-        PASSGEN_TOKEN_UNICODE_PAYLOAD);                                      \
-    assert(parser.state == PASSGEN_TOKEN_UNICODE_PAYLOAD);                   \
-    assert(parser.data.unicode_payload.length == 0);                         \
-    assert(parser.data.unicode_payload.codepoint == 0);                      \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, a) ==                        \
-        PASSGEN_TOKEN_UNICODE_PAYLOAD);                                      \
-    assert(parser.state == PASSGEN_TOKEN_UNICODE_PAYLOAD);                   \
-    assert(parser.data.unicode_payload.length == 1);                         \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, b) ==                        \
-        PASSGEN_TOKEN_UNICODE_PAYLOAD);                                      \
-    assert(parser.state == PASSGEN_TOKEN_UNICODE_PAYLOAD);                   \
-    assert(parser.data.unicode_payload.length == 2);                         \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, c) ==                        \
-        PASSGEN_TOKEN_UNICODE_PAYLOAD);                                      \
-    assert(parser.state == PASSGEN_TOKEN_UNICODE_PAYLOAD);                   \
-    assert(parser.data.unicode_payload.length == 3);                         \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, d) ==                        \
-        PASSGEN_TOKEN_UNICODE_PAYLOAD);                                      \
-    assert(parser.state == PASSGEN_TOKEN_UNICODE_PAYLOAD);                   \
-    assert(parser.data.unicode_payload.length == 4);                         \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, e) ==                        \
-        PASSGEN_TOKEN_UNICODE_PAYLOAD);                                      \
-    assert(parser.state == PASSGEN_TOKEN_UNICODE_PAYLOAD);                   \
-    assert(parser.data.unicode_payload.length == 5);                         \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, f) ==                        \
-        PASSGEN_TOKEN_UNICODE_PAYLOAD);                                      \
-    assert(parser.state == PASSGEN_TOKEN_UNICODE_PAYLOAD);                   \
-    assert(parser.data.unicode_payload.length == 6);                         \
-    assert(                                                                  \
-        passgen_token_parse(&parser, &token, 1, '}') == PASSGEN_TOKEN_INIT); \
-    assert(parser.state == PASSGEN_TOKEN_INIT);                              \
-    assert(token.codepoint == out)
-
-    TEST_UNICODE('0', '1', 'F', '6', '4', '2', 0x1F642);
-    TEST_UNICODE('0', '1', 'f', '6', '0', 'b', 0x1F60B);
-    TEST_UNICODE('0', '0', '0', '0', 'f', 'c', 0xFC);
-
-#undef TEST_UNICODE
+    char buffer[8];
+    for(uint32_t codepoint = 0; codepoint < CODEPOINT_MAX; codepoint++) {
+        sprintf(buffer, "%x", codepoint);
+        int ret = passgen_token_parse(&parser, &token, 1, '\\');
+        assert_eq(ret, PASSGEN_TOKEN_ESCAPED);
+        ret = passgen_token_parse(&parser, &token, 1, 'u');
+        assert_eq(ret, PASSGEN_TOKEN_UNICODE);
+        ret = passgen_token_parse(&parser, &token, 1, '{');
+        assert_eq(ret, PASSGEN_TOKEN_UNICODE_PAYLOAD);
+        assert_eq(parser.data.unicode_payload.length, 0);
+        for(size_t i = 0; buffer[i]; i++) {
+            ret = passgen_token_parse(&parser, &token, 1, buffer[i]);
+            assert_eq(ret, PASSGEN_TOKEN_UNICODE_PAYLOAD);
+            assert_eq(parser.data.unicode_payload.length, i + 1);
+        }
+        ret = passgen_token_parse(&parser, &token, 1, '}');
+        assert_eq(ret, PASSGEN_TOKEN_INIT);
+        assert_eq(token.codepoint, codepoint);
+    }
 
     return test_ok;
 }

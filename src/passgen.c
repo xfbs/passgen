@@ -102,7 +102,7 @@ int passgen_parse(
     }
 
     passgen_stack_free(&parser.state);
-    *output = parser.pattern;
+    *output = *parser.pattern;
 
     return 0;
 }
