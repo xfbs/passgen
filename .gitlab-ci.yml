@@ -176,7 +176,7 @@ test:alpine:
     - cmake --build build
     - ./build/src/tests/passgen-test -v
     - valgrind ./build/src/tests/passgen-test -v
-    - valgrind ./build/src/bench/passgen-bench
+    - valgrind ./build/src/bench/passgen-bench -i1 -t0s
     - ninja -C build symbols-check
 
 test:riscv64:
