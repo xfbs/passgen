@@ -7,8 +7,8 @@
 // Test that normal (non-escaped) tokens are parsed corredly. They should
 // just be fed through.
 test_result test_token_normal(void) {
-    struct passgen_token_parser parser;
-    struct passgen_token token;
+    passgen_token_parser parser;
+    passgen_token token;
     passgen_token_parser_init(&parser);
 
     for(uint32_t codepoint = 0; codepoint < CODEPOINT_MAX; codepoint++) {
@@ -27,8 +27,8 @@ test_result test_token_normal(void) {
 // Test that regular escapes are handled correctly: they should resolve
 // to the appropriate characters.
 test_result test_token_escaped(void) {
-    struct passgen_token_parser parser;
-    struct passgen_token token;
+    passgen_token_parser parser;
+    passgen_token token;
     passgen_token_parser_init(&parser);
 
     uint32_t escapes[][2] = {
@@ -61,8 +61,8 @@ test_result test_token_escaped(void) {
 // Test that regular characters have the escape bit set when parsed with
 // leading backslashes.
 test_result test_token_special_escaped(void) {
-    struct passgen_token_parser parser;
-    struct passgen_token token;
+    passgen_token_parser parser;
+    passgen_token token;
     passgen_token_parser_init(&parser);
 
     for(uint32_t codepoint = 0; codepoint < CODEPOINT_MAX; codepoint++) {
@@ -96,8 +96,8 @@ test_result test_token_special_escaped(void) {
 
 // Test that escaped unicode tokens (eg: \u{ffff}) get parsed correctly.
 test_result test_token_unicode(void) {
-    struct passgen_token_parser parser;
-    struct passgen_token token;
+    passgen_token_parser parser;
+    passgen_token token;
     passgen_token_parser_init(&parser);
 
     char buffer[8];
@@ -130,8 +130,8 @@ test_result test_token_unicode(void) {
 // Test that passing any character that is not an opening brace after \u
 // causes an error state (so \u{FC} is fine, but \u[ is not).
 test_result test_token_unicode_error_start(void) {
-    struct passgen_token_parser parser;
-    struct passgen_token token;
+    passgen_token_parser parser;
+    passgen_token token;
     passgen_token_parser_init(&parser);
 
     uint32_t chars[] =
@@ -156,8 +156,8 @@ test_result test_token_unicode_error_start(void) {
 // Test that passing any character that is not a hexadecimal character after \u{
 // causes an error state (so \u{FC} is fine, but \u{ZZ} is not).
 test_result test_token_unicode_error_payload(void) {
-    struct passgen_token_parser parser;
-    struct passgen_token token;
+    passgen_token_parser parser;
+    passgen_token token;
 
     uint32_t chars[] = {'x', ' ', '_', '-', '!', '+', '=', 'w', 'g', '[', 0};
 
@@ -183,8 +183,8 @@ test_result test_token_unicode_error_payload(void) {
 // Test that passing any character that is not an opening brace after \u
 // causes an error state (so \u{FC} is fine, but \u[ is not).
 test_result test_token_unicode_error_len(void) {
-    struct passgen_token_parser parser;
-    struct passgen_token token;
+    passgen_token_parser parser;
+    passgen_token token;
 
     const uint32_t inputs[][7] = {
         {'0', '0', '0', '0', '0', '0', '0'},
@@ -252,8 +252,8 @@ test_result test_token_state_string(void) {
 // Test that the token parser correctly keeps track of byte and codepoint
 // offsets.
 test_result test_token_normal_offsets(void) {
-    struct passgen_token_parser parser = {0};
-    struct passgen_token token = {0};
+    passgen_token_parser parser = {0};
+    passgen_token token = {0};
 
 #define PARSE(cp, width)                                   \
     assert(                                                \
@@ -312,8 +312,8 @@ test_result test_token_normal_offsets(void) {
 // Test that the token parser correctly keeps track of byte and codepoint
 // offsets.
 test_result test_token_multi_offsets(void) {
-    struct passgen_token_parser parser = {0};
-    struct passgen_token token = {0};
+    passgen_token_parser parser = {0};
+    passgen_token token = {0};
 
     assert(
         passgen_token_parse(&parser, &token, 1, '\\') == PASSGEN_TOKEN_ESCAPED);
@@ -356,8 +356,8 @@ test_result test_token_multi_offsets(void) {
 // Test that parsing any character in an error state simply returns that error
 // state.
 test_result test_token_error_propagation(void) {
-    struct passgen_token_parser parser;
-    struct passgen_token token;
+    passgen_token_parser parser;
+    passgen_token token;
     int errors[] = {
         PASSGEN_TOKEN_ERROR_UNICODE_START,
         PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD,

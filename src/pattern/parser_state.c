@@ -1,7 +1,7 @@
 #include "passgen/pattern/parser_state.h"
 #include "passgen/pattern/special.h"
 
-void passgen_parser_state_free(struct passgen_parser_state *state) {
+void passgen_parser_state_free(passgen_parser_state *state) {
     switch(state->type) {
         case PASSGEN_PARSER_SPECIAL:
         case PASSGEN_PARSER_SPECIAL_NAME:

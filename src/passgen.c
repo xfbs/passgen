@@ -10,12 +10,12 @@
 #include <string.h>
 
 int passgen_parse(
-    struct passgen_pattern *output,
+    passgen_pattern *output,
     passgen_error *error,
     const char *string) {
-    struct passgen_parser parser;
-    struct passgen_token_parser token_parser = {0};
-    struct passgen_token token = {0};
+    passgen_parser parser;
+    passgen_token_parser token_parser = {0};
+    passgen_token token = {0};
     passgen_parser_init(&parser, output);
 
     size_t pattern_max = 256;

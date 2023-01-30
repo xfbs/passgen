@@ -51,8 +51,8 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
 }
 
 int passgen_cli_run(passgen_cli_opts opts) {
-    struct passgen_pattern pattern;
-    struct passgen_error error;
+    passgen_pattern pattern;
+    passgen_error error;
     int ret = passgen_parse(&pattern, &error, opts.pattern);
     if(ret != 0) {
         fprintf(
@@ -75,7 +75,7 @@ int passgen_cli_run(passgen_cli_opts opts) {
 
 int passgen_cli_generate_normal(
     passgen_cli_opts opts,
-    struct passgen_pattern *pattern) {
+    passgen_pattern *pattern) {
     // allocate some space for pass.
     // size_t pass_len = pattern_maxlen(pattern);
     size_t pass_len = 256;
@@ -117,7 +117,7 @@ int passgen_cli_generate_normal(
 
 int passgen_cli_generate_json(
     passgen_cli_opts opts,
-    struct passgen_pattern *pattern) {
+    passgen_pattern *pattern) {
     // allocate some space for pass.
     // size_t pass_len = pattern_maxlen(pattern);
     size_t pass_len = 256;
@@ -148,7 +148,7 @@ int passgen_cli_generate_json(
 
 int passgen_cli_generate(
     passgen_cli_opts opts,
-    struct passgen_pattern *pattern) {
+    passgen_pattern *pattern) {
     if(!opts.json) {
         return passgen_cli_generate_normal(opts, pattern);
     } else {

@@ -33,7 +33,7 @@ struct fillpos_utf8 {
     size_t len;
 };
 
-static struct passgen_env passgen_env_default = {
+static passgen_env passgen_env_default = {
     .find_entropy = false,
     .random = NULL,
 };
@@ -147,8 +147,8 @@ passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
 }
 
 size_t passgen_generate_fill_unicode(
-    struct passgen_pattern *pattern,
-    struct passgen_env *env,
+    passgen_pattern *pattern,
+    passgen_env *env,
     uint32_t *buffer,
     size_t len) {
     struct fillpos fillpos = {
@@ -167,8 +167,8 @@ size_t passgen_generate_fill_unicode(
 }
 
 size_t passgen_generate_fill_utf8(
-    struct passgen_pattern *pattern,
-    struct passgen_env *env,
+    passgen_pattern *pattern,
+    passgen_env *env,
     uint8_t *buffer,
     size_t len) {
     struct fillpos_utf8 fillpos = {
@@ -207,8 +207,8 @@ size_t passgen_generate_fill_json_utf8(
 }
 
 size_t passgen_generate_repeat(
-    struct passgen_env *env,
-    struct passgen_pattern_repeat *repeat) {
+    passgen_env *env,
+    passgen_pattern_repeat *repeat) {
     size_t difference = repeat->max - repeat->min;
 
     // if there is no difference to pick, just return here
@@ -228,8 +228,8 @@ size_t passgen_generate_repeat(
 }
 
 int passgen_generate_set(
-    struct passgen_pattern_set *set,
-    struct passgen_env *env,
+    passgen_pattern_set *set,
+    passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     // if this set is empty, we're done.
@@ -266,14 +266,14 @@ int passgen_generate_set(
         choice -= set->choices_list[num - 1];
     }
 
-    struct passgen_pattern_range *range = passgen_stack_get(&set->items, num);
+    passgen_pattern_range *range = passgen_stack_get(&set->items, num);
 
     return func(data, range->start + choice);
 }
 
 int passgen_generate_character(
     passgen_pattern_literal *character,
-    struct passgen_env *env,
+    passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     (void) env;
@@ -289,8 +289,8 @@ int passgen_generate_character(
 }
 
 int passgen_generate_special_pronounceable(
-    struct passgen_pattern_special *special,
-    struct passgen_env *env,
+    passgen_pattern_special *special,
+    passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     passgen_hashmap_entry *entry =
@@ -329,8 +329,8 @@ int passgen_generate_special_pronounceable(
 }
 
 int passgen_generate_special_wordlist(
-    struct passgen_pattern_special *special,
-    struct passgen_env *env,
+    passgen_pattern_special *special,
+    passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     passgen_hashmap_entry *entry =
@@ -356,8 +356,8 @@ int passgen_generate_special_wordlist(
 }
 
 int passgen_generate_special_preset(
-    struct passgen_pattern_special *special,
-    struct passgen_env *env,
+    passgen_pattern_special *special,
+    passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     (void) special;
@@ -369,8 +369,8 @@ int passgen_generate_special_preset(
 }
 
 int passgen_generate_special(
-    struct passgen_pattern_special *special,
-    struct passgen_env *env,
+    passgen_pattern_special *special,
+    passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     switch(special->kind) {
@@ -391,8 +391,8 @@ int passgen_generate_special(
 }
 
 int passgen_generate_item(
-    struct passgen_pattern_item *item,
-    struct passgen_env *env,
+    passgen_pattern_item *item,
+    passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     // if it is a maybe (has a question mark following it), decide first if we
@@ -439,12 +439,12 @@ int passgen_generate_item(
 }
 
 int passgen_generate_segment(
-    struct passgen_pattern_segment *segment,
-    struct passgen_env *env,
+    passgen_pattern_segment *segment,
+    passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     for(size_t i = 0; i < segment->items.len; i++) {
-        struct passgen_pattern_item *item =
+        passgen_pattern_item *item =
             passgen_stack_get(&segment->items, i);
 
         try(passgen_generate_item(item, env, data, func));
@@ -454,8 +454,8 @@ int passgen_generate_segment(
 }
 
 int passgen_generate_group(
-    struct passgen_pattern_group *group,
-    struct passgen_env *env,
+    passgen_pattern_group *group,
+    passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     // choose random segment from segments
@@ -480,8 +480,8 @@ int passgen_generate_group(
 }
 
 int passgen_generate(
-    struct passgen_pattern *pattern,
-    struct passgen_env *env,
+    passgen_pattern *pattern,
+    passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
     /* use default env if none was supplied. this should be relatively sane. */

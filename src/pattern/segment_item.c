@@ -3,7 +3,7 @@
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/special.h"
 
-void passgen_pattern_item_free(struct passgen_pattern_item *item) {
+void passgen_pattern_item_free(passgen_pattern_item *item) {
     switch(item->kind) {
         case PASSGEN_PATTERN_SET:
             passgen_pattern_set_free(&item->data.set);
@@ -19,7 +19,7 @@ void passgen_pattern_item_free(struct passgen_pattern_item *item) {
     }
 }
 
-void passgen_pattern_item_init(struct passgen_pattern_item *item) {
+void passgen_pattern_item_init(passgen_pattern_item *item) {
     item->repeat.min = 1;
     item->repeat.max = 1;
     item->maybe = 0;

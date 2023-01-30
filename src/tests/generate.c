@@ -20,10 +20,10 @@
 #define SEED 320843200
 
 #define PREAMBLE()                                  \
-    struct passgen_parser parser;                   \
-    struct passgen_token_parser token_parser = {0}; \
-    struct passgen_token token = {0};               \
-    struct passgen_env env = {0};                   \
+    passgen_parser parser;                   \
+    passgen_token_parser token_parser = {0}; \
+    passgen_token token = {0};               \
+    passgen_env env = {0};                   \
     passgen_pattern parsed_pattern;                 \
     const char *pattern;                            \
     passgen_random random;                          \

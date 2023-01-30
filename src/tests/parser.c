@@ -18,11 +18,11 @@
 #include <passgen/passgen.h>
 
 #define PREAMBLE()                                  \
-    struct passgen_parser parser;                   \
-    struct passgen_token_parser token_parser = {0}; \
-    struct passgen_token token = {0};               \
-    struct passgen_pattern_segment *segment;        \
-    struct passgen_pattern_item *item;              \
+    passgen_parser parser;                   \
+    passgen_token_parser token_parser = {0}; \
+    passgen_token token = {0};               \
+    passgen_pattern_segment *segment;        \
+    passgen_pattern_item *item;              \
     passgen_pattern parsed_pattern;                 \
     passgen_parser_init(&parser, &parsed_pattern);
 
@@ -226,7 +226,7 @@ test_result test_parser_set_simple(void) {
     PARSE_CODEPOINT('a');
     PARSE_CODEPOINT('b');
     PARSE_CODEPOINT(']');
-    struct passgen_pattern_range *range;
+    passgen_pattern_range *range;
 
     // single segment containing char 'a'
     assert(1 == parser.pattern->group.segments.len);
@@ -263,7 +263,7 @@ test_result test_parser_set_simple_escaped(void) {
     PARSE_CODEPOINT_DOUBLE('\\', '-');
     PARSE_CODEPOINT('b');
     PARSE_CODEPOINT(']');
-    struct passgen_pattern_range *range;
+    passgen_pattern_range *range;
 
     // single segment containing char 'a'
     assert(1 == parser.pattern->group.segments.len);
@@ -305,7 +305,7 @@ test_result test_parser_range_simple(void) {
     PARSE_CODEPOINT('-');
     PARSE_CODEPOINT('b');
     PARSE_CODEPOINT(']');
-    struct passgen_pattern_range *range;
+    passgen_pattern_range *range;
 
     // single segment containing char 'a'
     assert(1 == parser.pattern->group.segments.len);
@@ -340,7 +340,7 @@ test_result test_parser_range_multiple(void) {
     PARSE_CODEPOINT('-');
     PARSE_CODEPOINT('d');
     PARSE_CODEPOINT(']');
-    struct passgen_pattern_range *range;
+    passgen_pattern_range *range;
 
     // single segment containing char 'a'
     assert(1 == parser.pattern->group.segments.len);
@@ -790,7 +790,7 @@ const char *pattern_broken[] = {
 /// patterns.
 test_result test_parser_can_parse_broken(void) {
     for(int i = 0; pattern_broken[i]; i++) {
-        struct passgen_pattern pattern;
+        passgen_pattern pattern;
         passgen_error error;
         int ret = passgen_parse(&pattern, &error, pattern_broken[i]);
         passgen_pattern_free(&pattern);
@@ -861,7 +861,7 @@ const char *pattern_working[] = {
 /// Make sure that we can parse patterns that are known to be good.
 test_result test_parser_can_parse_working(void) {
     for(int i = 0; pattern_working[i]; i++) {
-        struct passgen_pattern pattern;
+        passgen_pattern pattern;
         passgen_error error;
         int ret = passgen_parse(&pattern, &error, pattern_working[i]);
         assert(ret == 0);
@@ -903,7 +903,7 @@ test_result test_parser_can_parse_random(void) {
         }
 
         // Parse the string.
-        struct passgen_pattern pattern;
+        passgen_pattern pattern;
         passgen_error error;
         passgen_parse(&pattern, &error, string);
         passgen_pattern_free(&pattern);

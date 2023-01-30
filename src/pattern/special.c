@@ -9,7 +9,7 @@
 #define PARAMETERS_MULTIPLIER   2
 
 void passgen_pattern_special_init_char(
-    struct passgen_pattern_special *special,
+    passgen_pattern_special *special,
     uint32_t kind) {
     special->parameters_len = 0;
     special->parameters_cap = 0;
@@ -31,12 +31,12 @@ void passgen_pattern_special_init_char(
     }
 }
 
-void passgen_pattern_special_free(struct passgen_pattern_special *special) {
+void passgen_pattern_special_free(passgen_pattern_special *special) {
     free(special->parameters);
 }
 
 void passgen_pattern_special_add_parameter_cp(
-    struct passgen_pattern_special *special,
+    passgen_pattern_special *special,
     int32_t codepoint) {
     if(special->parameters_cap == 0) {
         special->parameters_cap = PARAMETERS_INITIAL_SIZE;
