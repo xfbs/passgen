@@ -1,4 +1,15 @@
 #!/bin/bash
+if test "$#" -lt 1; then
+    echo "$0 <passgen cli path>"
+    echo "Runs tests against the passgen binary."
+    echo
+    echo "Example:"
+    echo "    mkdir build"
+    echo "    cmake -S . -B build"
+    echo "    cmake --build build"
+    echo "    ./scripts/test-passgen-cli.sh ./build/src/cli/passgen"
+    exit 0
+fi
 set -euxo pipefail
 
 # which binary to test

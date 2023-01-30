@@ -142,10 +142,10 @@ sanitize:
   image: registry.gitlab.com/xfbs/passgen/amd64
   stage: test
   script:
-    - CC=clang scripts/run_sanitizer.sh Address
-    - CC=clang scripts/run_sanitizer.sh Memory
-    - CC=clang scripts/run_sanitizer.sh Undefined
-    - CC=clang scripts/run_sanitizer.sh Leak
+    - CC=clang scripts/sanitizer.sh Address
+    - CC=clang scripts/sanitizer.sh Memory
+    - CC=clang scripts/sanitizer.sh Undefined
+    - CC=clang scripts/sanitizer.sh Leak
 
 test:aarch64:
   image: registry.gitlab.com/xfbs/passgen/aarch64
@@ -220,7 +220,7 @@ build:aarch64:
     - cd build-aarch64
     - ninja
     - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/tests/passgen-test
-    - ../scripts/ci-test-passgen.sh qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/cli/passgen
+    - ../scripts/test-passgen-cli.sh qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/cli/passgen
     - cpack -G TXZ
     - cpack -G DEB
   artifacts:
@@ -236,7 +236,7 @@ build:riscv64:
     - cd build-riscv64
     - ninja
     - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./src/tests/passgen-test
-    - ../scripts/ci-test-passgen.sh qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./src/cli/passgen
+    - ../scripts/test-passgen-cli.sh qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./src/cli/passgen
     - cpack -G TXZ
     - cpack -G DEB
   artifacts:
@@ -253,7 +253,7 @@ build:amd64:
     - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_SECCOMP=YES ..
     - ninja
     - ./src/tests/passgen-test
-    - ../scripts/ci-test-passgen.sh ./src/cli/passgen
+    - ../scripts/test-passgen-cli.sh ./src/cli/passgen
     - cpack -G TXZ
     - cpack -G DEB
   artifacts:
@@ -270,7 +270,7 @@ build:alpine:
     - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y ..
     - ninja
     - ./src/tests/passgen-test
-    - ../scripts/ci-test-passgen.sh ./src/cli/passgen
+    - ../scripts/test-passgen-cli.sh ./src/cli/passgen
     - cpack -G TXZ
   artifacts:
     paths:

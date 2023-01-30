@@ -14,7 +14,7 @@ function run_sanitizer() {
         -DBUILD_GIT_INFO=NO
 
     ninja -C "$build_dir" test
-    ninja -C "$build_dir" passgen-bin
+    ninja -C "$build_dir" passgen-cli
     ./scripts/ci-test-passgen.sh ./$build_dir/src/cli/passgen
 }
 
@@ -25,9 +25,6 @@ if test "$#" -lt 1; then
   echo "and runs the tests. Possible values for the sanitizer are:"
   echo
   echo "  Address Memory Undefined Leak Thread"
-  echo
-  echo "If the path to the source directory is not given, the script assumes it is"
-  echo "in the current working directory."
   echo
   echo "For more information on the sanitizers, read cmake/Sanitizers.cmake"
 else
