@@ -283,7 +283,7 @@ build:wasi:
   script:
     - mkdir build-wasi && cd build-wasi
     - cmake cmake -DLIBPASSGEN_SHARED=OFF ..
-    - make -j passgen-bin
+    - make -j passgen-cli
   artifacts:
     paths:
       - build-wasi
