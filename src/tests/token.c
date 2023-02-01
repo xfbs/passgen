@@ -1,4 +1,3 @@
-#include "passgen/pattern/token.h"
 #include "passgen/parser/token.h"
 #include "tests.h"
 

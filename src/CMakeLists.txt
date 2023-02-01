@@ -17,7 +17,6 @@ set(SOURCE_LIST
     "pattern/segment_item.c"
     "pattern/set.c"
     "pattern/special.c"
-    "pattern/token.c"
     "token.c"
     "util/array.c"
     "util/hashmap.c"

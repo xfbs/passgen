@@ -1,7 +1,6 @@
 #include "bench.h"
 #include <assert.h>
 #include <passgen/parser/token.h>
-#include <passgen/pattern/token.h>
 #include <stdlib.h>
 
 #define CODEPOINT_CHAR(c)         c

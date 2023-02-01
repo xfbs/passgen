@@ -7,14 +7,8 @@
 #include "passgen/util/hashmap.h"
 #include "passgen/util/random.h"
 #include "passgen/pattern/pattern.h"
+#include "passgen/preset.h"
 #include <stdio.h>
-
-typedef struct passgen_preset {
-    const char *name;
-    const char *preset;
-    bool parsed;
-    passgen_pattern pattern;
-} passgen_preset;
 
 /// Environment that is needed when generating patterns.
 ///

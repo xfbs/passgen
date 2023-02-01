@@ -11,7 +11,6 @@
 #include "passgen/pattern/segment.h"
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
-#include "passgen/pattern/token.h"
 #include "passgen/util/random.h"
 #include "passgen/util/stack.h"
 #include "tests.h"

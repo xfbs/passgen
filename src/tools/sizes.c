@@ -15,7 +15,6 @@
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/special.h"
 #include "passgen/pattern/special_kind.h"
-#include "passgen/pattern/token.h"
 #include "passgen/util/array.h"
 
 #define add_type(name) \

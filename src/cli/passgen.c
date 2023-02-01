@@ -22,7 +22,6 @@
 #include "passgen/passgen.h"
 #include "passgen/pattern/parser.h"
 #include "passgen/pattern/pattern.h"
-#include "passgen/pattern/token.h"
 #include "passgen/util/random.h"
 #include "passgen/util/try.h"
 #include "passgen/util/utf8.h"
