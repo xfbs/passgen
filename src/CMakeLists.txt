@@ -21,6 +21,7 @@ set(SOURCE_LIST
     "pattern/segment_item.c"
     "pattern/set.c"
     "pattern/special.c"
+    "pattern/preset.c"
     "util/random.c"
     "util/siphash.c"
     "util/utf8.c"
