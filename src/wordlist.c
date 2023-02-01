@@ -1,6 +1,6 @@
 #include "passgen/wordlist.h"
 #include "passgen/assert.h"
-#include "passgen/util/try.h"
+#include "passgen/try.h"
 #include "passgen/util/utf8.h"
 #include <stdlib.h>
 #include <string.h>

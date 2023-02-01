@@ -4,7 +4,7 @@
 #pragma once
 #include <stddef.h>
 
-#include "passgen/util/stack.h"
+#include "passgen/container/stack.h"
 #include "passgen/pattern/segment_item.h"
 
 /// Represents a single segment of a pattern. 

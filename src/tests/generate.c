@@ -12,7 +12,7 @@
 #include "passgen/pattern/segment.h"
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
-#include "passgen/util/stack.h"
+#include "passgen/container/stack.h"
 #include "tests.h"
 
 // don't change this seed - that will break tests!

@@ -1,7 +1,7 @@
 #pragma once
 #include <stdbool.h>
 
-#include "passgen/util/stack.h"
+#include "passgen/container/stack.h"
 #include "passgen/pattern/literal.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/pattern_kind.h"

@@ -9,7 +9,7 @@
 #pragma once
 #include <stddef.h>
 
-#include "passgen/util/stack.h"
+#include "passgen/container/stack.h"
 #include "passgen/pattern/repeat.h"
 
 typedef struct passgen_pattern_segment passgen_pattern_segment;

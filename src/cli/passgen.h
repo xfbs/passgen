@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <passgen/util/random.h>
-#include <passgen/util/hashmap.h>
+#include <passgen/container/hashmap.h>
 #include "passgen/pattern/pattern.h"
 #include "passgen/pattern/env.h"
 

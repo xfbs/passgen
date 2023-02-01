@@ -5,7 +5,7 @@
 #include "passgen/pattern/repeat.h"
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
-#include "passgen/util/stack.h"
+#include "passgen/container/stack.h"
 
 void passgen_pattern_segment_init(passgen_pattern_segment *segment) {
     segment->multiplier = 1;

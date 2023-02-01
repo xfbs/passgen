@@ -1,4 +1,4 @@
-#include "passgen/util/stack.h"
+#include "passgen/container/stack.h"
 #include "tests.h"
 #include <stdlib.h>
 

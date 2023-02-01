@@ -2,7 +2,7 @@
 /// @brief Benchmark framework header file
 #pragma once
 #include <stdbool.h>
-#include <passgen/util/hashmap.h>
+#include <passgen/container/hashmap.h>
 
 /// Benchmark definition
 typedef struct bench {

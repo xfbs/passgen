@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "passgen/util/hashmap.h"
+#include "passgen/container/hashmap.h"
 #include "passgen/util/random.h"
 #include "passgen/pattern/pattern.h"
-#include "passgen/preset.h"
+#include "passgen/pattern/preset.h"
 #include <stdio.h>
 
 /// Environment that is needed when generating patterns.

@@ -15,7 +15,7 @@
 #include "passgen/pattern/segment.h"
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
-#include "passgen/util/stack.h"
+#include "passgen/container/stack.h"
 
 // get the last item, making sure that it's only a single character.
 // in case of characters, mark it as tainted.

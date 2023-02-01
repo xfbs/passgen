@@ -1,4 +1,4 @@
-#include "passgen/util/array.h"
+#include "passgen/container/array.h"
 #include "tests.h"
 #include <string.h>
 

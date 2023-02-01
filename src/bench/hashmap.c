@@ -1,5 +1,5 @@
 #include "bench.h"
-#include <passgen/util/hashmap.h>
+#include <passgen/container/hashmap.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -15,7 +15,7 @@
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/special.h"
 #include "passgen/pattern/special_kind.h"
-#include "passgen/util/array.h"
+#include "passgen/container/array.h"
 
 #define add_type(name) \
     { #name, sizeof(name) }

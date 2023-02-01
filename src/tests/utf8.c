@@ -54,7 +54,7 @@ test_result test_utf8_can_decode_empty_widths(void) {
 
 // test that we can decode a simple utf-8 sequence.
 test_result test_utf8_can_decode_simple(void) {
-    // ü😂µ
+    // ÃÂ¼Ã°ÂÂÂÃÂµ
     const uint8_t input[] =
         {0xc3, 0xbc, 0xf0, 0x9f, 0x98, 0x82, 0xc2, 0xb5, 0x0a};
     size_t input_size = sizeof(input);
@@ -92,7 +92,7 @@ test_result test_utf8_can_decode_simple(void) {
 
 // test that we can decode a simple utf-8 sequence with character widths.
 test_result test_utf8_can_decode_simple_widths(void) {
-    // ü😂µ
+    // ÃÂ¼Ã°ÂÂÂÃÂµ
     const uint8_t input[] =
         {0xc3, 0xbc, 0xf0, 0x9f, 0x98, 0x82, 0xc2, 0xb5, 0x0a};
     size_t input_size = sizeof(input);
@@ -139,7 +139,7 @@ test_result test_utf8_can_decode_simple_widths(void) {
 // test that we can decode a simple UTF-8 string, if there is not enough
 // space in the output array, by restarting the decoding.
 test_result test_utf8_decode_short_output(void) {
-    // ü😂µ
+    // ÃÂ¼Ã°ÂÂÂÃÂµ
     const uint8_t input[] =
         {0xc3, 0xbc, 0xf0, 0x9f, 0x98, 0x82, 0xc2, 0xb5, 0x0a};
     size_t input_size = sizeof(input);
@@ -194,7 +194,7 @@ test_result test_utf8_decode_short_output(void) {
 test_result test_utf8_encode_simple(void) {
     // test that we can decode a simple UTF-8 string.
 
-    // ü😂µ
+    // ÃÂ¼Ã°ÂÂÂÃÂµ
     const uint8_t expected[] =
         {0xc3, 0xbc, 0xf0, 0x9f, 0x98, 0x82, 0xc2, 0xb5, 0x0a};
 

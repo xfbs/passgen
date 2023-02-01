@@ -1,6 +1,6 @@
 #include <passgen/assert.h>
 #include <passgen/config.h>
-#include <passgen/util/array.h>
+#include <passgen/container/array.h>
 #include <stdlib.h>
 #include <string.h>
 
