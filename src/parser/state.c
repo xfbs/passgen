@@ -1,4 +1,4 @@
-#include "passgen/pattern/parser_state.h"
+#include "passgen/parser/state.h"
 #include "passgen/pattern/special.h"
 
 void passgen_parser_state_free(passgen_parser_state *state) {

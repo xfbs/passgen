@@ -8,7 +8,7 @@
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/literal.h"
 #include "passgen/pattern/parser.h"
-#include "passgen/pattern/parser_state.h"
+#include "passgen/parser/state.h"
 #include "passgen/pattern/pattern.h"
 #include "passgen/pattern/range.h"
 #include "passgen/pattern/repeat.h"

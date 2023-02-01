@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "passgen/pattern/parser.h"
-#include "passgen/pattern/parser_state.h"
+#include "passgen/parser/state.h"
 
 inline passgen_parser_state *passgen_parser_state_push(passgen_parser *parser) {
     return passgen_stack_push(&parser->state, NULL);
