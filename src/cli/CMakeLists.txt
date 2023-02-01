@@ -16,7 +16,7 @@ endif()
 
 install(TARGETS passgen-cli
     DESTINATION bin
-    COMPONENT bin
+    COMPONENT runtime
     OPTIONAL)
 
 add_custom_target(test-cli ${CMAKE_SOURCE_DIR}/scripts/test-passgen-cli.sh $<TARGET_FILE:passgen-cli>

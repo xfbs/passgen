@@ -12,6 +12,7 @@ option(BUILD_TOOLS "Build utility binaries." YES)
 option(BUILD_BENCH "Build benchmark utilities." YES)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
 option(BUILD_TESTING "Build unit tests" ON)
+option(BUILD_DATA "Build data" ON)
 
 option(LIBPASSGEN_STATIC "Build libpassgen.a" ON)
 option(LIBPASSGEN_SHARED "Build libpassgen.so" ON)
@@ -65,6 +66,10 @@ add_subdirectory(extern)
 # build libpassgen
 add_subdirectory(src)
 
+if(BUILD_DATA)
+    add_subdirectory(data)
+endif()
+
 if(BUILD_BENCH)
     add_subdirectory(src/bench)
 endif()
@@ -86,20 +91,46 @@ configure_file(man/passgen.1.in passgen.1)
 install(
     FILES ${PROJECT_BINARY_DIR}/passgen.1
     DESTINATION share/man/man1
-    COMPONENT man)
+    COMPONENT runtime)
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Passgen")
 set(CPACK_PACKAGE_VENDOR "xfbs")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md")
-if(PASSGEN_SECCOMP)
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libseccomp2 (>= 2.5.1)")
-else()
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "")
-endif()
-set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
-set(CPACK_DEB_COMPONENT_INSTALL OFF)
 set(CPACK_PACKAGE_CONTACT "Patrick Elsen <pelsen@xfbs.net>")
 set(CPACK_PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
 
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md")
+set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
+set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON)
+set(CPACK_DEB_COMPONENT_INSTALL OFF)
+
+if(PASSGEN_SECCOMP)
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libseccomp2 (>= 2.5.1)")
+else()
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6")
+endif()
+
+# development package
+set(CPACK_COMPONENT_DEVELOPMENT_DEPENDS "runtime")
+set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_NAME "passgen-dev")
+set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_ARCHITECTURE "all")
+set(CPACK_DEBIAN_DEVELOPMENT_PACKAGE_DEPENDS "libc6-dev | libc-dev")
+
+# data package
+set(CPACK_COMPONENT_DATA_DEPENDS "runtime")
+set(CPACK_DEBIAN_DATA_PACKAGE_NAME "passgen-data")
+set(CPACK_DEBIAN_DATA_PACKAGE_ARCHITECTURE "all")
+set(CPACK_DEBIAN_DATA_PACKAGE_DEPENDS "")
+
+# runtime package
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "passgen")
+set(CPACK_DEBIAN_RUNTIME_PACKAGE_SECTION "utils")
+if(PASSGEN_SECCOMP)
+    set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS "libc6, libseccomp2 (>= 2.5.1)")
+else()
+    set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS "libc6")
+endif()
+
+
 include(CPack)
+

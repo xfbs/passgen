@@ -58,7 +58,7 @@ target_compile_definitions(passgen-static PUBLIC -DPASSGEN_STATIC_DEFINE)
 install(
     TARGETS passgen-static passgen-shared
     DESTINATION lib
-    COMPONENT lib
+    COMPONENT runtime
     OPTIONAL)
 
 if(NOT LIBPASSGEN_STATIC)
@@ -72,12 +72,12 @@ endif()
 install(
     DIRECTORY ../include/passgen
     DESTINATION include
-    COMPONENT dev)
+    COMPONENT development)
 
 install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/passgen/config.h"
     DESTINATION include/passgen
-    COMPONENT dev)
+    COMPONENT development)
 
 if(USE_LIBEXECINFO)
   target_link_libraries(passgen-static PRIVATE execinfo)
