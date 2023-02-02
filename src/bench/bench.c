@@ -127,6 +127,7 @@ extern const bench hashmap_insert;
 extern const bench hashmap_lookup;
 extern const bench token_parse;
 extern const bench bench_passgen_parse;
+extern const bench bench_utf8_decode;
 
 const bench *benches[] = {
     &dummy,
@@ -151,6 +152,7 @@ const bench *benches[] = {
     &hashmap_lookup,
     &token_parse,
     &bench_passgen_parse,
+    &bench_utf8_decode,
     NULL,
 };
 
