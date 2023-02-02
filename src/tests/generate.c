@@ -1,5 +1,6 @@
-#include "passgen/parser/parser.h"
 #include "passgen/generate.h"
+#include "passgen/container/stack.h"
+#include "passgen/parser/parser.h"
 #include "passgen/parser/token.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/literal.h"
@@ -9,20 +10,19 @@
 #include "passgen/pattern/segment.h"
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
-#include "passgen/container/stack.h"
 #include "tests.h"
 
 // don't change this seed - that will break tests!
 #define SEED 320843200
 
-#define PREAMBLE()                                  \
+#define PREAMBLE()                           \
     passgen_parser parser;                   \
     passgen_token_parser token_parser = {0}; \
     passgen_token token = {0};               \
     passgen_env env = {0};                   \
-    passgen_pattern parsed_pattern;                 \
-    const char *pattern;                            \
-    passgen_random random;                          \
+    passgen_pattern parsed_pattern;          \
+    const char *pattern;                     \
+    passgen_random random;                   \
     assert(passgen_random_open_xorshift(&random, SEED)) env.random = &random
 
 #define GENERATE(output, pattern)                                          \

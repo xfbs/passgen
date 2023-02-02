@@ -1,6 +1,8 @@
 #include "passgen/generate.h"
 
 #include "passgen/assert.h"
+#include "passgen/container/hashmap.h"
+#include "passgen/container/stack.h"
 #include "passgen/markov.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/literal.h"
@@ -11,8 +13,6 @@
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/special.h"
-#include "passgen/container/hashmap.h"
-#include "passgen/container/stack.h"
 #include "passgen/try.h"
 #include "passgen/wordlist.h"
 
@@ -204,9 +204,8 @@ size_t passgen_generate_fill_json_utf8(
     return fillpos.cur;
 }
 
-size_t passgen_generate_repeat(
-    passgen_env *env,
-    passgen_pattern_repeat *repeat) {
+size_t
+passgen_generate_repeat(passgen_env *env, passgen_pattern_repeat *repeat) {
     size_t difference = repeat->max - repeat->min;
 
     // if there is no difference to pick, just return here
@@ -442,8 +441,7 @@ int passgen_generate_segment(
     void *data,
     passgen_generate_cb *func) {
     for(size_t i = 0; i < segment->items.len; i++) {
-        passgen_pattern_item *item =
-            passgen_stack_get(&segment->items, i);
+        passgen_pattern_item *item = passgen_stack_get(&segment->items, i);
 
         try(passgen_generate_item(item, env, data, func));
     }

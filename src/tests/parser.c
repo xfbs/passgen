@@ -1,4 +1,5 @@
 #include "passgen/parser/parser.h"
+#include "passgen/container/stack.h"
 #include "passgen/parser/token.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/literal.h"
@@ -9,17 +10,16 @@
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
 #include "passgen/util/random.h"
-#include "passgen/container/stack.h"
 #include "tests.h"
 #include <passgen/passgen.h>
 
-#define PREAMBLE()                                  \
+#define PREAMBLE()                           \
     passgen_parser parser;                   \
     passgen_token_parser token_parser = {0}; \
     passgen_token token = {0};               \
     passgen_pattern_segment *segment;        \
     passgen_pattern_item *item;              \
-    passgen_pattern parsed_pattern;                 \
+    passgen_pattern parsed_pattern;          \
     passgen_parser_init(&parser, &parsed_pattern);
 
 #define POSTAMBLE()                              \
@@ -891,8 +891,24 @@ test_result test_parser_can_parse_random(void) {
     size_t iterations = 10000;
     // Characters to choose from. Must be zero-terminated for `strlen` to work
     // on it.
-    const char characters[] =
-        {'(', ')', '[', ']', '|', '{', '}', ',', 'a', 'w', 'm', 'p', 'z', '0', '9', '\\', 0};
+    const char characters[] = {
+        '(',
+        ')',
+        '[',
+        ']',
+        '|',
+        '{',
+        '}',
+        ',',
+        'a',
+        'w',
+        'm',
+        'p',
+        'z',
+        '0',
+        '9',
+        '\\',
+        0};
     // Find out how many possible characters there are.
     size_t characters_len = strlen(characters);
     // Maximum length of the string to try parsing.

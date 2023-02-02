@@ -21,8 +21,8 @@
 #include "passgen/parser/token.h"
 #include "passgen/passgen.h"
 #include "passgen/pattern/pattern.h"
-#include "passgen/util/random.h"
 #include "passgen/try.h"
+#include "passgen/util/random.h"
 #include "passgen/util/utf8.h"
 #include "passgen/version.h"
 #include "passgen/wordlist.h"
@@ -113,9 +113,7 @@ int passgen_cli_generate_normal(
     return 0;
 }
 
-int passgen_cli_generate_json(
-    passgen_cli_opts opts,
-    passgen_pattern *pattern) {
+int passgen_cli_generate_json(passgen_cli_opts opts, passgen_pattern *pattern) {
     // allocate some space for pass.
     // size_t pass_len = pattern_maxlen(pattern);
     size_t pass_len = 256;
@@ -144,9 +142,7 @@ int passgen_cli_generate_json(
     return 0;
 }
 
-int passgen_cli_generate(
-    passgen_cli_opts opts,
-    passgen_pattern *pattern) {
+int passgen_cli_generate(passgen_cli_opts opts, passgen_pattern *pattern) {
     if(!opts.json) {
         return passgen_cli_generate_normal(opts, pattern);
     } else {

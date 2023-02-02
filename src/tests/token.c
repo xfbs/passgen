@@ -361,14 +361,12 @@ test_result test_token_error_propagation(void) {
         PASSGEN_TOKEN_ERROR_UNICODE_START,
         PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD,
         PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN,
-        0
-    };
+        0};
 
     for(size_t i = 0; errors[i]; i++) {
         passgen_token_parser_init(&parser);
         parser.state = errors[i];
-        assert_eq(passgen_token_parse(&parser, &token, 1, 'a'),
-                errors[i]);
+        assert_eq(passgen_token_parse(&parser, &token, 1, 'a'), errors[i]);
     }
 
     return test_ok;

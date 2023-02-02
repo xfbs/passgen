@@ -1,8 +1,8 @@
 #include "passgen/pattern/special.h"
 #include "passgen/assert.h"
 #include "utf8proc.h"
-#include <stdbool.h>
 #include <assert.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 #define PARAMETERS_INITIAL_SIZE 16

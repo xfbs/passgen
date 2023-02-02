@@ -4,7 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char *pattern_fragment = "abcde?fgh?i{9}j[klmopq]{2,19}(prst|uvw){15}\\u{68}\\u{65}\\u{6c}\\u{6C}\\u{6F}\\{thishello\\}this\\[hello\\][a\\-z][a-z0-9A-Z;':\",.<>]{10}\\w{wordlist}\\m{markov}\\p{pattern}";
+static const char *pattern_fragment =
+    "abcde?fgh?i{9}j[klmopq]{2,19}(prst|uvw){15}\\u{68}\\u{65}\\u{6c}\\u{6C}"
+    "\\u{6F}\\{thishello\\}this\\[hello\\][a\\-z][a-z0-9A-Z;':\",.<>]{10}\\w{"
+    "wordlist}\\m{markov}\\p{pattern}";
 
 struct bench_parser_data {
     size_t repeat;

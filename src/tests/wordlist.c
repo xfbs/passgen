@@ -1,7 +1,7 @@
 #include "passgen/wordlist.h"
 #include "tests.h"
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 const char example_wordlist[] = "abacus\nbrother\nculling";
 size_t example_wordlist_size = sizeof(example_wordlist);
@@ -40,10 +40,7 @@ test_result test_wordlist_load_long(void) {
     wordlist_data[26 * 26 * 3 - 1] = 0;
 
 #ifndef _WIN32
-    FILE *file = fmemopen(
-        (void *) wordlist_data,
-        strlen(wordlist_data),
-        "r");
+    FILE *file = fmemopen((void *) wordlist_data, strlen(wordlist_data), "r");
     assert(file);
 
     passgen_wordlist wordlist;

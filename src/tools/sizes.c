@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "passgen/container/array.h"
 #include "passgen/markov.h"
 #include "passgen/parser/parser.h"
+#include "passgen/parser/state.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/literal.h"
-#include "passgen/parser/state.h"
 #include "passgen/pattern/pattern.h"
 #include "passgen/pattern/range.h"
 #include "passgen/pattern/repeat.h"
@@ -13,7 +14,6 @@
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/special.h"
-#include "passgen/container/array.h"
 
 #define add_type(name) \
     { #name, sizeof(name) }
