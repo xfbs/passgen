@@ -1,3 +1,6 @@
+/// @file assert.h
+/// @author Patrick M. Elsen
+/// @brief Assertions for debug builds.
 #pragma once
 #include <passgen/config.h>
 #include <stddef.h>

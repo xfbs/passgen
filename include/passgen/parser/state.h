@@ -1,3 +1,6 @@
+/// @file state.h
+/// @author Patrick M. Elsen
+/// @brief Parser state item.
 #pragma once
 
 #include "passgen/pattern/pattern.h"
