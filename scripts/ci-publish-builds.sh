@@ -10,7 +10,7 @@ cp build-amd64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-amd64.tar.xz
 cp build-amd64/passgen_*_amd64.deb public/nightly/passgen-linux-amd64.deb
 
 cp build-aarch64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-aarch64.tar.xz
-cp build-aarch64/passgen_*_aarch64.deb public/nightly/passgen-linux-aarch64.deb
+cp build-aarch64/passgen_*_arm64.deb public/nightly/passgen-linux-arm64.deb
 
 cp build-riscv64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-riscv64.tar.xz
 cp build-riscv64/passgen_*_riscv64.deb public/nightly/passgen-linux-riscv64.deb
@@ -32,7 +32,7 @@ sign public/nightly/passgen-linux-amd64-musl.bin
 sign public/nightly/passgen-linux-amd64.tar.xz
 sign public/nightly/passgen-linux-amd64.deb
 sign public/nightly/passgen-linux-aarch64.tar.xz
-sign public/nightly/passgen-linux-aarch64.deb
+sign public/nightly/passgen-linux-arm64.deb
 sign public/nightly/passgen-linux-riscv64.tar.xz
 sign public/nightly/passgen-linux-riscv64.deb
 sign public/nightly/passgen-macos-amd64.tar.xz
