@@ -77,6 +77,7 @@ passgen_parser_state *passgen_parser_state_push_special(
 
 void passgen_parser_init(passgen_parser *parser, passgen_pattern *pattern) {
     passgen_stack_init(&parser->state, sizeof(passgen_parser_state));
+    parser->limit = 0;
     parser->pattern = pattern;
     if(!pattern) {
         parser->pattern = malloc(sizeof(passgen_pattern));
@@ -141,6 +142,10 @@ int passgen_parse_token(
     struct passgen_parser *parser,
     struct passgen_token *token) {
     struct passgen_parser_state *state = passgen_parser_get_state_last(parser);
+
+    if(parser->limit && parser->state.len >= parser->limit) {
+        return -1;
+    }
 
     switch(state->type) {
         case PASSGEN_PARSER_GROUP:

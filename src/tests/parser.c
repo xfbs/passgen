@@ -167,6 +167,22 @@ test_result test_parser_nested_groups(void) {
     return test_ok;
 }
 
+test_result test_parser_depth_limit(void) {
+    PREAMBLE();
+    parser.limit = 5;
+    PARSE_CODEPOINT('(');
+    PARSE_CODEPOINT('(');
+    PARSE_CODEPOINT('(');
+    PARSE_CODEPOINT('(');
+    assert(0 != passgen_parse_token(&parser, &token));
+
+    assert(0 != passgen_parse_finish(&parser));
+    passgen_parser_free(&parser);
+    passgen_pattern_free(&parsed_pattern);
+
+    return test_ok;
+}
+
 test_result test_parser_multi_nested_groups(void) {
     PREAMBLE();
     PARSE_CODEPOINT('(');

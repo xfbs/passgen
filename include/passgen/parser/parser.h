@@ -35,6 +35,8 @@ struct passgen_token;
 typedef struct passgen_parser {
     /// Current state of the parser, as a stack.
     passgen_stack state;
+    /// Limit of parsing depth
+    size_t limit;
     /// The current, possibly incomplete parsed pattern.
     passgen_pattern *pattern;
 } passgen_parser;
@@ -78,11 +80,22 @@ passgen_parser_state *passgen_parser_state_push_special(
     passgen_parser *parser,
     passgen_pattern_special *special);
 
-/// Initialize the parsing structure. Must be called once before the parser can
-/// be used.
+/// Initialize the parsing structure.
+///
+/// Must be called once before the parser can be used. If @ref pattern is not
+/// supplied, a new pattern will be allocated. This needs to be deallocated
+/// (using @ref passgen_pattern_free and free).
 void passgen_parser_init(passgen_parser *parser, passgen_pattern *pattern);
 
+/// Set parsing depth limit for this parser.
+///
+/// This will prevent the parser from parsing recursive structures more than
+/// @ref limit deep. Setting it to zero disables it.
+void passgen_parser_limit(passgen_parser *parser, size_t limit);
+
 /// Release memory used by the parser.
+///
+/// @return The parsed pattern
 passgen_pattern *passgen_parser_free(passgen_parser *parser);
 
 /// Finalize parsing.
