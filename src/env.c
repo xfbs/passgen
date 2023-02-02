@@ -8,8 +8,8 @@ void passgen_env_init(passgen_env *env, passgen_random *random) {
     env->entropy = 0;
     env->find_entropy = false;
     env->random = random;
-    passgen_hashmap_init(&env->wordlists, &passgen_hashmap_context_default);
-    passgen_hashmap_init(&env->presets, &passgen_hashmap_context_default);
+    passgen_hashmap_init(&env->wordlists, &passgen_hashmap_context_utf8);
+    passgen_hashmap_init(&env->presets, &passgen_hashmap_context_utf8);
 }
 
 static int wordlist_entry_free(void *user, passgen_hashmap_entry *entry) {

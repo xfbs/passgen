@@ -433,7 +433,7 @@ int main(int argc, char *argv[]) {
         .program = argv[0],
     };
 
-    passgen_hashmap_init(&options.options, &passgen_hashmap_context_default);
+    passgen_hashmap_init(&options.options, &passgen_hashmap_context_utf8);
     measure_name_col(&options);
 
     while(true) {

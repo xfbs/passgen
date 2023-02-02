@@ -33,7 +33,7 @@ void passgen_hashmap_init(
     if(context) {
         map->context = context;
     } else {
-        map->context = &passgen_hashmap_context_default;
+        map->context = &passgen_hashmap_context_utf8;
     }
 }
 
@@ -108,7 +108,7 @@ passgen_hashmap_insert(passgen_hashmap *map, const void *key, void *value) {
         map->len += 1;
         return (passgen_hashmap_entry){NULL, NULL};
     } else {
-        if(map->context->key_equal(map, map->data[hash].key, key)) {
+        if(map->context->equal(map, map->data[hash].key, key)) {
             passgen_hashmap_entry entry = map->data[hash];
             map->data[hash].key = key;
             map->data[hash].value = value;
@@ -128,7 +128,7 @@ passgen_hashmap_insert(passgen_hashmap *map, const void *key, void *value) {
         map->len += 1;
         return (passgen_hashmap_entry){NULL, NULL};
     } else {
-        if(map->context->key_equal(map, map->data[hash].key, key)) {
+        if(map->context->equal(map, map->data[hash].key, key)) {
             passgen_hashmap_entry entry = map->data[hash];
             map->data[hash].key = key;
             map->data[hash].value = value;
@@ -153,7 +153,7 @@ passgen_hashmap_remove(passgen_hashmap *map, const void *key) {
     hash = passgen_hashmap_position(map, key, true);
     if(map->data[hash].key) {
         // and it matches
-        if(map->context->key_equal(map, map->data[hash].key, key)) {
+        if(map->context->equal(map, map->data[hash].key, key)) {
             passgen_hashmap_entry entry = map->data[hash];
             map->data[hash].key = NULL;
             map->data[hash].value = NULL;
@@ -166,7 +166,7 @@ passgen_hashmap_remove(passgen_hashmap *map, const void *key) {
     hash = passgen_hashmap_position(map, key, false);
     if(map->data[hash].key) {
         // and it matches
-        if(map->context->key_equal(map, map->data[hash].key, key)) {
+        if(map->context->equal(map, map->data[hash].key, key)) {
             passgen_hashmap_entry entry = map->data[hash];
             map->data[hash].key = NULL;
             map->data[hash].value = NULL;
@@ -190,14 +190,14 @@ passgen_hashmap_lookup(const passgen_hashmap *map, const void *key) {
     // lookup first possible location
     hash = passgen_hashmap_position(map, key, true);
     if(map->data[hash].key &&
-       map->context->key_equal(map, map->data[hash].key, key)) {
+       map->context->equal(map, map->data[hash].key, key)) {
         return &map->data[hash];
     }
 
     // lookup second possible location
     hash = passgen_hashmap_position(map, key, false);
     if(map->data[hash].key &&
-       map->context->key_equal(map, map->data[hash].key, key)) {
+       map->context->equal(map, map->data[hash].key, key)) {
         return &map->data[hash];
     }
 
@@ -242,9 +242,9 @@ string_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
     return strcmp(lhs, rhs) == 0;
 }
 
-const passgen_hashmap_context passgen_hashmap_context_default = {
+const passgen_hashmap_context passgen_hashmap_context_utf8 = {
     .hash = string_hash,
-    .key_equal = string_equal,
+    .equal = string_equal,
 };
 
 static size_t unicode_len(const void *data) {
@@ -283,7 +283,7 @@ unicode_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
 
 const passgen_hashmap_context passgen_hashmap_context_unicode = {
     .hash = unicode_hash,
-    .key_equal = unicode_equal,
+    .equal = unicode_equal,
 };
 
 int passgen_hashmap_entry_free(void *user, passgen_hashmap_entry *entry) {

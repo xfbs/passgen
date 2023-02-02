@@ -196,7 +196,7 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->null = false;
     opts->json = false;
     opts->markov_length = 3;
-    passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_default);
+    passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_utf8);
     passgen_env_init(&opts->env, NULL);
 
     // some defaults

@@ -1,0 +1,19 @@
+- Implement passgen_preset
+- File comments for all
+- Implement passgen_config parsing
+- Implement passgen_buffer (rename passgen_array?)
+- Implement generation limit (in env?)
+- Create include/passgen/generate/{generate,env}.h
+- Implement "--config" switch to read arbitrary config
+- Implement "--limit" switch to limit parsing/generating limits
+- Implement utf8 benchmark
+- Implement generation benchmark
+- Enable EFF wordlists in CI
+- Implement or remove memory.h, memory_accounting.h
+- Move try.h to util/
+- Add simple generation to passgen.h
+- Reduce public API
+- Fix up parser unit tests
+- Script to push master to github
+- Script to do proper releases
+

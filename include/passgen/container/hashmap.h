@@ -68,14 +68,14 @@ typedef struct passgen_hashmap_context {
     // Determine the hash value of the supplied key
     uint64_t (*hash)(const struct passgen_hashmap *map, const void *key, bool first);
     // Determine if two keys are equal
-    bool (*key_equal)(const struct passgen_hashmap *map, const void *lhs, const void *rhs);
+    bool (*equal)(const struct passgen_hashmap *map, const void *lhs, const void *rhs);
 } passgen_hashmap_context;
 
 /// Default context which assumes that the keys are NULL-terminated UTF-8
 /// encoded strings.
 ///
 /// @relates passgen_hashmap
-extern const passgen_hashmap_context passgen_hashmap_context_default;
+extern const passgen_hashmap_context passgen_hashmap_context_utf8;
 
 /// Assumes that keys are unicode (UTF-32), NULL-terminated strings.
 ///
