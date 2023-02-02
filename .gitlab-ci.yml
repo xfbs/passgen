@@ -151,7 +151,7 @@ test:aarch64:
   image: registry.gitlab.com/xfbs/passgen/aarch64
   stage: test
   script:
-    - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug
+    - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug
     - cmake --build build-aarch64
     - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./build-aarch64/src/tests/passgen-test
 
@@ -183,7 +183,7 @@ test:riscv64:
   image: registry.gitlab.com/xfbs/passgen/riscv64
   stage: test
   script:
-    - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug
+    - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug
     - cmake --build build-riscv64
     - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./build-riscv64/src/tests/passgen-test
 
@@ -206,7 +206,7 @@ build:mingw64:
   dependencies:
     - wordlists
   script:
-    - cmake -S . -B build-mingw64 -DCMAKE_TOOLCHAIN_FILE=scripts/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y
+    - cmake -S . -B build-mingw64 -DCMAKE_TOOLCHAIN_FILE=cmake/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y
     - cd build-mingw64
     - make -j
     - cpack -G ZIP
@@ -221,7 +221,7 @@ build:macos:
   dependencies:
     - wordlists
   script:
-    - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_TOOLCHAIN_FILE=scripts/macos-toolchain.cmake
+    - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_TOOLCHAIN_FILE=cmake/macos-toolchain.cmake
     - cmake --build build-macos
     - cd build-macos && cpack -G TXZ
   artifacts:
@@ -235,7 +235,7 @@ build:aarch64:
   dependencies:
     - wordlists
   script:
-    - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
+    - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
     - cd build-aarch64
     - ninja
     - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/tests/passgen-test
@@ -253,7 +253,7 @@ build:riscv64:
   dependencies:
     - wordlists
   script:
-    - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
+    - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
     - cd build-riscv64
     - ninja
     - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./src/tests/passgen-test
