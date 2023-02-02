@@ -11,8 +11,6 @@ theme:
   features:
     - navigation.instant
     - navigation.tracking
-    - navigation.tabs
-    - navigation.tabs.sticky
 
 markdown_extensions:
   - attr_list
@@ -38,13 +36,13 @@ plugins:
       DownloadDir: images
 
 nav:
-  - Passgen:
-    - Home: index.md
+  - Home: index.md
+  - Usage:
     - Usage: usage.md
     - Presets: presets.md
-    - Entropy: entropy.md
-    - Security: security.md
     - Syntax: syntax.md
+    - Entropy: entropy.md
+    - Randomness: randomness.md
   - Releases:
     - Releases: releases.md
     - Installation: install.md
@@ -53,7 +51,10 @@ nav:
     - Building: building.md
     - Tooling: tooling.md
     - Testing: testing.md
+    - Benchmarks: benchmarks.md
     - CI/CD: ci.md
+    - Security: security.md
+  - Licenses: licenses.md
   - About: about.md
 
 extra_css:
