@@ -187,6 +187,19 @@ test:riscv64:
     - cmake --build build-riscv64
     - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./build-riscv64/src/tests/passgen-test
 
+# fetch wordlists
+wordlists:
+  image: alpine
+  stage: test
+  before_script:
+    - apk add curl
+  script:
+    - ./scripts/fetch-wordlists.sh
+  artifacts:
+    paths:
+      - data/
+    expire_in: 1 week
+
 build:mingw64:
   image: registry.gitlab.com/xfbs/passgen/mingw64
   stage: build
