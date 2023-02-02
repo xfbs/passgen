@@ -11,9 +11,21 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-struct passgen_hashmap_entry;
 struct passgen_hashmap_context;
-struct passgen_hashmap;
+
+/// Represents a single entry. If the *key* pointer is NULL, it is unoccupied.
+///
+/// @relates passgen_hashmap
+typedef struct {
+    /// Key of the entry.
+    ///
+    /// This must not be changed. If you want to change this key, you must
+    /// first remove it from the hashmap using #passgen_hashmap_remove and then
+    /// re-add it with #passgen_hashmap_insert.
+    const void *key;
+    /// Value of this entry.
+    void *value;
+} passgen_hashmap_entry;
 
 /// Hashmap implementation with variable hash function and open addressing.
 ///
@@ -26,7 +38,7 @@ struct passgen_hashmap;
 /// taken, it attempts to see if it can move around either of the two items.
 /// This leads to another 2x space efficiency increase at the expense of minor
 /// complexity when inserting.
-typedef struct passgen_hashmap {
+typedef struct {
     /// The current capacity of the data allocation. If it is zero, there is
     /// no allocation for data.
     size_t capacity;
@@ -39,22 +51,8 @@ typedef struct passgen_hashmap {
     const struct passgen_hashmap_context *context;
 
     /// The data allocation. This is an array of *capacity* entries.
-    struct passgen_hashmap_entry *data;
+    passgen_hashmap_entry *data;
 } passgen_hashmap;
-
-/// Represents a single entry. If the *key* pointer is NULL, it is unoccupied.
-///
-/// @relates passgen_hashmap
-typedef struct passgen_hashmap_entry {
-    /// Key of the entry.
-    ///
-    /// This must not be changed. If you want to change this key, you must
-    /// first remove it from the hashmap using #passgen_hashmap_remove and then
-    /// re-add it with #passgen_hashmap_insert.
-    const void *key;
-    /// Value of this entry.
-    void *value;
-} passgen_hashmap_entry;
 
 /// Context, this determines the hash function and comparison functions that are used.
 ///
@@ -66,9 +64,9 @@ typedef struct passgen_hashmap_entry {
 /// @relates passgen_hashmap
 typedef struct passgen_hashmap_context {
     // Determine the hash value of the supplied key
-    uint64_t (*hash)(const struct passgen_hashmap *map, const void *key, bool first);
+    uint64_t (*hash)(const passgen_hashmap *map, const void *key, bool first);
     // Determine if two keys are equal
-    bool (*equal)(const struct passgen_hashmap *map, const void *lhs, const void *rhs);
+    bool (*equal)(const passgen_hashmap *map, const void *lhs, const void *rhs);
 } passgen_hashmap_context;
 
 /// Default context which assumes that the keys are NULL-terminated UTF-8
