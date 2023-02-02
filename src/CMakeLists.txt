@@ -15,7 +15,6 @@ set(SOURCE_LIST
     "parser/token.c"
     "passgen.c"
     "pattern/group.c"
-    "pattern/parser.c"
     "pattern/pattern.c"
     "pattern/segment.c"
     "pattern/segment_item.c"
