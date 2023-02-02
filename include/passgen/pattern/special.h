@@ -2,7 +2,13 @@
 #include <stdint.h>
 
 #include "passgen/pattern/repeat.h"
-#include "passgen/pattern/special_kind.h"
+
+/// Kind of special pattern
+enum passgen_pattern_special_kind {
+    PASSGEN_PATTERN_SPECIAL_WORDLIST,
+    PASSGEN_PATTERN_SPECIAL_MARKOV,
+    PASSGEN_PATTERN_SPECIAL_PRESET,
+};
 
 /// Passgen pattern special
 ///

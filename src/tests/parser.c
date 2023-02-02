@@ -3,7 +3,6 @@
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/literal.h"
 #include "passgen/pattern/pattern.h"
-#include "passgen/pattern/pattern_kind.h"
 #include "passgen/pattern/range.h"
 #include "passgen/pattern/repeat.h"
 #include "passgen/pattern/segment.h"

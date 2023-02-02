@@ -1,6 +1,6 @@
 /// @file range.h
 /// @author Patrick M. Elsen
-/// @brief Pattern range data structure.
+/// @brief Pattern range data structure (such as `a-z` in `[a-zA-Z0-9]`)
 ///
 /// A pattern range is something like `a-z`, which matches all characters in the range from `a` to `z`.
 /// The @ref passgen_pattern_range struct is how these ranges are stored in memory.

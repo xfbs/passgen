@@ -21,14 +21,13 @@
 #include <stdint.h>
 #include <stddef.h>
 
-typedef struct passgen_parser_state passgen_parser_state;
-struct passgen_token;
-
 #include "passgen/pattern/pattern.h"
 #include "passgen/pattern/range.h"
 #include "passgen/pattern/segment.h"
 #include "passgen/pattern/segment_item.h"
 #include "passgen/parser/token.h"
+
+typedef struct passgen_parser_state passgen_parser_state;
 
 /// Represents a parser. Contains a parsing stack, as well as a pattern, which
 /// is dynamically built, and should not be used until the parsing is finalized.

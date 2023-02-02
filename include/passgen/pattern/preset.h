@@ -1,6 +1,6 @@
 /// @file preset.h
 /// @author Patrick M. Elsen <pelsen@xfbs.net>
-/// @brief Passgen pattern presets
+/// @brief Pattern presets
 #pragma once
 #include "passgen/pattern/pattern.h"
 #include <stdbool.h>

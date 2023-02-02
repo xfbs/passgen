@@ -1,6 +1,6 @@
 /// @file group.h
 /// @author Patrick M. Elsen <pelsen@xfbs.net>
-/// @brief Pattern group
+/// @brief Pattern group (such as `(abc|def)`)
 ///
 /// Data structure to hold pattern groups. A pattern group is a sequence like `(abc|def)`, where the
 /// subsequences `abc` and `def` are two *segments* of the group. That is, when generating sequences,

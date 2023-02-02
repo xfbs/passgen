@@ -1,6 +1,6 @@
 /// @file segment.h
 /// @author Patrick M. Elsen <pelsen@xfbs.net>
-/// @brief Pattern segment data structure and methods.
+/// @brief Pattern segment data structure (such as the `abc` in `(abc|def)`)
 #pragma once
 #include <stddef.h>
 
@@ -20,21 +20,33 @@ typedef struct passgen_pattern_segment {
     passgen_stack items;
 } passgen_pattern_segment;
 
+/// Allocate new segment
 void passgen_pattern_segment_init(passgen_pattern_segment *segment);
+
+/// Release segment memory
 void passgen_pattern_segment_free(passgen_pattern_segment *segment);
 
+/// Appends new empty segment item onto this segment
 passgen_pattern_item *
 passgen_pattern_segment_new_item(passgen_pattern_segment *segment);
 
+/// Appends new @ref passgen_pattern_literal onto this segment.
 passgen_pattern_literal *
 passgen_pattern_segment_new_char(passgen_pattern_segment *segment);
+
+/// Appends new @ref passgen_pattern_set onto this segment.
 passgen_pattern_set *
 passgen_pattern_segment_new_set(passgen_pattern_segment *segment);
+
+/// Appends new @ref [passgen_pattern_group] onto this segment.
 passgen_pattern_group *
 passgen_pattern_segment_new_group(passgen_pattern_segment *segment);
+
+/// Appends new @ref passgen_pattern_special onto this segment.
 passgen_pattern_special *
 passgen_pattern_segment_new_special(passgen_pattern_segment *segment);
 
+/// Lookup the [n]th segment item of this segment.
 passgen_pattern_item *passgen_pattern_segment_get_item(
     passgen_pattern_segment *segment,
     size_t n);

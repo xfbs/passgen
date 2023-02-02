@@ -1,7 +1,6 @@
 #include "passgen/pattern/segment.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/literal.h"
-#include "passgen/pattern/pattern_kind.h"
 #include "passgen/pattern/repeat.h"
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"

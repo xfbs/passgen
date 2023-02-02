@@ -1,6 +1,6 @@
 /// @file repeat.h
 /// @author Patrick M. Elsen <pelsen@xfbs.net>
-/// @brief Pattern repetition data structure
+/// @brief Pattern repetition data structure (such as the `{4}` in `[a-z]{4}`)
 ///
 /// Groups, characters and ranges can be repeated, by following them with braces with either a fixed amount
 /// of repetitions or a min, max range. The @ref passgen_pattern_repeat struct is how these repetition counts
