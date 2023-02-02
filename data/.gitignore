@@ -1,0 +1,4 @@
+# don't keep wordlists in git
+*.txt
+
+!checksums.txt
