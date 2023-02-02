@@ -203,6 +203,8 @@ wordlists:
 build:mingw64:
   image: registry.gitlab.com/xfbs/passgen/mingw64
   stage: build
+  dependencies:
+    - wordlists
   script:
     - cmake -S . -B build-mingw64 -DCMAKE_TOOLCHAIN_FILE=scripts/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y
     - cd build-mingw64
@@ -216,6 +218,8 @@ build:mingw64:
 build:macos:
   image: registry.gitlab.com/xfbs/passgen/macos
   stage: build
+  dependencies:
+    - wordlists
   script:
     - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_TOOLCHAIN_FILE=scripts/macos-toolchain.cmake
     - cmake --build build-macos
@@ -228,6 +232,8 @@ build:macos:
 build:aarch64:
   image: registry.gitlab.com/xfbs/passgen/aarch64
   stage: build
+  dependencies:
+    - wordlists
   script:
     - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
     - cd build-aarch64
@@ -244,6 +250,8 @@ build:aarch64:
 build:riscv64:
   image: registry.gitlab.com/xfbs/passgen/riscv64
   stage: build
+  dependencies:
+    - wordlists
   script:
     - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=scripts/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
     - cd build-riscv64
@@ -261,6 +269,8 @@ build:riscv64:
 build:amd64:
   image: registry.gitlab.com/xfbs/passgen/amd64
   stage: build
+  dependencies:
+    - wordlists
   script:
     - mkdir build-amd64 && cd build-amd64
     - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_SECCOMP=YES ..
@@ -278,6 +288,8 @@ build:amd64:
 build:alpine:
   image: registry.gitlab.com/xfbs/passgen/alpine
   stage: build
+  dependencies:
+    - wordlists
   script:
     - mkdir -p build-alpine-release && cd build-alpine-release
     - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y ..
@@ -293,6 +305,8 @@ build:alpine:
 build:wasi:
   image: registry.gitlab.com/xfbs/passgen/wasi
   stage: build
+  dependencies:
+    - wordlists
   script:
     - mkdir build-wasi && cd build-wasi
     - cmake cmake -DLIBPASSGEN_SHARED=OFF ..

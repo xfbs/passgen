@@ -1,1 +1,0 @@
-([a-z]{5}[123456789][04jfdasa]g{0,2}(a|b|c|d|e|f|g|h)|[a-z0-9A-Z=]{5}abcdefghijl7{4}(a|b){4})
