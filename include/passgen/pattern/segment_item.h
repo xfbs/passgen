@@ -1,4 +1,4 @@
-/// @file segment.h
+/// @file segment_item.h
 /// @author Patrick M. Elsen <pelsen@xfbs.net>
 /// @brief Pattern segment item (such as the `[a-z]` in `[a-z][a-z]`)
 #pragma once
