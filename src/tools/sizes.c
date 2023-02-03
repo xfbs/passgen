@@ -19,7 +19,7 @@
     { #name, sizeof(name) }
 
 #define add_struct(name) \
-    { #name, sizeof(struct name) }
+    { #name, sizeof(name) }
 
 #define size_info_end() \
     { NULL, 0 }

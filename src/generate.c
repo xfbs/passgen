@@ -13,8 +13,8 @@
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/special.h"
-#include "try.h"
 #include "passgen/wordlist.h"
+#include "try.h"
 
 #include <string.h>
 #include <utf8proc.h>

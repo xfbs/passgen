@@ -10,34 +10,68 @@
 #include <stddef.h>
 
 #include "passgen/container/stack.h"
-#include "passgen/pattern/repeat.h"
 
 typedef struct passgen_pattern_segment passgen_pattern_segment;
 
-/// Represents a group, such as `(day|night)`.
-typedef struct passgen_pattern_group {
-    /// Segments that make up this group
+/// Pattern group, such as `(day|night)`.
+///
+/// Groups consist of [passgen_pattern_segments](#passgen_pattern_segment),
+/// which are delimited by pipe characters (`|`). When generating a password
+/// from the group, a segment is chosen at random.
+///
+/// [Segments][#passgen_pattern_segments] can have multipliers in front of
+/// them, which changes the probability that they are chosen. For example:
+/// `({5}abc|{1}def)`. In this example, the `abc` pattern is chosen at a 5:1
+/// ratio. If no multipliers are specified, then every segment is chosen at the
+/// same probability. Their documentation explains this in more detail. To make
+/// generation work correctly, the group keeps track of the #multiplier_sum,
+/// which is the sum of all of the multipliers of all segments. This needs to
+/// be computed using the #passgen_pattern_group_finish method.
+typedef struct {
+    /// [Segments][#passgen_pattern_segment] that make up this group
     passgen_stack segments;
 
-    /// Sum of multipliers
+    /// Sum of segment multipliers
     size_t multiplier_sum;
 } passgen_pattern_group;
 
-/// Initialize a @ref passgen_pattern_group.
+/// Initialize a pattern group.
+///
+/// @memberof passgen_pattern_group
+/// @param group Pattern group to initialize
 void passgen_pattern_group_init(passgen_pattern_group *group);
 
-/// Finishes a @ref passgen_pattern_group.
+/// Finishes a pattern group.
 ///
-/// This will compute the multiplier_sum from the segments inside the group.
+/// This will compute the #multiplier_sum from the segments inside the group.
+/// Must be called after parsing the group is done to ensure accurate generation.
+///
+/// @memberof passgen_pattern_group
+/// @param group Pattern group to finish
 void passgen_pattern_group_finish(passgen_pattern_group *group);
 
-/// Free a @ref passgen_pattern_group.
+/// Free a pattern group.
+///
+/// This will free all of the segments contained in the group. It will not free the
+/// memory of the group struct itself.
+///
+/// @memberof passgen_pattern_group
+/// @param group Pattern group to free
 void passgen_pattern_group_free(passgen_pattern_group *group);
 
-/// Add a new segment to an existing @ref passgen_pattern_group.
+/// Appends a new segment to an existing #passgen_pattern_group.
+///
+/// @memberof passgen_pattern_group
+/// @param group Group to append segment to
+/// @returns Point to the newly appended segment
 passgen_pattern_segment *
 passgen_pattern_group_new_segment(passgen_pattern_group *group);
 
 /// Get a specific segment from a @ref passgen_pattern_group by index.
+///
+/// @memberof passgen_pattern_group
+/// @param group Group to lookup segment in
+/// @param n Offset of segment to return
+/// @returns Pointer to the segment or NULL if it does not exist
 passgen_pattern_segment *
 passgen_pattern_group_get_segment(passgen_pattern_group *group, size_t n);

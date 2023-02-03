@@ -4,6 +4,11 @@
 #pragma once
 
 #include "passgen/pattern/pattern.h"
+#include "passgen/pattern/group.h"
+#include "passgen/pattern/segment.h"
+#include "passgen/pattern/repeat.h"
+#include "passgen/pattern/set.h"
+#include "passgen/pattern/range.h"
 
 typedef enum passgen_parser_state_type {
     PASSGEN_PARSER_GROUP,
@@ -27,18 +32,18 @@ typedef struct passgen_parser_state {
     enum passgen_parser_state_type type;
     union {
         struct {
-            struct passgen_pattern_group *group;
-            struct passgen_pattern_segment *segment;
+            passgen_pattern_group *group;
+            passgen_pattern_segment *segment;
         } group;
         struct {
-            struct passgen_pattern_repeat *repeat;
+            passgen_pattern_repeat *repeat;
         } repeat;
         struct {
-            struct passgen_pattern_set *set;
-            struct passgen_pattern_range *range;
+            passgen_pattern_set *set;
+            passgen_pattern_range *range;
         } set;
         struct {
-            struct passgen_pattern_special *special;
+            passgen_pattern_special *special;
         } special;
         size_t *multiplier;
     } data;

@@ -107,9 +107,9 @@ passgen_parser_state *passgen_parser_get_state_last(passgen_parser *parser) {
 
 // get the last item, making sure that it's only a single character.
 // in case of characters, mark it as tainted.
-static inline struct passgen_pattern_item *
-last_single_item_taint(struct passgen_pattern_segment *segment) {
-    struct passgen_pattern_item *item = passgen_stack_top(&segment->items);
+static inline passgen_pattern_item *
+last_single_item_taint(passgen_pattern_segment *segment) {
+    passgen_pattern_item *item = passgen_stack_top(&segment->items);
 
     if(!item) {
         return NULL;
@@ -138,10 +138,8 @@ last_single_item_taint(struct passgen_pattern_segment *segment) {
     return item;
 }
 
-int passgen_parse_token(
-    struct passgen_parser *parser,
-    struct passgen_token *token) {
-    struct passgen_parser_state *state = passgen_parser_get_state_last(parser);
+int passgen_parse_token(passgen_parser *parser, passgen_token *token) {
+    passgen_parser_state *state = passgen_parser_get_state_last(parser);
 
     if(parser->limit && parser->state.len >= parser->limit) {
         return -1;
@@ -170,13 +168,13 @@ int passgen_parse_token(
 }
 
 int passgen_parse_group(
-    struct passgen_parser *parser,
-    struct passgen_token *token,
-    struct passgen_parser_state *state) {
+    passgen_parser *parser,
+    passgen_token *token,
+    passgen_parser_state *state) {
     uint32_t codepoint = token->codepoint;
-    struct passgen_pattern_group *group;
-    struct passgen_pattern_special *special;
-    struct passgen_pattern_item *item;
+    passgen_pattern_group *group;
+    passgen_pattern_special *special;
+    passgen_pattern_item *item;
 
     if(codepoint & PASSGEN_TOKEN_ESCAPED_BIT) {
         codepoint &= ~PASSGEN_TOKEN_ESCAPED_BIT;
@@ -258,7 +256,7 @@ int passgen_parse_group(
 
     // check if the last item was a character that we can add this one to
     if(state->data.group.segment->items.len) {
-        struct passgen_pattern_item *last =
+        passgen_pattern_item *last =
             passgen_stack_top(&state->data.group.segment->items);
 
         if(last->kind == PASSGEN_PATTERN_CHAR) {
@@ -271,7 +269,7 @@ int passgen_parse_group(
         }
     }
 
-    struct passgen_pattern_literal *chr =
+    passgen_pattern_literal *chr =
         passgen_pattern_segment_new_char(state->data.group.segment);
     chr->count = 1;
     chr->tainted = 0;
@@ -281,10 +279,10 @@ int passgen_parse_group(
 }
 
 int passgen_parse_set(
-    struct passgen_parser *parser,
-    struct passgen_token *token,
-    struct passgen_parser_state *state) {
-    struct passgen_pattern_set *set = state->data.set.set;
+    passgen_parser *parser,
+    passgen_token *token,
+    passgen_parser_state *state) {
+    passgen_pattern_set *set = state->data.set.set;
 
     // this set's over
     if(token->codepoint == ']') {
@@ -292,8 +290,7 @@ int passgen_parse_set(
         size_t choices = 0;
         set->choices_list = malloc(sizeof(size_t) * set->items.len);
         for(size_t i = 0; i < set->items.len; i++) {
-            struct passgen_pattern_range *range =
-                passgen_stack_get(&set->items, i);
+            passgen_pattern_range *range = passgen_stack_get(&set->items, i);
             choices += 1 + range->end - range->start;
             set->choices_list[i] = choices;
         }
@@ -308,7 +305,7 @@ int passgen_parse_set(
         return 0;
     }
 
-    struct passgen_pattern_range *range = passgen_pattern_set_new_range(set);
+    passgen_pattern_range *range = passgen_pattern_set_new_range(set);
 
     range->start = token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT;
     range->end = token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT;
@@ -319,9 +316,9 @@ int passgen_parse_set(
 }
 
 int passgen_parse_set_range(
-    struct passgen_parser *parser,
-    struct passgen_token *token,
-    struct passgen_parser_state *state) {
+    passgen_parser *parser,
+    passgen_token *token,
+    passgen_parser_state *state) {
     (void) parser;
     if(token->codepoint == ']') {
         return -1;
@@ -338,9 +335,9 @@ int passgen_parse_set_range(
 }
 
 int passgen_parse_multiplier(
-    struct passgen_parser *parser,
-    struct passgen_token *token,
-    struct passgen_parser_state *state) {
+    passgen_parser *parser,
+    passgen_token *token,
+    passgen_parser_state *state) {
     if(token->codepoint == '}') {
         passgen_stack_pop(&parser->state, NULL);
         return 0;
@@ -359,9 +356,9 @@ int passgen_parse_multiplier(
 }
 
 int passgen_parse_repeat(
-    struct passgen_parser *parser,
-    struct passgen_token *token,
-    struct passgen_parser_state *state) {
+    passgen_parser *parser,
+    passgen_token *token,
+    passgen_parser_state *state) {
     // this set's over
     if(token->codepoint == '}') {
         state->data.repeat.repeat->max = state->data.repeat.repeat->min;
@@ -388,9 +385,9 @@ int passgen_parse_repeat(
 }
 
 int passgen_parse_repeat_range(
-    struct passgen_parser *parser,
-    struct passgen_token *token,
-    struct passgen_parser_state *state) {
+    passgen_parser *parser,
+    passgen_token *token,
+    passgen_parser_state *state) {
     if(token->codepoint == '}') {
         passgen_stack_pop(&parser->state, NULL);
         return 0;
@@ -409,9 +406,9 @@ int passgen_parse_repeat_range(
 }
 
 int passgen_parse_special(
-    struct passgen_parser *parser,
-    struct passgen_token *token,
-    struct passgen_parser_state *state) {
+    passgen_parser *parser,
+    passgen_token *token,
+    passgen_parser_state *state) {
     (void) parser;
 
     if(token->codepoint == '{') {
@@ -423,9 +420,9 @@ int passgen_parse_special(
 }
 
 int passgen_parse_special_name(
-    struct passgen_parser *parser,
-    struct passgen_token *token,
-    struct passgen_parser_state *state) {
+    passgen_parser *parser,
+    passgen_token *token,
+    passgen_parser_state *state) {
     (void) parser;
 
     if(token->codepoint == '}') {
@@ -439,7 +436,7 @@ int passgen_parse_special_name(
     return 0;
 }
 
-int passgen_parse_finish(struct passgen_parser *parser) {
+int passgen_parse_finish(passgen_parser *parser) {
     // make sure we just have one state on the stack, the initial one.
     if(parser->state.len != 1) {
         return -1;
@@ -449,11 +446,11 @@ int passgen_parse_finish(struct passgen_parser *parser) {
 }
 
 int passgen_parser_unicode(
-    struct passgen_parser *parser,
+    passgen_parser *parser,
     uint32_t *data,
     size_t length) {
-    struct passgen_token_parser token_parser = {0};
-    struct passgen_token token = {0};
+    passgen_token_parser token_parser = {0};
+    passgen_token token = {0};
     int ret;
 
     for(size_t pos = 0; pos < length; pos++) {

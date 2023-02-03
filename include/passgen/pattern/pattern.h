@@ -11,7 +11,7 @@
 /// it does not need to be enclosed in parentheses.
 typedef struct passgen_pattern {
     /// Items in this pattern.
-    struct passgen_pattern_group group;
+    passgen_pattern_group group;
 } passgen_pattern;
 
 /// Initialize this @ref pattern.

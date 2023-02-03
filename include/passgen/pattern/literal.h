@@ -5,10 +5,14 @@
 #include "passgen/pattern/repeat.h"
 #include <stdint.h>
 
-// stores a bunch of character - up to seven. why seven? this is stored in an
-// union inside passgen_pattern_item, and there's enough space in there to
-// store seven codepoints and a count variable, so why not.
-typedef struct passgen_pattern_literal {
+/// Literal pattern (such as `abc`).
+///
+/// Literal patterns consist of codepoints that are generated verbatim.
+/// There is enough space in the struct to store up to seven codepoints.
+///
+/// Literal patterns also store a tainted flag, this is set to true if
+/// the last codepoint has modifiers on it.
+typedef struct {
     /// How many characters are stored here
     uint8_t count;
     /// If this literal is tainted, new characters must go into a new, empty @ref passgen_pattern_literal.

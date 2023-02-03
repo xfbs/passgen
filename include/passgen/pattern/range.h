@@ -2,18 +2,21 @@
 /// @author Patrick M. Elsen
 /// @brief Pattern range data structure (such as `a-z` in `[a-zA-Z0-9]`)
 ///
-/// A pattern range is something like `a-z`, which matches all characters in the range from `a` to `z`.
-/// The @ref passgen_pattern_range struct is how these ranges are stored in memory.
+/// A pattern range is something like `a-z`, which matches all characters in
+/// the range from `a` to `z`.  The @ref passgen_pattern_range struct is how
+/// these ranges are stored in memory.
 #pragma once
 #include <stddef.h>
 #include <stdint.h>
 
-/// Represents a single range of characters, such as `a-z`.
+/// Range of characters, such as `a-z`.
 ///
-/// The range has a start and an end character, both are inclusive. The end character
-/// must be equal to or larger than the start character. If they are the same, the range
-/// matches only the single character.
-typedef struct passgen_pattern_range {
+/// The range has a start and an end character, both are inclusive. The end
+/// character must be equal to or larger than the start character. If they are
+/// the same, the range matches only the single character.
+///
+/// [Pattern sets](#passgen_pattern_set) consist of character ranges.
+typedef struct {
     /// Starting character in the range
     uint32_t start;
     /// Final character in the end.
