@@ -20,3 +20,19 @@ typedef struct {
     /// Space for seven characters to be encoded.
     int32_t codepoints[7];
 } passgen_pattern_literal;
+
+/// Initialize a pattern literal.
+/// @param literal Pattern literal to initialize
+/// @memberof passgen_pattern_literal
+void passgen_pattern_literal_init(passgen_pattern_literal *literal);
+
+/// Taint a pattern literal.
+/// Doing so prevents further appending to the literal.
+/// @param literal Pattern literal to taint
+void passgen_pattern_literal_taint(passgen_pattern_literal *literal);
+
+/// Append codepoint to pattern literal.
+/// @param literal Literal to append codepoint to
+/// @param codepoint Codepoint to append to literal
+/// @returns 0 on success, nonzero on failure (maximum capacity or tainted)
+int passgen_pattern_literal_append(passgen_pattern_literal *literal, uint32_t codepoint);

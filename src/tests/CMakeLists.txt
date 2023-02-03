@@ -9,6 +9,7 @@ set(TEST_LIST
     "entropy.c"
     "generate.c"
     "hashmap.c"
+    "literal.c"
     "markov.c"
     "parser.c"
     "random.c"
