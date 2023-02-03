@@ -32,10 +32,10 @@ passgen_pattern_segment_new_item(passgen_pattern_segment *segment) {
 passgen_pattern_literal *
 passgen_pattern_segment_new_char(passgen_pattern_segment *segment) {
     passgen_pattern_item *item = passgen_pattern_segment_new_item(segment);
-    item->kind = PASSGEN_PATTERN_CHAR;
-    passgen_pattern_literal_init(&item->data.chars);
+    item->kind = PASSGEN_PATTERN_LITERAL;
+    passgen_pattern_literal_init(&item->data.literal);
 
-    return &item->data.chars;
+    return &item->data.literal;
 }
 
 passgen_pattern_set *

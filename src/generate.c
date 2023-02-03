@@ -408,9 +408,9 @@ int passgen_generate_item(
             case PASSGEN_PATTERN_SET:
                 try(passgen_generate_set(&item->data.set, env, data, func));
                 break;
-            case PASSGEN_PATTERN_CHAR:
+            case PASSGEN_PATTERN_LITERAL:
                 try(passgen_generate_character(
-                    &item->data.chars,
+                    &item->data.literal,
                     env,
                     data,
                     func));

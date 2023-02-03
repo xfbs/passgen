@@ -115,24 +115,24 @@ last_single_item_taint(passgen_pattern_segment *segment) {
         return NULL;
     }
 
-    if(item->kind == PASSGEN_PATTERN_CHAR) {
-        if(item->data.chars.count > 1) {
+    if(item->kind == PASSGEN_PATTERN_LITERAL) {
+        if(item->data.literal.count > 1) {
             // save last codepoint
             int32_t codepoint =
-                item->data.chars.codepoints[item->data.chars.count - 1];
+                item->data.literal.codepoints[item->data.literal.count - 1];
 
             // trim codepoints
-            item->data.chars.count -= 1;
+            item->data.literal.count -= 1;
 
             // create new item
             item = passgen_pattern_segment_new_item(segment);
-            item->kind = PASSGEN_PATTERN_CHAR;
-            passgen_pattern_literal_init(&item->data.chars);
-            passgen_pattern_literal_append(&item->data.chars, codepoint);
+            item->kind = PASSGEN_PATTERN_LITERAL;
+            passgen_pattern_literal_init(&item->data.literal);
+            passgen_pattern_literal_append(&item->data.literal, codepoint);
         }
 
         // characters are always marked as tainted.
-        passgen_pattern_literal_taint(&item->data.chars);
+        passgen_pattern_literal_taint(&item->data.literal);
     }
 
     return item;
@@ -259,8 +259,8 @@ int passgen_parse_group(
         passgen_pattern_item *last =
             passgen_stack_top(&state->data.group.segment->items);
 
-        if(last->kind == PASSGEN_PATTERN_CHAR) {
-            if(0 == passgen_pattern_literal_append(&last->data.chars, codepoint)) {
+        if(last->kind == PASSGEN_PATTERN_LITERAL) {
+            if(0 == passgen_pattern_literal_append(&last->data.literal, codepoint)) {
                 return 0;
             }
         }

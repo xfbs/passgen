@@ -14,7 +14,7 @@
 /// Kind of segment item.
 enum passgen_pattern_kind {
     PASSGEN_PATTERN_SET,
-    PASSGEN_PATTERN_CHAR,
+    PASSGEN_PATTERN_LITERAL,
     PASSGEN_PATTERN_SPECIAL,
     PASSGEN_PATTERN_GROUP,
 };
@@ -38,7 +38,7 @@ typedef struct passgen_pattern_item {
     union {
         passgen_pattern_set set;
         passgen_pattern_group group;
-        passgen_pattern_literal chars;
+        passgen_pattern_literal literal;
         passgen_pattern_special special;
     } data;
 
