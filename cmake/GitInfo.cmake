@@ -1,5 +1,9 @@
 find_package(Git QUIET REQUIRED)
 
+if(Git_FOUND)
+    message("-- Git found: ${GIT_EXECUTABLE}, version ${GIT_VERSION_STRING}")
+endif()
+
 macro(GIT_INFO)
 execute_process(
     COMMAND "${GIT_EXECUTABLE}" rev-parse HEAD
