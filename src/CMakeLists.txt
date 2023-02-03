@@ -11,7 +11,6 @@ set(SOURCE_LIST
     "generate.c"
     "markov.c"
     "parser/parser.c"
-    "parser/state.c"
     "parser/token.c"
     "passgen.c"
     "pattern/group.c"

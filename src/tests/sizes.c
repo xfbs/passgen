@@ -3,7 +3,6 @@
 #include "passgen/container/stack.h"
 #include "passgen/markov.h"
 #include "passgen/parser/parser.h"
-#include "passgen/parser/state.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/literal.h"
 #include "passgen/pattern/pattern.h"
