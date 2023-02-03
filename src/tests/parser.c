@@ -253,12 +253,12 @@ test_result test_parser_set_simple(void) {
 
     assert(item->data.set.items.len == 2);
 
-    range = passgen_pattern_set_get_range(&item->data.set, 0);
+    range = passgen_pattern_set_range_get(&item->data.set, 0);
     assert(range);
     assert(range->start == 'a');
     assert(range->end == 'a');
 
-    range = passgen_pattern_set_get_range(&item->data.set, 1);
+    range = passgen_pattern_set_range_get(&item->data.set, 1);
     assert(range);
     assert(range->start == 'b');
     assert(range->end == 'b');
@@ -290,17 +290,17 @@ test_result test_parser_set_simple_escaped(void) {
 
     assert(item->data.set.items.len == 3);
 
-    range = passgen_pattern_set_get_range(&item->data.set, 0);
+    range = passgen_pattern_set_range_get(&item->data.set, 0);
     assert(range);
     assert(range->start == 'a');
     assert(range->end == 'a');
 
-    range = passgen_pattern_set_get_range(&item->data.set, 1);
+    range = passgen_pattern_set_range_get(&item->data.set, 1);
     assert(range);
     assert(range->start == '-');
     assert(range->end == '-');
 
-    range = passgen_pattern_set_get_range(&item->data.set, 2);
+    range = passgen_pattern_set_range_get(&item->data.set, 2);
     assert(range);
     assert(range->start == 'b');
     assert(range->end == 'b');
@@ -332,7 +332,7 @@ test_result test_parser_range_simple(void) {
 
     assert(item->data.set.items.len == 1);
 
-    range = passgen_pattern_set_get_range(&item->data.set, 0);
+    range = passgen_pattern_set_range_get(&item->data.set, 0);
     assert(range);
     assert(range->start == 'a');
     assert(range->end == 'b');
@@ -367,12 +367,12 @@ test_result test_parser_range_multiple(void) {
 
     assert(item->data.set.items.len == 2);
 
-    range = passgen_pattern_set_get_range(&item->data.set, 0);
+    range = passgen_pattern_set_range_get(&item->data.set, 0);
     assert(range);
     assert(range->start == 'a');
     assert(range->end == 'b');
 
-    range = passgen_pattern_set_get_range(&item->data.set, 1);
+    range = passgen_pattern_set_range_get(&item->data.set, 1);
     assert(range);
     assert(range->start == 'c');
     assert(range->end == 'd');

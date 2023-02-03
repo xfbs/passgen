@@ -8,7 +8,7 @@
 #define PARAMETERS_INITIAL_SIZE 16
 #define PARAMETERS_MULTIPLIER   2
 
-void passgen_pattern_special_init_char(
+void passgen_pattern_special_init(
     passgen_pattern_special *special,
     uint32_t kind) {
     special->parameters_len = 0;
@@ -35,7 +35,7 @@ void passgen_pattern_special_free(passgen_pattern_special *special) {
     free(special->parameters);
 }
 
-void passgen_pattern_special_add_parameter_cp(
+void passgen_pattern_special_push(
     passgen_pattern_special *special,
     int32_t codepoint) {
     if(special->parameters_cap == 0) {

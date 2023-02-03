@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/// Range of characters, such as `a-z`.
+/// Pattern range, such as `a-z`.
 ///
 /// The range has a start and an end character, both are inclusive. The end
 /// character must be equal to or larger than the start character. If they are

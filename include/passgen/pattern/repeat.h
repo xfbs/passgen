@@ -8,6 +8,8 @@
 #pragma once
 #include <stddef.h>
 
+/// Pattern repetition, such as `{5}` or `{3,5}`.
+///
 /// Represents a repetition of the preceding item.
 ///
 /// For example, `a{4}` evaluates to `aaaa`. But specifying `a{1,4}` results

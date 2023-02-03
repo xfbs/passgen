@@ -195,7 +195,7 @@ int passgen_parse_group(
                 // special token
                 special = passgen_pattern_segment_new_special(
                     state->data.group.segment);
-                passgen_pattern_special_init_char(special, (char) codepoint);
+                passgen_pattern_special_init(special, (char) codepoint);
                 passgen_parser_state_push_special(parser, special);
                 return 0;
             default:
@@ -305,7 +305,7 @@ int passgen_parse_set(
         return 0;
     }
 
-    passgen_pattern_range *range = passgen_pattern_set_new_range(set);
+    passgen_pattern_range *range = passgen_pattern_set_range_append(set);
 
     range->start = token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT;
     range->end = token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT;
@@ -428,7 +428,7 @@ int passgen_parse_special_name(
     if(token->codepoint == '}') {
         passgen_stack_pop(&parser->state, NULL);
     } else {
-        passgen_pattern_special_add_parameter_cp(
+        passgen_pattern_special_push(
             state->data.special.special,
             token->codepoint);
     }

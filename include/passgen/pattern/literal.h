@@ -5,7 +5,7 @@
 #include "passgen/pattern/repeat.h"
 #include <stdint.h>
 
-/// Literal pattern (such as `abc`).
+/// Pattern literal, such as `abc`.
 ///
 /// Literal patterns consist of codepoints that are generated verbatim.
 /// There is enough space in the struct to store up to seven codepoints.

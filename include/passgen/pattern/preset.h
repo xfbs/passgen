@@ -16,10 +16,21 @@ typedef struct passgen_preset {
 } passgen_preset;
 
 /// Initialize a preset
+///
+/// @memberof passgen_preset
+/// @param preset Preset to initialize
+/// @param value Value of preset
 void passgen_preset_init(passgen_preset *preset, const char *value);
 
 /// Parse this preset, if it has not been already
+///
+/// @memberof passgen_preset
+/// @param preset Preset to parse
+/// @returns 0 on success, 1 on failure
 int passgen_preset_parse(passgen_preset *preset);
 
 /// Free this preset
+///
+/// @memberof passgen_preset
+/// @param preset Preset to free
 void passgen_preset_free(passgen_preset *preset);

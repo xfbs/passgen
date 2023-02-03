@@ -14,7 +14,7 @@ enum passgen_pattern_special_kind {
     PASSGEN_PATTERN_SPECIAL_PRESET,
 };
 
-/// Passgen pattern special
+/// Pattern special, such as `\w{english}`
 ///
 /// Represents a special pattern, such as `\w{name}` (to generate a random
 /// word from a word list), `\m{name}` (to generate a random word from a
@@ -45,7 +45,7 @@ typedef struct {
 /// @memberof passgen_pattern_special
 /// @param special Special pattern to initialize
 /// @param type Type of special pattern to initialize
-void passgen_pattern_special_init_char(
+void passgen_pattern_special_init(
     passgen_pattern_special *special,
     uint32_t type);
 
@@ -60,6 +60,6 @@ void passgen_pattern_special_free(passgen_pattern_special *special);
 /// @memberof passgen_pattern_special
 /// @param special Special pattern to add codepoint to
 /// @param codepoint Codepoint to add to the pattern
-void passgen_pattern_special_add_parameter_cp(
+void passgen_pattern_special_push(
     passgen_pattern_special *special,
     int32_t codepoint);

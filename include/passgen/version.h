@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-/// Struct describing the version of libpassgen.
+/// Version information for libpassgen.
 typedef struct passgen_version {
     /// Major version
     uint8_t major;
