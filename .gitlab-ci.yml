@@ -1,5 +1,3 @@
-image: debian:11
-
 # makes git submodules work
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
@@ -9,17 +7,23 @@ variables:
 default:
   retry: 2
 
+# stages
+# image stage builds prerequisite docker containers.
+# pre stage is run before build, contains tests and dependencies.
+# build stage builds the code in release mode.
+# post stage runs integration tests
+# deploy deploys the resulting artifacts and builds docs.
 stages:
-  - setup
-  - test
+  - images
+  - pre
   - build
-  - integrate
+  - post
   - deploy
 
 # rebuild alpine docker container.
 docker:alpine:
   image: docker
-  stage: setup
+  stage: images
   services:
     - docker:dind
   script:
@@ -35,7 +39,7 @@ docker:alpine:
 # rebuild deploy docker container.
 docker:deploy:
   image: docker
-  stage: setup
+  stage: images
   services:
     - docker:dind
   script:
@@ -50,7 +54,7 @@ docker:deploy:
 
 docker:mingw64:
   image: docker
-  stage: setup
+  stage: images
   services:
     - docker:dind
   script:
@@ -65,7 +69,7 @@ docker:mingw64:
 
 docker:riscv64:
   image: docker
-  stage: setup
+  stage: images
   services:
     - docker:dind
   script:
@@ -80,7 +84,7 @@ docker:riscv64:
 
 docker:macos:
   image: docker
-  stage: setup
+  stage: images
   services:
     - docker:dind
   script:
@@ -95,7 +99,7 @@ docker:macos:
 
 docker:amd64:
   image: docker
-  stage: setup
+  stage: images
   services:
     - docker:dind
   script:
@@ -110,7 +114,7 @@ docker:amd64:
 
 docker:aarch64:
   image: docker
-  stage: setup
+  stage: images
   services:
     - docker:dind
   script:
@@ -125,7 +129,7 @@ docker:aarch64:
 
 docker:wasi:
   image: docker
-  stage: setup
+  stage: images
   services:
     - docker:dind
   script:
@@ -140,7 +144,7 @@ docker:wasi:
 
 sanitize:
   image: registry.gitlab.com/xfbs/passgen/amd64
-  stage: test
+  stage: pre
   script:
     - CC=clang scripts/sanitizer.sh Address
     - CC=clang scripts/sanitizer.sh Memory
@@ -149,7 +153,7 @@ sanitize:
 
 test:aarch64:
   image: registry.gitlab.com/xfbs/passgen/aarch64
-  stage: test
+  stage: pre
   script:
     - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_GIT_INFO=No
     - cmake --build build-aarch64
@@ -157,7 +161,7 @@ test:aarch64:
 
 test:amd64:
   image: registry.gitlab.com/xfbs/passgen/amd64
-  stage: test
+  stage: pre
   script:
     - CC=clang ./scripts/gen_coverage.sh passgen-test build-clang
     - CC=gcc ./scripts/gen_coverage.sh passgen-test build-gcc
@@ -170,7 +174,7 @@ test:amd64:
 
 test:alpine:
   image: registry.gitlab.com/xfbs/passgen/alpine
-  stage: test
+  stage: pre
   script:
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DUSE_BACKTRACE=NO -GNinja
     - cmake --build build
@@ -181,7 +185,7 @@ test:alpine:
 
 test:riscv64:
   image: registry.gitlab.com/xfbs/passgen/riscv64
-  stage: test
+  stage: pre
   script:
     - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_GIT_INFO=No
     - cmake --build build-riscv64
@@ -190,7 +194,7 @@ test:riscv64:
 # fetch wordlists
 wordlists:
   image: alpine
-  stage: test
+  stage: pre
   before_script:
     - apk add curl
   script:
