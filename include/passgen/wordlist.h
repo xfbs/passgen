@@ -37,29 +37,47 @@ typedef struct passgen_wordlist {
 } passgen_wordlist;
 
 /// Convenience function to initialize, open and parse a wordlist, including the markov chain.
+///
+/// @memberof passgen_wordlist
 void passgen_wordlist_load(passgen_wordlist *wordlist, FILE *file, size_t markov_length);
 
 /// Initialize a wordlist with a file object.
+///
+/// @memberof passgen_wordlist
 void passgen_wordlist_init(passgen_wordlist *wordlist, FILE *file, size_t markov_length);
 
 /// Load words from wordlist. After running this, the file object can be closed.
+///
+/// @memberof passgen_wordlist
 int passgen_wordlist_parse(passgen_wordlist *wordlist);
 
 /// Generate markov chain from wordlist.
+///
+/// @memberof passgen_wordlist
 void passgen_wordlist_parse_markov(passgen_wordlist *wordlist);
 
 /// Generate random word from this wordlist.
+///
+/// @memberof passgen_wordlist
 const char *
 passgen_wordlist_random(passgen_wordlist *wordlist, passgen_random *random);
 
 /// Read a whole wordlist in from a file.
+///
+/// @memberof passgen_wordlist
 int passgen_wordlist_read(passgen_wordlist *wordlist, FILE *file);
 
 /// Scan a read wordlist for words.
+///
+/// @memberof passgen_wordlist
 void passgen_wordlist_scan(passgen_wordlist *wordlist);
 
 /// Release memory for wordlist.
+///
+/// @memberof passgen_wordlist
 void passgen_wordlist_free(passgen_wordlist *wordlist);
 
 /// Get the wordcount of this wordlist
+///
+/// @memberof passgen_wordlist
 size_t passgen_wordlist_count(passgen_wordlist *wordlist);
