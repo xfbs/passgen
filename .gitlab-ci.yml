@@ -163,8 +163,8 @@ test:amd64:
   image: registry.gitlab.com/xfbs/passgen/amd64
   stage: pre
   script:
-    - CC=clang ./scripts/gen_coverage.sh passgen-test build-clang
-    - CC=gcc ./scripts/gen_coverage.sh passgen-test build-gcc
+    - CC=clang ./scripts/coverage.sh build-clang
+    - CC=gcc ./scripts/coverage.sh build-gcc
   artifacts:
     paths:
       - build-clang/ccov/passgen-test

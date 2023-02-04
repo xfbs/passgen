@@ -20,6 +20,10 @@ bench: $(BUILDDIR)/src/bench/passgen-bench
 test: $(BUILDDIR)/src/tests/passgen-test
 	@./$< -v
 
+# compute coverage
+coverage:
+	@./scripts/coverage.sh build-coverage
+
 # format source code
 format: $(BUILDDIR)
 	cd build && make clangformat
