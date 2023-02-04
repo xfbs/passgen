@@ -213,7 +213,8 @@ static void passgen_pattern_segment_clean(passgen_pattern_segment *segment) {
         // get last item
         passgen_pattern_item *last = passgen_stack_top(&segment->items);
 
-        if(last->kind == PASSGEN_PATTERN_GROUP && last->data.group.multiplier_sum == 0) {
+        if(last->kind == PASSGEN_PATTERN_GROUP &&
+           last->data.group.multiplier_sum == 0) {
             passgen_pattern_group_free(&last->data.group);
             passgen_stack_pop(&segment->items, NULL);
         }
@@ -263,7 +264,8 @@ int passgen_parse_group(
                 if(state->data.group.segment->multiplier > 0) {
                     // create new segment and parser state
                     state->data.group.segment =
-                        passgen_pattern_group_new_segment(state->data.group.group);
+                        passgen_pattern_group_new_segment(
+                            state->data.group.group);
                 } else {
                     // if the previous segment had a zero multiplier, recycle it
                     passgen_pattern_segment_free(state->data.group.segment);

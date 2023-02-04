@@ -21,11 +21,19 @@ test_result test_hashmap_context_utf8(void) {
     assert(passgen_hashmap_context_utf8.equal(&map, key2, key2));
     assert(!passgen_hashmap_context_utf8.equal(&map, key1, key2));
 
-    assert_eq(passgen_hashmap_context_utf8.hash(&map, key1, true), 0xf6f0cd43722c7cfe);
-    assert_eq(passgen_hashmap_context_utf8.hash(&map, key1, false), 0x438bcb516e4d4abf);
+    assert_eq(
+        passgen_hashmap_context_utf8.hash(&map, key1, true),
+        0xf6f0cd43722c7cfe);
+    assert_eq(
+        passgen_hashmap_context_utf8.hash(&map, key1, false),
+        0x438bcb516e4d4abf);
 
-    assert_eq(passgen_hashmap_context_utf8.hash(&map, key2, true), 0xcb99aa476d12f348);
-    assert_eq(passgen_hashmap_context_utf8.hash(&map, key2, false), 0xef7ec81d7aa533ea);
+    assert_eq(
+        passgen_hashmap_context_utf8.hash(&map, key2, true),
+        0xcb99aa476d12f348);
+    assert_eq(
+        passgen_hashmap_context_utf8.hash(&map, key2, false),
+        0xef7ec81d7aa533ea);
 
     passgen_hashmap_free(&map);
 
@@ -43,11 +51,19 @@ test_result test_hashmap_context_utf32(void) {
     assert(passgen_hashmap_context_utf32.equal(&map, &key2[0], &key2[0]));
     assert(!passgen_hashmap_context_utf32.equal(&map, &key1[0], &key2[0]));
 
-    assert_eq(passgen_hashmap_context_utf32.hash(&map, &key1[0], true), 0x4b9a41e6925a46ad);
-    assert_eq(passgen_hashmap_context_utf32.hash(&map, &key1[0], false), 0x6ce43ac01a6144b8);
+    assert_eq(
+        passgen_hashmap_context_utf32.hash(&map, &key1[0], true),
+        0x4b9a41e6925a46ad);
+    assert_eq(
+        passgen_hashmap_context_utf32.hash(&map, &key1[0], false),
+        0x6ce43ac01a6144b8);
 
-    assert_eq(passgen_hashmap_context_utf32.hash(&map, &key2[0], true), 0xdefab330a5dcde19);
-    assert_eq(passgen_hashmap_context_utf32.hash(&map, &key2[0], false), 0x45168f9b31b7e7bd);
+    assert_eq(
+        passgen_hashmap_context_utf32.hash(&map, &key2[0], true),
+        0xdefab330a5dcde19);
+    assert_eq(
+        passgen_hashmap_context_utf32.hash(&map, &key2[0], false),
+        0x45168f9b31b7e7bd);
 
     passgen_hashmap_free(&map);
 

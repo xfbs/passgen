@@ -338,7 +338,6 @@ static void utf32_fini(passgen_hashmap *map) {
     map->context_data = NULL;
 }
 
-
 const passgen_hashmap_context passgen_hashmap_context_utf32 = {
     .hash = utf32_hash,
     .equal = utf32_equal,

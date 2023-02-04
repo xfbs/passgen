@@ -13,15 +13,15 @@
 #include "tests.h"
 #include <passgen/passgen.h>
 
-#define PREAMBLE()                           \
-    passgen_parser parser;                   \
-    passgen_token_parser token_parser = {0}; \
-    passgen_token token = {0};               \
-    passgen_pattern_segment *segment;        \
-    passgen_pattern_item *item;              \
-    passgen_pattern parsed_pattern;          \
+#define PREAMBLE()                                 \
+    passgen_parser parser;                         \
+    passgen_token_parser token_parser = {0};       \
+    passgen_token token = {0};                     \
+    passgen_pattern_segment *segment;              \
+    passgen_pattern_item *item;                    \
+    passgen_pattern parsed_pattern;                \
     passgen_parser_init(&parser, &parsed_pattern); \
-    (void) item; \
+    (void) item;                                   \
     (void) segment
 
 #define POSTAMBLE()                              \
