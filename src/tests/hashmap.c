@@ -32,33 +32,33 @@ test_result test_hashmap_context_utf8(void) {
     return test_ok;
 }
 
-test_result test_hashmap_context_unicode(void) {
+test_result test_hashmap_context_utf32(void) {
     passgen_hashmap map;
-    passgen_hashmap_init(&map, &passgen_hashmap_context_unicode);
+    passgen_hashmap_init(&map, &passgen_hashmap_context_utf32);
 
     uint32_t key1[] = {'h', 'e', 'l', 'l', 'o', 0};
     uint32_t key2[] = {'h', 'o', 'l', 'a', 0};
 
-    assert(passgen_hashmap_context_unicode.equal(&map, &key1[0], &key1[0]));
-    assert(passgen_hashmap_context_unicode.equal(&map, &key2[0], &key2[0]));
-    assert(!passgen_hashmap_context_unicode.equal(&map, &key1[0], &key2[0]));
+    assert(passgen_hashmap_context_utf32.equal(&map, &key1[0], &key1[0]));
+    assert(passgen_hashmap_context_utf32.equal(&map, &key2[0], &key2[0]));
+    assert(!passgen_hashmap_context_utf32.equal(&map, &key1[0], &key2[0]));
 
-    assert_eq(passgen_hashmap_context_unicode.hash(&map, &key1[0], true), 0x4b9a41e6925a46ad);
-    assert_eq(passgen_hashmap_context_unicode.hash(&map, &key1[0], false), 0x6ce43ac01a6144b8);
+    assert_eq(passgen_hashmap_context_utf32.hash(&map, &key1[0], true), 0x4b9a41e6925a46ad);
+    assert_eq(passgen_hashmap_context_utf32.hash(&map, &key1[0], false), 0x6ce43ac01a6144b8);
 
-    assert_eq(passgen_hashmap_context_unicode.hash(&map, &key2[0], true), 0xdefab330a5dcde19);
-    assert_eq(passgen_hashmap_context_unicode.hash(&map, &key2[0], false), 0x45168f9b31b7e7bd);
+    assert_eq(passgen_hashmap_context_utf32.hash(&map, &key2[0], true), 0xdefab330a5dcde19);
+    assert_eq(passgen_hashmap_context_utf32.hash(&map, &key2[0], false), 0x45168f9b31b7e7bd);
 
     passgen_hashmap_free(&map);
 
     return test_ok;
 }
 
-test_result test_hashmap_unicode(void) {
+test_result test_hashmap_insert_utf32(void) {
     passgen_hashmap map;
     passgen_hashmap_entry entry;
 
-    passgen_hashmap_init(&map, &passgen_hashmap_context_unicode);
+    passgen_hashmap_init(&map, &passgen_hashmap_context_utf32);
 
     uint32_t key1[] = {'h', 'e', 'l', 'l', 'o', 0};
     int value1;
@@ -82,7 +82,7 @@ test_result test_hashmap_unicode(void) {
     return test_ok;
 }
 
-test_result test_hashmap_insert(void) {
+test_result test_hashmap_insert_utf8(void) {
     passgen_hashmap map;
     passgen_hashmap_init(&map, NULL);
 

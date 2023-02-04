@@ -69,23 +69,31 @@ typedef struct passgen_hashmap_context {
     bool (*equal)(const passgen_hashmap *map, const void *lhs, const void *rhs);
 } passgen_hashmap_context;
 
-/// Default context which assumes that the keys are NULL-terminated UTF-8
-/// encoded strings.
-///
-/// @relates passgen_hashmap
+/// UTF-8 hashmap context.
+/// Assumes that the keys UTF-8 encoded, NULL-terminated strings. See
+/// #passgen_hashmap_init for more information.
 extern const passgen_hashmap_context passgen_hashmap_context_utf8;
 
-/// Assumes that keys are unicode (UTF-32), NULL-terminated strings.
-///
-/// @relates passgen_hashmap
-extern const passgen_hashmap_context passgen_hashmap_context_unicode;
+/// UTF-32 hashmap context.
+/// Assumes that keys are UTF-32, NULL-terminated strings. See
+/// #passgen_hashmap_init for more information.
+extern const passgen_hashmap_context passgen_hashmap_context_utf32;
 
-/// Initialize new hashmap. If context is NULL, it uses the default context
-/// which assumes that the keys are NULL-terminated, UTF-8 strings.
+/// Initialize new hashmap.
+/// The context parameter determines how keys should be compared and hashed.
+/// When not supplied, it falls back to the default context, which treats them as
+/// UTF-8 encoded, NULL-terminated strings.
+///
+/// Possible contexts to choose from are:
+///
+/// | Name | Description |
+/// | --- | --- |
+/// | #passgen_hashmap_context_utf8 | UTF-8 context, treats keys as UTF-8 encoded, NULL-terminated strings. |
+/// | #passgen_hashmap_context_utf32 | UTF-32 context, treats keys as UTF-32 encoded, NULL-terminated strings. |
 ///
 /// @memberof passgen_hashmap
 /// @param map Hashmap to initialize
-/// @param context Context to to set for the hashmap
+/// @param context Pointer to context to to use for the hashmap
 void passgen_hashmap_init(passgen_hashmap *map, const passgen_hashmap_context *context);
 
 /// Free the hashmap.

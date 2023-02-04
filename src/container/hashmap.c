@@ -247,13 +247,13 @@ const passgen_hashmap_context passgen_hashmap_context_utf8 = {
     .equal = string_equal,
 };
 
-static size_t unicode_len(const void *data) {
+static size_t utf32_len(const void *data) {
     // cast void pointer to array of UTF-32 codepoints
-    const int32_t *unicode = data;
+    const int32_t *utf32 = data;
 
     // iterate over until we hit zero codepoint
     size_t len = 0;
-    while(unicode[len]) {
+    while(utf32[len]) {
         len++;
     }
 
@@ -261,13 +261,13 @@ static size_t unicode_len(const void *data) {
 }
 
 static uint64_t
-unicode_hash(const passgen_hashmap *map, const void *key, bool first) {
+utf32_hash(const passgen_hashmap *map, const void *key, bool first) {
     UNUSED(map);
     uint64_t output;
     const char *siphash_key = first ? SIPHASH_KEY_FIRST : SIPHASH_KEY_SECOND;
     passgen_siphash(
         key,
-        unicode_len(key),
+        utf32_len(key),
         siphash_key,
         (uint8_t *) &output,
         sizeof(output));
@@ -275,11 +275,11 @@ unicode_hash(const passgen_hashmap *map, const void *key, bool first) {
 }
 
 static bool
-unicode_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
+utf32_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
     UNUSED(map);
     // compute lengths of lhs and rhs
-    size_t rhs_len = unicode_len(rhs);
-    size_t lhs_len = unicode_len(lhs);
+    size_t rhs_len = utf32_len(rhs);
+    size_t lhs_len = utf32_len(lhs);
 
     // if lengths are not the same, the keys cannot be equal
     if(rhs_len != lhs_len) {
@@ -293,9 +293,9 @@ unicode_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
     return ret == 0;
 }
 
-const passgen_hashmap_context passgen_hashmap_context_unicode = {
-    .hash = unicode_hash,
-    .equal = unicode_equal,
+const passgen_hashmap_context passgen_hashmap_context_utf32 = {
+    .hash = utf32_hash,
+    .equal = utf32_equal,
 };
 
 int passgen_hashmap_entry_free(void *user, passgen_hashmap_entry *entry) {
