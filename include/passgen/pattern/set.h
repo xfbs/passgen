@@ -17,10 +17,12 @@
 /// For example, `[a-z0-9]` is a set expression that can produce lowercase latin
 /// characters or numbers.
 typedef struct {
-    // array of range_items
+    /// Items in this set.
+    /// This is a stack of #passgen_pattern_range items.
     passgen_stack items;
 
-    // Array of possible choices for every range in this set.
+    /// Array of possible choices for every range in this set.
+    /// This is a pointer to an array that has `items.len` entries.
     size_t *choices_list;
 } passgen_pattern_set;
 
