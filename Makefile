@@ -24,6 +24,18 @@ test: $(BUILDDIR)/src/tests/passgen-test
 coverage:
 	@./scripts/coverage.sh build-coverage
 
+# run AddressSanitizer against the code
+asan:
+	@./scripts/sanitizer.sh Address
+
+# run MemorySanitizer against the code, may have to set `CC=clang`.
+msan:
+	@./scripts/sanitizer.sh Memory
+
+# run UndefinedSanitizer agains the code
+usan:
+	@./scripts/sanitizer.sh Undefined
+
 # format source code
 format: $(BUILDDIR)
 	cd build && make clangformat
@@ -60,4 +72,4 @@ docker-build:
 docs:
 	$(DOXYGEN) Doxyfile
 
-.PHONY: docs bench test passgen format
+.PHONY: docs bench test passgen format asan usan msan
