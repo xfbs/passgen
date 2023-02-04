@@ -23,8 +23,8 @@ int passgen_wordlist_parse(passgen_wordlist *wordlist) {
     passgen_assert(!wordlist->parsed);
     wordlist->parsed = true;
     try(passgen_wordlist_read(wordlist, wordlist->file));
-    passgen_wordlist_scan(wordlist);
     wordlist->file = NULL;
+    passgen_wordlist_scan(wordlist);
     return 0;
 }
 
@@ -133,6 +133,10 @@ void passgen_wordlist_free(passgen_wordlist *wordlist) {
     if(wordlist->parsed) {
         free(wordlist->words);
         free(wordlist->data);
+    }
+
+    if(wordlist->should_close_file && wordlist->file) {
+        fclose(wordlist->file);
     }
 }
 
