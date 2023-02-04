@@ -68,7 +68,10 @@ typedef struct passgen_parser_state {
         struct {
             passgen_pattern_special *special;
         } special;
-        size_t *multiplier;
+        struct {
+            size_t *value;
+            size_t *sum;
+        } multiplier;
     } data;
 } passgen_parser_state;
 
@@ -104,7 +107,8 @@ passgen_parser_state *passgen_parser_state_push_group(
 /// Push a multiplier item onto the parsing stack.
 passgen_parser_state *passgen_parser_state_push_multiplier(
     passgen_parser *parser,
-    size_t *multiplier);
+    size_t *multiplier,
+    size_t *sum);
 
 /// Push a set item onto the parsing stack.
 passgen_parser_state *passgen_parser_state_push_set(

@@ -57,11 +57,13 @@ passgen_parser_state *passgen_parser_state_push_repeat(
 
 passgen_parser_state *passgen_parser_state_push_multiplier(
     passgen_parser *parser,
-    size_t *multiplier) {
+    size_t *multiplier,
+    size_t *sum) {
     passgen_parser_state *state = passgen_parser_state_push(parser);
     state->type = PASSGEN_PARSER_MULTIPLIER;
     *multiplier = 0;
-    state->data.multiplier = multiplier;
+    state->data.multiplier.value = multiplier;
+    state->data.multiplier.sum = sum;
     return state;
 }
 
@@ -166,6 +168,18 @@ int passgen_parse_token(passgen_parser *parser, passgen_token *token) {
     }
 }
 
+static void passgen_pattern_segment_clean(passgen_pattern_segment *segment) {
+    if(segment->items.len > 0) {
+        // get last item
+        passgen_pattern_item *last = passgen_stack_top(&segment->items);
+
+        if(last->kind == PASSGEN_PATTERN_GROUP && last->data.group.multiplier_sum == 0) {
+            passgen_pattern_group_free(&last->data.group);
+            passgen_stack_pop(&segment->items, NULL);
+        }
+    }
+}
+
 int passgen_parse_group(
     passgen_parser *parser,
     passgen_token *token,
@@ -174,6 +188,8 @@ int passgen_parse_group(
     passgen_pattern_group *group;
     passgen_pattern_special *special;
     passgen_pattern_item *item;
+
+    passgen_pattern_segment_clean(state->data.group.segment);
 
     if(codepoint & PASSGEN_TOKEN_ESCAPED_BIT) {
         codepoint &= ~PASSGEN_TOKEN_ESCAPED_BIT;
@@ -204,17 +220,26 @@ int passgen_parse_group(
     } else {
         switch((char) codepoint) {
             case '|':
-                // create new segment and parser state
-                state->data.group.segment =
-                    passgen_pattern_group_new_segment(state->data.group.group);
+                if(state->data.group.segment->multiplier > 0) {
+                    // create new segment and parser state
+                    state->data.group.segment =
+                        passgen_pattern_group_new_segment(state->data.group.group);
+                } else {
+                    // if the previous segment had a zero multiplier, recycle it
+                    passgen_pattern_segment_free(state->data.group.segment);
+                    passgen_pattern_segment_init(state->data.group.segment);
+                }
                 return 0;
             case ')':
-                if(parser->state.len > 1) {
-                    passgen_pattern_group_finish(state->data.group.group);
-                    passgen_stack_pop(&parser->state, NULL);
-                } else {
+                if(state->data.group.segment->multiplier == 0) {
+                    passgen_pattern_segment_free(state->data.group.segment);
+                    passgen_stack_pop(&state->data.group.group->segments, NULL);
+                }
+                if(parser->state.len <= 1) {
                     return -1;
                 }
+                passgen_pattern_group_finish(state->data.group.group);
+                passgen_stack_pop(&parser->state, NULL);
                 return 0;
             case '(':
                 // we're supposed to read something in.
@@ -239,9 +264,11 @@ int passgen_parse_group(
                     return 0;
                 } else {
                     state->data.group.segment->multiplier = 0;
+                    state->data.group.group->multiplier_sum -= 1;
                     passgen_parser_state_push_multiplier(
                         parser,
-                        &state->data.group.segment->multiplier);
+                        &state->data.group.segment->multiplier,
+                        &state->data.group.group->multiplier_sum);
                     return 0;
                 }
             case '?':
@@ -334,6 +361,7 @@ int passgen_parse_multiplier(
     passgen_token *token,
     passgen_parser_state *state) {
     if(token->codepoint == '}') {
+        *state->data.multiplier.sum += *state->data.multiplier.value;
         passgen_stack_pop(&parser->state, NULL);
         return 0;
     }
@@ -341,8 +369,8 @@ int passgen_parse_multiplier(
     if(token->codepoint >= '0' && token->codepoint <= '9') {
         uint8_t digit = token->codepoint - '0';
 
-        *state->data.multiplier *= 10;
-        *state->data.multiplier += digit;
+        *state->data.multiplier.value *= 10;
+        *state->data.multiplier.value += digit;
 
         return 0;
     }
@@ -436,6 +464,15 @@ int passgen_parse_finish(passgen_parser *parser) {
     if(parser->state.len != 1) {
         return -1;
     }
+
+    // make sure last state is a group
+    passgen_parser_state *state = passgen_parser_get_state_last(parser);
+    if(state->type != PASSGEN_PARSER_GROUP) {
+        return -1;
+    }
+
+    // clean last state
+    passgen_pattern_segment_clean(state->data.group.segment);
 
     return 0;
 }

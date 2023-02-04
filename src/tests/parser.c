@@ -20,7 +20,9 @@
     passgen_pattern_segment *segment;        \
     passgen_pattern_item *item;              \
     passgen_pattern parsed_pattern;          \
-    passgen_parser_init(&parser, &parsed_pattern);
+    passgen_parser_init(&parser, &parsed_pattern); \
+    (void) item; \
+    (void) segment
 
 #define POSTAMBLE()                              \
     assert_eq(0, passgen_parse_finish(&parser)); \
@@ -53,6 +55,133 @@ test_result test_parser_empty(void) {
 
     POSTAMBLE();
 
+    return test_ok;
+}
+
+test_result test_parser_segment_multiplier(void) {
+    PREAMBLE();
+    PARSE_CODEPOINT('(');
+
+    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    item = passgen_pattern_segment_get_item(segment, 0);
+
+    PARSE_CODEPOINT('{');
+    PARSE_CODEPOINT('5');
+    PARSE_CODEPOINT('}');
+
+    assert_eq(item->data.group.segments.len, 1);
+    assert_eq(item->data.group.multiplier_sum, 5);
+    segment = passgen_pattern_group_get_segment(&item->data.group, 0);
+    assert_eq(segment->multiplier, 5);
+
+    PARSE_CODEPOINT('a');
+
+    assert_eq(segment->items.len, 1);
+
+    PARSE_CODEPOINT('|');
+
+    assert_eq(item->data.group.segments.len, 2);
+    assert_eq(item->data.group.multiplier_sum, 6);
+    segment = passgen_pattern_group_get_segment(&item->data.group, 1);
+    assert_eq(segment->multiplier, 1);
+
+    PARSE_CODEPOINT('b');
+    PARSE_CODEPOINT('c');
+
+    // one item (two codepoints in a single literal)
+    assert_eq(segment->items.len, 1);
+
+    PARSE_CODEPOINT('|');
+
+    assert_eq(item->data.group.segments.len, 3);
+    assert_eq(item->data.group.multiplier_sum, 7);
+    segment = passgen_pattern_group_get_segment(&item->data.group, 2);
+    assert_eq(segment->multiplier, 1);
+
+    PARSE_CODEPOINT('{');
+    PARSE_CODEPOINT('3');
+    PARSE_CODEPOINT('}');
+
+    assert_eq(item->data.group.multiplier_sum, 9);
+    assert_eq(segment->multiplier, 3);
+
+    PARSE_CODEPOINT('c');
+
+    assert_eq(segment->items.len, 1);
+
+    PARSE_CODEPOINT(')');
+
+    assert_eq(item->data.group.multiplier_sum, 9);
+
+    POSTAMBLE();
+
+    return test_ok;
+}
+
+// when parsing a group, skip over any segments that have a zero multiplier.
+test_result test_parser_skip_zero_segment(void) {
+    PREAMBLE();
+    PARSE_CODEPOINT('(');
+
+    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    item = passgen_pattern_segment_get_item(segment, 0);
+    assert_eq(item->data.group.segments.len, 1);
+
+    for(size_t i = 0; i < 100; i++) {
+        PARSE_CODEPOINT('{');
+        PARSE_CODEPOINT('0');
+        PARSE_CODEPOINT('}');
+        PARSE_CODEPOINT('|');
+
+        // because the multiplier is zero, this segment is removed
+        assert_eq(item->data.group.segments.len, 1);
+    }
+
+    PARSE_CODEPOINT('{');
+    PARSE_CODEPOINT('0');
+    PARSE_CODEPOINT('}');
+    PARSE_CODEPOINT(')');
+
+    // final segment is also removed, leaving no segments
+    assert_eq(item->data.group.segments.len, 0);
+
+    POSTAMBLE();
+    return test_ok;
+}
+
+test_result test_parser_empty_group(void) {
+    PREAMBLE();
+    PARSE_CODEPOINT('(');
+
+    assert(1 == parser.pattern->group.segments.len);
+    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    assert(segment);
+    assert(1 == segment->items.len);
+
+    // group with one empty segment
+    item = passgen_pattern_segment_get_item(segment, 0);
+    assert(item);
+    assert(item->kind == PASSGEN_PATTERN_GROUP);
+    assert_eq(item->data.group.segments.len, 1);
+
+    PARSE_CODEPOINT(')');
+
+    assert(1 == parser.pattern->group.segments.len);
+    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    assert(segment);
+    assert(1 == segment->items.len);
+
+    for(size_t i = 0; i < 100; i++) {
+        PARSE_CODEPOINT('(');
+        PARSE_CODEPOINT(')');
+
+        assert(1 == parser.pattern->group.segments.len);
+        segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+        assert(segment);
+        assert(1 == segment->items.len);
+    }
+
+    POSTAMBLE();
     return test_ok;
 }
 
@@ -474,8 +603,10 @@ test_result test_parser_item_maybe(void) {
     PARSE_CODEPOINT('a');
     PARSE_CODEPOINT('?');
     PARSE_CODEPOINT('(');
+    PARSE_CODEPOINT('a');
     PARSE_CODEPOINT(')');
     PARSE_CODEPOINT('(');
+    PARSE_CODEPOINT('b');
     PARSE_CODEPOINT(')');
     PARSE_CODEPOINT('?');
 
