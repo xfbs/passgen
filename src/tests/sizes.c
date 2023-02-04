@@ -56,8 +56,8 @@ test_result test_sizes_wordlist(void) {
 }
 
 test_result test_sizes_util(void) {
-    assert_eq(sizeof(passgen_hashmap), 32);
-    assert_eq(sizeof(passgen_hashmap_context), 16);
+    assert_eq(sizeof(passgen_hashmap), 40);
+    assert_eq(sizeof(passgen_hashmap_context), 32);
     assert_eq(sizeof(passgen_hashmap_entry), 16);
     assert_eq(sizeof(passgen_stack), 32);
     assert_eq(sizeof(passgen_random), 1024 + 4 * 8);

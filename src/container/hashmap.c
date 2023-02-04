@@ -23,22 +23,47 @@ static const size_t hashmap_sizes[] = {
     350899,
     701819,
     0};
-static const char *SIPHASH_KEY_FIRST = "someverylongpass";
-static const char *SIPHASH_KEY_SECOND = "myotherverylongk";
+
+struct siphash_keys {
+    const char *first;
+    const char *second;
+};
+
+static const struct siphash_keys utf8_keys = {
+    .first = "someverylongpass",
+    .second = "myotherverylongk",
+};
+
+static const struct siphash_keys utf32_keys = {
+    .first = "someverylongpass",
+    .second = "myotherverylongk",
+};
 
 void passgen_hashmap_init(
     passgen_hashmap *map,
     const passgen_hashmap_context *context) {
+    // zero-out hashmap
     memset(map, 0, sizeof(*map));
+
+    // set context or default to UTF-8 context
     if(context) {
         map->context = context;
     } else {
         map->context = &passgen_hashmap_context_utf8;
     }
+
+    // initialize hashmap context
+    map->context->init(map);
 }
 
 void passgen_hashmap_free(passgen_hashmap *map) {
+    // deinitialize context
+    map->context->fini(map);
+
+    // deallocate data
     free(map->data);
+
+    // set everything to zero
     memset(map, 0, sizeof(*map));
 }
 
@@ -222,11 +247,20 @@ int passgen_hashmap_foreach(
     return 0;
 }
 
+static void utf8_init(passgen_hashmap *map) {
+    map->context_data = (void *) &utf8_keys;
+}
+
+static void utf8_fini(passgen_hashmap *map) {
+    map->context_data = NULL;
+}
+
 static uint64_t
-string_hash(const passgen_hashmap *map, const void *key, bool first) {
+utf8_hash(const passgen_hashmap *map, const void *key, bool first) {
     UNUSED(map);
     uint64_t output;
-    const char *siphash_key = first ? SIPHASH_KEY_FIRST : SIPHASH_KEY_SECOND;
+    const struct siphash_keys *keys = map->context_data;
+    const char *siphash_key = first ? keys->first : keys->second;
     passgen_siphash(
         key,
         strlen(key),
@@ -237,14 +271,16 @@ string_hash(const passgen_hashmap *map, const void *key, bool first) {
 }
 
 static bool
-string_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
+utf8_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
     UNUSED(map);
     return strcmp(lhs, rhs) == 0;
 }
 
 const passgen_hashmap_context passgen_hashmap_context_utf8 = {
-    .hash = string_hash,
-    .equal = string_equal,
+    .hash = utf8_hash,
+    .equal = utf8_equal,
+    .init = utf8_init,
+    .fini = utf8_fini,
 };
 
 static size_t utf32_len(const void *data) {
@@ -264,7 +300,8 @@ static uint64_t
 utf32_hash(const passgen_hashmap *map, const void *key, bool first) {
     UNUSED(map);
     uint64_t output;
-    const char *siphash_key = first ? SIPHASH_KEY_FIRST : SIPHASH_KEY_SECOND;
+    const struct siphash_keys *keys = map->context_data;
+    const char *siphash_key = first ? keys->first : keys->second;
     passgen_siphash(
         key,
         utf32_len(key),
@@ -293,9 +330,20 @@ utf32_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
     return ret == 0;
 }
 
+static void utf32_init(passgen_hashmap *map) {
+    map->context_data = (void *) &utf32_keys;
+}
+
+static void utf32_fini(passgen_hashmap *map) {
+    map->context_data = NULL;
+}
+
+
 const passgen_hashmap_context passgen_hashmap_context_utf32 = {
     .hash = utf32_hash,
     .equal = utf32_equal,
+    .init = utf32_init,
+    .fini = utf32_fini,
 };
 
 int passgen_hashmap_entry_free(void *user, passgen_hashmap_entry *entry) {

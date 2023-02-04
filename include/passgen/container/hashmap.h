@@ -46,9 +46,12 @@ typedef struct {
     /// The amount of items currently allocated.
     size_t len;
 
-    /// The context. This determines the hash function that is used, as well
+    /// Context. This determines the hash function that is used, as well
     /// as the comparison function.
     const struct passgen_hashmap_context *context;
+
+    /// Data for the context.
+    void *context_data;
 
     /// The data allocation. This is an array of *capacity* entries.
     passgen_hashmap_entry *data;
@@ -63,10 +66,14 @@ typedef struct {
 ///
 /// @relates passgen_hashmap
 typedef struct passgen_hashmap_context {
-    // Determine the hash value of the supplied key
+    /// Compute the hash value of the supplied key
     uint64_t (*hash)(const passgen_hashmap *map, const void *key, bool first);
-    // Determine if two keys are equal
+    /// Check for key equality
     bool (*equal)(const passgen_hashmap *map, const void *lhs, const void *rhs);
+    /// Initialize
+    void (*init)(passgen_hashmap *map);
+    /// Deiniitialize
+    void (*fini)(passgen_hashmap *map);
 } passgen_hashmap_context;
 
 /// UTF-8 hashmap context.
