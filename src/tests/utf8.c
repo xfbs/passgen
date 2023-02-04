@@ -4,9 +4,9 @@
 // test that we can decode an empty string.
 test_result test_utf8_can_decode_empty(void) {
     size_t input_size = 0;
-    const uint8_t input[input_size];
+    const uint8_t input[input_size + 1];
     size_t output_size = 0;
-    uint32_t output[output_size];
+    uint32_t output[output_size + 1];
     size_t input_pos = 0;
     size_t output_pos = 0;
 
@@ -29,7 +29,7 @@ test_result test_utf8_can_decode_empty(void) {
 // test that we can decode an empty string with character widths.
 test_result test_utf8_can_decode_empty_widths(void) {
     size_t input_size = 0;
-    const uint8_t input[input_size];
+    const uint8_t input[input_size + 1];
     size_t output_size = 1;
     uint32_t output[output_size];
     uint8_t widths[output_size];

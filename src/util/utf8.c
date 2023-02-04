@@ -40,7 +40,7 @@ int passgen_utf8_encode(
     const uint32_t *in,
     size_t in_len,
     size_t *in_pos) {
-    utf8proc_ssize_t n;
+    utf8proc_ssize_t n = 0;
 
     // TODO: fixeme. what?
     (void) in_len;
