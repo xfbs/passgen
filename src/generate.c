@@ -19,6 +19,58 @@
 #include <string.h>
 #include <utf8proc.h>
 
+size_t passgen_generate_repeat(
+    passgen_env *env,
+    passgen_pattern_repeat *repeat);
+
+int passgen_generate_set(
+    passgen_pattern_set *set,
+    passgen_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_character(
+    passgen_pattern_literal *character,
+    passgen_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_special_pronounceable(
+    passgen_pattern_special *special,
+    passgen_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_special_wordlist(
+    passgen_pattern_special *special,
+    passgen_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_special(
+    passgen_pattern_special *special,
+    passgen_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_group(
+    passgen_pattern_group *group,
+    passgen_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_item(
+    passgen_pattern_item *item,
+    passgen_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
+int passgen_generate_segment(
+    passgen_pattern_segment *segment,
+    passgen_env *env,
+    void *data,
+    passgen_generate_cb *func);
+
 struct fillpos {
     uint32_t *buffer;
     size_t cur;
