@@ -12,9 +12,17 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/// Get the child with the given codepoint.
+/// @memberof passgen_markov_node
+/// @param node Node to get child of
+/// @param codepoint Codepoint to lookup child for
 #define passgen_markov_node_child(node, codepoint) \
     node->entries[(node->capacity + 1) / 2].child[codepoint % node->capacity]
 
+/// Get the codepoint at the given index
+/// @memberof passgen_markov_node
+/// @param node Node to get codepoint for
+/// @param index Index to lookup
 #define passgen_markov_node_codepoint(node, index) \
     node->entries[0].codepoint[index % node->capacity]
 
