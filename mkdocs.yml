@@ -47,7 +47,7 @@ nav:
     - Releases: releases.md
     - Installation: install.md
   - Development:
-    - Development: development.md
+    - Resources: development.md
     - Building: building.md
     - Tooling: tooling.md
     - Testing: testing.md

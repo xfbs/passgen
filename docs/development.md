@@ -1,4 +1,4 @@
-# Development
+# Resources
 
 Development of Passgen happens at [GitLab][gitlab]. [Merge
 requests][merge-requests] and [bug reports][bug-reports] are very welcome
@@ -36,7 +36,7 @@ there. These are some useful resources for development of passgen:
 
     As part of the CI/CD pipeline, test coverage reports are generated.
 
-    :octicons-arrow-right-24: Coverage: [LCOV][coverage-lcov], [LLVM cov][coverage-llvm-cov]
+    [:octicons-arrow-right-24: Coverage][coverage-lcov] (or: [LLVM cov][coverage-llvm-cov])
 
 </div>
 
