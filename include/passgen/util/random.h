@@ -21,7 +21,7 @@ typedef size_t passgen_random_read_func(void *dest, size_t size, void *data);
 typedef void passgen_random_close_func(void *data);
 
 /// Randomness source.
-typedef struct passgen_random {
+typedef struct {
     /// Ring buffer to hold random data in.
     uint8_t buffer[PASSGEN_RANDOM_BUFFER_LENGTH];
 
@@ -192,11 +192,3 @@ uint32_t passgen_random_u32_max(passgen_random *random, uint32_t max);
 /// @param max must be nonzero.
 /// @memberof passgen_random
 uint64_t passgen_random_u64_max(passgen_random *random, uint64_t max);
-
-size_t passgen_random_read_file(void *dest, size_t size, void *data);
-size_t passgen_random_read_system(void *dest, size_t size, void *data);
-size_t passgen_random_read_xorshift(void *dest, size_t size, void *data);
-
-void passgen_random_close_file(void *data);
-void passgen_random_close_system(void *data);
-void passgen_random_close_xorshift(void *data);
