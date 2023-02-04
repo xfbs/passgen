@@ -9,7 +9,7 @@
 ///
 /// The root element of a pattern is a group, but it does not need to be
 /// enclosed in parantheses.
-typedef struct passgen_pattern {
+typedef struct {
     /// Items in this pattern.
     passgen_pattern_group group;
 } passgen_pattern;

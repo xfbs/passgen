@@ -5,16 +5,12 @@
 #include <stddef.h>
 #include <passgen/pattern/pattern.h>
 
-struct passgen_pattern;
-
 /// An error occured while parsing.
-struct passgen_error {
+typedef struct {
     const char *message;
     size_t codepoint;
     size_t byte;
-};
-
-typedef struct passgen_error passgen_error;
+} passgen_error;
 
 /// Parse a pattern.
 ///
@@ -27,6 +23,6 @@ typedef struct passgen_error passgen_error;
 ///   contains a fully parsed passgen pattern. If it returns nonzero, it means that @ref error
 ///   contains information about what went wrong.
 int passgen_parse(
-    struct passgen_pattern *pattern,
+    passgen_pattern *pattern,
     passgen_error *error,
     const char *string);

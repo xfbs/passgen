@@ -185,7 +185,7 @@ size_t passgen_generate_fill_utf8(
 }
 
 size_t passgen_generate_fill_json_utf8(
-    struct passgen_pattern *pattern,
+    passgen_pattern *pattern,
     struct passgen_env *env,
     uint8_t *buffer,
     size_t len) {

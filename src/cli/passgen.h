@@ -96,7 +96,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]);
 int passgen_cli_run(passgen_cli_opts opts);
 
 /// Generate passgen passwords.
-int passgen_cli_generate(passgen_cli_opts opts, struct passgen_pattern *pattern);
+int passgen_cli_generate(passgen_cli_opts opts, passgen_pattern *pattern);
 
 /// Free data from passgen ops.
 void passgen_cli_opts_free(passgen_cli_opts *opts);
