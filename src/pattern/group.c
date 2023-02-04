@@ -42,7 +42,7 @@ void passgen_pattern_group_finish(passgen_pattern_group *group) {
 }
 
 passgen_pattern_segment *
-passgen_pattern_group_new_segment(passgen_pattern_group *group) {
+passgen_pattern_group_segment_append(passgen_pattern_group *group) {
     group->multiplier_sum += 1;
     passgen_pattern_segment *segment =
         passgen_stack_push(&group->segments, NULL);
@@ -52,6 +52,6 @@ passgen_pattern_group_new_segment(passgen_pattern_group *group) {
 }
 
 passgen_pattern_segment *
-passgen_pattern_group_get_segment(passgen_pattern_group *group, size_t n) {
+passgen_pattern_group_segment_get(passgen_pattern_group *group, size_t n) {
     return passgen_stack_get(&group->segments, n);
 }

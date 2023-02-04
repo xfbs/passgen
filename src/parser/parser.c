@@ -127,7 +127,7 @@ void passgen_parser_init(passgen_parser *parser, passgen_pattern *pattern) {
     passgen_parser_state_push_group(
         parser,
         &parser->pattern->group,
-        passgen_pattern_group_new_segment(&parser->pattern->group));
+        passgen_pattern_group_segment_append(&parser->pattern->group));
 }
 
 passgen_pattern *passgen_parser_free(passgen_parser *parser) {
@@ -264,7 +264,7 @@ int passgen_parse_group(
                 if(state->data.group.segment->multiplier > 0) {
                     // create new segment and parser state
                     state->data.group.segment =
-                        passgen_pattern_group_new_segment(
+                        passgen_pattern_group_segment_append(
                             state->data.group.group);
                 } else {
                     // if the previous segment had a zero multiplier, recycle it
@@ -290,7 +290,7 @@ int passgen_parse_group(
                 passgen_parser_state_push_group(
                     parser,
                     group,
-                    passgen_pattern_group_new_segment(group));
+                    passgen_pattern_group_segment_append(group));
                 return 0;
             case '[':
                 passgen_parser_state_push_set(

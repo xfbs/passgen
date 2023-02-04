@@ -50,7 +50,7 @@ test_result test_parser_empty(void) {
 
     // single empty segment
     assert(1 == parser.pattern->group.segments.len);
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(0 == segment->items.len);
 
     POSTAMBLE();
@@ -62,7 +62,7 @@ test_result test_parser_segment_multiplier(void) {
     PREAMBLE();
     PARSE_CODEPOINT('(');
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     item = passgen_pattern_segment_get_item(segment, 0);
 
     PARSE_CODEPOINT('{');
@@ -71,7 +71,7 @@ test_result test_parser_segment_multiplier(void) {
 
     assert_eq(item->data.group.segments.len, 1);
     assert_eq(item->data.group.multiplier_sum, 5);
-    segment = passgen_pattern_group_get_segment(&item->data.group, 0);
+    segment = passgen_pattern_group_segment_get(&item->data.group, 0);
     assert_eq(segment->multiplier, 5);
 
     PARSE_CODEPOINT('a');
@@ -82,7 +82,7 @@ test_result test_parser_segment_multiplier(void) {
 
     assert_eq(item->data.group.segments.len, 2);
     assert_eq(item->data.group.multiplier_sum, 6);
-    segment = passgen_pattern_group_get_segment(&item->data.group, 1);
+    segment = passgen_pattern_group_segment_get(&item->data.group, 1);
     assert_eq(segment->multiplier, 1);
 
     PARSE_CODEPOINT('b');
@@ -95,7 +95,7 @@ test_result test_parser_segment_multiplier(void) {
 
     assert_eq(item->data.group.segments.len, 3);
     assert_eq(item->data.group.multiplier_sum, 7);
-    segment = passgen_pattern_group_get_segment(&item->data.group, 2);
+    segment = passgen_pattern_group_segment_get(&item->data.group, 2);
     assert_eq(segment->multiplier, 1);
 
     PARSE_CODEPOINT('{');
@@ -123,7 +123,7 @@ test_result test_parser_skip_zero_segment(void) {
     PREAMBLE();
     PARSE_CODEPOINT('(');
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     item = passgen_pattern_segment_get_item(segment, 0);
     assert_eq(item->data.group.segments.len, 1);
 
@@ -154,7 +154,7 @@ test_result test_parser_empty_group(void) {
     PARSE_CODEPOINT('(');
 
     assert(1 == parser.pattern->group.segments.len);
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(1 == segment->items.len);
 
@@ -167,7 +167,7 @@ test_result test_parser_empty_group(void) {
     PARSE_CODEPOINT(')');
 
     assert(1 == parser.pattern->group.segments.len);
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(1 == segment->items.len);
 
@@ -176,7 +176,7 @@ test_result test_parser_empty_group(void) {
         PARSE_CODEPOINT(')');
 
         assert(1 == parser.pattern->group.segments.len);
-        segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+        segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
         assert(segment);
         assert(1 == segment->items.len);
     }
@@ -192,7 +192,7 @@ test_result test_parser_single_char(void) {
     // single segment containing char 'a'
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(1 == segment->items.len);
 
@@ -215,7 +215,7 @@ test_result test_parser_multi_char(void) {
     // single segment containing char 'a'
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(1 == segment->items.len);
 
@@ -239,7 +239,7 @@ test_result test_parser_multi_groups(void) {
 
     assert(2 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(1 == segment->items.len);
 
     item = passgen_pattern_segment_get_item(segment, 0);
@@ -248,7 +248,7 @@ test_result test_parser_multi_groups(void) {
     assert(item->data.literal.codepoints[0] == 'a');
     assert(item->data.literal.count == 1);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 1);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 1);
     assert(1 == segment->items.len);
 
     item = passgen_pattern_segment_get_item(segment, 0);
@@ -270,7 +270,7 @@ test_result test_parser_nested_groups(void) {
 
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(1 == segment->items.len);
 
     item = passgen_pattern_segment_get_item(segment, 0);
@@ -279,7 +279,7 @@ test_result test_parser_nested_groups(void) {
 
     assert(1 == item->data.group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&item->data.group, 0);
+    segment = passgen_pattern_group_segment_get(&item->data.group, 0);
     assert(1 == segment->items.len);
 
     item = passgen_pattern_segment_get_item(segment, 0);
@@ -322,7 +322,7 @@ test_result test_parser_multi_nested_groups(void) {
 
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(2 == segment->items.len);
 
     item = passgen_pattern_segment_get_item(segment, 0);
@@ -331,7 +331,7 @@ test_result test_parser_multi_nested_groups(void) {
 
     assert(1 == item->data.group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&item->data.group, 0);
+    segment = passgen_pattern_group_segment_get(&item->data.group, 0);
     assert(1 == segment->items.len);
 
     item = passgen_pattern_segment_get_item(segment, 0);
@@ -340,14 +340,14 @@ test_result test_parser_multi_nested_groups(void) {
     assert(item->data.literal.codepoints[0] == 'a');
     assert(item->data.literal.count == 1);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     item = passgen_pattern_segment_get_item(segment, 1);
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_GROUP);
 
     assert(1 == item->data.group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&item->data.group, 0);
+    segment = passgen_pattern_group_segment_get(&item->data.group, 0);
     assert(1 == segment->items.len);
 
     item = passgen_pattern_segment_get_item(segment, 0);
@@ -372,7 +372,7 @@ test_result test_parser_set_simple(void) {
     // single segment containing char 'a'
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(1 == segment->items.len);
 
@@ -409,7 +409,7 @@ test_result test_parser_set_simple_escaped(void) {
     // single segment containing char 'a'
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(1 == segment->items.len);
 
@@ -451,7 +451,7 @@ test_result test_parser_range_simple(void) {
     // single segment containing char 'a'
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(1 == segment->items.len);
 
@@ -486,7 +486,7 @@ test_result test_parser_range_multiple(void) {
     // single segment containing char 'a'
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(1 == segment->items.len);
 
@@ -521,7 +521,7 @@ test_result test_parser_char_repeat(void) {
     // single segment containing char 'a'
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(1 == segment->items.len);
 
@@ -551,7 +551,7 @@ test_result test_parser_char_repeat_range(void) {
     // single segment containing char 'a'
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(1 == segment->items.len);
 
@@ -577,7 +577,7 @@ test_result test_parser_group_ignore_escaped(void) {
 
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(1 == segment->items.len);
 
@@ -613,7 +613,7 @@ test_result test_parser_item_maybe(void) {
     // single segment containing char 'a'
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(4 == segment->items.len);
 
@@ -671,7 +671,7 @@ test_result test_parser_special_pronounceable(void) {
 
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(1 == segment->items.len);
 
@@ -706,7 +706,7 @@ test_result test_parser_mixed_special(void) {
 
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(2 == segment->items.len);
 
@@ -744,7 +744,7 @@ test_result test_parser_char_maybe_char(void) {
 
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(3 == segment->items.len);
 
@@ -811,7 +811,7 @@ test_result test_parser_char_repeat_tainted(void) {
 
     assert(1 == parser.pattern->group.segments.len);
 
-    segment = passgen_pattern_group_get_segment(&parser.pattern->group, 0);
+    segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
     assert(segment);
     assert(5 == segment->items.len);
 

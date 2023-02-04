@@ -19,53 +19,53 @@
 #include <string.h>
 #include <utf8proc.h>
 
-size_t passgen_generate_repeat(
+static size_t passgen_generate_repeat(
     passgen_env *env,
     passgen_pattern_repeat *repeat);
 
-int passgen_generate_set(
+static int passgen_generate_set(
     passgen_pattern_set *set,
     passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
-int passgen_generate_character(
+static int passgen_generate_character(
     passgen_pattern_literal *character,
     passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
-int passgen_generate_special_pronounceable(
+static int passgen_generate_special_pronounceable(
     passgen_pattern_special *special,
     passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
-int passgen_generate_special_wordlist(
+static int passgen_generate_special_wordlist(
     passgen_pattern_special *special,
     passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
-int passgen_generate_special(
+static int passgen_generate_special(
     passgen_pattern_special *special,
     passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
-int passgen_generate_group(
+static int passgen_generate_group(
     passgen_pattern_group *group,
     passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
-int passgen_generate_item(
+static int passgen_generate_item(
     passgen_pattern_item *item,
     passgen_env *env,
     void *data,
     passgen_generate_cb *func);
 
-int passgen_generate_segment(
+static int passgen_generate_segment(
     passgen_pattern_segment *segment,
     passgen_env *env,
     void *data,
@@ -256,7 +256,7 @@ size_t passgen_generate_fill_json_utf8(
     return fillpos.cur;
 }
 
-size_t
+static size_t
 passgen_generate_repeat(passgen_env *env, passgen_pattern_repeat *repeat) {
     size_t difference = repeat->max - repeat->min;
 
@@ -276,7 +276,7 @@ passgen_generate_repeat(passgen_env *env, passgen_pattern_repeat *repeat) {
     return repeat->min + choice;
 }
 
-int passgen_generate_set(
+static int passgen_generate_set(
     passgen_pattern_set *set,
     passgen_env *env,
     void *data,
@@ -320,7 +320,7 @@ int passgen_generate_set(
     return func(data, range->start + choice);
 }
 
-int passgen_generate_character(
+static int passgen_generate_character(
     passgen_pattern_literal *character,
     passgen_env *env,
     void *data,
@@ -337,7 +337,7 @@ int passgen_generate_character(
     return 0;
 }
 
-int passgen_generate_special_pronounceable(
+static int passgen_generate_special_pronounceable(
     passgen_pattern_special *special,
     passgen_env *env,
     void *data,
@@ -377,7 +377,7 @@ int passgen_generate_special_pronounceable(
     return 0;
 }
 
-int passgen_generate_special_wordlist(
+static int passgen_generate_special_wordlist(
     passgen_pattern_special *special,
     passgen_env *env,
     void *data,
@@ -404,7 +404,7 @@ int passgen_generate_special_wordlist(
     return 0;
 }
 
-int passgen_generate_special_preset(
+static int passgen_generate_special_preset(
     passgen_pattern_special *special,
     passgen_env *env,
     void *data,
@@ -417,7 +417,7 @@ int passgen_generate_special_preset(
     return 0;
 }
 
-int passgen_generate_special(
+static int passgen_generate_special(
     passgen_pattern_special *special,
     passgen_env *env,
     void *data,
@@ -439,7 +439,7 @@ int passgen_generate_special(
     return 0;
 }
 
-int passgen_generate_item(
+static int passgen_generate_item(
     passgen_pattern_item *item,
     passgen_env *env,
     void *data,
@@ -487,7 +487,7 @@ int passgen_generate_item(
     return 0;
 }
 
-int passgen_generate_segment(
+static int passgen_generate_segment(
     passgen_pattern_segment *segment,
     passgen_env *env,
     void *data,
@@ -501,7 +501,7 @@ int passgen_generate_segment(
     return 0;
 }
 
-int passgen_generate_group(
+static int passgen_generate_group(
     passgen_pattern_group *group,
     passgen_env *env,
     void *data,

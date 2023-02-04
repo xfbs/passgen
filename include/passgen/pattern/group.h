@@ -65,7 +65,7 @@ void passgen_pattern_group_free(passgen_pattern_group *group);
 /// @param group Group to append segment to
 /// @returns Point to the newly appended segment
 passgen_pattern_segment *
-passgen_pattern_group_new_segment(passgen_pattern_group *group);
+passgen_pattern_group_segment_append(passgen_pattern_group *group);
 
 /// Get a specific segment from a @ref passgen_pattern_group by index.
 ///
@@ -74,4 +74,4 @@ passgen_pattern_group_new_segment(passgen_pattern_group *group);
 /// @param n Offset of segment to return
 /// @returns Pointer to the segment or NULL if it does not exist
 passgen_pattern_segment *
-passgen_pattern_group_get_segment(passgen_pattern_group *group, size_t n);
+passgen_pattern_group_segment_get(passgen_pattern_group *group, size_t n);
