@@ -248,11 +248,15 @@ const passgen_hashmap_context passgen_hashmap_context_utf8 = {
 };
 
 static size_t unicode_len(const void *data) {
+    // cast void pointer to array of UTF-32 codepoints
     const int32_t *unicode = data;
+
+    // iterate over until we hit zero codepoint
     size_t len = 0;
     while(unicode[len]) {
         len++;
     }
+
     return len;
 }
 
@@ -273,12 +277,20 @@ unicode_hash(const passgen_hashmap *map, const void *key, bool first) {
 static bool
 unicode_equal(const passgen_hashmap *map, const void *lhs, const void *rhs) {
     UNUSED(map);
+    // compute lengths of lhs and rhs
     size_t rhs_len = unicode_len(rhs);
     size_t lhs_len = unicode_len(lhs);
+
+    // if lengths are not the same, the keys cannot be equal
     if(rhs_len != lhs_len) {
         return false;
     }
-    return memcmp(lhs, rhs, rhs_len) == 0;
+
+    // compare lhs and rhs
+    int ret = memcmp(lhs, rhs, rhs_len * sizeof(uint32_t));
+
+    // return true if comparison was equal
+    return ret == 0;
 }
 
 const passgen_hashmap_context passgen_hashmap_context_unicode = {

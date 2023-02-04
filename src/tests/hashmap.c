@@ -10,13 +10,57 @@ test_result test_hashmap_init(void) {
     return test_ok;
 }
 
+test_result test_hashmap_context_utf8(void) {
+    passgen_hashmap map;
+    passgen_hashmap_init(&map, &passgen_hashmap_context_utf8);
+
+    const char *key1 = "hello";
+    const char *key2 = "hola";
+
+    assert(passgen_hashmap_context_utf8.equal(&map, key1, key1));
+    assert(passgen_hashmap_context_utf8.equal(&map, key2, key2));
+    assert(!passgen_hashmap_context_utf8.equal(&map, key1, key2));
+
+    assert_eq(passgen_hashmap_context_utf8.hash(&map, key1, true), 0xf6f0cd43722c7cfe);
+    assert_eq(passgen_hashmap_context_utf8.hash(&map, key1, false), 0x438bcb516e4d4abf);
+
+    assert_eq(passgen_hashmap_context_utf8.hash(&map, key2, true), 0xcb99aa476d12f348);
+    assert_eq(passgen_hashmap_context_utf8.hash(&map, key2, false), 0xef7ec81d7aa533ea);
+
+    passgen_hashmap_free(&map);
+
+    return test_ok;
+}
+
+test_result test_hashmap_context_unicode(void) {
+    passgen_hashmap map;
+    passgen_hashmap_init(&map, &passgen_hashmap_context_unicode);
+
+    uint32_t key1[] = {'h', 'e', 'l', 'l', 'o', 0};
+    uint32_t key2[] = {'h', 'o', 'l', 'a', 0};
+
+    assert(passgen_hashmap_context_unicode.equal(&map, &key1[0], &key1[0]));
+    assert(passgen_hashmap_context_unicode.equal(&map, &key2[0], &key2[0]));
+    assert(!passgen_hashmap_context_unicode.equal(&map, &key1[0], &key2[0]));
+
+    assert_eq(passgen_hashmap_context_unicode.hash(&map, &key1[0], true), 0x4b9a41e6925a46ad);
+    assert_eq(passgen_hashmap_context_unicode.hash(&map, &key1[0], false), 0x6ce43ac01a6144b8);
+
+    assert_eq(passgen_hashmap_context_unicode.hash(&map, &key2[0], true), 0xdefab330a5dcde19);
+    assert_eq(passgen_hashmap_context_unicode.hash(&map, &key2[0], false), 0x45168f9b31b7e7bd);
+
+    passgen_hashmap_free(&map);
+
+    return test_ok;
+}
+
 test_result test_hashmap_unicode(void) {
     passgen_hashmap map;
     passgen_hashmap_entry entry;
 
     passgen_hashmap_init(&map, &passgen_hashmap_context_unicode);
 
-    uint64_t key1[] = {'h', 'e', 'l', 'l', 'o', 0};
+    uint32_t key1[] = {'h', 'e', 'l', 'l', 'o', 0};
     int value1;
     entry = passgen_hashmap_insert(&map, &key1, &value1);
     assert_eq(entry.key, NULL);
@@ -24,14 +68,14 @@ test_result test_hashmap_unicode(void) {
     assert_eq(map.len, 1);
     assert_eq(passgen_hashmap_lookup(&map, &key1)->value, &value1);
 
-    uint64_t key2[] = {'h', 'o', 'l', 'a', 0};
+    uint32_t key2[] = {'h', 'o', 'l', 'a', 0};
     int value2;
-    entry = passgen_hashmap_insert(&map, &key2, value2);
-    assert_eq(map.len, 1);
-    // assert_eq(entry.key, NULL);
-    // assert_eq(entry.value, NULL);
-    // assert_eq(passgen_hashmap_lookup(&map, &key1)->value, &value1);
-    // assert_eq(passgen_hashmap_lookup(&map, &key2)->value, &value2);
+    entry = passgen_hashmap_insert(&map, &key2, &value2);
+    assert_eq(map.len, 2);
+    assert_eq(entry.key, NULL);
+    assert_eq(entry.value, NULL);
+    assert_eq(passgen_hashmap_lookup(&map, &key1)->value, &value1);
+    assert_eq(passgen_hashmap_lookup(&map, &key2)->value, &value2);
 
     passgen_hashmap_free(&map);
 
