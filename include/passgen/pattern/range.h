@@ -21,6 +21,6 @@ typedef struct {
     uint32_t start;
     /// Final character in the end.
     uint32_t end;
-
+    /// Multiplier for this range (currently not used).
     size_t multiplier;
 } passgen_pattern_range;
