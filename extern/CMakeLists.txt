@@ -1,6 +1,7 @@
 # dependency: utf8proc
 if(BUILD_UTF8PROC)
     add_subdirectory(utf8proc EXCLUDE_FROM_ALL)
+    target_compile_options(utf8proc PRIVATE -fvisibility=hidden)
 else()
     find_package(utf8proc)
 endif()
@@ -14,7 +15,3 @@ endif(USE_LIBEXECINFO)
 if(PASSGEN_SECCOMP)
     find_library(libseccomp seccomp)
 endif()
-
-add_library(criterion INTERFACE)
-target_link_libraries(criterion INTERFACE ${CRITERION_LIBRARIES})
-target_include_directories(criterion INTERFACE ${CRITERION_INCLUDE_DIRS})
