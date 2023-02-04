@@ -15,6 +15,46 @@
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
 
+int passgen_parse_group(
+    struct passgen_parser *parser,
+    struct passgen_token *token,
+    passgen_parser_state *state);
+
+int passgen_parse_multiplier(
+    struct passgen_parser *parser,
+    struct passgen_token *token,
+    passgen_parser_state *state);
+
+int passgen_parse_set(
+    struct passgen_parser *parser,
+    struct passgen_token *token,
+    passgen_parser_state *state);
+
+int passgen_parse_set_range(
+    struct passgen_parser *parser,
+    struct passgen_token *token,
+    passgen_parser_state *state);
+
+int passgen_parse_repeat(
+    struct passgen_parser *parser,
+    struct passgen_token *token,
+    passgen_parser_state *state);
+
+int passgen_parse_repeat_range(
+    struct passgen_parser *parser,
+    struct passgen_token *token,
+    passgen_parser_state *state);
+
+int passgen_parse_special(
+    struct passgen_parser *parser,
+    struct passgen_token *token,
+    passgen_parser_state *state);
+
+int passgen_parse_special_name(
+    struct passgen_parser *parser,
+    struct passgen_token *token,
+    passgen_parser_state *state);
+
 inline passgen_parser_state *passgen_parser_state_push(passgen_parser *parser) {
     return passgen_stack_push(&parser->state, NULL);
 }
@@ -98,11 +138,11 @@ passgen_pattern *passgen_parser_free(passgen_parser *parser) {
 }
 
 passgen_parser_state *
-passgen_parser_get_state(passgen_parser *parser, size_t n) {
+passgen_parser_state_get(passgen_parser *parser, size_t n) {
     return passgen_stack_get(&parser->state, n);
 }
 
-passgen_parser_state *passgen_parser_get_state_last(passgen_parser *parser) {
+passgen_parser_state *passgen_parser_state_last(passgen_parser *parser) {
     return passgen_stack_top(&parser->state);
 }
 
@@ -140,7 +180,7 @@ last_single_item_taint(passgen_pattern_segment *segment) {
 }
 
 int passgen_parse_token(passgen_parser *parser, passgen_token *token) {
-    passgen_parser_state *state = passgen_parser_get_state_last(parser);
+    passgen_parser_state *state = passgen_parser_state_last(parser);
 
     if(parser->limit && parser->state.len >= parser->limit) {
         return -1;
@@ -466,7 +506,7 @@ int passgen_parse_finish(passgen_parser *parser) {
     }
 
     // make sure last state is a group
-    passgen_parser_state *state = passgen_parser_get_state_last(parser);
+    passgen_parser_state *state = passgen_parser_state_last(parser);
     if(state->type != PASSGEN_PARSER_GROUP) {
         return -1;
     }
