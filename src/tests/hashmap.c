@@ -10,6 +10,34 @@ test_result test_hashmap_init(void) {
     return test_ok;
 }
 
+test_result test_hashmap_unicode(void) {
+    passgen_hashmap map;
+    passgen_hashmap_entry entry;
+
+    passgen_hashmap_init(&map, &passgen_hashmap_context_unicode);
+
+    uint64_t key1[] = {'h', 'e', 'l', 'l', 'o', 0};
+    int value1;
+    entry = passgen_hashmap_insert(&map, &key1, &value1);
+    assert_eq(entry.key, NULL);
+    assert_eq(entry.value, NULL);
+    assert_eq(map.len, 1);
+    assert_eq(passgen_hashmap_lookup(&map, &key1)->value, &value1);
+
+    uint64_t key2[] = {'h', 'o', 'l', 'a', 0};
+    int value2;
+    entry = passgen_hashmap_insert(&map, &key2, value2);
+    assert_eq(map.len, 1);
+    // assert_eq(entry.key, NULL);
+    // assert_eq(entry.value, NULL);
+    // assert_eq(passgen_hashmap_lookup(&map, &key1)->value, &value1);
+    // assert_eq(passgen_hashmap_lookup(&map, &key2)->value, &value2);
+
+    passgen_hashmap_free(&map);
+
+    return test_ok;
+}
+
 test_result test_hashmap_insert(void) {
     passgen_hashmap map;
     passgen_hashmap_init(&map, NULL);

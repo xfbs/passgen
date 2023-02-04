@@ -14,7 +14,8 @@ void passgen_pattern_set_free(passgen_pattern_set *set) {
     free(set->choices_list);
 }
 
-passgen_pattern_range *passgen_pattern_set_range_append(passgen_pattern_set *set) {
+passgen_pattern_range *
+passgen_pattern_set_range_append(passgen_pattern_set *set) {
     return passgen_stack_push(&set->items, NULL);
 }
 

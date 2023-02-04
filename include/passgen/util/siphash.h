@@ -16,5 +16,17 @@
 #include <inttypes.h>
 #include <string.h>
 
-int passgen_siphash(const void *in, const size_t inlen, const void *k, uint8_t *out,
-            const size_t outlen);
+/// SipHash function
+/// High-speed secure pseudorandom function for short messages.
+/// @param in Pointer to data to hash
+/// @param inlen Length of input data
+/// @param k Pointer to key, must be 16 bytes
+/// @param out Pointer to output
+/// @param outlen Length (in bytes) of output, must be 8 or 16.
+/// @returns 0 on success
+int passgen_siphash(
+    const void *in,
+    const size_t inlen,
+    const void *k,
+    uint8_t *out,
+    const size_t outlen);

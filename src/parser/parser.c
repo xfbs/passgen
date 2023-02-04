@@ -259,7 +259,8 @@ int passgen_parse_group(
             passgen_stack_top(&state->data.group.segment->items);
 
         if(last->kind == PASSGEN_PATTERN_LITERAL) {
-            if(0 == passgen_pattern_literal_append(&last->data.literal, codepoint)) {
+            if(0 ==
+               passgen_pattern_literal_append(&last->data.literal, codepoint)) {
                 return 0;
             }
         }

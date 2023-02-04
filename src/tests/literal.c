@@ -14,9 +14,8 @@ test_result test_literal_init(void) {
 
 test_result test_literal_append(void) {
     passgen_pattern_literal literal;
-    const int32_t codepoints[] = {
-        0xabcd, 0x1234, 0x65ac, 0xdaa0, 0xdead, 0xbeef, 0xcafe, 0
-    };
+    const int32_t codepoints[] =
+        {0xabcd, 0x1234, 0x65ac, 0xdaa0, 0xdead, 0xbeef, 0xcafe, 0};
 
     passgen_pattern_literal_init(&literal);
     assert_eq(literal.count, 0);

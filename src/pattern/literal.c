@@ -9,7 +9,9 @@ void passgen_pattern_literal_taint(passgen_pattern_literal *literal) {
     literal->tainted = 1;
 }
 
-int passgen_pattern_literal_append(passgen_pattern_literal *literal, uint32_t codepoint) {
+int passgen_pattern_literal_append(
+    passgen_pattern_literal *literal,
+    uint32_t codepoint) {
     if(literal->count >= 7 || literal->tainted) {
         return 1;
     }

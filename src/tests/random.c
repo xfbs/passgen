@@ -228,6 +228,36 @@ test_result test_random_new(void) {
     return test_ok;
 }
 
+test_result test_random_file(void) {
+    FILE *file = fopen("/dev/zero", "r");
+    assert(file);
+    passgen_random *random = passgen_random_new_file(file);
+    assert(random);
+    assert(random->read);
+    assert(random->close);
+    assert_eq(passgen_random_u8(random), 0);
+    assert_eq(passgen_random_u16(random), 0);
+    assert_eq(passgen_random_u32(random), 0);
+    assert_eq(passgen_random_u64(random), 0);
+    passgen_random_free(random);
+
+    return test_ok;
+}
+
+test_result test_random_zero(void) {
+    passgen_random *random = passgen_random_new_zero();
+    assert(random);
+    assert(random->read);
+    assert(random->close);
+    assert_eq(passgen_random_u8(random), 0);
+    assert_eq(passgen_random_u16(random), 0);
+    assert_eq(passgen_random_u32(random), 0);
+    assert_eq(passgen_random_u64(random), 0);
+    passgen_random_free(random);
+
+    return test_ok;
+}
+
 test_result test_random_new_path(void) {
     passgen_random *random;
     random = passgen_random_new_path("/dev/nonexistent");
