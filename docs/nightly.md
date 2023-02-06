@@ -1,4 +1,4 @@
-# Releases
+# Nightly
 
 As of right now, there are no real releases for passgen, but there are nightly builds from the `master` branch that you can download and try out. Currently, passgen supports a variety of platforms for the Linux builds, as well as macOS and Windows builds. The latter however are considered experimental at this point because they are not tested as part of the CI process.
 

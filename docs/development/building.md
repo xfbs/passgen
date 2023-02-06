@@ -59,16 +59,16 @@ Note that you usually have to delete and recreate the build folder if you want t
 
 | Setting | Description |
 | --- | --- |
-| `BUILD_UTF8PROC` | Build utf8proc, the library used to decode UTF-8. If set to false, it will attempt to use the system version of libutf8proc. |
+| `BUILD_UTF8PROC` | Build utf8proc, the library used to decode UTF-8. If set to false, it will attempt to use the system version of libutf8proc. Enabled by default. |
 | `BUILD_TOOLS` | Build utility binaries. These are only really needed for testing. |
-| `BUILD_BENCH` | Build benchmark utilities. |
-| `BUILD_TESTING` | Build the `passgen-test` executable, which will run unit tests. It is recommended to always build this and run it to make sure there are no obvious issues with the build. |
-| `LIBPASSGEN_STATIC` | Build the static libpassgen library. |
-| `LIBPASSGEN_SHARED` | Build the shared libpassgen library. |
-| `PASSGEN_STATIC` | Link the passgen utility against the static library rather than the dynamic one. |
-| `PASSGEN_SECCOMP` | Enable [seccomp][] filters. These will run at startup to lock passgen down into a sandbox-like mode, used to enhance security, but can be fragile. |
-| `USE_SANITIZER` | Enables use of one of the [LLVM sanitizers][asan]. |
-| `CODE_COVERAGE` | Enable instrumentation for generating code coverage reports. |
+| `BUILD_BENCH` | Build the `passgen-bench` executable, which runs benchmarks against data structures, pattern parsing and password generation. Enabled by default. |
+| `BUILD_TESTING` | Build the `passgen-test` executable, which will run unit tests. It is recommended to always build this and run it to make sure there are no obvious issues with the build. Enabled by default. |
+| `LIBPASSGEN_STATIC` | Build the static libpassgen library. Enabled by default. |
+| `LIBPASSGEN_SHARED` | Build the shared libpassgen library. Enabled by default. |
+| `PASSGEN_STATIC` | Link the passgen utility against the static library rather than the dynamic one. Disabled by default. |
+| `PASSGEN_SECCOMP` | Enable [seccomp][] filters. These will run at startup to lock passgen down into a sandbox-like mode, used to enhance security, but can be fragile. Disabled by default. |
+| `USE_SANITIZER` | Enables use of one of the [LLVM sanitizers][asan]. Disabled by default. |
+| `CODE_COVERAGE` | Enable instrumentation for generating code coverage reports. Disabled by default. |
 
 [asan]: https://clang.llvm.org/docs/AddressSanitizer.html
 [seccomp]: https://www.kernel.org/doc/html/v4.19/userspace-api/seccomp_filter.html

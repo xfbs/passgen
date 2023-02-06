@@ -44,16 +44,28 @@ nav:
     - Entropy: entropy.md
     - Randomness: randomness.md
   - Releases:
-    - Releases: releases.md
+    - Nightly: nightly.md
+    - WASI: wasi.md
     - Installation: install.md
   - Development:
-    - Resources: development.md
-    - Building: building.md
-    - Tooling: tooling.md
-    - Testing: testing.md
-    - Benchmarks: benchmarks.md
-    - CI/CD: ci.md
-    - Security: security.md
+    - Resources: development/index.md
+    - Building: development/building.md
+    - Tooling:
+      - Overview: development/tooling.md
+      - Testing: development/tooling/testing.md
+      - Benchmarks: development/tooling/benchmarks.md
+      - Sanitizers: development/tooling/sanitizers.md
+      - Formatting: development/tooling/formatting.md
+      - Includes: development/tooling/includes.md
+      - Symbols: development/tooling/symbols.md
+      - Coverage: development/tooling/coverage.md
+      - Documentation: development/tooling/documentation.md
+      - Packaging: development/tooling/packaging.md
+      - CI/CD: development/tooling/ci.md
+    - Security: development/security.md
+    - Repository: "https://gitlab.com/xfbs/passgen"
+    - Coverage: "https://passgen.it/coverage/lcov/"
+    - Documentation: "https://passgen.it/docs/"
   - Licenses: licenses.md
   - About: about.md
 

@@ -1,20 +1,45 @@
 # Testing
 
+When the `BUILD_TESTING` option is enabled on the CMake build system (which it
+is, by default), a `passgen-test` binary will be built which runs unit tests
+against the codebase.
+
+For convenience, tests can be run using the `test` target of the build system.
+
+    make test
+
+These should be run and pass before committing.
+
+You can also filter the tests to run only specific tests by calling the test
+binary directly. For example, this will only run tests that start with
+`random`:
+
+    ./src/test/passgen-test random
+
+### Recommendations
+
+It is recommended to run the unit tests under [Valgrind][valgrind]
+occasionally.  This will catch memory leaks and certain kinds of undesired
+behaviour such as illegal memory accesses, at the expense of runtime speed.
+When doing so, it is important to make sure that the tool reports no errors and
+that "all heap blocks were freed".
+
+    $ valgrind ./tests/passgen-test -v
+
+Another recommendation is using the LLVM sanitizers. To do this, the code needs
+to be compiled specially with them enabled, instructions on how to do that can
+be found at the [Tooling](../tooling.md) page.
+
+## Implementation
+
 The folder [`src/tests/`][tests-folder] contains the testing framework, consisting of
 [`tests.h`][tests.h] and [`tests.c`][tests.c] as well as the unit tests
 themselves. The unit testing system is a very basic homegrown one which offers
 `assert()` and `assert_eq()` macros and does some reporting.
 
-[tests-folder]: https://gitlab.com/xfbs/passgen/-/tree/master/src/tests
-[tests.h]: https://gitlab.com/xfbs/passgen/-/blob/master/src/tests/tests.h
-[tests.c]: https://gitlab.com/xfbs/passgen/-/blob/master/src/tests/tests.c
-
 Every file containing tests is listed in the [`CMakeLists.txt`][cmakelists] in the tests folder. Any test
 sources listed there are automatically scanned for unit tests by 
 [`scripts/generate_test_list.rb`][generate-test-list].
-
-[cmakelists]: https://gitlab.com/xfbs/passgen/-/blob/master/src/tests/CMakeLists.txt
-[generate-test-list]: https://gitlab.com/xfbs/passgen/-/blob/master/scripts/generate-test-list.rb
 
 At build time, a list of these functions is automatically generated in
 `<build-folder>/tests/test_list.c`. This means that adding a new test function
@@ -82,13 +107,9 @@ The filters can be used to only run tests starting with a specific name, which
 is not really necessary as running all tests only takes a fraction of a second
 anyways, but can be useful when certain tests are broken during a refactoring.
 
-### Recommendations
-
-It usually makes sure to run tests with some kind of sanitizer, such as valgrind.
-This catches illegal memory accesses, at the expense of runtime speed.
-
-    $ valgrind ./tests/passgen-test
-
-Another recommendation is using the LLVM sanitizers. To do this, the code needs
-to be compiled specially with them enabled, instructions on how to do that can
-be found at the [Tooling](tooling.md) page.
+[tests-folder]: https://gitlab.com/xfbs/passgen/-/tree/master/src/tests
+[tests.h]: https://gitlab.com/xfbs/passgen/-/blob/master/src/tests/tests.h
+[tests.c]: https://gitlab.com/xfbs/passgen/-/blob/master/src/tests/tests.c
+[cmakelists]: https://gitlab.com/xfbs/passgen/-/blob/master/src/tests/CMakeLists.txt
+[generate-test-list]: https://gitlab.com/xfbs/passgen/-/blob/master/scripts/generate-test-list.rb
+[valgrind]: https://valgrind.org/
