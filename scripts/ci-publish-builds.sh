@@ -40,4 +40,4 @@ sign public/nightly/passgen-win64-amd64.zip
 sign public/nightly/passgen-wasi.wasm
 
 # export keys file
-cp passgen.pub public/passgen.pub
+cp data/passgen.pub public/passgen.pub
