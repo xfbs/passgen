@@ -1,7 +1,7 @@
 # Tooling
 
 <figure markdown>
-[![Tooling](images/tooling.jpg){ width="600px" }](https://unsplash.com/photos/t5YUoHW6zRo)
+[![Tooling](../images/tooling.jpg){ width="600px" }](https://unsplash.com/photos/t5YUoHW6zRo)
 <figcaption>Tooling in a woodworking shop</figcaption>
 </figure>
 
