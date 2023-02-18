@@ -15,11 +15,13 @@
 /// This allows for passing data to the generation functions, such as the available wordlists
 /// for word-based patterns and the randomness generator.
 typedef struct passgen_env {
-    bool find_entropy;
-    double entropy;
+    /// Recursion depth limit for generation
     size_t depth_limit;
+    /// Wordlists that are loaded
     passgen_hashmap wordlists;
+    /// Presets that are loaded
     passgen_hashmap presets;
+    /// Source of randomness
     passgen_random *random;
 } passgen_env;
 

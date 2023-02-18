@@ -46,6 +46,7 @@
         size_t len = passgen_generate_fill_unicode(                        \
             parser.pattern,                                                \
             &env,                                                          \
+            NULL, \
             output,                                                        \
             sizeof(output));                                               \
         output[len] = 0;                                                   \
@@ -307,9 +308,7 @@ test_result test_generate_depth_limit_zero(void) {
     passgen_env_init(&env, &random);
     env.depth_limit = 0;
 
-    uint8_t output[256];
-
-    int ret = passgen_generate(&pattern, &env, NULL, dummy_callback);
+    int ret = passgen_generate(&pattern, &env, NULL, NULL, dummy_callback);
 
     // can't generate
     assert(ret != 0);
@@ -334,9 +333,7 @@ test_result test_generate_depth_limit_one(void) {
     passgen_env_init(&env, &random);
     env.depth_limit = 1;
 
-    uint8_t output[256];
-
-    int ret = passgen_generate(&pattern, &env, NULL, dummy_callback);
+    int ret = passgen_generate(&pattern, &env, NULL, NULL, dummy_callback);
     assert_eq(ret, 0);
 
     passgen_pattern_free(&pattern);
@@ -359,9 +356,7 @@ test_result test_generate_depth_limit_one_over(void) {
     passgen_env_init(&env, &random);
     env.depth_limit = 1;
 
-    uint8_t output[256];
-
-    int ret = passgen_generate(&pattern, &env, NULL, dummy_callback);
+    int ret = passgen_generate(&pattern, &env, NULL, NULL, dummy_callback);
     assert(ret != 0);
 
     passgen_pattern_free(&pattern);
@@ -384,9 +379,7 @@ test_result test_generate_depth_limit_two(void) {
     passgen_env_init(&env, &random);
     env.depth_limit = 2;
 
-    uint8_t output[256];
-
-    int ret = passgen_generate(&pattern, &env, NULL, dummy_callback);
+    int ret = passgen_generate(&pattern, &env, NULL, NULL, dummy_callback);
     assert(ret == 0);
 
     passgen_pattern_free(&pattern);
@@ -409,9 +402,7 @@ test_result test_generate_depth_limit_two_over(void) {
     passgen_env_init(&env, &random);
     env.depth_limit = 2;
 
-    uint8_t output[256];
-
-    int ret = passgen_generate(&pattern, &env, NULL, dummy_callback);
+    int ret = passgen_generate(&pattern, &env, NULL, NULL, dummy_callback);
     assert(ret != 0);
 
     passgen_pattern_free(&pattern);

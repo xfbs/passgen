@@ -40,6 +40,8 @@ typedef struct {
     bool null;
     /// Output as JSON.
     bool json;
+    /// Collect entropy
+    bool entropy;
     /// Parsing depth.
     size_t depth;
     /// Length of markov chain

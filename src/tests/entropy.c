@@ -18,13 +18,13 @@ double entropy(const char *p) {
     passgen_random_open(&random, NULL);
     passgen_env env;
     passgen_env_init(&env, &random);
-    env.find_entropy = true;
+    double entropy;
     int length =
-        passgen_generate_fill_utf8(&pattern, &env, &buffer[0], buffer_len);
+        passgen_generate_fill_utf8(&pattern, &env, &entropy, &buffer[0], buffer_len);
     buffer[length] = 0;
     passgen_pattern_free(&pattern);
 
-    return env.entropy;
+    return entropy;
 }
 
 bool equals(double a, double b) {

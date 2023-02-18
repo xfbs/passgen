@@ -5,8 +5,6 @@
 #include <string.h>
 
 void passgen_env_init(passgen_env *env, passgen_random *random) {
-    env->entropy = 0;
-    env->find_entropy = false;
     env->depth_limit = 1024;
     env->random = random;
     passgen_hashmap_init(&env->wordlists, &passgen_hashmap_context_utf8);

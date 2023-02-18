@@ -94,11 +94,6 @@ struct fillpos_utf8 {
     size_t len;
 };
 
-static passgen_env passgen_env_default = {
-    .find_entropy = false,
-    .random = NULL,
-};
-
 static int passgen_generate_write_buffer(void *data, uint32_t codepoint) {
     struct fillpos *fillpos = data;
 
@@ -210,6 +205,7 @@ passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
 size_t passgen_generate_fill_unicode(
     const passgen_pattern *pattern,
     passgen_env *env,
+    double *entropy,
     uint32_t *buffer,
     size_t len) {
     struct fillpos fillpos = {
@@ -221,6 +217,7 @@ size_t passgen_generate_fill_unicode(
     try(passgen_generate(
         pattern,
         env,
+        entropy,
         &fillpos,
         passgen_generate_write_buffer));
 
@@ -230,6 +227,7 @@ size_t passgen_generate_fill_unicode(
 size_t passgen_generate_fill_utf8(
     const passgen_pattern *pattern,
     passgen_env *env,
+    double *entropy,
     uint8_t *buffer,
     size_t len) {
     struct fillpos_utf8 fillpos = {
@@ -241,6 +239,7 @@ size_t passgen_generate_fill_utf8(
     try(passgen_generate(
         pattern,
         env,
+        entropy,
         &fillpos,
         passgen_generate_write_buffer_utf8));
 
@@ -249,7 +248,8 @@ size_t passgen_generate_fill_utf8(
 
 size_t passgen_generate_fill_json_utf8(
     const passgen_pattern *pattern,
-    struct passgen_env *env,
+    passgen_env *env,
+    double *entropy,
     uint8_t *buffer,
     size_t len) {
     struct fillpos_utf8 fillpos = {
@@ -261,6 +261,7 @@ size_t passgen_generate_fill_json_utf8(
     try(passgen_generate(
         pattern,
         env,
+        entropy,
         &fillpos,
         passgen_generate_write_buffer_json_utf8));
 
@@ -282,8 +283,8 @@ static size_t passgen_generate_repeat(
         passgen_random_u64_max(context->env->random, difference + 1);
 
     // keep track of entropy
-    if(context->env->find_entropy) {
-        context->env->entropy *= difference + 1;
+    if(context->entropy) {
+        *context->entropy *= difference + 1;
     }
 
     return repeat->min + choice;
@@ -306,8 +307,8 @@ static int passgen_generate_set(
     size_t choice = passgen_random_u64_max(context->env->random, possible);
 
     // keep track of entropy
-    if(context->env->find_entropy) {
-        context->env->entropy *= possible;
+    if(context->entropy) {
+        *context->entropy *= possible;
     }
 
     // locate choice in list of choices.
@@ -364,7 +365,7 @@ static int passgen_generate_special_markov(
     size_t pos = markov->level;
     memset(word, 0, pos * sizeof(uint32_t));
     double *entropy =
-        context->env->find_entropy ? &context->env->entropy : NULL;
+        context->entropy ? &*context->entropy : NULL;
     do {
         word[pos] = passgen_markov_generate(
             markov,
@@ -401,8 +402,8 @@ static int passgen_generate_special_wordlist(
         word++;
     }
 
-    if(context->env->find_entropy) {
-        context->env->entropy *= passgen_wordlist_count(wordlist);
+    if(context->entropy) {
+        *context->entropy *= passgen_wordlist_count(wordlist);
     }
 
     return 0;
@@ -506,9 +507,9 @@ static int passgen_generate_group(
     }
 
     // keep track of entropy
-    if(context->env->find_entropy) {
-        context->env->entropy *= group->multiplier_sum;
-        context->env->entropy /= segment->multiplier;
+    if(context->entropy) {
+        *context->entropy *= group->multiplier_sum;
+        *context->entropy /= segment->multiplier;
     }
 
     try(passgen_generate_segment(context, segment));
@@ -521,15 +522,13 @@ static int passgen_generate_group(
 int passgen_generate(
     const passgen_pattern *pattern,
     passgen_env *env,
+    double *entropy,
     void *data,
     passgen_generate_cb *func) {
-    /* use default env if none was supplied. this should be relatively sane. */
-    if(!env) {
-        env = &passgen_env_default;
-    }
-
-    if(env->find_entropy) {
-        env->entropy = 1;
+    // when entropy collection is request (by passing a non-NULL pointer),
+    // initialize it.
+    if(entropy) {
+        *entropy = 1.0;
     }
 
     passgen_generate_context context = {
@@ -537,7 +536,7 @@ int passgen_generate(
         .depth = env->depth_limit,
         .func = func,
         .data = data,
-        .entropy = &env->entropy,
+        .entropy = entropy,
     };
 
     return passgen_generate_group(&context, &pattern->group);

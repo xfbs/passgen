@@ -31,6 +31,7 @@ typedef int passgen_generate_cb(void *data, uint32_t codepoint);
 size_t passgen_generate_fill_unicode(
     const passgen_pattern *pattern,
     passgen_env *env,
+    double *entropy,
     uint32_t *buffer,
     size_t len);
 
@@ -40,6 +41,7 @@ size_t passgen_generate_fill_unicode(
 size_t passgen_generate_fill_utf8(
     const passgen_pattern *pattern,
     passgen_env *env,
+    double *entropy,
     uint8_t *buffer,
     size_t len);
 
@@ -49,6 +51,7 @@ size_t passgen_generate_fill_utf8(
 size_t passgen_generate_fill_json_utf8(
     const passgen_pattern *pattern,
     passgen_env *env,
+    double *entropy,
     uint8_t *buffer,
     size_t len);
 
@@ -57,6 +60,7 @@ size_t passgen_generate_fill_json_utf8(
 int passgen_generate(
     const passgen_pattern *pattern,
     passgen_env *env,
+    double *entropy,
     void *data,
     passgen_generate_cb *func);
 

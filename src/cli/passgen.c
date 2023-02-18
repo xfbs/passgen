@@ -89,15 +89,20 @@ int passgen_cli_generate_normal(
 
     for(size_t i = 0; i < opts.amount; ++i) {
         // get a NULL-terminated, random pass.
-        size_t written =
-            passgen_generate_fill_utf8(pattern, &opts.env, pass, pass_len);
+        double entropy;
+        size_t written = passgen_generate_fill_utf8(
+                pattern,
+                &opts.env,
+                opts.entropy ? &entropy : NULL,
+                pass,
+                pass_len);
         pass[written] = '\0';
 
-        if(opts.env.entropy) {
+        if(opts.entropy) {
             fprintf(
                 stderr,
                 "entropy: %.2lf bits\n",
-                log(opts.env.entropy) / log(2));
+                log(entropy) / log(2));
         }
 
         if(i == 0) {
@@ -124,14 +129,19 @@ int passgen_cli_generate_json(passgen_cli_opts opts, passgen_pattern *pattern) {
 
     printf("[");
     for(size_t i = 0; i < opts.amount; ++i) {
+        double entropy;
         // get a NULL-terminated, random pass.
-        size_t written =
-            passgen_generate_fill_json_utf8(pattern, &opts.env, pass, pass_len);
+        size_t written = passgen_generate_fill_json_utf8(
+                pattern,
+                &opts.env,
+                opts.entropy ? &entropy : NULL,
+                pass,
+                pass_len);
         pass[written] = '\0';
         printf("%s{\"output\":\"%s\"", (i == 0) ? "" : ",", pass);
 
-        if(opts.env.entropy) {
-            printf(",\"entropy\":%lf", log(opts.env.entropy) / log(2));
+        if(opts.entropy) {
+            printf(",\"entropy\":%lf", log(entropy) / log(2));
         }
 
         printf("}");
@@ -192,6 +202,7 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->null = false;
     opts->json = false;
     opts->markov_length = 3;
+    opts->entropy = false;
     passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_utf8);
     passgen_env_init(&opts->env, NULL);
 
@@ -316,7 +327,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 opts->null = true;
                 break;
             case 'e':
-                opts->env.find_entropy = true;
+                opts->entropy = true;
                 break;
             case 'v':
                 return PASSGEN_SHOW_VERSION;
