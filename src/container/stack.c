@@ -45,7 +45,9 @@ void passgen_stack_free(passgen_stack *stack) {
 }
 
 // Execute a function for every item on the stack.
-void passgen_stack_foreach(const passgen_stack *stack, void (*func)(void *element)) {
+void passgen_stack_foreach(
+    const passgen_stack *stack,
+    void (*func)(void *element)) {
     size_t full_bins = stack->len / stack->bin_size;
     for(size_t i = 0; i < full_bins; i++) {
         void *bin = stack->data[i];

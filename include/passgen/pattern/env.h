@@ -17,7 +17,7 @@
 typedef struct passgen_env {
     bool find_entropy;
     double entropy;
-    size_t depth;
+    size_t depth_limit;
     passgen_hashmap wordlists;
     passgen_hashmap presets;
     passgen_random *random;

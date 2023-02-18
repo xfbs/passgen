@@ -22,13 +22,28 @@
 typedef struct {
     passgen_env *env;
     size_t depth;
-    void *data;
     double *entropy;
+    void *data;
     passgen_generate_cb *func;
 } passgen_generate_context;
 
+// Emit a character
 static inline int emit(passgen_generate_context *context, uint32_t codepoint) {
     return context->func(context->data, codepoint);
+}
+
+// Recurse
+static inline int descend(passgen_generate_context *context) {
+    if(!context->depth) {
+        return 1;
+    }
+
+    context->depth -= 1;
+    return 0;
+}
+
+static inline void ascend(passgen_generate_context *context) {
+    context->depth += 1;
 }
 
 static size_t passgen_generate_repeat(
@@ -252,11 +267,9 @@ size_t passgen_generate_fill_json_utf8(
     return fillpos.cur;
 }
 
-static size_t
-passgen_generate_repeat(
+static size_t passgen_generate_repeat(
     passgen_generate_context *context,
-    const passgen_pattern_repeat *repeat
-) {
+    const passgen_pattern_repeat *repeat) {
     size_t difference = repeat->max - repeat->min;
 
     // if there is no difference to pick, just return here
@@ -265,7 +278,8 @@ passgen_generate_repeat(
     }
 
     // get random number to choose from the range
-    size_t choice = passgen_random_u64_max(context->env->random, difference + 1);
+    size_t choice =
+        passgen_random_u64_max(context->env->random, difference + 1);
 
     // keep track of entropy
     if(context->env->find_entropy) {
@@ -349,7 +363,8 @@ static int passgen_generate_special_markov(
     uint32_t word[128];
     size_t pos = markov->level;
     memset(word, 0, pos * sizeof(uint32_t));
-    double *entropy = context->env->find_entropy ? &context->env->entropy : NULL;
+    double *entropy =
+        context->env->find_entropy ? &context->env->entropy : NULL;
     do {
         word[pos] = passgen_markov_generate(
             markov,
@@ -406,9 +421,7 @@ static int passgen_generate_special(
     const passgen_pattern_special *special) {
     switch(special->kind) {
         case PASSGEN_PATTERN_SPECIAL_MARKOV:
-            return passgen_generate_special_markov(
-                context,
-                special);
+            return passgen_generate_special_markov(context, special);
         case PASSGEN_PATTERN_SPECIAL_WORDLIST:
             return passgen_generate_special_wordlist(context, special);
         case PASSGEN_PATTERN_SPECIAL_PRESET:
@@ -439,14 +452,10 @@ static int passgen_generate_item(
                 try(passgen_generate_set(context, &item->data.set));
                 break;
             case PASSGEN_PATTERN_LITERAL:
-                try(passgen_generate_literal(
-                    context,
-                    &item->data.literal));
+                try(passgen_generate_literal(context, &item->data.literal));
                 break;
             case PASSGEN_PATTERN_SPECIAL:
-                try(passgen_generate_special(
-                    context,
-                    &item->data.special));
+                try(passgen_generate_special(context, &item->data.special));
                 break;
             case PASSGEN_PATTERN_GROUP:
                 try(passgen_generate_group(context, &item->data.group));
@@ -476,8 +485,16 @@ static int passgen_generate_segment(
 static int passgen_generate_group(
     passgen_generate_context *context,
     const passgen_pattern_group *group) {
+    // descend in depth
+    try(descend(context));
+
+    if(group->multiplier_sum == 0) {
+        return 1;
+    }
+
     // choose random segment from segments
-    size_t choice = passgen_random_u64_max(context->env->random, group->multiplier_sum);
+    size_t choice =
+        passgen_random_u64_max(context->env->random, group->multiplier_sum);
     size_t segment_index = 0;
     passgen_pattern_segment *segment =
         passgen_stack_get(&group->segments, segment_index);
@@ -494,7 +511,11 @@ static int passgen_generate_group(
         context->env->entropy /= segment->multiplier;
     }
 
-    return passgen_generate_segment(context, segment);
+    try(passgen_generate_segment(context, segment));
+
+    ascend(context);
+
+    return 0;
 }
 
 int passgen_generate(
@@ -513,7 +534,7 @@ int passgen_generate(
 
     passgen_generate_context context = {
         .env = env,
-        .depth = env->depth,
+        .depth = env->depth_limit,
         .func = func,
         .data = data,
         .entropy = &env->entropy,
