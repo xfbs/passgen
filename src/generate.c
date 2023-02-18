@@ -27,6 +27,10 @@ typedef struct {
     passgen_generate_cb *func;
 } passgen_generate_context;
 
+static inline int emit(passgen_generate_context *context, uint32_t codepoint) {
+    return context->func(context->data, codepoint);
+}
+
 static size_t passgen_generate_repeat(
     passgen_generate_context *context,
     const passgen_pattern_repeat *repeat);
@@ -35,11 +39,11 @@ static int passgen_generate_set(
     passgen_generate_context *context,
     const passgen_pattern_set *set);
 
-static int passgen_generate_character(
+static int passgen_generate_literal(
     passgen_generate_context *context,
     const passgen_pattern_literal *character);
 
-static int passgen_generate_special_pronounceable(
+static int passgen_generate_special_markov(
     passgen_generate_context *context,
     const passgen_pattern_special *special);
 
@@ -310,23 +314,23 @@ static int passgen_generate_set(
 
     passgen_pattern_range *range = passgen_stack_get(&set->items, num);
 
-    return context->func(context->data, range->start + choice);
+    return emit(context, range->start + choice);
 }
 
-static int passgen_generate_character(
+static int passgen_generate_literal(
     passgen_generate_context *context,
-    const passgen_pattern_literal *character) {
-    passgen_assert(character->count > 0);
-    passgen_assert(character->count < 8);
+    const passgen_pattern_literal *literal) {
+    passgen_assert(literal->count > 0);
+    passgen_assert(literal->count < 8);
 
-    for(size_t i = 0; i < character->count; i++) {
-        try(context->func(context->data, character->codepoints[i]));
+    for(size_t i = 0; i < literal->count; i++) {
+        try(emit(context, literal->codepoints[i]));
     }
 
     return 0;
 }
 
-static int passgen_generate_special_pronounceable(
+static int passgen_generate_special_markov(
     passgen_generate_context *context,
     const passgen_pattern_special *special) {
     passgen_hashmap_entry *entry =
@@ -357,7 +361,7 @@ static int passgen_generate_special_pronounceable(
 
     pos = markov->level;
     while(word[pos]) {
-        context->func(context->data, word[pos]);
+        try(emit(context, word[pos]));
         pos++;
     }
 
@@ -378,7 +382,7 @@ static int passgen_generate_special_wordlist(
     }
     const char *word = passgen_wordlist_random(wordlist, context->env->random);
     while(*word) {
-        context->func(context->data, *word);
+        try(emit(context, *word));
         word++;
     }
 
@@ -402,7 +406,7 @@ static int passgen_generate_special(
     const passgen_pattern_special *special) {
     switch(special->kind) {
         case PASSGEN_PATTERN_SPECIAL_MARKOV:
-            return passgen_generate_special_pronounceable(
+            return passgen_generate_special_markov(
                 context,
                 special);
         case PASSGEN_PATTERN_SPECIAL_WORDLIST:
@@ -435,7 +439,7 @@ static int passgen_generate_item(
                 try(passgen_generate_set(context, &item->data.set));
                 break;
             case PASSGEN_PATTERN_LITERAL:
-                try(passgen_generate_character(
+                try(passgen_generate_literal(
                     context,
                     &item->data.literal));
                 break;
