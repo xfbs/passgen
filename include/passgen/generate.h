@@ -29,7 +29,7 @@ typedef int passgen_generate_cb(void *data, uint32_t codepoint);
 /// provided buffer. Will not NULL-terminate anything, returns number of
 /// codepoints written.
 size_t passgen_generate_fill_unicode(
-    passgen_pattern *pattern,
+    const passgen_pattern *pattern,
     passgen_env *env,
     uint32_t *buffer,
     size_t len);
@@ -38,7 +38,7 @@ size_t passgen_generate_fill_unicode(
 /// the provided buffer. Will not NULL-terminate the buffer, returns the number
 /// of bytes written.
 size_t passgen_generate_fill_utf8(
-    passgen_pattern *pattern,
+    const passgen_pattern *pattern,
     passgen_env *env,
     uint8_t *buffer,
     size_t len);
@@ -47,7 +47,7 @@ size_t passgen_generate_fill_utf8(
 /// JSON-escaped into the provided buffer. Will not NULL-terminate the buffer,
 /// returns the number of bytes written.
 size_t passgen_generate_fill_json_utf8(
-    passgen_pattern *pattern,
+    const passgen_pattern *pattern,
     passgen_env *env,
     uint8_t *buffer,
     size_t len);
@@ -55,7 +55,7 @@ size_t passgen_generate_fill_json_utf8(
 /// Generate a password from a pattern, calling the provided callback function
 /// with the provided data pointer as well as each codepoint as it is generated.
 int passgen_generate(
-    passgen_pattern *pattern,
+    const passgen_pattern *pattern,
     passgen_env *env,
     void *data,
     passgen_generate_cb *func);

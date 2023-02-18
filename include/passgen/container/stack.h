@@ -38,7 +38,7 @@ void passgen_stack_free(passgen_stack *stack);
 /// @memberof passgen_stack
 /// @param stack Stack to iterate over
 /// @param func Function to call for every item in the stack
-void passgen_stack_foreach(passgen_stack *stack, void (*func)(void *element));
+void passgen_stack_foreach(const passgen_stack *stack, void (*func)(void *element));
 
 /// Push a new value onto this stack. If a non-NULL pointer is passed, it is
 /// copied to the new value. A pointer to the value on the stack is returned.
@@ -55,7 +55,7 @@ void *passgen_stack_push(passgen_stack *stack, void *value);
 /// @param stack Stack to get element from
 /// @param pos Position of element to get
 /// @returns Pointer to the element if it exists, else NULL.
-void *passgen_stack_get(passgen_stack *stack, size_t pos);
+void *passgen_stack_get(const passgen_stack *stack, size_t pos);
 
 /// Pop the largest element off the stack. If a non-NULL pointer is passed,
 /// the element's memory is copied into that value.
@@ -70,4 +70,4 @@ void *passgen_stack_pop(passgen_stack *stack, void *element);
 /// @memberof passgen_stack
 /// @param stack Stack to lookup top element in
 /// @returns Pointer to topmost element on the stack.
-void *passgen_stack_top(passgen_stack *stack);
+void *passgen_stack_top(const passgen_stack *stack);

@@ -19,57 +19,49 @@
 #include <string.h>
 #include <utf8proc.h>
 
+typedef struct {
+    passgen_env *env;
+    size_t depth;
+    void *data;
+    double *entropy;
+    passgen_generate_cb *func;
+} passgen_generate_context;
+
 static size_t passgen_generate_repeat(
-    passgen_env *env,
-    passgen_pattern_repeat *repeat);
+    passgen_generate_context *context,
+    const passgen_pattern_repeat *repeat);
 
 static int passgen_generate_set(
-    passgen_pattern_set *set,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func);
+    passgen_generate_context *context,
+    const passgen_pattern_set *set);
 
 static int passgen_generate_character(
-    passgen_pattern_literal *character,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func);
+    passgen_generate_context *context,
+    const passgen_pattern_literal *character);
 
 static int passgen_generate_special_pronounceable(
-    passgen_pattern_special *special,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func);
+    passgen_generate_context *context,
+    const passgen_pattern_special *special);
 
 static int passgen_generate_special_wordlist(
-    passgen_pattern_special *special,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func);
+    passgen_generate_context *context,
+    const passgen_pattern_special *special);
 
 static int passgen_generate_special(
-    passgen_pattern_special *special,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func);
+    passgen_generate_context *context,
+    const passgen_pattern_special *special);
 
 static int passgen_generate_group(
-    passgen_pattern_group *group,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func);
+    passgen_generate_context *context,
+    const passgen_pattern_group *group);
 
 static int passgen_generate_item(
-    passgen_pattern_item *item,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func);
+    passgen_generate_context *context,
+    const passgen_pattern_item *item);
 
 static int passgen_generate_segment(
-    passgen_pattern_segment *segment,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func);
+    passgen_generate_context *context,
+    const passgen_pattern_segment *segment);
 
 struct fillpos {
     uint32_t *buffer;
@@ -197,7 +189,7 @@ passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
 }
 
 size_t passgen_generate_fill_unicode(
-    passgen_pattern *pattern,
+    const passgen_pattern *pattern,
     passgen_env *env,
     uint32_t *buffer,
     size_t len) {
@@ -217,7 +209,7 @@ size_t passgen_generate_fill_unicode(
 }
 
 size_t passgen_generate_fill_utf8(
-    passgen_pattern *pattern,
+    const passgen_pattern *pattern,
     passgen_env *env,
     uint8_t *buffer,
     size_t len) {
@@ -237,7 +229,7 @@ size_t passgen_generate_fill_utf8(
 }
 
 size_t passgen_generate_fill_json_utf8(
-    passgen_pattern *pattern,
+    const passgen_pattern *pattern,
     struct passgen_env *env,
     uint8_t *buffer,
     size_t len) {
@@ -257,7 +249,10 @@ size_t passgen_generate_fill_json_utf8(
 }
 
 static size_t
-passgen_generate_repeat(passgen_env *env, passgen_pattern_repeat *repeat) {
+passgen_generate_repeat(
+    passgen_generate_context *context,
+    const passgen_pattern_repeat *repeat
+) {
     size_t difference = repeat->max - repeat->min;
 
     // if there is no difference to pick, just return here
@@ -266,21 +261,19 @@ passgen_generate_repeat(passgen_env *env, passgen_pattern_repeat *repeat) {
     }
 
     // get random number to choose from the range
-    size_t choice = passgen_random_u64_max(env->random, difference + 1);
+    size_t choice = passgen_random_u64_max(context->env->random, difference + 1);
 
     // keep track of entropy
-    if(env->find_entropy) {
-        env->entropy *= difference + 1;
+    if(context->env->find_entropy) {
+        context->env->entropy *= difference + 1;
     }
 
     return repeat->min + choice;
 }
 
 static int passgen_generate_set(
-    passgen_pattern_set *set,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func) {
+    passgen_generate_context *context,
+    const passgen_pattern_set *set) {
     // if this set is empty, we're done.
     if(set->items.len == 0) {
         return 0;
@@ -292,11 +285,11 @@ static int passgen_generate_set(
 
     passgen_assert(possible != 0);
 
-    size_t choice = passgen_random_u64_max(env->random, possible);
+    size_t choice = passgen_random_u64_max(context->env->random, possible);
 
     // keep track of entropy
-    if(env->find_entropy) {
-        env->entropy *= possible;
+    if(context->env->find_entropy) {
+        context->env->entropy *= possible;
     }
 
     // locate choice in list of choices.
@@ -317,33 +310,27 @@ static int passgen_generate_set(
 
     passgen_pattern_range *range = passgen_stack_get(&set->items, num);
 
-    return func(data, range->start + choice);
+    return context->func(context->data, range->start + choice);
 }
 
 static int passgen_generate_character(
-    passgen_pattern_literal *character,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func) {
-    (void) env;
-
+    passgen_generate_context *context,
+    const passgen_pattern_literal *character) {
     passgen_assert(character->count > 0);
     passgen_assert(character->count < 8);
 
     for(size_t i = 0; i < character->count; i++) {
-        try(func(data, character->codepoints[i]));
+        try(context->func(context->data, character->codepoints[i]));
     }
 
     return 0;
 }
 
 static int passgen_generate_special_pronounceable(
-    passgen_pattern_special *special,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func) {
+    passgen_generate_context *context,
+    const passgen_pattern_special *special) {
     passgen_hashmap_entry *entry =
-        passgen_hashmap_lookup(&env->wordlists, special->parameters);
+        passgen_hashmap_lookup(&context->env->wordlists, special->parameters);
     if(!entry) {
         return -1;
     }
@@ -358,19 +345,19 @@ static int passgen_generate_special_pronounceable(
     uint32_t word[128];
     size_t pos = markov->level;
     memset(word, 0, pos * sizeof(uint32_t));
-    double *entropy = env->find_entropy ? &env->entropy : NULL;
+    double *entropy = context->env->find_entropy ? &context->env->entropy : NULL;
     do {
         word[pos] = passgen_markov_generate(
             markov,
             &word[pos - markov->level],
-            env->random,
+            context->env->random,
             entropy);
         pos++;
     } while(word[pos - 1]);
 
     pos = markov->level;
     while(word[pos]) {
-        func(data, word[pos]);
+        context->func(context->data, word[pos]);
         pos++;
     }
 
@@ -378,12 +365,10 @@ static int passgen_generate_special_pronounceable(
 }
 
 static int passgen_generate_special_wordlist(
-    passgen_pattern_special *special,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func) {
+    passgen_generate_context *context,
+    const passgen_pattern_special *special) {
     passgen_hashmap_entry *entry =
-        passgen_hashmap_lookup(&env->wordlists, special->parameters);
+        passgen_hashmap_lookup(&context->env->wordlists, special->parameters);
     if(!entry) {
         return -1;
     }
@@ -391,48 +376,39 @@ static int passgen_generate_special_wordlist(
     if(!wordlist->parsed) {
         passgen_wordlist_parse(wordlist);
     }
-    const char *word = passgen_wordlist_random(wordlist, env->random);
+    const char *word = passgen_wordlist_random(wordlist, context->env->random);
     while(*word) {
-        func(data, *word);
+        context->func(context->data, *word);
         word++;
     }
 
-    if(env->find_entropy) {
-        env->entropy *= passgen_wordlist_count(wordlist);
+    if(context->env->find_entropy) {
+        context->env->entropy *= passgen_wordlist_count(wordlist);
     }
 
     return 0;
 }
 
 static int passgen_generate_special_preset(
-    passgen_pattern_special *special,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func) {
+    passgen_generate_context *context,
+    const passgen_pattern_special *special) {
     (void) special;
-    (void) env;
-    (void) data;
-    (void) func;
     // TODO: implement
     return 0;
 }
 
 static int passgen_generate_special(
-    passgen_pattern_special *special,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func) {
+    passgen_generate_context *context,
+    const passgen_pattern_special *special) {
     switch(special->kind) {
         case PASSGEN_PATTERN_SPECIAL_MARKOV:
             return passgen_generate_special_pronounceable(
-                special,
-                env,
-                data,
-                func);
+                context,
+                special);
         case PASSGEN_PATTERN_SPECIAL_WORDLIST:
-            return passgen_generate_special_wordlist(special, env, data, func);
+            return passgen_generate_special_wordlist(context, special);
         case PASSGEN_PATTERN_SPECIAL_PRESET:
-            return passgen_generate_special_preset(special, env, data, func);
+            return passgen_generate_special_preset(context, special);
         default:
             return 1;
     }
@@ -440,42 +416,36 @@ static int passgen_generate_special(
 }
 
 static int passgen_generate_item(
-    passgen_pattern_item *item,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func) {
+    passgen_generate_context *context,
+    const passgen_pattern_item *item) {
     // if it is a maybe (has a question mark following it), decide first if we
     // want to emit it or not.
     if(item->maybe) {
-        if(!passgen_random_bool(env->random)) {
+        if(!passgen_random_bool(context->env->random)) {
             return 0;
         }
     }
 
     // compute random number of repetitions
-    size_t reps = passgen_generate_repeat(env, &item->repeat);
+    size_t reps = passgen_generate_repeat(context, &item->repeat);
 
     for(size_t i = 0; i < reps; i++) {
         switch(item->kind) {
             case PASSGEN_PATTERN_SET:
-                try(passgen_generate_set(&item->data.set, env, data, func));
+                try(passgen_generate_set(context, &item->data.set));
                 break;
             case PASSGEN_PATTERN_LITERAL:
                 try(passgen_generate_character(
-                    &item->data.literal,
-                    env,
-                    data,
-                    func));
+                    context,
+                    &item->data.literal));
                 break;
             case PASSGEN_PATTERN_SPECIAL:
                 try(passgen_generate_special(
-                    &item->data.special,
-                    env,
-                    data,
-                    func));
+                    context,
+                    &item->data.special));
                 break;
             case PASSGEN_PATTERN_GROUP:
-                try(passgen_generate_group(&item->data.group, env, data, func));
+                try(passgen_generate_group(context, &item->data.group));
                 break;
             default:
                 passgen_assert(false);
@@ -488,26 +458,22 @@ static int passgen_generate_item(
 }
 
 static int passgen_generate_segment(
-    passgen_pattern_segment *segment,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func) {
+    passgen_generate_context *context,
+    const passgen_pattern_segment *segment) {
     for(size_t i = 0; i < segment->items.len; i++) {
         passgen_pattern_item *item = passgen_stack_get(&segment->items, i);
 
-        try(passgen_generate_item(item, env, data, func));
+        try(passgen_generate_item(context, item));
     }
 
     return 0;
 }
 
 static int passgen_generate_group(
-    passgen_pattern_group *group,
-    passgen_env *env,
-    void *data,
-    passgen_generate_cb *func) {
+    passgen_generate_context *context,
+    const passgen_pattern_group *group) {
     // choose random segment from segments
-    size_t choice = passgen_random_u64_max(env->random, group->multiplier_sum);
+    size_t choice = passgen_random_u64_max(context->env->random, group->multiplier_sum);
     size_t segment_index = 0;
     passgen_pattern_segment *segment =
         passgen_stack_get(&group->segments, segment_index);
@@ -519,16 +485,16 @@ static int passgen_generate_group(
     }
 
     // keep track of entropy
-    if(env->find_entropy) {
-        env->entropy *= group->multiplier_sum;
-        env->entropy /= segment->multiplier;
+    if(context->env->find_entropy) {
+        context->env->entropy *= group->multiplier_sum;
+        context->env->entropy /= segment->multiplier;
     }
 
-    return passgen_generate_segment(segment, env, data, func);
+    return passgen_generate_segment(context, segment);
 }
 
 int passgen_generate(
-    passgen_pattern *pattern,
+    const passgen_pattern *pattern,
     passgen_env *env,
     void *data,
     passgen_generate_cb *func) {
@@ -541,5 +507,13 @@ int passgen_generate(
         env->entropy = 1;
     }
 
-    return passgen_generate_group(&pattern->group, env, data, func);
+    passgen_generate_context context = {
+        .env = env,
+        .depth = env->depth,
+        .func = func,
+        .data = data,
+        .entropy = &env->entropy,
+    };
+
+    return passgen_generate_group(&context, &pattern->group);
 }

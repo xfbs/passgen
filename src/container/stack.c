@@ -45,7 +45,7 @@ void passgen_stack_free(passgen_stack *stack) {
 }
 
 // Execute a function for every item on the stack.
-void passgen_stack_foreach(passgen_stack *stack, void (*func)(void *element)) {
+void passgen_stack_foreach(const passgen_stack *stack, void (*func)(void *element)) {
     size_t full_bins = stack->len / stack->bin_size;
     for(size_t i = 0; i < full_bins; i++) {
         void *bin = stack->data[i];
@@ -106,7 +106,7 @@ void *passgen_stack_push(passgen_stack *stack, void *value) {
 }
 
 // Get the nth element on the stack. If the position is invalid, returns NULL.
-void *passgen_stack_get(passgen_stack *stack, size_t pos) {
+void *passgen_stack_get(const passgen_stack *stack, size_t pos) {
     if(stack->len <= pos) {
         return NULL;
     }
@@ -156,6 +156,6 @@ void *passgen_stack_pop(passgen_stack *stack, void *element) {
 }
 
 // Returns the topmost element of the stack, or NULL if the stack is empty.
-void *passgen_stack_top(passgen_stack *stack) {
+void *passgen_stack_top(const passgen_stack *stack) {
     return passgen_stack_get(stack, stack->len > 0 ? stack->len - 1 : 0);
 }
