@@ -595,6 +595,13 @@ int passgen_cli_opts_config_user(passgen_cli_opts *opts) {
 }
 
 #ifdef PASSGEN_SECCOMP
+#include <sys/ioctl.h>
+
+// musl uses this, glibc doesn't have it by default.
+#ifndef O_LARGEFILE
+#define O_LARGEFILE 0
+#endif
+
 void passgen_cli_seccomp_init() {
     scmp_filter_ctx ctx;
     ctx = seccomp_init(SCMP_ACT_KILL);
@@ -612,6 +619,13 @@ void passgen_cli_seccomp_init() {
         SCMP_SYS(openat),
         1,
         SCMP_CMP(2, SCMP_CMP_EQ, O_RDONLY));
+    // musl sets O_LARGEFILE
+    seccomp_rule_add(
+        ctx,
+        SCMP_ACT_ALLOW,
+        SCMP_SYS(open),
+        1,
+        SCMP_CMP(1, SCMP_CMP_EQ, O_RDONLY | O_LARGEFILE));
 
     // allow reading stat of files
     seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(fstat), 0);
@@ -619,6 +633,7 @@ void passgen_cli_seccomp_init() {
 
     // allow reading and seeking in files
     seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(read), 0);
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(readv), 0);
     seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(lseek), 0);
 
     // allow writing, but only to stdout or stderr.
@@ -627,13 +642,26 @@ void passgen_cli_seccomp_init() {
         SCMP_ACT_ALLOW,
         SCMP_SYS(write),
         1,
-        SCMP_CMP(0, SCMP_CMP_EQ, 2));
+        SCMP_CMP(0, SCMP_CMP_EQ, 1));
     seccomp_rule_add(
         ctx,
         SCMP_ACT_ALLOW,
         SCMP_SYS(write),
         1,
+        SCMP_CMP(0, SCMP_CMP_EQ, 2));
+    // musl uses writev
+    seccomp_rule_add(
+        ctx,
+        SCMP_ACT_ALLOW,
+        SCMP_SYS(writev),
+        1,
         SCMP_CMP(0, SCMP_CMP_EQ, 1));
+    seccomp_rule_add(
+        ctx,
+        SCMP_ACT_ALLOW,
+        SCMP_SYS(writev),
+        1,
+        SCMP_CMP(0, SCMP_CMP_EQ, 2));
 
     // allow closing, as long as the fd is not any of the standard streams.
     seccomp_rule_add(
@@ -652,6 +680,8 @@ void passgen_cli_seccomp_init() {
 
     // allow allocating memory
     seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(brk), 0);
+
+    // allow mapping anonymous memory (used by allocator)
     seccomp_rule_add(
         ctx,
         SCMP_ACT_ALLOW,
@@ -660,8 +690,17 @@ void passgen_cli_seccomp_init() {
         SCMP_CMP(0, SCMP_CMP_EQ, NULL),
         SCMP_CMP(2, SCMP_CMP_EQ, PROT_READ | PROT_WRITE),
         SCMP_CMP(3, SCMP_CMP_EQ, MAP_PRIVATE | MAP_ANONYMOUS));
-    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(mremap), 0);
+
+    // allow unmapping memory (used by allocation)
     seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(munmap), 0);
+
+    // allow remapping memory (used by allocation)
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(mremap), 0);
+
+    // allow checking for terminal window size
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(ioctl), 2,
+        SCMP_CMP(0, SCMP_CMP_EQ, 1),
+        SCMP_CMP(1, SCMP_CMP_EQ, TIOCGWINSZ));
 
     // apply rules
     seccomp_load(ctx);

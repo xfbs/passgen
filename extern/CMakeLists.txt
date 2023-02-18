@@ -13,5 +13,9 @@ endif(USE_LIBEXECINFO)
 
 # dependency: secconf, if requested.
 if(PASSGEN_SECCOMP)
-    find_library(libseccomp seccomp)
+    if(PASSGEN_STATIC)
+        find_library(libseccomp NAMES libseccomp.a seccomp)
+    else()
+        find_library(libseccomp seccomp)
+    endif()
 endif()
