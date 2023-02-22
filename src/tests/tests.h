@@ -58,6 +58,46 @@ bool run(test_run test);
             .line = __LINE__,              \
             .func = __func__};
 
+#define assert_ne(lhs, rhs)                \
+    if(lhs == rhs)                         \
+        return (test_result){              \
+            .ok = false,                   \
+            .assertion = #lhs " != " #rhs, \
+            .line = __LINE__,              \
+            .func = __func__};
+
+#define assert_gt(lhs, rhs)                \
+    if(lhs <= rhs)                         \
+        return (test_result){              \
+            .ok = false,                   \
+            .assertion = #lhs " > " #rhs,  \
+            .line = __LINE__,              \
+            .func = __func__};
+
+#define assert_ge(lhs, rhs)                \
+    if(lhs < rhs)                          \
+        return (test_result){              \
+            .ok = false,                   \
+            .assertion = #lhs " >= " #rhs, \
+            .line = __LINE__,              \
+            .func = __func__};
+
+#define assert_lt(lhs, rhs)                \
+    if(lhs >= rhs)                         \
+        return (test_result){              \
+            .ok = false,                   \
+            .assertion = #lhs " < " #rhs,  \
+            .line = __LINE__,              \
+            .func = __func__};
+
+#define assert_le(lhs, rhs)                \
+    if(lhs > rhs)                          \
+        return (test_result){              \
+            .ok = false,                   \
+            .assertion = #lhs " <= " #rhs, \
+            .line = __LINE__,              \
+            .func = __func__};
+
 #define assert_streq(lhs, rhs)             \
     if(strcmp(lhs, rhs) != 0)              \
         return (test_result){              \
