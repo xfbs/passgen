@@ -45,7 +45,7 @@ the platforms that are supported. [LLVM sanitizers][llvm-sanitizer] and
 [valgrind][valgrind] are used to catch memory unsafety errors. [QEMU][qemu] is
 used to execute all of the unit tests for all of the supported platforms.
 Additionally, the CI generates SSH signatures for the nightly builds that are
-also available for download at the [releases](releases.md) page.
+also available for download at the [releases](../nightly.md) page.
 
 !!! warning "Code coverage reports from llvm-cov are currently broken"
 

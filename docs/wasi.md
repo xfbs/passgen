@@ -2,7 +2,7 @@
 
 Passgen can be built as a [WebAssembly](https://webassembly.org/) executable following the [WASI](https://wasi.dev) standard. This means it can run portably on any operating system, and it is sandboxed and has no access to anything that is not explicitly granted. These properties should, in theory, make it more secure.
 
-If you want to try it, you can download the latest WASI build from the [releases](releases.md) page. To run passgen, you will need to install a WASI-compatible runtime, and you need to specify some flags to get it to work.
+If you want to try it, you can download the latest WASI build from the [releases](nightly.md) page. To run passgen, you will need to install a WASI-compatible runtime, and you need to specify some flags to get it to work.
 
 ## WASI Runtime
 

@@ -143,7 +143,7 @@ logis-med-musives-interprefinglidits
 
 By default, passgen will use the system's secure random number generator. You
 can override this and use a different source of randomness using the `--random`
-flag, this is explained more in the [Security](security.md) section. It is not
+flag, this is explained more in the [Randomness](randomness.md) section. It is not
 recommended to using a different source of randomness because the default is
 typically the best.
 

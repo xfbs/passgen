@@ -5,7 +5,7 @@ variables:
 # by default, retry failed jobs up to three times. sometimes jobs can fail due to
 # temporary blips like network connectivity issues.
 default:
-  retry: 2
+  retry: 1
 
 # stages
 # image stage builds prerequisite docker containers.

@@ -1,10 +1,5 @@
 # CI/CD
 
-<figure markdown>
-[![CI Pipelines overview](images/pipelines.png)](https://gitlab.com/xfbs/passgen/-/pipelines)
-<figcaption>Passgen CI pipelines in GitLab CI</figcaption>
-</figure>
-
 A CI/CD system (*continuous integration* and *continuous deployment*) is used
 to run jobs every time the code changes, such as when new code is pushed
 or in merge requests. These jobs are used to check the changes (*integration*)

@@ -1,10 +1,5 @@
 # Randomness
 
-<figure markdown>
-[![Artist's rendition of randomness, dice](images/randomness.jpg){ width="600px" }](https://unsplash.com/photos/kgRBoAKq-4E)
-<figcaption>Artist's rendition of randomness.</figcaption>
-</figure>
-
 Passgen generates random sequences, and in order to do so, it needs access to
 secure, random data. By default, it will use whatever is the best source of
 randomness that is availalble on the system. For Linux, this means using the

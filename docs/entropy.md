@@ -1,10 +1,5 @@
 # Entropy
 
-<figure markdown>
-[![Chaos](images/chaos.jpg){ width="600px" }](https://unsplash.com/photos/XRNSn4gt8Hs)
-<figcaption>Chaos is the natural state of the universe.</figcaption>
-</figure>
-
 Entropy is the measure of chaos in a system. In computer science, we use the
 term entropy when talking about random data as measuring how many bits of
 randomness something contains. For example, a lowercase eight-letter password

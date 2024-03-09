@@ -44,8 +44,8 @@ This is an overview of how the Passgen project is laid out on the filesystem:
 [utf8proc]: http://juliastrings.github.io/utf8proc/
 [CMake]: https://cmake.org/
 
-For information on the grammar that passgen accepts, see [Syntax](../syntax).
+For information on the grammar that passgen accepts, see [Syntax](syntax.md).
 
-For information on how to build the project, see [Building](../building).
+For information on how to build the project, see [Building](development/building.md).
 
-For information on how the testing works, see [Testing](../testing).
+For information on how the testing works, see [Testing](development/tooling/testing.md).
