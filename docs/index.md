@@ -1,8 +1,9 @@
 # Passgen
 
-Passgen generates **random sequences** from a **[regex][]-like pattern**. It
-can be used to generate **secure passphrases**. It is available for download as
-a command-line utility. For a quick overview of how it works, see
+Passgen generates **random sequences** from a dialect of **regular
+expressions**. It is suitable for generating **secure passphrases** that are
+**memorable** but have **high-entropy**. It is available for download as a
+command-line utility. For a quick overview of how it works, see
 [usage](usage.md).
 
 <div class="grid cards" markdown>
@@ -11,7 +12,8 @@ a command-line utility. For a quick overview of how it works, see
 
     ---
 
-    Passgen uses the strong system randomness generator.
+    Passgen can use any source of randomness, defaulting to the system
+    randomness generator.
 
     [:octicons-arrow-right-24: Security][security]
 
@@ -19,7 +21,8 @@ a command-line utility. For a quick overview of how it works, see
 
     ---
 
-    Passgen uses a custom language to be able to generate any kinds of sequences.
+    Passgen supports a dialect of [regular expressions][regex] to be able to generate
+    any kinds of sequences.
 
     [:octicons-arrow-right-24: Grammar][grammar]
 
@@ -27,7 +30,8 @@ a command-line utility. For a quick overview of how it works, see
 
     ---
 
-    Passgen comes with many useful and secure presets out-of-the box.
+    Passgen comes with many useful and secure presets out-of-the box that make
+    generating secure passphrases simple.
 
     [:octicons-arrow-right-24: Presets][presets]
 
@@ -35,12 +39,13 @@ a command-line utility. For a quick overview of how it works, see
 
     ---
 
-    Passgen is licensed as MIT and is available on [GitLab][repo].
+    Passgen is [open-source][repo] and permissively licensed under the [MIT
+    license][license].
 
     [:octicons-arrow-right-24: License][license]
 
 [grammar]: grammar.md
-[security]: security.md
+[security]: development/security.md
 [presets]: presets.md
 [repo]: https://gitlab.com/xfbs/passgen
 [license]: https://gitlab.com/xfbs/passgen/-/blob/master/LICENSE.md
@@ -49,13 +54,11 @@ a command-line utility. For a quick overview of how it works, see
 
 ## Getting Started
 
-If you want to try it out, take a look at the [releases](releases.md) section
+If you want to try it out, take a look at the [releases](releases/nightly.md) section
 where you can find signed tarballs and packages for your platform operating
-system.
+system. You can also [compile it yourself](development/building.md), if you wish.
 
-For documentation on the syntax, see [grammar](grammar.md).
+If you want to help develop it, see [development](development.md), which has
+resources and links to get you started.
 
-If you want to help develop it, see [development](development.md), where you
-can find resources and links.
-
-[regex]: https://regexr.com/
+[regex]: https://en.wikipedia.org/wiki/Regular_expression
