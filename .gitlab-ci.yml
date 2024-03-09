@@ -328,11 +328,20 @@ build:wasi:
       - build-wasi
     expire_in: 1 week
 
-pages:
+website:mkdocs:
   image: registry.gitlab.com/xfbs/passgen/deploy
-  stage: deploy
+  stage: post
+  script:
+    - bash scripts/ci-publish-website.sh
+  artifacts:
+    paths:
+      - public
+    expire_in: 30 days
+
+website:builds:
+  image: registry.gitlab.com/xfbs/passgen/deploy
+  stage: post
   dependencies:
-    - test:amd64
     - build:alpine
     - build:amd64
     - build:aarch64
@@ -341,10 +350,46 @@ pages:
     - build:mingw64
     - build:wasi
   script:
-    - bash scripts/ci-publish-website.sh
-    - bash scripts/ci-publish-coverage.sh
-    - bash scripts/ci-publish-doxygen.sh
     - bash scripts/ci-publish-builds.sh
+  artifacts:
+    paths:
+      - public
+    expire_in: 30 days
+  only:
+    - master
+
+website:doxygen:
+  image: registry.gitlab.com/xfbs/passgen/deploy
+  stage: post
+  script:
+    - bash scripts/ci-publish-doxygen.sh
+  artifacts:
+    paths:
+      - public
+    expire_in: 30 days
+
+website:coverage:
+  image: registry.gitlab.com/xfbs/passgen/deploy
+  stage: post
+  dependencies:
+    - test:amd64
+  script:
+    - bash scripts/ci-publish-coverage.sh
+  artifacts:
+    paths:
+      - public
+    expire_in: 30 days
+
+pages:
+  image: alpine
+  stage: deploy
+  dependencies:
+    - website:mkdocs
+    - website:builds
+    - website:doxygen
+    - website:coverage
+  script:
+    - "true"
   artifacts:
     paths:
       - public
