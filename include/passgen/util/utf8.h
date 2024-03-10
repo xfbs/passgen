@@ -13,6 +13,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define PASSGEN_UTF8_OUTPUT_SIZE 1
+#define PASSGEN_UTF8_SUCCESS 0
+#define PASSGEN_UTF8_INVALID_CHAR -1
+
 /// Decodes a UTF-8 character sequence into an output array.
 ///
 /// Decodes the UTF-8 character sequence in `input` (with length `input_len`) into
@@ -40,13 +44,11 @@
 /// @return 0 on success, a positive integer when the output is too small to fit the
 ///   decoded codepoints, and a negative integer on error.
 int passgen_utf8_decode(
-    uint32_t *output,
+    uint32_t **output,
     size_t output_len,
-    size_t *output_pos,
     uint8_t *output_widths,
-    const uint8_t *input,
-    size_t input_len,
-    size_t *input_pos);
+    const uint8_t **input,
+    size_t input_len);
 
 /// Encodes unicode characters into a UTF-8 character sequence.
 int passgen_utf8_encode(

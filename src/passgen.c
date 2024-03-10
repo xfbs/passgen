@@ -16,9 +16,10 @@ int passgen_parse(
     passgen_token token = {0};
     passgen_parser_init(&parser, output);
 
-    size_t pattern_max = 256;
-    uint32_t pattern[pattern_max];
-    uint8_t pattern_widths[pattern_max];
+    const uint8_t *pattern_raw = (const uint8_t *) string;
+    size_t pattern_len = 256;
+    uint32_t pattern[pattern_len];
+    uint8_t pattern_widths[pattern_len];
     size_t pattern_pos = 0;
     size_t pattern_pos_total = 0;
     size_t pattern_raw_pos = 0;
@@ -27,21 +28,23 @@ int passgen_parse(
     int decode_ret = 0;
 
     do {
-        // decode input utf8 into unicode codepoints
-        pattern_pos = 0;
-        decode_ret = passgen_utf8_decode(
-            pattern,
-            pattern_max,
-            &pattern_pos,
-            pattern_widths,
-            (const unsigned char *) string,
-            pattern_raw_len,
-            &pattern_raw_pos);
+        uint32_t *pattern_cur = &pattern[0];
+        const uint8_t *pattern_raw_cur = &pattern_raw[pattern_raw_pos];
 
+        // decode input utf8 into unicode codepoints
+        decode_ret = passgen_utf8_decode(
+            &pattern_cur,
+            pattern_len,
+            pattern_widths,
+            &pattern_raw_cur,
+            pattern_raw_len - pattern_raw_pos);
+
+        pattern_raw_pos += pattern_raw_cur - &pattern_raw[pattern_raw_pos];
+        pattern_pos = pattern_cur - &pattern[0];
         pattern_pos_total += pattern_pos;
 
         // make sure utf8 decoding was successful
-        if(decode_ret < 0) {
+        if(decode_ret < PASSGEN_UTF8_SUCCESS) {
             error->codepoint = pattern_pos_total;
             error->byte = pattern_raw_pos;
             error->message = passgen_utf8_error(decode_ret);
@@ -80,7 +83,7 @@ int passgen_parse(
                 assert(ret == 0);
             }
         }
-    } while(decode_ret > 0);
+    } while(decode_ret > PASSGEN_UTF8_SUCCESS);
 
     // make sure we aren't still parsing tokens
     if(token_parser.state != PASSGEN_TOKEN_INIT) {

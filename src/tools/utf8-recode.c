@@ -4,19 +4,26 @@
 #include <stdlib.h>
 
 #include "passgen/util/utf8.h"
+#include "passgen/assert.h"
 
 int main(int argc, char *argv[]) {
-    uint8_t utf8_input[128];
-    size_t utf8_input_start = 0;
-    size_t utf8_input_end = 0;
-    uint32_t decoded[128];
-    size_t decoded_pos = 0;
-    uint8_t utf8_output[128];
+    size_t input_len = 128;
+    uint8_t input[input_len];
+
+    size_t input_start = 0;
+    size_t input_end = 0;
+
+    size_t decoded_len = 128;
+    uint32_t decoded[decoded_len];
+    size_t decoded_total = 0;
+
+    size_t output_len = 128;
+    uint8_t output[output_len];
+
     int ret;
 
     (void) argc;
     (void) argv;
-    (void) utf8_output;
 
     while(true) {
         if(ferror(stdin)) {
@@ -27,31 +34,35 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        // read a chunk of data into the utf8_input buffer
-        utf8_input_end += fread(
-            utf8_input + utf8_input_end,
-            sizeof(utf8_input[0]),
-            sizeof(utf8_input) - utf8_input_end,
+        // read a chunk of data into the input buffer
+        input_end += fread(
+            input + input_end,
+            sizeof(input[0]),
+            sizeof(input) - input_end,
             stdin);
 
-        printf("read %zu bytes\n", utf8_input_end);
+        printf("read %zu bytes\n", input_end);
+
+        uint32_t *decoded_pos = &decoded[0];
+        const uint8_t *input_pos = &input[0];
 
         ret = passgen_utf8_decode(
-            decoded,
-            sizeof(decoded),
             &decoded_pos,
+            decoded_len,
             NULL,
-            utf8_input,
-            utf8_input_end - utf8_input_start,
-            &utf8_input_start);
+            &input_pos,
+            input_end);
+
+        decoded_total += decoded_pos - &decoded[0];
+        passgen_assert(ret == PASSGEN_UTF8_SUCCESS);
 
         printf("ret is %i\n", ret);
 
-        printf("read %zu characters\n", decoded_pos);
+        printf("read %zu codepoints\n", decoded_total);
 
         decoded_pos = 0;
-        utf8_input_start = 0;
-        utf8_input_end = 0;
+        input_start = 0;
+        input_end = 0;
     }
 
     return EXIT_SUCCESS;

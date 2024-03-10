@@ -4379,14 +4379,17 @@ static void *bench_utf8_iter(void *raw_data) {
     do {
         output_total += output_position;
         output_position = 0;
+
+        uint32_t *output_pos = &data->output[0];
+        const uint8_t *data_pos = &utf8_txt[input_position];
         ret = passgen_utf8_decode(
-            data->output,
+            &output_pos,
             data->output_len,
-            &output_position,
             NULL,
-            utf8_txt,
-            utf8_txt_len,
-            &input_position);
+            &data_pos,
+            utf8_txt_len - input_position);
+        output_position = output_pos - &data->output[0];
+        input_position += data_pos - &utf8_txt[input_position];
     } while(ret > 0);
 
     assert(ret == 0);

@@ -32,24 +32,29 @@ void passgen_wordlist_parse_markov(passgen_wordlist *wordlist) {
     passgen_assert(!wordlist->parsed_markov);
     wordlist->parsed_markov = true;
 
-    uint32_t unicode_buffer[256];
-    size_t unicode_buffer_len;
+    size_t unicode_buffer_len = 256;
+    uint32_t unicode_buffer[unicode_buffer_len];
     for(size_t i = 0; i < wordlist->count; i++) {
-        unicode_buffer_len = 0;
-        size_t word_length = strlen(wordlist->words[i]);
-        size_t word_pos = 0;
-        passgen_utf8_decode(
-            unicode_buffer,
-            256,
-            &unicode_buffer_len,
+        uint32_t *unicode_buffer_pos = &unicode_buffer[0];
+        const uint8_t *word = (const uint8_t *) wordlist->words[i];
+        size_t word_length = strlen((const char *) word);
+
+        // decode utf8
+        int ret = passgen_utf8_decode(
+            &unicode_buffer_pos,
+            unicode_buffer_len,
             NULL,
-            (const unsigned char *) wordlist->words[i],
-            word_length,
-            &word_pos);
+            &word,
+            word_length);
+
+        // make sure the conversion worked
+        passgen_assert(ret == PASSGEN_UTF8_SUCCESS);
+
+        // add word to markov chain
         passgen_markov_add(
             &wordlist->markov,
             unicode_buffer,
-            unicode_buffer_len,
+            unicode_buffer_pos - &unicode_buffer[0],
             1);
     }
 }
