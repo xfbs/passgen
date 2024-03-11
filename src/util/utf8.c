@@ -1,5 +1,4 @@
 #include "passgen/util/utf8.h"
-#include <utf8proc.h>
 
 // Copyright (c) 2008-2009 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 // See http://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
@@ -77,11 +76,54 @@ int passgen_utf8_decode(
     *output += output_offset;
     *input += input_offset;
 
-    if(input_offset == input_len) {
-        return PASSGEN_UTF8_SUCCESS;
-    } else {
+    if(input_offset != input_len) {
         return PASSGEN_UTF8_OUTPUT_SIZE;
     }
+
+    return PASSGEN_UTF8_SUCCESS;
+}
+
+/// Encode a code point using UTF-8
+///
+/// @author OndÅej HruÅ¡ka <ondra@ondrovo.com>
+/// @license MIT
+///
+/// @param out - output buffer (min 4 characters), will be 0-terminated
+/// @param utf - code point 0-0x10FFFF
+/// @return number of bytes on success, 0 on failure (also produces U+FFFD, which uses 3 bytes)
+int passgen_utf8_encode_codepoint(uint8_t *out, uint32_t utf) {
+    if (utf <= 0x7F) {
+        // Plain ASCII
+        out[0] = (uint8_t) utf;
+        return 1;
+    }
+
+    if (utf <= 0x07FF) {
+        // 2-byte unicode
+        out[0] = (uint8_t) (((utf >> 6) & 0x1F) | 0xC0);
+        out[1] = (uint8_t) (((utf >> 0) & 0x3F) | 0x80);
+        return 2;
+    }
+
+    if (utf <= 0xFFFF) {
+        // 3-byte unicode
+        out[0] = (uint8_t) (((utf >> 12) & 0x0F) | 0xE0);
+        out[1] = (uint8_t) (((utf >>  6) & 0x3F) | 0x80);
+        out[2] = (uint8_t) (((utf >>  0) & 0x3F) | 0x80);
+        return 3;
+    }
+
+    if (utf <= 0x10FFFF) {
+        // 4-byte unicode
+        out[0] = (uint8_t) (((utf >> 18) & 0x07) | 0xF0);
+        out[1] = (uint8_t) (((utf >> 12) & 0x3F) | 0x80);
+        out[2] = (uint8_t) (((utf >>  6) & 0x3F) | 0x80);
+        out[3] = (uint8_t) (((utf >>  0) & 0x3F) | 0x80);
+        return 4;
+    }
+
+    // error
+    return PASSGEN_UTF8_INVALID_CHAR;
 }
 
 int passgen_utf8_encode(
@@ -91,20 +133,37 @@ int passgen_utf8_encode(
     const uint32_t *in,
     size_t in_len,
     size_t *in_pos) {
-    utf8proc_ssize_t n = 0;
 
-    // TODO: fixeme. what?
-    (void) in_len;
+    while((*in_pos < in_len) && (*out_pos < (out_len - 4))) {
+        int ret = passgen_utf8_encode_codepoint(&out[*out_pos], in[*in_pos]);
+        if(ret < 0) {
+            return ret;
+        }
 
-    while((out_len - *out_pos) > 0 &&
-          (n = utf8proc_encode_char(in[*in_pos], &out[*out_pos])) > 0) {
         *in_pos += 1;
-        *out_pos += n;
+        *out_pos += ret;
     }
 
-    return n;
+    if(*out_pos < out_len) {
+        out[*out_pos] = 0;
+    }
+
+    if(*in_pos != in_len) {
+        return PASSGEN_UTF8_OUTPUT_SIZE;
+    }
+
+    return PASSGEN_UTF8_SUCCESS;
 }
 
 const char *passgen_utf8_error(int retval) {
-    return utf8proc_errmsg(retval);
+    switch(retval) {
+        case PASSGEN_UTF8_INVALID_CHAR:
+            return "invalid character";
+        case PASSGEN_UTF8_SUCCESS:
+            return "success";
+        case PASSGEN_UTF8_OUTPUT_SIZE:
+            return "output size too small";
+        default:
+            return "unknown";
+    }
 }

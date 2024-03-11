@@ -6,9 +6,6 @@
 /// codepoints). However, for transport and storage, UTF-8 is more common. Therefore,
 /// these functions are needed to convert from UTF-8 to Unicode codepoints, and vice
 /// versa.
-///
-/// These utilities are wrappers around the functionality provided by the incredible
-/// [utf8proc](https://github.com/JuliaStrings/utf8proc) library of the Julia language.
 #pragma once
 #include <stddef.h>
 #include <stdint.h>
@@ -58,6 +55,9 @@ int passgen_utf8_encode(
     const uint32_t *in,
     size_t in_len,
     size_t *in_pos);
+
+/// Encode a single codepoint.
+int passgen_utf8_encode_codepoint(uint8_t *out, uint32_t codepoint);
 
 /// Given an error (negative return value), returns a string describing it.
 const char *passgen_utf8_error(int retval);

@@ -19,7 +19,6 @@ To build, some dependencies are necessary.
 - Ruby,
 - Git (optional),
 - Coverage reporting tool (`llvm-cov` or `lcov`, optional),
-- [libutf8proc][utf8proc] (optional).
 
 On Ubuntu or Debian, the base dependencies can be installed by running the following.
 
@@ -34,13 +33,9 @@ On other systems, these packages should also be easily available.
 ## Cloning the Repository
 
 Before you can set up the build system, you must clone the Passgen repository.
-You can do this using Git. If you want to use the bundled version of [libutf8proc][utf8proc],
-which is recommended, you have to make sure to also update the Git submodules.
+You can do this using Git. 
 
     git clone https://gitlab.com/xfbs/passgen
-    git submodule update --init
-
-[utf8proc]: https://juliastrings.github.io/utf8proc/
 
 ## Build System
 
@@ -59,7 +54,6 @@ Note that you usually have to delete and recreate the build folder if you want t
 
 | Setting | Description |
 | --- | --- |
-| `BUILD_UTF8PROC` | Build utf8proc, the library used to decode UTF-8. If set to false, it will attempt to use the system version of libutf8proc. Enabled by default. |
 | `BUILD_TOOLS` | Build utility binaries. These are only really needed for testing. |
 | `BUILD_BENCH` | Build the `passgen-bench` executable, which runs benchmarks against data structures, pattern parsing and password generation. Enabled by default. |
 | `BUILD_TESTING` | Build the `passgen-test` executable, which will run unit tests. It is recommended to always build this and run it to make sure there are no obvious issues with the build. Enabled by default. |

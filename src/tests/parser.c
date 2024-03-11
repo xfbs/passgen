@@ -1061,6 +1061,8 @@ test_result test_parser_can_parse_random(void) {
                 characters[passgen_random_u8_max(random, characters_len)];
         }
 
+        string[length] = 0;
+
         // Parse the string.
         passgen_pattern pattern;
         passgen_error error;

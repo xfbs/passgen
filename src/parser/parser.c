@@ -495,7 +495,7 @@ int passgen_parse_special_name(
     } else {
         passgen_pattern_special_push(
             state->data.special.special,
-            token->codepoint);
+            token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT);
     }
 
     return 0;

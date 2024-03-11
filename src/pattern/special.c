@@ -1,6 +1,6 @@
 #include "passgen/pattern/special.h"
 #include "passgen/assert.h"
-#include "utf8proc.h"
+#include "passgen/util/utf8.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -51,9 +51,11 @@ void passgen_pattern_special_push(
             realloc(special->parameters, special->parameters_cap);
     }
 
-    size_t bytes = utf8proc_encode_char(
-        codepoint,
-        (unsigned char *) &special->parameters[special->parameters_len]);
+    int bytes = passgen_utf8_encode_codepoint(
+        (uint8_t *) &special->parameters[special->parameters_len],
+        codepoint);
+
+    passgen_assert(bytes > 0);
     special->parameters_len += bytes;
 
     assert(special->parameters_len < special->parameters_cap);

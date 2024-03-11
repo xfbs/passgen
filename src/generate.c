@@ -13,11 +13,11 @@
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/special.h"
+#include "passgen/util/utf8.h"
 #include "passgen/wordlist.h"
 #include "try.h"
 
 #include <string.h>
-#include <utf8proc.h>
 
 typedef struct {
     passgen_env *env;
@@ -115,11 +115,11 @@ static int passgen_generate_write_buffer_utf8(void *data, uint32_t codepoint) {
     }
 
     if((fillpos->cur + 4) <= fillpos->len) {
-        size_t bytes = utf8proc_encode_char(
-            codepoint,
-            (utf8proc_uint8_t *) &fillpos->buffer[fillpos->cur]);
+        int bytes = passgen_utf8_encode_codepoint(
+            (uint8_t *) &fillpos->buffer[fillpos->cur],
+            codepoint);
 
-        if(!bytes) {
+        if(bytes < 0) {
             // error happened during encoding.
             return -1;
         }
@@ -127,10 +127,10 @@ static int passgen_generate_write_buffer_utf8(void *data, uint32_t codepoint) {
         fillpos->cur += bytes;
     } else {
         char buffer[4];
-        size_t bytes =
-            utf8proc_encode_char(codepoint, (utf8proc_uint8_t *) &buffer[0]);
+        int bytes =
+            passgen_utf8_encode_codepoint((uint8_t *) &buffer[0], codepoint);
 
-        if(!bytes) {
+        if(bytes < 0) {
             // error happened during encoding.
             return -1;
         }
@@ -181,9 +181,9 @@ passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
             buffer[1] = 't';
             break;
         default:
-            bytes = utf8proc_encode_char(
-                codepoint,
-                (utf8proc_uint8_t *) &buffer[0]);
+            bytes = passgen_utf8_encode_codepoint(
+                (uint8_t *) &buffer[0],
+                codepoint);
     }
 
     // check that no error happened.

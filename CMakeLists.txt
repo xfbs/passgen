@@ -7,7 +7,6 @@ project(
     LANGUAGES C)
 
 # project build options.
-option(BUILD_UTF8PROC "Build utf8proc, a dependency." YES)
 option(BUILD_TOOLS "Build utility binaries." YES)
 option(BUILD_BENCH "Build benchmark utilities." YES)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
@@ -61,7 +60,19 @@ if(BUILD_GIT_INFO)
     git_info()
 endif()
 
-add_subdirectory(extern)
+# dependency (only on alpine): libexecinfo-dev
+if(USE_LIBEXECINFO)
+    find_library(libexecinfo execinfo)
+endif(USE_LIBEXECINFO)
+
+# dependency: secconf, if requested.
+if(PASSGEN_SECCOMP)
+    if(PASSGEN_STATIC)
+        find_library(libseccomp NAMES libseccomp.a seccomp)
+    else()
+        find_library(libseccomp seccomp)
+    endif()
+endif()
 
 # build libpassgen
 add_subdirectory(src)

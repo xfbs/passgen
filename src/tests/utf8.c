@@ -163,20 +163,21 @@ test_result test_utf8_encode_simple(void) {
 
     const uint32_t input[] = {0xFC, 0x1F602, 0xB5, 0x0A};
 
-    uint8_t output[9];
+    size_t output_len = 15;
+    uint8_t output[output_len];
 
     size_t in_pos = 0;
     size_t out_pos = 0;
 
     int ret = passgen_utf8_encode(
         output,
-        sizeof(output) / sizeof(output[0]),
+        output_len,
         &out_pos,
         input,
         sizeof(input) / sizeof(input[0]),
         &in_pos);
 
-    assert(ret != 0);
+    assert(ret == PASSGEN_UTF8_SUCCESS);
     assert(in_pos == (sizeof(input) / sizeof(input[0])));
     assert(out_pos == (sizeof(expected) / sizeof(expected[0])));
     for(size_t i = 0; i < out_pos; i++) {
