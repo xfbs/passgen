@@ -8,6 +8,7 @@ set(SOURCE_LIST
     "container/stack.c"
     "context.c"
     "env.c"
+    "error.c"
     "generate.c"
     "markov.c"
     "parser/parser.c"

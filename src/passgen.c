@@ -45,9 +45,8 @@ int passgen_parse(
 
         // make sure utf8 decoding was successful
         if(decode_ret < PASSGEN_UTF8_SUCCESS) {
-            error->codepoint = pattern_pos_total;
-            error->byte = pattern_raw_pos;
-            error->message = passgen_utf8_error(decode_ret);
+            passgen_error_init(error, passgen_utf8_error(decode_ret));
+            passgen_error_offset_set(error, pattern_pos_total, pattern_raw_pos);
             passgen_parser_free(&parser);
             return -1;
         }
@@ -62,9 +61,8 @@ int passgen_parse(
 
             // make sure parsing the token was successful
             if(ret < 0) {
-                error->codepoint = token.offset;
-                error->byte = token.byte_offset;
-                error->message = passgen_token_parse_error_str(ret);
+                passgen_error_init(error, passgen_token_parse_error_str(ret));
+                passgen_error_offset_set(error, token.offset, token.byte_offset);
                 passgen_parser_free(&parser);
                 return -1;
             }
@@ -74,9 +72,8 @@ int passgen_parse(
                 ret = passgen_parse_token(&parser, &token);
                 // make sure that the parser accepts the token
                 if(ret != 0) {
-                    error->codepoint = token.offset;
-                    error->byte = token.byte_offset;
-                    error->message = "invalid token";
+                    passgen_error_init(error, "invalid token");
+                    passgen_error_offset_set(error, token.offset, token.byte_offset);
                     passgen_parser_free(&parser);
                     return -1;
                 }
@@ -87,18 +84,16 @@ int passgen_parse(
 
     // make sure we aren't still parsing tokens
     if(token_parser.state != PASSGEN_TOKEN_INIT) {
-        error->codepoint = pattern_pos_total;
-        error->byte = pattern_raw_pos;
-        error->message = passgen_token_parse_error_str(token_parser.state);
+        passgen_error_init(error, passgen_token_parse_error_str(token_parser.state));
+        passgen_error_offset_set(error, pattern_pos_total, pattern_raw_pos);
         passgen_parser_free(&parser);
         return -1;
     }
 
     // make sure we are done parsing
     if(0 != passgen_parse_finish(&parser)) {
-        error->codepoint = pattern_pos_total;
-        error->byte = pattern_raw_pos;
-        error->message = "parsing not finished";
+        passgen_error_init(error, "parsing not finished");
+        passgen_error_offset_set(error, pattern_pos_total, pattern_raw_pos);
         passgen_parser_free(&parser);
         return -1;
     }

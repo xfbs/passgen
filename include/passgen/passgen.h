@@ -3,14 +3,8 @@
 /// @brief Passgen main interface
 #pragma once
 #include <stddef.h>
+#include <passgen/error.h>
 #include <passgen/pattern/pattern.h>
-
-/// An error occured while parsing.
-typedef struct {
-    const char *message;
-    size_t codepoint;
-    size_t byte;
-} passgen_error;
 
 /// Parse a pattern.
 ///

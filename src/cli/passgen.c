@@ -53,16 +53,7 @@ int passgen_cli_run(passgen_cli_opts opts) {
     passgen_error error;
     int ret = passgen_parse(&pattern, &error, opts.pattern);
     if(ret != 0) {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m parsing pattern: %s\n",
-            error.message);
-        fprintf(stderr, "\033[1;33mpattern\033[0m: %s\n", opts.pattern);
-        fprintf(stderr, "         ");
-        for(size_t i = 1; i < error.byte; i++) {
-            fprintf(stderr, " ");
-        }
-        fprintf(stderr, "\033[1;31m^\033[0m\n");
+        passgen_error_print(&error, opts.pattern);
         return PASSGEN_ERROR_PATTERN_PARSE;
     }
 
