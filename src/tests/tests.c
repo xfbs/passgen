@@ -125,9 +125,15 @@ int main(int argc, char *argv[]) {
         memset(enabled_tests, 1, sizeof(enabled_tests));
     }
 
+    // determine max test name width and count of enabled tests.
+    int width = 20;
     size_t enabled_count = 0;
     for(size_t i = 0; i < tests_len; i++) {
-        if(enabled_tests[i]) enabled_count++;
+        if(enabled_tests[i]) {
+            enabled_count++;
+            int len = strlen(tests[i].name);
+            if(len > width) width = len;
+        }
     }
 
     size_t failures = 0;
@@ -140,7 +146,7 @@ int main(int argc, char *argv[]) {
                 .number = success + failures,
                 .amount = enabled_count};
 
-            if(run(r)) {
+            if(run(r, width)) {
                 success += 1;
             } else {
                 failures += 1;
@@ -191,7 +197,7 @@ int main(int argc, char *argv[]) {
     }
 }
 
-bool run(test_run test) {
+bool run(test_run test, int padding) {
     switch(test.verbosity) {
         case 0:
             // not a tty, regular
@@ -250,13 +256,15 @@ bool run(test_run test) {
         case 2:
             if(ret.ok) {
                 printf(
-                    "%-30s \033[0;32mpassed\033[0m in %s%4.3lfs\033[0m.\n",
+                    "%-*s \033[0;32mpassed\033[0m in %s%4.3lfs\033[0m.\n",
+                    padding,
                     test.entry.name,
                     (time > 0.1) ? "\033[0;33m" : "",
                     time);
             } else {
                 printf(
-                    "%-30s \033[0;31mfailed\033[0m in %4.3lfs.\n",
+                    "%-*s \033[0;31mfailed\033[0m in %4.3lfs.\n",
+                    padding,
                     test.entry.name,
                     time);
                 printf(

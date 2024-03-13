@@ -37,7 +37,7 @@ typedef struct {
     int verbosity;
 } test_run;
 
-bool run(test_run test);
+bool run(test_run test, int width);
 
 #define test(id) \
     { .name = #id, .func = test_##id }
