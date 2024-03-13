@@ -91,18 +91,15 @@ int passgen_cli_generate_normal(
         // get a NULL-terminated, random pass.
         double entropy;
         size_t written = passgen_generate_fill_utf8(
-                pattern,
-                &opts.env,
-                opts.entropy ? &entropy : NULL,
-                pass,
-                pass_len);
+            pattern,
+            &opts.env,
+            opts.entropy ? &entropy : NULL,
+            pass,
+            pass_len);
         pass[written] = '\0';
 
         if(opts.entropy) {
-            fprintf(
-                stderr,
-                "entropy: %.2lf bits\n",
-                log(entropy) / log(2));
+            fprintf(stderr, "entropy: %.2lf bits\n", log(entropy) / log(2));
         }
 
         if(i == 0) {
@@ -132,11 +129,11 @@ int passgen_cli_generate_json(passgen_cli_opts opts, passgen_pattern *pattern) {
         double entropy;
         // get a NULL-terminated, random pass.
         size_t written = passgen_generate_fill_json_utf8(
-                pattern,
-                &opts.env,
-                opts.entropy ? &entropy : NULL,
-                pass,
-                pass_len);
+            pattern,
+            &opts.env,
+            opts.entropy ? &entropy : NULL,
+            pass,
+            pass_len);
         pass[written] = '\0';
         printf("%s{\"output\":\"%s\"", (i == 0) ? "" : ",", pass);
 
@@ -709,7 +706,11 @@ void passgen_cli_seccomp_init() {
     seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(mremap), 0);
 
     // allow checking for terminal window size
-    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(ioctl), 2,
+    seccomp_rule_add(
+        ctx,
+        SCMP_ACT_ALLOW,
+        SCMP_SYS(ioctl),
+        2,
         SCMP_CMP(0, SCMP_CMP_EQ, 1),
         SCMP_CMP(1, SCMP_CMP_EQ, TIOCGWINSZ));
 

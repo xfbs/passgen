@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "passgen/util/utf8.h"
 #include "passgen/assert.h"
+#include "passgen/util/utf8.h"
 
 int main(int argc, char *argv[]) {
     size_t input_len = 128;

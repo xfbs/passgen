@@ -66,12 +66,12 @@ bool run(test_run test, int width);
             .line = __LINE__,              \
             .func = __func__};
 
-#define assert_gt(lhs, rhs)                \
-    if(lhs <= rhs)                         \
-        return (test_result){              \
-            .ok = false,                   \
-            .assertion = #lhs " > " #rhs,  \
-            .line = __LINE__,              \
+#define assert_gt(lhs, rhs)               \
+    if(lhs <= rhs)                        \
+        return (test_result){             \
+            .ok = false,                  \
+            .assertion = #lhs " > " #rhs, \
+            .line = __LINE__,             \
             .func = __func__};
 
 #define assert_ge(lhs, rhs)                \
@@ -82,12 +82,12 @@ bool run(test_run test, int width);
             .line = __LINE__,              \
             .func = __func__};
 
-#define assert_lt(lhs, rhs)                \
-    if(lhs >= rhs)                         \
-        return (test_result){              \
-            .ok = false,                   \
-            .assertion = #lhs " < " #rhs,  \
-            .line = __LINE__,              \
+#define assert_lt(lhs, rhs)               \
+    if(lhs >= rhs)                        \
+        return (test_result){             \
+            .ok = false,                  \
+            .assertion = #lhs " < " #rhs, \
+            .line = __LINE__,             \
             .func = __func__};
 
 #define assert_le(lhs, rhs)                \

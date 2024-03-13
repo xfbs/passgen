@@ -19,8 +19,12 @@ double entropy(const char *p) {
     passgen_env env;
     passgen_env_init(&env, &random);
     double entropy;
-    int length =
-        passgen_generate_fill_utf8(&pattern, &env, &entropy, &buffer[0], buffer_len);
+    int length = passgen_generate_fill_utf8(
+        &pattern,
+        &env,
+        &entropy,
+        &buffer[0],
+        buffer_len);
     buffer[length] = 0;
     passgen_pattern_free(&pattern);
 

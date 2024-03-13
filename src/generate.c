@@ -364,8 +364,7 @@ static int passgen_generate_special_markov(
     uint32_t word[128];
     size_t pos = markov->level;
     memset(word, 0, pos * sizeof(uint32_t));
-    double *entropy =
-        context->entropy ? &*context->entropy : NULL;
+    double *entropy = context->entropy ? &*context->entropy : NULL;
     do {
         word[pos] = passgen_markov_generate(
             markov,

@@ -1095,7 +1095,8 @@ test_result test_parser_parse_random_unicode(void) {
 
     for(size_t i = 0; i < iterations; i++) {
         for(size_t c = 0; c < string_length; c++) {
-            string[c] = 33 + passgen_random_u32_max(random, PASSGEN_UNICODE_MAX);
+            string[c] =
+                33 + passgen_random_u32_max(random, PASSGEN_UNICODE_MAX);
         }
 
         // Parse the string.

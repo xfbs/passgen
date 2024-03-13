@@ -46,7 +46,7 @@
         size_t len = passgen_generate_fill_unicode(                        \
             parser.pattern,                                                \
             &env,                                                          \
-            NULL, \
+            NULL,                                                          \
             output,                                                        \
             sizeof(output));                                               \
         output[len] = 0;                                                   \
