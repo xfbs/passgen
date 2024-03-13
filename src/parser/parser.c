@@ -315,8 +315,13 @@ int passgen_parse_group(
                 }
             case '?':
                 item = last_single_item_taint(state->data.group.segment);
-                item->maybe = true;
-                return 0;
+                if(item) {
+                    item->maybe = true;
+                    return 0;
+                } else {
+                    // error: maybe without a previous item
+                    return -1;
+                }
             default:
                 break;
         }

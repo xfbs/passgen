@@ -10,8 +10,10 @@
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
 #include "passgen/util/random.h"
+#include "passgen/util/utf8.h"
 #include "tests.h"
 #include <passgen/passgen.h>
+#include <stdlib.h>
 
 #define PREAMBLE()                                 \
     passgen_parser parser;                         \
@@ -931,7 +933,7 @@ const char *pattern_broken[] = {
 
 /// Make sure that the parser returns an error when parsing these known broken
 /// patterns.
-test_result test_parser_can_parse_broken(void) {
+test_result test_parser_parse_broken(void) {
     for(int i = 0; pattern_broken[i]; i++) {
         passgen_pattern pattern;
         passgen_error error;
@@ -1002,7 +1004,7 @@ const char *pattern_working[] = {
 };
 
 /// Make sure that we can parse patterns that are known to be good.
-test_result test_parser_can_parse_working(void) {
+test_result test_parser_parse_working(void) {
     for(int i = 0; pattern_working[i]; i++) {
         passgen_pattern pattern;
         passgen_error error;
@@ -1017,29 +1019,12 @@ test_result test_parser_can_parse_working(void) {
 /// Make sure that we can parse random patterns. Some of these might be valid,
 /// some might not. But none of these should be able to crash the parser in any
 /// way.
-test_result test_parser_can_parse_random(void) {
+test_result test_parser_parse_random_selected(void) {
     // How many random patterns to generate.
     size_t iterations = 10000;
     // Characters to choose from. Must be zero-terminated for `strlen` to work
     // on it.
-    const char characters[] = {
-        '(',
-        ')',
-        '[',
-        ']',
-        '|',
-        '{',
-        '}',
-        ',',
-        'a',
-        'w',
-        'm',
-        'p',
-        'z',
-        '0',
-        '9',
-        '\\',
-        0};
+    const char characters[] = "()[]|{},.abcdefghijklmnopqrstuvw0123456789\\";
     // Find out how many possible characters there are.
     size_t characters_len = strlen(characters);
     // Maximum length of the string to try parsing.
@@ -1068,6 +1053,58 @@ test_result test_parser_can_parse_random(void) {
         passgen_error error;
         passgen_parse(&pattern, &error, string);
         passgen_pattern_free(&pattern);
+    }
+
+    passgen_random_free(random);
+
+    return test_ok;
+}
+
+/// Make sure that we can parse random patterns. Some of these might be valid,
+/// some might not. But none of these should be able to crash the parser in any
+/// way.
+test_result test_parser_parse_random_ascii_printable(void) {
+    size_t iterations = 10000;
+    size_t string_length = 16;
+    char string[string_length + 1];
+    passgen_random *random = passgen_random_new(NULL);
+
+    for(size_t i = 0; i < iterations; i++) {
+        for(size_t c = 0; c < string_length; c++) {
+            string[c] = 33 + passgen_random_u8_max(random, 93);
+        }
+        string[string_length] = 0;
+
+        // Parse the string.
+        passgen_pattern pattern;
+        passgen_error error;
+        passgen_parse(&pattern, &error, string);
+        passgen_pattern_free(&pattern);
+    }
+
+    passgen_random_free(random);
+
+    return test_ok;
+}
+
+test_result test_parser_parse_random_unicode(void) {
+    size_t iterations = 10000;
+    size_t string_length = 16;
+    uint32_t string[string_length];
+    passgen_random *random = passgen_random_new(NULL);
+
+    for(size_t i = 0; i < iterations; i++) {
+        for(size_t c = 0; c < string_length; c++) {
+            string[c] = 33 + passgen_random_u32_max(random, PASSGEN_UNICODE_MAX);
+        }
+
+        // Parse the string.
+        passgen_parser parser;
+        passgen_pattern pattern;
+        passgen_parser_init(&parser, &pattern);
+        passgen_parser_unicode(&parser, string, string_length);
+        passgen_pattern_free(parser.pattern);
+        passgen_parser_free(&parser);
     }
 
     passgen_random_free(random);

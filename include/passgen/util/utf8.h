@@ -14,6 +14,8 @@
 #define PASSGEN_UTF8_SUCCESS 0
 #define PASSGEN_UTF8_INVALID_CHAR -1
 
+#define PASSGEN_UNICODE_MAX 0x10FFFF
+
 /// Decodes a UTF-8 character sequence into an output array.
 ///
 /// Decodes the UTF-8 character sequence in `input` (with length `input_len`) into
