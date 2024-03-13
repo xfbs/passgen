@@ -17,7 +17,8 @@ function(clangformat_setup)
     endif()
   endif()
 
-  add_custom_target(clangformat)
+  add_custom_target(format)
+  add_custom_target(format-check)
 endfunction()
 
 function(clangformat_add target)
@@ -38,7 +39,23 @@ function(clangformat_add target)
       "Formating with ${CLANGFORMAT_EXECUTABLE}"
   )
 
-  add_dependencies(clangformat ${target}_clangformat)
+  add_dependencies(format ${target}_clangformat)
+
+  add_custom_target(${target}_clangformat_check
+    COMMAND
+      ${CLANGFORMAT_EXECUTABLE}
+      -style=file
+      --dry-run
+      -Werror
+      -i
+      ${clangformat_sources}
+    VERBATIM
+    DEPENDS ${clangformat_sources}
+    COMMENT
+      "Checking formating with ${CLANGFORMAT_EXECUTABLE}"
+  )
+
+  add_dependencies(format-check ${target}_clangformat_check)
 endfunction()
 
 function(target_clangformat_setup target)
