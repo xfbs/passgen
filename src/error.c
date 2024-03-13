@@ -1,12 +1,18 @@
 #include <passgen/error.h>
 #include <stdio.h>
+#include <string.h>
 
 void passgen_error_init_raw(passgen_error *error, const char *message) {
+    passgen_array_init(&error->causes, 0);
+    memset(&error->source, 0, sizeof(passgen_error_source));
+    memset(&error->offset, 0, sizeof(passgen_error_offset));
+    memset(&error->end, 0, sizeof(passgen_error_offset));
     error->message = message;
 }
 
 void passgen_error_free(passgen_error *error) {
-    (void) error;
+    passgen_array_free(&error->causes);
+    memset(error, 0, sizeof(passgen_error));
 }
 
 void passgen_error_print(passgen_error *error, const char *pattern) {
@@ -26,8 +32,7 @@ void passgen_error_print(passgen_error *error, const char *pattern) {
 }
 
 void passgen_error_cause_add(passgen_error *error, const passgen_error *cause) {
-    (void) error;
-    (void) cause;
+    passgen_array_push(&error->causes, (void *) cause);
 }
 
 void passgen_error_offset_set(passgen_error *error, size_t codepoint, size_t byte) {
