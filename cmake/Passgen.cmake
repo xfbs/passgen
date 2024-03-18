@@ -24,7 +24,6 @@ function(passgen_check_symbols target)
     ruby ${PROJECT_SOURCE_DIR}/scripts/symbols-check.rb
       -n ${NM_PATH}
       -p passgen
-      -p utf8
       -e _init
       -e _fini
       $<TARGET_FILE:${target}>
