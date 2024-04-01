@@ -191,6 +191,12 @@ test:riscv64:
     - cmake --build build-riscv64
     - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./build-riscv64/src/tests/passgen-test
 
+test:nix:
+  image: nixos/nix
+  stage: pre
+  script:
+    - nix --extra-experimental-features nix-command --extra-experimental-features flakes run
+
 # fetch wordlists
 wordlists:
   image: alpine
