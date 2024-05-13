@@ -1,4 +1,5 @@
 #include "passgen/markov.h"
+#include "passgen/config.h"
 #include "passgen/assert.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -65,6 +66,7 @@ passgen_markov_leaf *passgen_markov_leaf_new(size_t size_index) {
 }
 
 void passgen_markov_leaf_free(passgen_markov_leaf *leaf) {
+    PASSGEN_CLEAR(leaf);
     free(leaf);
 }
 
@@ -79,6 +81,8 @@ void passgen_markov_node_free(passgen_markov_node *node, size_t level) {
             }
         }
     }
+
+    // TODO: clear
 
     free(node);
 }
@@ -278,6 +282,7 @@ void passgen_markov_add(
 // Free a markov chain
 void passgen_markov_free(passgen_markov *markov) {
     passgen_markov_node_free(markov->root, markov->level);
+    PASSGEN_CLEAR(markov);
 }
 
 uint32_t passgen_markov_generate(

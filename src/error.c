@@ -1,4 +1,5 @@
 #include <passgen/error.h>
+#include <passgen/config.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -12,7 +13,7 @@ void passgen_error_init_raw(passgen_error *error, const char *message) {
 
 void passgen_error_free(passgen_error *error) {
     passgen_array_free(&error->causes);
-    memset(error, 0, sizeof(passgen_error));
+    PASSGEN_CLEAR(error);
 }
 
 void passgen_error_print(passgen_error *error, const char *pattern) {

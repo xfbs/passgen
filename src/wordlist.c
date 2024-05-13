@@ -1,5 +1,6 @@
 #include "passgen/wordlist.h"
 #include "passgen/assert.h"
+#include "passgen/config.h"
 #include "passgen/util/utf8.h"
 #include "try.h"
 #include <stdlib.h>
@@ -143,6 +144,8 @@ void passgen_wordlist_free(passgen_wordlist *wordlist) {
     if(wordlist->should_close_file && wordlist->file) {
         fclose(wordlist->file);
     }
+
+    PASSGEN_CLEAR(wordlist);
 }
 
 size_t passgen_wordlist_count(passgen_wordlist *wordlist) {

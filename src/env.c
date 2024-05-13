@@ -1,6 +1,7 @@
 #include "passgen/pattern/env.h"
 #include "passgen/util/utf8.h"
 #include "passgen/wordlist.h"
+#include "passgen/config.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -27,6 +28,8 @@ void passgen_env_free(passgen_env *env) {
     passgen_hashmap_foreach(&env->wordlists, NULL, wordlist_entry_free);
     passgen_hashmap_free(&env->wordlists);
     passgen_hashmap_free(&env->presets);
+
+    PASSGEN_CLEAR(env);
 }
 
 int passgen_env_wordlist_add(

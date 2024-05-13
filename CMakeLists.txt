@@ -21,6 +21,9 @@ option(USE_BACKTRACE "Use backtrace() for debug builds (not always available)." 
 option(USE_LIBEXECINFO
        "Use libexecinfo. For systems that don't have backtrace in libc." OFF)
 
+# TODO: disable when not building for linux
+option(PASSGEN_MLOCK "Use mlock() to lock memory on startup, preventing leaks through swapping" ON)
+
 option(PASSGEN_MEMORY "Build with option to override memory management" ON)
 option(PASSGEN_SECCOMP "Build with seccomp filters" OFF)
 

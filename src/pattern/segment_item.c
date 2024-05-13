@@ -2,6 +2,7 @@
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/special.h"
+#include "passgen/config.h"
 
 void passgen_pattern_item_free(passgen_pattern_item *item) {
     switch(item->kind) {
@@ -17,6 +18,8 @@ void passgen_pattern_item_free(passgen_pattern_item *item) {
         default:
             break;
     }
+
+    PASSGEN_CLEAR(item);
 }
 
 void passgen_pattern_item_init(passgen_pattern_item *item) {

@@ -1,4 +1,5 @@
 #include "passgen/parser/parser.h"
+#include "passgen/config.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -134,6 +135,8 @@ passgen_pattern *passgen_parser_free(passgen_parser *parser) {
     passgen_stack_free(&parser->state);
     passgen_pattern *pattern = parser->pattern;
     parser->pattern = NULL;
+
+    PASSGEN_CLEAR(parser);
     return pattern;
 }
 

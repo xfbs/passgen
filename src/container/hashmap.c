@@ -1,5 +1,6 @@
 #include "passgen/container/hashmap.h"
 #include "passgen/util/siphash.h"
+#include "passgen/config.h"
 #include <stdlib.h>
 #define UNUSED(x) (void) x
 
@@ -64,7 +65,7 @@ void passgen_hashmap_free(passgen_hashmap *map) {
     free(map->data);
 
     // set everything to zero
-    memset(map, 0, sizeof(*map));
+    PASSGEN_CLEAR(map);
 }
 
 void passgen_hashmap_realloc(passgen_hashmap *map, size_t capacity) {
@@ -349,5 +350,6 @@ int passgen_hashmap_entry_free(void *user, passgen_hashmap_entry *entry) {
     (void) user;
     free((void *) entry->key);
     free(entry->value);
+    PASSGEN_CLEAR(entry);
     return 0;
 }

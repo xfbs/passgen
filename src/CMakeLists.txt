@@ -83,3 +83,5 @@ if(USE_LIBEXECINFO)
   target_link_libraries(passgen-static PRIVATE execinfo)
   #target_link_libraries(passgen-shared PRIVATE execinfo)
 endif(USE_LIBEXECINFO)
+
+add_custom_target(test DEPENDS test-lib test-cli)

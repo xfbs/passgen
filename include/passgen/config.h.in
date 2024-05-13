@@ -1,4 +1,8 @@
 #pragma once
 
+#include <string.h>
+#define PASSGEN_CLEAR(value) memset((value), 0, sizeof(*(value)))
+
 #cmakedefine PASSGEN_DEBUG
 #cmakedefine PASSGEN_MEMORY
+#cmakedefine PASSGEN_MLOCK

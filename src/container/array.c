@@ -47,7 +47,7 @@ void *passgen_array_get(passgen_array *array, size_t pos) {
 // Frees an array.
 void passgen_array_free(passgen_array *array) {
     free(array->data);
-    memset(array, 0, sizeof(*array));
+    PASSGEN_CLEAR(array);
 }
 
 // Pops the last item off the array and returns it.

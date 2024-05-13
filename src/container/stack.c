@@ -1,5 +1,6 @@
 #include "passgen/container/stack.h"
 #include "passgen/assert.h"
+#include "passgen/config.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -41,7 +42,7 @@ void passgen_stack_free(passgen_stack *stack) {
         free(stack->data);
     }
 
-    memset(stack, 0, sizeof(*stack));
+    PASSGEN_CLEAR(stack);
 }
 
 // Execute a function for every item on the stack.

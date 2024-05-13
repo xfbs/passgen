@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "passgen/config.h"
 
 #define PARAMETERS_INITIAL_SIZE 16
 #define PARAMETERS_MULTIPLIER   2
@@ -33,6 +34,7 @@ void passgen_pattern_special_init(
 
 void passgen_pattern_special_free(passgen_pattern_special *special) {
     free(special->parameters);
+    PASSGEN_CLEAR(special);
 }
 
 void passgen_pattern_special_push(

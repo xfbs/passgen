@@ -218,7 +218,7 @@ build:mingw64:
   before_script:
     - git config --global --add safe.directory '*'
   script:
-    - cmake -S . -B build-mingw64 -DCMAKE_TOOLCHAIN_FILE=cmake/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y
+    - cmake -S . -B build-mingw64 -DCMAKE_TOOLCHAIN_FILE=cmake/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y -DPASSGEN_MLOCK=OFF
     - cd build-mingw64
     - make -j
     - cpack -G ZIP
@@ -327,7 +327,7 @@ build:wasi:
     - wordlists
   script:
     - mkdir build-wasi && cd build-wasi
-    - cmake cmake -DLIBPASSGEN_SHARED=OFF ..
+    - cmake -DLIBPASSGEN_SHARED=OFF -DPASSGEN_MLOCK=OFF ..
     - make -j passgen-cli
   artifacts:
     paths:

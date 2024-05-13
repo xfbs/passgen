@@ -1,5 +1,6 @@
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/range.h"
+#include "passgen/config.h"
 #include <stdlib.h>
 
 void passgen_pattern_set_init(passgen_pattern_set *set) {
@@ -10,8 +11,8 @@ void passgen_pattern_set_init(passgen_pattern_set *set) {
 
 void passgen_pattern_set_free(passgen_pattern_set *set) {
     passgen_stack_free(&set->items);
-
     free(set->choices_list);
+    PASSGEN_CLEAR(set);
 }
 
 passgen_pattern_range *

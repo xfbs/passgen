@@ -1,4 +1,9 @@
 #include "passgen.h"
+#include <passgen/config.h>
+
+#ifdef PASSGEN_MLOCK
+#include <sys/mman.h>
+#endif
 
 #define try(statement)            \
     do {                          \
@@ -11,6 +16,13 @@
 int main(int argc, char *argv[]) {
     int ret;
     passgen_cli_opts opts;
+
+    // locks memory used by passgen to avoid it being swapped to disk. this
+    // would result in leaking secret state, such as the generated output or
+    // the randomness source buffer.
+#ifdef PASSGEN_MLOCK
+    mlockall(MCL_CURRENT | MCL_FUTURE);
+#endif
 
     // seccomp is a linux feature that allows us to load filters for the
     // syscalls we are allowed to issue. this means that even if there is a
