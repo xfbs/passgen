@@ -1,4 +1,5 @@
 #include "passgen/util/random.h"
+#include "passgen/util/endian.h"
 #include "passgen/assert.h"
 #include <stdlib.h>
 #include <string.h>
@@ -17,7 +18,7 @@ static bool _strprefix(const char *prefix, const char *string) {
 #define PASSGEN_RANDOM_HAVE_SYSTEM
 #include <sys/random.h>
 
-size_t passgen_random_read_system(void *dest, size_t size, void *data) {
+static size_t passgen_random_read_system(void *dest, size_t size, void *data) {
     (void) data;
     return getrandom(dest, size, 0);
 }
@@ -26,7 +27,7 @@ size_t passgen_random_read_system(void *dest, size_t size, void *data) {
 #ifdef __APPLE__
 #define PASSGEN_RANDOM_HAVE_SYSTEM
 
-size_t passgen_random_read_system(void *dest, size_t size, void *data) {
+static size_t passgen_random_read_system(void *dest, size_t size, void *data) {
     (void) data;
     arc4random_buf(dest, size);
     return size;
@@ -37,15 +38,15 @@ size_t passgen_random_read_system(void *dest, size_t size, void *data) {
 static const char *passgen_random_default_device = "/dev/urandom";
 #endif
 
-size_t passgen_random_read_file(void *dest, size_t size, void *data) {
+static size_t passgen_random_read_file(void *dest, size_t size, void *data) {
     return fread(dest, 1, size, data);
 }
 
-void passgen_random_close_file(void *data) {
+static void passgen_random_close_file(void *data) {
     fclose(data);
 }
 
-void passgen_random_close_system(void *data) {
+static void passgen_random_close_system(void *data) {
     (void) data;
 }
 
@@ -57,7 +58,7 @@ static uint64_t xorshift64(uint64_t *state) {
     return *state = x;
 }
 
-size_t passgen_random_read_xorshift(void *dest, size_t size, void *data) {
+static size_t passgen_random_read_xorshift(void *dest, size_t size, void *data) {
     size_t written = 0;
     uint64_t result;
 
@@ -78,7 +79,7 @@ size_t passgen_random_read_xorshift(void *dest, size_t size, void *data) {
     return written;
 }
 
-void passgen_random_close_xorshift(void *data) {
+static void passgen_random_close_xorshift(void *data) {
     free(data);
 }
 
@@ -89,7 +90,7 @@ passgen_random *passgen_random_new_xorshift(uint64_t seed) {
     return passgen_random_open_xorshift(random, seed);
 }
 
-void passgen_random_reload(passgen_random *random) {
+static void passgen_random_reload(passgen_random *random) {
     passgen_assert(random != NULL);
 
     // read random data.
@@ -331,18 +332,21 @@ inline uint8_t passgen_random_u8(passgen_random *random) {
 inline uint16_t passgen_random_u16(passgen_random *random) {
     uint16_t data;
     passgen_random_read(random, &data, sizeof(data));
+    data = htole16(data);
     return data;
 }
 
 inline uint32_t passgen_random_u32(passgen_random *random) {
     uint32_t data;
     passgen_random_read(random, &data, sizeof(data));
+    data = htole32(data);
     return data;
 }
 
 inline uint64_t passgen_random_u64(passgen_random *random) {
     uint64_t data;
     passgen_random_read(random, &data, sizeof(data));
+    data = htole64(data);
     return data;
 }
 
