@@ -1,6 +1,6 @@
 #include "passgen/util/random.h"
-#include "passgen/util/endian.h"
 #include "passgen/assert.h"
+#include "passgen/util/endian.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -58,7 +58,8 @@ static uint64_t xorshift64(uint64_t *state) {
     return *state = x;
 }
 
-static size_t passgen_random_read_xorshift(void *dest, size_t size, void *data) {
+static size_t
+passgen_random_read_xorshift(void *dest, size_t size, void *data) {
     size_t written = 0;
     uint64_t result;
 
@@ -107,6 +108,11 @@ static void passgen_random_reload(passgen_random *random) {
 
 passgen_random *
 passgen_random_open_xorshift(passgen_random *random, uint64_t seed) {
+    if(!random) {
+        random = malloc(sizeof(passgen_random));
+        if(!random) return NULL;
+    }
+
     // create state
     uint64_t *state = malloc(sizeof(uint64_t));
     if(!state) return NULL;
@@ -133,6 +139,11 @@ void passgen_random_close_zero(void *data) {
 }
 
 passgen_random *passgen_random_open_zero(passgen_random *random) {
+    if(!random) {
+        random = malloc(sizeof(passgen_random));
+        if(!random) return NULL;
+    }
+
     random->data = NULL;
     random->read = passgen_random_read_zero;
     random->close = passgen_random_close_zero;
@@ -148,6 +159,11 @@ passgen_random *passgen_random_new_zero() {
 
 #ifdef PASSGEN_RANDOM_HAVE_SYSTEM
 passgen_random *passgen_random_open_system(passgen_random *random) {
+    if(!random) {
+        random = malloc(sizeof(passgen_random));
+        if(!random) return NULL;
+    }
+
     random->data = NULL;
     random->read = passgen_random_read_system;
     random->close = passgen_random_close_system;
@@ -290,6 +306,11 @@ passgen_random_open_path(passgen_random *random, const char *path) {
         return NULL;
     }
 
+    if(!random) {
+        random = malloc(sizeof(passgen_random));
+        if(!random) return NULL;
+    }
+
     return passgen_random_open_file(random, device);
 
     passgen_random_reload(random);
@@ -298,6 +319,11 @@ passgen_random_open_path(passgen_random *random, const char *path) {
 }
 
 passgen_random *passgen_random_open_file(passgen_random *random, FILE *file) {
+    if(!random) {
+        random = malloc(sizeof(passgen_random));
+        if(!random) return NULL;
+    }
+
     random->data = file;
     random->read = passgen_random_read_file;
     random->close = passgen_random_close_file;

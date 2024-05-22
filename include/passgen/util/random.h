@@ -38,53 +38,8 @@ typedef struct {
     passgen_random_close_func *close;
 } passgen_random;
 
-/// Allocates and opens new random object.
-///
-/// @param desc String description of which randomness source to allocate. When `NULL`, uses
-/// system randomness source.
-/// @returns Returns `NULL` on error.
-/// @memberof passgen_random
-///
-/// @par Example
-///
-/// ```c
-/// passgen_random *random_default = passgen_random_new(NULL);
-/// passgen_random *random_system = passgen_random_new("system");
-/// passgen_random *random_xorshift = passgen_random_new("xorshift:1234");
-/// passgen_random *random_file = passgen_random_new("file:/dev/urandom");
-/// passgen_random *random_zero = passgen_random_new("zero");
-/// passgen_random_free(random_default);
-/// passgen_random_free(random_system);
-/// passgen_random_free(random_xorshift);
-/// passgen_random_free(random_file);
-/// passgen_random_free(random_zero);
-/// ```
-passgen_random *passgen_random_new(const char *desc);
-
-/// Allocates and opens a new random object using @p path as random device.
-/// Not recommended to use `/dev/random` as randomness device, use the default
-/// `/dev/urandom` instead.
-///
-/// @memberof passgen_random
-passgen_random *passgen_random_new_path(const char *path);
-
-/// Allocates and opens a new random object with @p file as randomness source.
-///
-/// @memberof passgen_random
-passgen_random *passgen_random_new_file(FILE *file);
-
-/// Allocates and opens a new random object using the xorshift PRNG.
-///
-/// @memberof passgen_random
-passgen_random *passgen_random_new_xorshift(uint64_t seed);
-
-/// Allocates and opens a new random object using the zero randomness generator.
-///
-/// @memberof passgen_random
-passgen_random *passgen_random_new_zero();
-
-/// Opens a new, existing random object. Returns `NULL` on failure. Uses
-/// `/dev/urandom` as random device.
+/// Opens a new random object. If given a NULL pointer, allocates memory for it.
+/// Returns `NULL` on failure.
 ///
 /// @par Example
 ///

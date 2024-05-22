@@ -62,7 +62,10 @@ int passgen_parse(
             // make sure parsing the token was successful
             if(ret < 0) {
                 passgen_error_init(error, passgen_token_parse_error_str(ret));
-                passgen_error_offset_set(error, token.offset, token.byte_offset);
+                passgen_error_offset_set(
+                    error,
+                    token.offset,
+                    token.byte_offset);
                 passgen_parser_free(&parser);
                 return -1;
             }
@@ -73,7 +76,10 @@ int passgen_parse(
                 // make sure that the parser accepts the token
                 if(ret != 0) {
                     passgen_error_init(error, "invalid token");
-                    passgen_error_offset_set(error, token.offset, token.byte_offset);
+                    passgen_error_offset_set(
+                        error,
+                        token.offset,
+                        token.byte_offset);
                     passgen_parser_free(&parser);
                     return -1;
                 }
@@ -84,7 +90,9 @@ int passgen_parse(
 
     // make sure we aren't still parsing tokens
     if(token_parser.state != PASSGEN_TOKEN_INIT) {
-        passgen_error_init(error, passgen_token_parse_error_str(token_parser.state));
+        passgen_error_init(
+            error,
+            passgen_token_parse_error_str(token_parser.state));
         passgen_error_offset_set(error, pattern_pos_total, pattern_raw_pos);
         passgen_parser_free(&parser);
         return -1;

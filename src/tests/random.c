@@ -176,19 +176,19 @@ test_result test_random_u64_max(void) {
 }
 
 test_result test_random_new(void) {
-    passgen_random *random_default = passgen_random_new(NULL);
+    passgen_random *random_default = passgen_random_open(NULL, NULL);
     assert(random_default);
     assert(random_default->read);
     assert(random_default->close);
 
-    passgen_random *random = passgen_random_new("system");
+    passgen_random *random = passgen_random_open(NULL, "system");
     assert(random);
     assert_eq(random->read, random_default->read);
     assert_eq(random->close, random_default->close);
     passgen_random_free(random);
     passgen_random_free(random_default);
 
-    random = passgen_random_new("zero");
+    random = passgen_random_open(NULL, "zero");
     assert(random);
     assert(random->read);
     assert(random->close);
@@ -198,7 +198,7 @@ test_result test_random_new(void) {
     assert_eq(passgen_random_u64(random), 0);
     passgen_random_free(random);
 
-    random = passgen_random_new("xorshift:1234");
+    random = passgen_random_open(NULL, "xorshift:1234");
     assert(random);
     assert(random->read);
     assert(random->close);
@@ -209,7 +209,7 @@ test_result test_random_new(void) {
     assert_eq(passgen_random_u64_max(random, 999999999), 851051297);
     passgen_random_free(random);
 
-    random = passgen_random_new("file:/dev/zero");
+    random = passgen_random_open(NULL, "file:/dev/zero");
     assert(random);
     assert(random->read);
     assert(random->close);
@@ -219,11 +219,11 @@ test_result test_random_new(void) {
     assert_eq(passgen_random_u64(random), 0);
     passgen_random_free(random);
 
-    assert(!passgen_random_new("other"));
-    assert(!passgen_random_new("xorshift:abc"));
-    assert(!passgen_random_new("xorshift:"));
-    assert(!passgen_random_new("file:"));
-    assert(!passgen_random_new("file:/dev/nonexistant"));
+    assert(!passgen_random_open(NULL, "other"));
+    assert(!passgen_random_open(NULL, "xorshift:abc"));
+    assert(!passgen_random_open(NULL, "xorshift:"));
+    assert(!passgen_random_open(NULL, "file:"));
+    assert(!passgen_random_open(NULL, "file:/dev/nonexistant"));
 
     return test_ok;
 }
@@ -231,7 +231,7 @@ test_result test_random_new(void) {
 test_result test_random_file(void) {
     FILE *file = fopen("/dev/zero", "r");
     assert(file);
-    passgen_random *random = passgen_random_new_file(file);
+    passgen_random *random = passgen_random_open_file(NULL, file);
     assert(random);
     assert(random->read);
     assert(random->close);
@@ -245,7 +245,7 @@ test_result test_random_file(void) {
 }
 
 test_result test_random_zero(void) {
-    passgen_random *random = passgen_random_new_zero();
+    passgen_random *random = passgen_random_open_zero(NULL);
     assert(random);
     assert(random->read);
     assert(random->close);
@@ -260,11 +260,11 @@ test_result test_random_zero(void) {
 
 test_result test_random_new_path(void) {
     passgen_random *random;
-    random = passgen_random_new_path("/dev/nonexistent");
+    random = passgen_random_open_path(NULL, "/dev/nonexistent");
     assert(!random);
 
     // reading from /dev/zero should always yield zero.
-    random = passgen_random_new_path("/dev/zero");
+    random = passgen_random_open_path(NULL, "/dev/zero");
     assert(random);
     assert(random->data);
     assert(passgen_random_u8(random) == 0);

@@ -1032,7 +1032,7 @@ test_result test_parser_parse_random_selected(void) {
     // Storage for the string plus NULL-terminator.
     char string[string_length + 1];
     // Source of randomness.
-    passgen_random *random = passgen_random_new(NULL);
+    passgen_random *random = passgen_random_open(NULL, NULL);
 
     // Generate random strings and parse them.
     for(size_t i = 0; i < iterations; i++) {
@@ -1067,7 +1067,7 @@ test_result test_parser_parse_random_ascii_printable(void) {
     size_t iterations = 10000;
     size_t string_length = 16;
     char string[string_length + 1];
-    passgen_random *random = passgen_random_new(NULL);
+    passgen_random *random = passgen_random_open(NULL, NULL);
 
     for(size_t i = 0; i < iterations; i++) {
         for(size_t c = 0; c < string_length; c++) {
@@ -1091,7 +1091,7 @@ test_result test_parser_parse_random_unicode(void) {
     size_t iterations = 10000;
     size_t string_length = 16;
     uint32_t string[string_length];
-    passgen_random *random = passgen_random_new(NULL);
+    passgen_random *random = passgen_random_open(NULL, NULL);
 
     for(size_t i = 0; i < iterations; i++) {
         for(size_t c = 0; c < string_length; c++) {

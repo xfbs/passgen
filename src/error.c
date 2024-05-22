@@ -21,7 +21,11 @@ void passgen_error_print(passgen_error *error, const char *pattern) {
         "\033[1;31merror\033[0m parsing pattern: %s\n",
         error->message);
     if(error->source.file) {
-        fprintf(stderr, "location %s:%zu\n", error->source.file, error->source.line);
+        fprintf(
+            stderr,
+            "location %s:%zu\n",
+            error->source.file,
+            error->source.line);
     }
     fprintf(stderr, "\033[1;33mpattern\033[0m: %s\n", pattern);
     fprintf(stderr, "         ");
@@ -35,12 +39,18 @@ void passgen_error_cause_add(passgen_error *error, const passgen_error *cause) {
     passgen_array_push(&error->causes, (void *) cause);
 }
 
-void passgen_error_offset_set(passgen_error *error, size_t codepoint, size_t byte) {
+void passgen_error_offset_set(
+    passgen_error *error,
+    size_t codepoint,
+    size_t byte) {
     error->offset.codepoint = codepoint;
     error->offset.byte = byte;
 }
 
-void passgen_error_source_set(passgen_error *error, const char *file, size_t line) {
+void passgen_error_source_set(
+    passgen_error *error,
+    const char *file,
+    size_t line) {
     error->source.file = file;
     error->source.line = line;
 }

@@ -36,7 +36,7 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
         opts->env.random = NULL;
     }
 
-    opts->env.random = passgen_random_new(random);
+    opts->env.random = passgen_random_open(NULL, random);
 
     if(!opts->env.random) {
         printf(
@@ -384,7 +384,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 
     // fallback to system randomness if nothing else is defined
     if(!opts->env.random) {
-        opts->env.random = passgen_random_new(NULL);
+        opts->env.random = passgen_random_open(NULL, NULL);
         assert(opts->env.random);
     }
 

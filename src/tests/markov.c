@@ -375,7 +375,7 @@ test_result test_markov_leaf_insert_sequential(void) {
 }
 
 test_result test_markov_generate(void) {
-    passgen_random *rand = passgen_random_new_xorshift(SEED);
+    passgen_random *rand = passgen_random_open_xorshift(NULL, SEED);
     // passgen_random_open_xorshift(&rand, SEED);
 
     passgen_markov markov;
