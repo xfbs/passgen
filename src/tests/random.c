@@ -6,8 +6,6 @@
 
 #include "tests.h"
 
-#define XORSHIFT_SEED 234720984723
-
 /// Tests that a given function covers all possible outputs (0..max, inclusive).
 #define TEST_COVERAGE(max, collate, function)                    \
     do {                                                         \
@@ -328,6 +326,8 @@ test_result test_random_open_path(void) {
     return test_ok;
 }
 
+#define XORSHIFT_SEED 234720984723
+
 test_result test_random_read(void) {
     passgen_random random;
     assert(passgen_random_open_xorshift(&random, XORSHIFT_SEED));
@@ -390,6 +390,8 @@ test_result test_random_read(void) {
     return test_ok;
 }
 
+#undef XORSHIFT_SEED
+
 test_result test_random_xorshift(void) {
     passgen_random random;
 
@@ -412,4 +414,93 @@ test_result test_random_xorshift(void) {
     return test_ok;
 }
 
-#undef XORSHIFT_SEED
+#define CHECK_BEGINNING(random)                  \
+    assert(passgen_random_u8(random) == 180);    \
+    assert(passgen_random_u16(random) == 43073); \
+    assert(passgen_random_u32(random) == 1604870485)
+
+#define CHECK_REST(random)                                         \
+    assert(passgen_random_u64(random) == 5567227278517054982ULL);  \
+    assert(passgen_random_u64(random) == 10120912194545613486ULL); \
+    assert(passgen_random_u64(random) == 14168488844181147231ULL); \
+    assert(passgen_random_u64(random) == 17990605897407475310ULL); \
+    assert(passgen_random_u64(random) == 14488897527995456554ULL); \
+    assert(passgen_random_u64(random) == 16603445463307625220ULL); \
+    assert(passgen_random_u64(random) == 17826730983279974707ULL); \
+    assert(passgen_random_u64(random) == 7745812445609307379ULL);  \
+    assert(passgen_random_u64(random) == 6756294678665739130ULL)
+
+test_result test_random_chacha20_seek(void) {
+    passgen_random random;
+
+    assert(
+        passgen_random_chacha20_open(
+            &random,
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "passgen") != NULL);
+    CHECK_BEGINNING(&random);
+    CHECK_REST(&random);
+
+    // seek back to beginning, same values
+    passgen_random_chacha20_seek(&random, 0);
+    CHECK_BEGINNING(&random);
+    CHECK_REST(&random);
+
+    // seek to middle of stream, only latter values
+    passgen_random_chacha20_seek(&random, 7);
+    CHECK_REST(&random);
+
+    passgen_random_close(&random);
+
+    return test_ok;
+}
+
+#undef CHECK_BEGINNING
+#undef CHECK_REST
+
+test_result test_random_chacha20(void) {
+    passgen_random random;
+
+    assert(
+        passgen_random_chacha20_open(
+            &random,
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "passgen") != NULL);
+    assert(passgen_random_u8(&random) == 180);
+    assert(passgen_random_u16(&random) == 43073);
+    assert(passgen_random_u32(&random) == 1604870485);
+    assert(passgen_random_u64(&random) == 5567227278517054982ULL);
+    passgen_random_close(&random);
+
+    assert(
+        passgen_random_chacha20_open(
+            &random,
+            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "passgen") != NULL);
+    assert(passgen_random_u8(&random) == 14);
+    assert(passgen_random_u16(&random) == 19281);
+    assert(passgen_random_u32(&random) == 2608689089);
+    assert(passgen_random_u64(&random) == 12744604773769097796ULL);
+    passgen_random_close(&random);
+
+    return test_ok;
+}
+
+test_result test_random_chacha20_argon2(void) {
+    passgen_random random;
+
+    assert(
+        passgen_random_chacha20_argon2_open(
+            &random,
+            "mypassword",
+            "google.com",
+            "",
+            NULL) != NULL);
+    assert(passgen_random_u8(&random) == 53);
+    assert(passgen_random_u16(&random) == 45909);
+    assert(passgen_random_u32(&random) == 1750958599);
+    assert(passgen_random_u64(&random) == 13270789079271667756ULL);
+    passgen_random_close(&random);
+
+    return test_ok;
+}

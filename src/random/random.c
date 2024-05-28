@@ -1,7 +1,6 @@
 #include "passgen/util/random.h"
 #include "passgen/assert.h"
 #include "passgen/util/endian.h"
-#include "passgen/config.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -15,84 +14,7 @@ static bool _strprefix(const char *prefix, const char *string) {
     return true;
 }
 
-#ifdef __linux__
-#define PASSGEN_RANDOM_HAVE_SYSTEM
-#include <sys/random.h>
-
-static size_t passgen_random_read_system(void *dest, size_t size, void *data) {
-    (void) data;
-    return getrandom(dest, size, 0);
-}
-#endif
-
-#ifdef __APPLE__
-#define PASSGEN_RANDOM_HAVE_SYSTEM
-
-static size_t passgen_random_read_system(void *dest, size_t size, void *data) {
-    (void) data;
-    arc4random_buf(dest, size);
-    return size;
-}
-#endif
-
-#ifndef PASSGEN_RANDOM_HAVE_SYSTEM
-static const char *passgen_random_default_device = "/dev/urandom";
-#endif
-
-static size_t passgen_random_read_file(void *dest, size_t size, void *data) {
-    return fread(dest, 1, size, data);
-}
-
-static void passgen_random_close_file(void *data) {
-    fclose(data);
-}
-
-static void passgen_random_close_system(void *data) {
-    (void) data;
-}
-
-static uint64_t xorshift64(uint64_t *state) {
-    uint64_t x = *state;
-    x ^= x << 13;
-    x ^= x >> 7;
-    x ^= x << 17;
-    return *state = x;
-}
-
-static size_t
-passgen_random_read_xorshift(void *dest, size_t size, void *data) {
-    size_t written = 0;
-    uint64_t result;
-
-    // fill all whole uint64 blocks
-    while((size - written) >= sizeof(result)) {
-        result = xorshift64(data);
-        memcpy(dest + written, &result, sizeof(result));
-        written += sizeof(result);
-    }
-
-    // maybe fill the last incomplete block
-    if(size != written) {
-        result = xorshift64(data);
-        memcpy(dest + written, &result, size - written);
-        written += size - written;
-    }
-
-    return written;
-}
-
-static void passgen_random_close_xorshift(void *data) {
-    free(data);
-}
-
-passgen_random *passgen_random_new_xorshift(uint64_t seed) {
-    passgen_random *random = malloc(sizeof(passgen_random));
-    if(!random) return NULL;
-
-    return passgen_random_open_xorshift(random, seed);
-}
-
-static void passgen_random_reload(passgen_random *random) {
+void passgen_random_reload(passgen_random *random) {
     passgen_assert(random != NULL);
 
     // read random data.
@@ -106,78 +28,6 @@ static void passgen_random_reload(passgen_random *random) {
     // reset position in ring buffer.
     random->pos = 0;
 }
-
-passgen_random *
-passgen_random_open_xorshift(passgen_random *random, uint64_t seed) {
-    if(!random) {
-        random = malloc(sizeof(passgen_random));
-        if(!random) return NULL;
-    }
-
-    // create state
-    uint64_t *state = malloc(sizeof(uint64_t));
-    if(!state) return NULL;
-
-    // initialise state
-    *state = seed;
-
-    random->data = state;
-    random->read = passgen_random_read_xorshift;
-    random->close = passgen_random_close_xorshift;
-    passgen_random_reload(random);
-
-    return random;
-}
-
-size_t passgen_random_read_zero(void *dest, size_t size, void *data) {
-    (void) data;
-    memset(dest, 0, size);
-    return size;
-}
-
-void passgen_random_close_zero(void *data) {
-    (void) data;
-}
-
-passgen_random *passgen_random_open_zero(passgen_random *random) {
-    if(!random) {
-        random = malloc(sizeof(passgen_random));
-        if(!random) return NULL;
-    }
-
-    random->data = NULL;
-    random->read = passgen_random_read_zero;
-    random->close = passgen_random_close_zero;
-    passgen_random_reload(random);
-    return random;
-}
-
-passgen_random *passgen_random_new_zero() {
-    passgen_random *random = malloc(sizeof(passgen_random));
-    if(!random) return NULL;
-    return passgen_random_open_zero(random);
-}
-
-#ifdef PASSGEN_RANDOM_HAVE_SYSTEM
-passgen_random *passgen_random_open_system(passgen_random *random) {
-    if(!random) {
-        random = malloc(sizeof(passgen_random));
-        if(!random) return NULL;
-    }
-
-    random->data = NULL;
-    random->read = passgen_random_read_system;
-    random->close = passgen_random_close_system;
-    passgen_random_reload(random);
-    return random;
-}
-#else
-passgen_random *passgen_random_open_system(passgen_random *random) {
-    (void) random;
-
-    return NULL;
-}
-#endif
 
 void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
     if(bytes <= sizeof(random->buffer)) {
@@ -211,39 +61,6 @@ void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
             abort();
         }
     }
-}
-
-passgen_random *passgen_random_new(const char *desc) {
-    passgen_random *random = malloc(sizeof(passgen_random));
-    passgen_assert(random);
-
-    passgen_random *ret = passgen_random_open(random, desc);
-    if(!ret) {
-        free(random);
-    }
-
-    return ret;
-}
-
-passgen_random *passgen_random_new_path(const char *path) {
-    passgen_random *random = malloc(sizeof(passgen_random));
-    if(!random) return NULL;
-
-    if(!passgen_random_open_path(random, path)) {
-        free(random);
-        return NULL;
-    }
-
-    return random;
-}
-
-passgen_random *passgen_random_new_file(FILE *file) {
-    passgen_random *random = malloc(sizeof(passgen_random));
-    if(!random) return NULL;
-
-    passgen_random_open_file(random, file);
-
-    return random;
 }
 
 passgen_random *
@@ -285,51 +102,7 @@ passgen_random *passgen_random_open(passgen_random *random, const char *desc) {
         return passgen_random_open_parse(random, desc);
     }
 
-#ifdef PASSGEN_RANDOM_HAVE_SYSTEM
     return passgen_random_open_system(random);
-#else
-    passgen_random *rand =
-        passgen_random_open_path(random, passgen_random_default_device);
-    if(!rand) {
-        fprintf(
-            stderr,
-            "error: cannot open system randomness device '%s'\n",
-            passgen_random_default_device);
-    }
-    return rand;
-#endif
-}
-
-passgen_random *
-passgen_random_open_path(passgen_random *random, const char *path) {
-    FILE *device = fopen(path, "r");
-    if(!device) {
-        return NULL;
-    }
-
-    if(!random) {
-        random = malloc(sizeof(passgen_random));
-        if(!random) return NULL;
-    }
-
-    return passgen_random_open_file(random, device);
-
-    passgen_random_reload(random);
-
-    return random;
-}
-
-passgen_random *passgen_random_open_file(passgen_random *random, FILE *file) {
-    if(!random) {
-        random = malloc(sizeof(passgen_random));
-        if(!random) return NULL;
-    }
-
-    random->data = file;
-    random->read = passgen_random_read_file;
-    random->close = passgen_random_close_file;
-    passgen_random_reload(random);
-    return random;
 }
 
 void passgen_random_close(passgen_random *random) {
