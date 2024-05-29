@@ -118,6 +118,33 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
 
         return passgen_random_chacha20_open(random, key, iv);
     }
+
+    // use chacha20 with raw key and IV
+    if(_strprefix("chacha20-argon2:", desc)) {
+        char master_pass[128] = {0};
+        char domain[128] = {0};
+        char token[128] = {0};
+
+        const char *start = &desc[16];
+        const char *end = &desc[16];
+
+#define PARSE_STRING(name) \
+        if(*end == ':') end++; \
+        if(*end) { \
+            start = end; \
+            end = strchr(start, ':'); \
+            if(!end) { \
+                end = start + strlen(start); \
+            } \
+            memcpy(name, start, end - start); \
+        }
+
+        PARSE_STRING(master_pass)
+        PARSE_STRING(domain)
+        PARSE_STRING(token)
+
+        return passgen_random_chacha20_argon2_open(random, master_pass, domain, token, NULL);
+    }
 #endif
 
     return NULL;

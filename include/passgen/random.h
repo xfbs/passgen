@@ -93,7 +93,7 @@ typedef struct {
 /// | Zero | `zero` | `zero` |
 /// | File | `file:<path>` | `file:/dev/zero` |
 /// | ChaCha20 | `chacha20:<key>:<iv>` | `chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:iviviviv` |
-///
+/// | ChaCha20-Argon2 | `chacha20-argon2:<master-pass>[:<domain>[:<token>]]` | `chacha20-argon2:mymasterpass:example.com:1` |
 ///
 /// @par Example
 ///
@@ -189,6 +189,14 @@ passgen_random *passgen_random_chacha20_open(
 /// stream cipher, with a key derived from the supplied passphrase, domain and
 /// token.
 ///
+/// The domain and token parameters are optional, but allow you to generate distinct
+/// passphrases using the same master passphrase. You may use the token to generate
+/// distinct passphrases for multiple logins to the same domain, for example. Or you
+/// may use it as a counter to rotate your passphrases periodically.
+///
+/// @param passphrase Master passphrase
+/// @param domain Domain name
+/// @param token Token, used as additional input
 /// @memberof passgen_random
 passgen_random *passgen_random_chacha20_argon2_open(
     passgen_random *random,
