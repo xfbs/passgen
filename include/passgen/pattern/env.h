@@ -5,7 +5,7 @@
 #pragma once
 
 #include "passgen/container/hashmap.h"
-#include "passgen/util/random.h"
+#include "passgen/random.h"
 #include "passgen/pattern/pattern.h"
 #include "passgen/pattern/preset.h"
 #include <stdio.h>

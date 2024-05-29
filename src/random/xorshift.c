@@ -1,5 +1,5 @@
+#include "passgen/random.h"
 #include "passgen/util/endian.h"
-#include "passgen/util/random.h"
 #include <stdlib.h>
 #include <string.h>
 

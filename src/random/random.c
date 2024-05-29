@@ -1,4 +1,4 @@
-#include "passgen/util/random.h"
+#include "passgen/random.h"
 #include "passgen/assert.h"
 #include "passgen/util/endian.h"
 #include <stdlib.h>

@@ -1,5 +1,5 @@
 #include "bench.h"
-#include <passgen/util/random.h>
+#include <passgen/random.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>

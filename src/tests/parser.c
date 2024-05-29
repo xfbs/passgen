@@ -9,7 +9,7 @@
 #include "passgen/pattern/segment.h"
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
-#include "passgen/util/random.h"
+#include "passgen/random.h"
 #include "passgen/util/utf8.h"
 #include "tests.h"
 #include <passgen/passgen.h>

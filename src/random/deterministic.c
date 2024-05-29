@@ -1,7 +1,7 @@
 #include "passgen/assert.h"
 #include "passgen/config.h"
 #include "passgen/crypto.h"
-#include "passgen/util/random.h"
+#include "passgen/random.h"
 #include <stdlib.h>
 #include <string.h>
 

@@ -7,7 +7,7 @@
 /// from it, and then using the Markov chain to generate sequences that are
 /// pronounceable in English but not real words.
 #pragma once
-#include "passgen/util/random.h"
+#include "passgen/random.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
