@@ -330,7 +330,7 @@ test_result test_random_open_path(void) {
 
 test_result test_random_read(void) {
     passgen_random random;
-    assert(passgen_random_open_xorshift(&random, XORSHIFT_SEED));
+    assert(passgen_random_xorshift_open(&random, XORSHIFT_SEED));
 
     uint8_t data[2000] = {0};
 
@@ -396,7 +396,7 @@ test_result test_random_xorshift(void) {
     passgen_random random;
 
     // using a state of zero generates only zeroes.
-    assert(passgen_random_open_xorshift(&random, 0) != NULL);
+    assert(passgen_random_xorshift_open(&random, 0) != NULL);
     assert(passgen_random_u8(&random) == 0);
     assert(passgen_random_u16(&random) == 0);
     assert(passgen_random_u32(&random) == 0);
@@ -404,7 +404,7 @@ test_result test_random_xorshift(void) {
     passgen_random_close(&random);
 
     // same seed always yields the same output
-    assert(passgen_random_open_xorshift(&random, 123) != NULL);
+    assert(passgen_random_xorshift_open(&random, 123) != NULL);
     assert(passgen_random_u8(&random) == 187);
     assert(passgen_random_u16(&random) == 31102);
     assert(passgen_random_u32(&random) == 7933);

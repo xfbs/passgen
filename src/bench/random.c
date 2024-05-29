@@ -26,7 +26,7 @@ static void *bench_data_prepare(const passgen_hashmap *opts) {
 
 static void *bench_data_prepare_xorshift(const passgen_hashmap *opts) {
     struct bench_data *data = bench_data_prepare(opts);
-    passgen_random_open_xorshift(&data->random, XORSHIFT_SEED);
+    passgen_random_xorshift_open(&data->random, XORSHIFT_SEED);
     return data;
 }
 

@@ -85,7 +85,7 @@ passgen_random_open_file(passgen_random *random, FILE *file);
 ///
 /// @memberof passgen_random
 passgen_random *
-passgen_random_open_xorshift(passgen_random *random, uint64_t seed);
+passgen_random_xorshift_open(passgen_random *random, uint64_t seed);
 
 /// Opens a new random object using the zero randomness generator
 ///

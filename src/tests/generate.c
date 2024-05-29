@@ -24,7 +24,7 @@
     passgen_pattern parsed_pattern;                      \
     const char *pattern;                                 \
     passgen_random random;                               \
-    assert(passgen_random_open_xorshift(&random, SEED)); \
+    assert(passgen_random_xorshift_open(&random, SEED)); \
     passgen_env_init(&env, &random);
 
 #define GENERATE(output, pattern)                                          \

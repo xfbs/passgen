@@ -86,7 +86,7 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
             return NULL;
         }
 
-        return passgen_random_open_xorshift(random, seed);
+        return passgen_random_xorshift_open(random, seed);
     }
 
     // check if we should use the system default

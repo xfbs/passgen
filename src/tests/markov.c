@@ -293,7 +293,7 @@ test_result test_markov_add(void) {
 test_result test_markov_add_random(void) {
     passgen_markov markov;
     passgen_random rand;
-    passgen_random_open_xorshift(&rand, SEED);
+    passgen_random_xorshift_open(&rand, SEED);
     uint32_t word[12] = {0};
 
     for(size_t length = 3; length < 10; length++) {
@@ -318,7 +318,7 @@ test_result test_markov_add_random(void) {
 
 test_result test_markov_leaf_count_random(void) {
     passgen_random rand;
-    passgen_random_open_xorshift(&rand, SEED);
+    passgen_random_xorshift_open(&rand, SEED);
     passgen_markov_leaf *leaf = passgen_markov_leaf_new(0);
 
     /// FIXME: if you 10x the count, it breaks.
@@ -336,7 +336,7 @@ test_result test_markov_leaf_count_random(void) {
 
 test_result test_markov_leaf_insert_random(void) {
     passgen_random rand;
-    passgen_random_open_xorshift(&rand, SEED);
+    passgen_random_xorshift_open(&rand, SEED);
     passgen_markov_leaf *leaf = passgen_markov_leaf_new(0);
 
     for(size_t count = 0; count < 10000; count++) {
@@ -356,7 +356,7 @@ test_result test_markov_leaf_insert_random(void) {
 
 test_result test_markov_leaf_insert_sequential(void) {
     passgen_random rand;
-    passgen_random_open_xorshift(&rand, SEED);
+    passgen_random_xorshift_open(&rand, SEED);
     passgen_markov_leaf *leaf = passgen_markov_leaf_new(0);
 
     for(size_t count = 0; count < 100000; count++) {
@@ -375,8 +375,8 @@ test_result test_markov_leaf_insert_sequential(void) {
 }
 
 test_result test_markov_generate(void) {
-    passgen_random *rand = passgen_random_open_xorshift(NULL, SEED);
-    // passgen_random_open_xorshift(&rand, SEED);
+    passgen_random *rand = passgen_random_xorshift_open(NULL, SEED);
+    // passgen_random_xorshift_open(&rand, SEED);
 
     passgen_markov markov;
     passgen_markov_init(&markov, 2);

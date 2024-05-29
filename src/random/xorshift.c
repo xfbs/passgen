@@ -12,7 +12,7 @@ static uint64_t xorshift64(uint64_t *state) {
 }
 
 static size_t
-passgen_random_read_xorshift(void *context, void *dest, size_t size) {
+passgen_random_xorshift_read(void *context, void *dest, size_t size) {
     size_t written = 0;
     uint64_t result;
 
@@ -33,12 +33,12 @@ passgen_random_read_xorshift(void *context, void *dest, size_t size) {
     return written;
 }
 
-static void passgen_random_close_xorshift(void *context) {
+static void passgen_random_xorshift_close(void *context) {
     free(context);
 }
 
 passgen_random *
-passgen_random_open_xorshift(passgen_random *random, uint64_t seed) {
+passgen_random_xorshift_open(passgen_random *random, uint64_t seed) {
     if(!random) {
         random = malloc(sizeof(passgen_random));
         if(!random) return NULL;
@@ -52,8 +52,8 @@ passgen_random_open_xorshift(passgen_random *random, uint64_t seed) {
     *state = seed;
 
     random->context = state;
-    random->read = passgen_random_read_xorshift;
-    random->close = passgen_random_close_xorshift;
+    random->read = passgen_random_xorshift_read;
+    random->close = passgen_random_xorshift_close;
     passgen_random_reload(random);
 
     return random;
