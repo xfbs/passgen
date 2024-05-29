@@ -11,7 +11,7 @@ static const char *passgen_random_default_device = "/dev/urandom";
 #define PASSGEN_RANDOM_HAVE_SYSTEM
 #include <sys/random.h>
 
-static size_t passgen_random_read_system(void *context, void *dest, size_t size) {
+static size_t passgen_random_system_read(void *context, void *dest, size_t size) {
     (void) context;
     return getrandom(dest, size, 0);
 }
@@ -20,7 +20,7 @@ static size_t passgen_random_read_system(void *context, void *dest, size_t size)
 #ifdef __APPLE__
 #define PASSGEN_RANDOM_HAVE_SYSTEM
 
-static size_t passgen_random_read_system(void *context, void *dest, size_t size) {
+static size_t passgen_random_system_read(void *context, void *dest, size_t size) {
     (void) context;
     arc4random_buf(dest, size);
     return size;
@@ -35,25 +35,22 @@ static void passgen_random_close_file(void *context) {
     fclose(context);
 }
 
-static void passgen_random_close_system(void *context) {
+static void passgen_random_system_close(void *context) {
     (void) context;
 }
 
+passgen_random *passgen_random_system_open(passgen_random *random) {
 #ifdef PASSGEN_RANDOM_HAVE_SYSTEM
-passgen_random *passgen_random_open_system(passgen_random *random) {
     if(!random) {
         random = malloc(sizeof(passgen_random));
         if(!random) return NULL;
     }
 
     random->context = NULL;
-    random->read = passgen_random_read_system;
-    random->close = passgen_random_close_system;
+    random->read = passgen_random_system_read;
+    random->close = passgen_random_system_close;
     passgen_random_reload(random);
-    return random;
-}
 #else
-passgen_random *passgen_random_open_system(passgen_random *random) {
     passgen_random *rand =
         passgen_random_open_path(random, passgen_random_default_device);
     if(!rand) {
@@ -62,9 +59,9 @@ passgen_random *passgen_random_open_system(passgen_random *random) {
             "error: cannot open system randomness device '%s'\n",
             passgen_random_default_device);
     }
-    return rand;
-}
 #endif
+    return random;
+}
 
 passgen_random *
 passgen_random_open_path(passgen_random *random, const char *path) {

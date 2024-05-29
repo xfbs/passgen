@@ -64,7 +64,7 @@ passgen_random *passgen_random_open(passgen_random *random, const char *desc);
 /// Opens the default system randomness source.
 ///
 /// @memberof passgen_random
-passgen_random *passgen_random_open_system(passgen_random *random);
+passgen_random *passgen_random_system_open(passgen_random *random);
 
 /// Opens a new, existing random object using @p path as random device.
 ///
@@ -190,6 +190,10 @@ uint64_t passgen_random_u64_max(passgen_random *random, uint64_t max);
 void passgen_random_reload(passgen_random *random);
 
 /// Seeks to a specified position in the ChaCha20 stream.
+///
+/// Only use this with randomness sources from @p passgen_random_chacha20_open
+/// or @p passgen_random_chacha20_argon2_open. If you use it with any other
+/// randomness source, it will panic at runtime.
 ///
 /// @memberof passgen_random
 void passgen_random_chacha20_seek(passgen_random *random, size_t position);

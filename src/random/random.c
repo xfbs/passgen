@@ -91,7 +91,7 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
 
     // check if we should use the system default
     if(0 == strcmp(desc, "system")) {
-        return passgen_random_open_system(random);
+        return passgen_random_system_open(random);
     }
 
     return NULL;
@@ -102,7 +102,7 @@ passgen_random *passgen_random_open(passgen_random *random, const char *desc) {
         return passgen_random_open_parse(random, desc);
     }
 
-    return passgen_random_open_system(random);
+    return passgen_random_system_open(random);
 }
 
 void passgen_random_close(passgen_random *random) {
