@@ -37,7 +37,7 @@ In general, if you have all dependencies installed, doing the following should r
     $ cmake --build build
     $ cmake --install build
 
-See the [BUILDING.md](BUILDING.md) for more information about building the project.
+See [Building](https://passgen.it/development/building) for more information about building the project.
 
 ## Prior art
 

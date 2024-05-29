@@ -13,11 +13,11 @@ option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
 option(BUILD_TESTING "Build unit tests" ON)
 option(BUILD_DATA "Build data" ON)
 
-option(LIBPASSGEN_STATIC "Build libpassgen.a" ON)
-option(LIBPASSGEN_SHARED "Build libpassgen.so" ON)
-option(PASSGEN_STATIC "Link passgen statically" OFF)
+option(LIBPASSGEN_STATIC "Build Passgen static library (libpassgen.a)" ON)
+option(LIBPASSGEN_SHARED "Build Passgen dynamic library (libpassgen.so)" ON)
+option(PASSGEN_STATIC "Link Passgen CLI statically" OFF)
 
-option(USE_BACKTRACE "Use backtrace() for debug builds (not always available)." ON)
+option(USE_BACKTRACE "Enable backtrace() for debug builds (not always available)." ON)
 option(USE_LIBEXECINFO
        "Use libexecinfo. For systems that don't have backtrace in libc." OFF)
 

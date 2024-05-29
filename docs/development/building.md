@@ -61,6 +61,9 @@ Note that you usually have to delete and recreate the build folder if you want t
 | `LIBPASSGEN_SHARED` | Build the shared libpassgen library. Enabled by default. |
 | `PASSGEN_STATIC` | Link the passgen utility against the static library rather than the dynamic one. Disabled by default. |
 | `PASSGEN_SECCOMP` | Enable [seccomp][] filters. These will run at startup to lock passgen down into a sandbox-like mode, used to enhance security, but can be fragile. Disabled by default. |
+| `PASSGEN_MLOCK` | Enable the use of [`mlock()`](https://www.man7.org/linux/man-pages/man2/mlock.2.html) on startup, which prevents Passgen memory from being swapped out to disk. |
+| `PASSGEN_MONOCYPHER` | Enable building [Monocypher](https://monocypher.org/manual/), a cryptographic library. This is used to implement the masterpass mode. | 
+| `PASSGEN_DEBUG` | Enable debugging code. Defaults to on unless building in release mode. |
 | `USE_SANITIZER` | Enables use of one of the [LLVM sanitizers][asan]. Disabled by default. |
 | `CODE_COVERAGE` | Enable instrumentation for generating code coverage reports. Disabled by default. |
 
@@ -85,7 +88,7 @@ The supported build types are:
 | --- | --- |
 | Release | Builds with optimisations. |
 | Debug | Builds without optimizations. |
-| RelWithDebInfo | Build with optimisations. |
+| RelWithDebInfo | Build with optimisations and debugging information. |
 | MinSizeRel | Minimal executable size. |
 
 ## After Building
@@ -96,7 +99,7 @@ You may want to run tests after building:
 	# or
 	./src/test/passgen-test -v
 
-If the tests work, you can use the build passgen:
+If the tests work, you can use the built passgen:
 
     ./src/cli/passgen -h
 
