@@ -66,7 +66,7 @@ void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
 passgen_random *
 passgen_random_open_parse(passgen_random *random, const char *desc) {
     if(strcmp("zero", desc) == 0) {
-        return passgen_random_open_zero(random);
+        return passgen_random_zero_open(random);
     }
 
     // check if we should read randomness from this file

@@ -91,7 +91,7 @@ passgen_random_open_xorshift(passgen_random *random, uint64_t seed);
 ///
 /// @memberof passgen_random
 passgen_random *
-passgen_random_open_zero(passgen_random *random);
+passgen_random_zero_open(passgen_random *random);
 
 /// Opens a new random object using pseudorandom data generated using the
 /// ChaCha20 stream cipher.

@@ -243,7 +243,7 @@ test_result test_random_file(void) {
 }
 
 test_result test_random_zero(void) {
-    passgen_random *random = passgen_random_open_zero(NULL);
+    passgen_random *random = passgen_random_zero_open(NULL);
     assert(random);
     assert(random->read);
     assert(random->close);

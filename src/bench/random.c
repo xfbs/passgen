@@ -38,7 +38,7 @@ static void *bench_data_prepare_system(const passgen_hashmap *opts) {
 
 static void *bench_data_prepare_zero(const passgen_hashmap *opts) {
     struct bench_data *data = bench_data_prepare(opts);
-    passgen_random_open_zero(&data->random);
+    passgen_random_zero_open(&data->random);
     return data;
 }
 
