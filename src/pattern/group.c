@@ -1,6 +1,6 @@
 #include "passgen/pattern/group.h"
-#include "passgen/pattern/segment.h"
 #include "passgen/config.h"
+#include "passgen/pattern/segment.h"
 
 void passgen_pattern_group_init(passgen_pattern_group *group) {
     passgen_stack_init(&group->segments, sizeof(passgen_pattern_segment));

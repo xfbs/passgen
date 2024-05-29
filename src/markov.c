@@ -1,6 +1,6 @@
 #include "passgen/markov.h"
-#include "passgen/config.h"
 #include "passgen/assert.h"
+#include "passgen/config.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>

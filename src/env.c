@@ -1,7 +1,7 @@
 #include "passgen/pattern/env.h"
+#include "passgen/config.h"
 #include "passgen/util/utf8.h"
 #include "passgen/wordlist.h"
-#include "passgen/config.h"
 #include <stdlib.h>
 #include <string.h>
 

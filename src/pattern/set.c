@@ -1,6 +1,6 @@
 #include "passgen/pattern/set.h"
-#include "passgen/pattern/range.h"
 #include "passgen/config.h"
+#include "passgen/pattern/range.h"
 #include <stdlib.h>
 
 void passgen_pattern_set_init(passgen_pattern_set *set) {

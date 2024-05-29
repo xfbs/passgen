@@ -1,11 +1,11 @@
 #include "passgen/pattern/segment.h"
+#include "passgen/config.h"
 #include "passgen/container/stack.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/literal.h"
 #include "passgen/pattern/repeat.h"
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
-#include "passgen/config.h"
 
 void passgen_pattern_segment_init(passgen_pattern_segment *segment) {
     segment->multiplier = 1;

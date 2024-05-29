@@ -1,5 +1,5 @@
-#include <passgen/error.h>
 #include <passgen/config.h>
+#include <passgen/error.h>
 #include <stdio.h>
 #include <string.h>
 

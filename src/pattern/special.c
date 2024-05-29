@@ -1,10 +1,10 @@
 #include "passgen/pattern/special.h"
 #include "passgen/assert.h"
+#include "passgen/config.h"
 #include "passgen/util/utf8.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "passgen/config.h"
 
 #define PARAMETERS_INITIAL_SIZE 16
 #define PARAMETERS_MULTIPLIER   2
