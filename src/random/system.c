@@ -11,8 +11,8 @@ static const char *passgen_random_default_device = "/dev/urandom";
 #define PASSGEN_RANDOM_HAVE_SYSTEM
 #include <sys/random.h>
 
-static size_t passgen_random_read_system(void *dest, size_t size, void *data) {
-    (void) data;
+static size_t passgen_random_read_system(void *context, void *dest, size_t size) {
+    (void) context;
     return getrandom(dest, size, 0);
 }
 #endif
@@ -20,23 +20,23 @@ static size_t passgen_random_read_system(void *dest, size_t size, void *data) {
 #ifdef __APPLE__
 #define PASSGEN_RANDOM_HAVE_SYSTEM
 
-static size_t passgen_random_read_system(void *dest, size_t size, void *data) {
-    (void) data;
+static size_t passgen_random_read_system(void *context, void *dest, size_t size) {
+    (void) context;
     arc4random_buf(dest, size);
     return size;
 }
 #endif
 
-static size_t passgen_random_read_file(void *dest, size_t size, void *data) {
-    return fread(dest, 1, size, data);
+static size_t passgen_random_read_file(void *context, void *dest, size_t size) {
+    return fread(dest, 1, size, context);
 }
 
-static void passgen_random_close_file(void *data) {
-    fclose(data);
+static void passgen_random_close_file(void *context) {
+    fclose(context);
 }
 
-static void passgen_random_close_system(void *data) {
-    (void) data;
+static void passgen_random_close_system(void *context) {
+    (void) context;
 }
 
 #ifdef PASSGEN_RANDOM_HAVE_SYSTEM

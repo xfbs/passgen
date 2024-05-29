@@ -16,10 +16,10 @@
 #define PASSGEN_RANDOM_BUFFER_LENGTH 1024
 
 /// Type of function used to read more random data.
-typedef size_t passgen_random_read_func(void *dest, size_t size, void *data);
+typedef size_t passgen_random_read_func(void *context, void *dest, size_t size);
 
 /// Type of function used to close the randomness source.
-typedef void passgen_random_close_func(void *data);
+typedef void passgen_random_close_func(void *context);
 
 /// Randomness source.
 typedef struct {
@@ -174,6 +174,14 @@ uint32_t passgen_random_u32_max(passgen_random *random, uint32_t max);
 /// @memberof passgen_random
 uint64_t passgen_random_u64_max(passgen_random *random, uint64_t max);
 
+/// Reloads the randomness buffer of the randomness source.
+///
+/// This will discard any unused random data in the buffer.
+///
+/// @memberof passgen_random
 void passgen_random_reload(passgen_random *random);
 
+/// Seeks to a specified position in the ChaCha20 stream.
+///
+/// @memberof passgen_random
 void passgen_random_chacha20_seek(passgen_random *random, size_t position);

@@ -5,14 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-size_t passgen_random_read_zero(void *dest, size_t size, void *data) {
-    (void) data;
+size_t passgen_random_read_zero(void *context, void *dest, size_t size) {
+    (void) context;
     memset(dest, 0, size);
     return size;
 }
 
-void passgen_random_close_zero(void *data) {
-    (void) data;
+void passgen_random_close_zero(void *context) {
+    (void) context;
 }
 
 passgen_random *passgen_random_open_zero(passgen_random *random) {

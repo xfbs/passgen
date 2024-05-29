@@ -16,33 +16,33 @@ typedef struct {
 } passgen_random_chacha20_context;
 
 static size_t
-passgen_random_chacha20_read_short(void *dest, size_t size, void *data_raw) {
+passgen_random_chacha20_read_short(void *context_raw, void *dest, size_t size) {
     passgen_assert(size < CHACHA20_BLOCK_SIZE);
-    passgen_random_chacha20_context *data = data_raw;
+    passgen_random_chacha20_context *context = context_raw;
     uint8_t block[CHACHA20_BLOCK_SIZE];
     passgen_chacha20_djb(
         block,
         NULL,
         CHACHA20_BLOCK_SIZE,
-        data->key,
-        data->iv,
-        data->offset / CHACHA20_BLOCK_SIZE);
+        context->key,
+        context->iv,
+        context->offset / CHACHA20_BLOCK_SIZE);
 
-    memcpy(dest, &block[data->offset % CHACHA20_BLOCK_SIZE], size);
-    data->offset += size;
+    memcpy(dest, &block[context->offset % CHACHA20_BLOCK_SIZE], size);
+    context->offset += size;
     return size;
 }
 
 static size_t
-passgen_random_chacha20_read(void *dest, size_t size, void *data_raw) {
-    passgen_random_chacha20_context *data = data_raw;
+passgen_random_chacha20_read(void *context_raw, void *dest, size_t size) {
+    passgen_random_chacha20_context *context = context_raw;
     memset(dest, 0, size);
 
-    size_t offset_bytes = data->offset % CHACHA20_BLOCK_SIZE;
+    size_t offset_bytes = context->offset % CHACHA20_BLOCK_SIZE;
     size_t written = 0;
     if(offset_bytes) {
         size_t short_bytes = MIN(CHACHA20_BLOCK_SIZE - offset_bytes, size);
-        passgen_random_chacha20_read_short(dest, short_bytes, data_raw);
+        passgen_random_chacha20_read_short(context_raw, dest, short_bytes);
         written += short_bytes;
     }
 
@@ -51,18 +51,18 @@ passgen_random_chacha20_read(void *dest, size_t size, void *data_raw) {
         dest + written,
         NULL,
         remaining,
-        data->key,
-        data->iv,
-        data->offset / CHACHA20_BLOCK_SIZE);
-    data->offset += remaining;
+        context->key,
+        context->iv,
+        context->offset / CHACHA20_BLOCK_SIZE);
+    context->offset += remaining;
 
     return size;
 }
 
-static void passgen_random_chacha20_close(void *data_raw) {
-    passgen_random_chacha20_context *data = data_raw;
-    PASSGEN_CLEAR(data);
-    free(data);
+static void passgen_random_chacha20_close(void *context_raw) {
+    passgen_random_chacha20_context *context = context_raw;
+    PASSGEN_CLEAR(context);
+    free(context);
 }
 
 passgen_random *passgen_random_chacha20_open(
