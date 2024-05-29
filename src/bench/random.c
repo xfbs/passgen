@@ -42,6 +42,12 @@ static void *bench_data_prepare_zero(const passgen_hashmap *opts) {
     return data;
 }
 
+static void *bench_data_prepare_chacha20(const passgen_hashmap *opts) {
+    struct bench_data *data = bench_data_prepare(opts);
+    passgen_random_chacha20_open(&data->random, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "passgen");
+    return data;
+}
+
 static void bench_prepare_data(struct bench_data *data) {
     data->data = malloc(data->count);
 }
@@ -60,6 +66,12 @@ static void *bench_data_prepare_system_data(const passgen_hashmap *opts) {
 
 static void *bench_data_prepare_zero_data(const passgen_hashmap *opts) {
     struct bench_data *data = bench_data_prepare_zero(opts);
+    bench_prepare_data(data);
+    return data;
+}
+
+static void *bench_data_prepare_chacha20_data(const passgen_hashmap *opts) {
+    struct bench_data *data = bench_data_prepare_chacha20(opts);
     bench_prepare_data(data);
     return data;
 }
@@ -307,6 +319,66 @@ const bench random_zero_read = {
     .name = "random_zero_read",
     .desc = "Stack push benchmark",
     .prepare = &bench_data_prepare_zero_data,
+    .iterate = &bench_random_read,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
+    .consumes = false,
+    .unit = "bytes",
+};
+
+const bench random_chacha20_u8 = {
+    .name = "random_chacha20_u8",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_chacha20,
+    .iterate = &bench_random_u8,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u8,
+    .consumes = false,
+    .unit = "bytes",
+};
+
+const bench random_chacha20_u16 = {
+    .name = "random_chacha20_u16",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_chacha20,
+    .iterate = &bench_random_u16,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u16,
+    .consumes = false,
+    .unit = "bytes",
+};
+
+const bench random_chacha20_u32 = {
+    .name = "random_chacha20_u32",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_chacha20,
+    .iterate = &bench_random_u32,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u32,
+    .consumes = false,
+    .unit = "bytes",
+};
+
+const bench random_chacha20_u64 = {
+    .name = "random_chacha20_u64",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_chacha20,
+    .iterate = &bench_random_u64,
+    .cleanup = NULL,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_u64,
+    .consumes = false,
+    .unit = "bytes",
+};
+
+const bench random_chacha20_read = {
+    .name = "random_chacha20_read",
+    .desc = "Stack push benchmark",
+    .prepare = &bench_data_prepare_chacha20_data,
     .iterate = &bench_random_read,
     .cleanup = NULL,
     .release = &bench_data_release,

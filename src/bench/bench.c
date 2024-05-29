@@ -123,6 +123,11 @@ extern const bench random_zero_u16;
 extern const bench random_zero_u32;
 extern const bench random_zero_u64;
 extern const bench random_zero_read;
+extern const bench random_chacha20_u8;
+extern const bench random_chacha20_u16;
+extern const bench random_chacha20_u32;
+extern const bench random_chacha20_u64;
+extern const bench random_chacha20_read;
 extern const bench hashmap_insert;
 extern const bench hashmap_lookup;
 extern const bench token_parse;
@@ -148,6 +153,11 @@ const bench *benches[] = {
     &random_zero_u32,
     &random_zero_u64,
     &random_zero_read,
+    &random_chacha20_u8,
+    &random_chacha20_u16,
+    &random_chacha20_u32,
+    &random_chacha20_u64,
+    &random_chacha20_read,
     &hashmap_insert,
     &hashmap_lookup,
     &token_parse,
