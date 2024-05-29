@@ -85,7 +85,7 @@ passgen_random *passgen_random_chacha20_open(
     memcpy(data->iv, iv, 8);
     data->offset = 0;
 
-    random->data = data;
+    random->context = data;
     random->close = passgen_random_chacha20_close;
     random->read = passgen_random_chacha20_read;
 
@@ -100,7 +100,7 @@ void passgen_random_chacha20_seek(passgen_random *random, size_t position) {
     passgen_assert(random->close == passgen_random_chacha20_close);
 
     // reset offset
-    passgen_random_chacha20_context *data = random->data;
+    passgen_random_chacha20_context *data = random->context;
     data->offset = position;
 
     // reload random data buffer

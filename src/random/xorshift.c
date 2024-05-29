@@ -51,7 +51,7 @@ passgen_random_open_xorshift(passgen_random *random, uint64_t seed) {
     // initialise state
     *state = seed;
 
-    random->data = state;
+    random->context = state;
     random->read = passgen_random_read_xorshift;
     random->close = passgen_random_close_xorshift;
     passgen_random_reload(random);

@@ -264,7 +264,7 @@ test_result test_random_new_path(void) {
     // reading from /dev/zero should always yield zero.
     random = passgen_random_open_path(NULL, "/dev/zero");
     assert(random);
-    assert(random->data);
+    assert(random->context);
     assert(passgen_random_u8(random) == 0);
     assert(passgen_random_u16(random) == 0);
     assert(passgen_random_u32(random) == 0);
@@ -315,13 +315,13 @@ test_result test_random_open_path(void) {
     assert(!passgen_random_open_path(&random, "/dev/nonexistent"));
 
     assert(passgen_random_open_path(&random, "/dev/zero"));
-    assert(random.data);
+    assert(random.context);
     assert(passgen_random_u8(&random) == 0);
     assert(passgen_random_u16(&random) == 0);
     assert(passgen_random_u32(&random) == 0);
     assert(passgen_random_u64(&random) == 0);
     passgen_random_close(&random);
-    assert(!random.data);
+    assert(!random.context);
 
     return test_ok;
 }

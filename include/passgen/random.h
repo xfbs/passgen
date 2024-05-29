@@ -29,8 +29,8 @@ typedef struct {
     /// Current position in the ring buffer.
     size_t pos;
 
-    /// Device to read random data from.
-    void *data;
+    /// Context for randomness source. What this contains is implementation-defined.
+    void *context;
 
     /// Function used to read more random data.
     passgen_random_read_func *read;

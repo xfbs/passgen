@@ -46,7 +46,7 @@ passgen_random *passgen_random_open_system(passgen_random *random) {
         if(!random) return NULL;
     }
 
-    random->data = NULL;
+    random->context = NULL;
     random->read = passgen_random_read_system;
     random->close = passgen_random_close_system;
     passgen_random_reload(random);
@@ -91,7 +91,7 @@ passgen_random *passgen_random_open_file(passgen_random *random, FILE *file) {
         if(!random) return NULL;
     }
 
-    random->data = file;
+    random->context = file;
     random->read = passgen_random_read_file;
     random->close = passgen_random_close_file;
     passgen_random_reload(random);

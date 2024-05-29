@@ -19,7 +19,7 @@ void passgen_random_reload(passgen_random *random) {
 
     // read random data.
     size_t bytes =
-        random->read(random->data, &random->buffer, sizeof(random->buffer));
+        random->read(random->context, &random->buffer, sizeof(random->buffer));
     (void) bytes;
 
     // make sure we've read enough.
@@ -50,7 +50,7 @@ void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
             }
         }
     } else {
-        size_t ret = random->read(random->data, data, bytes);
+        size_t ret = random->read(random->context, data, bytes);
         if(ret != bytes) {
             fprintf(
                 stderr,
@@ -107,7 +107,7 @@ passgen_random *passgen_random_open(passgen_random *random, const char *desc) {
 
 void passgen_random_close(passgen_random *random) {
     // close randomness source
-    random->close(random->data);
+    random->close(random->context);
 
     // reset members to prevent accidental use-after-free
     PASSGEN_CLEAR(random);
