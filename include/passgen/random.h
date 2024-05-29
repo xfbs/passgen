@@ -14,20 +14,52 @@
 
 /// Size of the random data ring buffer.
 ///
-/// Requests for more than this result in a direct call to the @ref
-/// passgen_random_read_fun, requests smaller than this are read from the
+/// Requests for more than this result in a direct call to the
+/// ::passgen_random_read_func, requests smaller than this are read from the
 /// buffer.
 #define PASSGEN_RANDOM_BUFFER_LENGTH 1024
 
-/// Type of function used to read more random data.
+/// Function used to read more random data.
+///
+/// @param context Context pointer of the randomness source.
+/// @param dest Destination to write data to.
+/// @param size Amount of bytes of data to write.
 typedef size_t passgen_random_read_func(void *context, void *dest, size_t size);
 
-/// Type of function used to close the randomness source.
+/// Function used to close the randomness source.
+///
+/// @param context Context pointer of the randomness source.
 typedef void passgen_random_close_func(void *context);
 
-/// Randomness source.
+/// Source of randomness, backed by the system randomness generator or a custom strategy.
+///
+/// Provides methods for generating random values from this source. This module
+/// implements several sources of randomness, if you are unsure which to use,
+/// @p passgen_random_system_open is a good default.
+///
+/// Randomness sources are like file handles: they need to be opened, for
+/// example with ::passgen_random_open. When you are done using them, they
+/// need to be closed, for example with ::passgen_random_close. If you forget
+/// to close them, you might leak memory or randomness state.
+///
+/// @par Example
+///
+/// ```c
+/// passgen_random random;
+///
+/// // open
+/// passgen_random_open(&random, "system");
+///
+/// // use it
+/// uint8_t value_u8 = passgen_random_u8(&random);
+/// uint16_t value_u16 = passgen_random_u16(&random);
+/// uint32_t value_u32 = passgen_random_u32_max(&random, 142413413);
+///
+/// // close it
+/// passgen_random_close(&random);
+/// ```
 typedef struct {
-    /// Ring buffer to hold random data in.
+    /// Buffer to hold random data in.
     uint8_t buffer[PASSGEN_RANDOM_BUFFER_LENGTH];
 
     /// Current position in the ring buffer.
@@ -46,15 +78,30 @@ typedef struct {
 /// Opens a new random object. If given a NULL pointer, allocates memory for it.
 /// Returns `NULL` on failure.
 ///
+/// It takes a string description as to determine what kind of randomness source to create. When this is NULL,
+/// it defaults to creating a system randomness source. Other strategies are also available:
+///
+/// | Strategy | Syntax | Example |
+/// | --- | --- | --- |
+/// | System | `system` | `system` |
+/// | Xorshift | `xorshift:<seed>` | `xorshift:123` |
+/// | Zero | `zero` | `zero` |
+/// | File | `file:<path>` | `file:/dev/zero` |
+/// | ChaCha20 | `chacha20:<key>:<iv>` | `chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:iviviviv` |
+///
+///
 /// @par Example
 ///
 /// ```c
 /// passgen_random random;
 ///
-/// assert(passgen_random_open(&random) != NULL);
+/// // open new random device
+/// assert(passgen_random_open(&random, "system") != NULL);
 ///
-/// // use random
+/// // generate random values
+/// uint8_t value = passgen_random_u8(&random);
 ///
+/// // close random device
 /// passgen_random_close(&random);
 /// ```
 ///
@@ -63,17 +110,37 @@ passgen_random *passgen_random_open(passgen_random *random, const char *desc);
 
 /// Opens the default system randomness source.
 ///
+/// @par Source of Randomness
+///
+/// The source of randomness depends on which platform you are using this.
+///
+/// | Platform | Source |
+/// | --- | --- |
+/// | Linux | `getrandom()` syscall |
+/// | macOS | `arc4random_buf()` syscall |
+/// | UNIX | `/dev/urandom` |
+///
+/// @par Example
+///
+/// ```c
+/// passgen_random random;
+/// passgen_random_system_open(&random);
+/// ```
+///
+/// @param desc String describing which source of randomness to create.
 /// @memberof passgen_random
 passgen_random *passgen_random_system_open(passgen_random *random);
 
 /// Opens a new, existing random object using @p path as random device.
 ///
+/// @param path Path of file to use as randomness source.
 /// @memberof passgen_random
 passgen_random *
 passgen_random_path_open(passgen_random *random, const char *path);
 
 /// Opens a new random object with @p file as randomness source.
 ///
+/// @param file File object to use as randomness source.
 /// @memberof passgen_random
 passgen_random *
 passgen_random_file_open(passgen_random *random, FILE *file);
@@ -83,11 +150,19 @@ passgen_random_file_open(passgen_random *random, FILE *file);
 /// When using this, ensure that the seed is not set to zero. Otherwise all
 /// data generated will be zeroes.
 ///
+/// Note that this you should not use this to generate secrets as it is not
+/// very secure. Use ::passgen_random_chacha20_open to generate secure
+/// pseudorandom data instead.
+///
+/// @param seed Seed to use for the algorithm.
 /// @memberof passgen_random
 passgen_random *
 passgen_random_xorshift_open(passgen_random *random, uint64_t seed);
 
 /// Opens a new random object using the zero randomness generator
+///
+/// Note that this randomness generator always returns zeroes. It only exists
+/// for testing purposes.
 ///
 /// @memberof passgen_random
 passgen_random *
@@ -96,6 +171,8 @@ passgen_random_zero_open(passgen_random *random);
 /// Opens a new random object using pseudorandom data generated using the
 /// ChaCha20 stream cipher.
 ///
+/// @param key Key to use. Must be a 32-byte value with a lot of entropy. It is recommended that you use a hash function to generate it.
+/// @param iv Initialisation vector, used to randomize the output for the same key.
 /// @memberof passgen_random
 passgen_random *passgen_random_chacha20_open(
     passgen_random *random,
@@ -114,13 +191,18 @@ passgen_random *passgen_random_chacha20_argon2_open(
     const uint8_t *token,
     passgen_argon2_config *config);
 
-/// Close @p random. Use this with object opened by passgen_random_open().
+/// Close @p random.
+///
+/// Always call this when you are done using a randomness source to avoid a
+/// memory leak and clear the memory.
 ///
 /// @memberof passgen_random
 void passgen_random_close(passgen_random *random);
 
-/// Close and free @p random. Use this with objects allocated by
-/// passgen_random_new().
+/// Close and free @p random.
+///
+/// Always call this when you are done using a heap-allocated randomness source
+/// to avoid a memory leak and clear the memory.
 ///
 /// @memberof passgen_random
 void passgen_random_free(passgen_random *random);
