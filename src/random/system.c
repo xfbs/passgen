@@ -52,7 +52,7 @@ passgen_random *passgen_random_system_open(passgen_random *random) {
     passgen_random_reload(random);
 #else
     passgen_random *rand =
-        passgen_random_open_path(random, passgen_random_default_device);
+        passgen_random_path_open(random, passgen_random_default_device);
     if(!rand) {
         fprintf(
             stderr,
@@ -64,7 +64,7 @@ passgen_random *passgen_random_system_open(passgen_random *random) {
 }
 
 passgen_random *
-passgen_random_open_path(passgen_random *random, const char *path) {
+passgen_random_path_open(passgen_random *random, const char *path) {
     FILE *device = fopen(path, "r");
     if(!device) {
         return NULL;
@@ -75,14 +75,14 @@ passgen_random_open_path(passgen_random *random, const char *path) {
         if(!random) return NULL;
     }
 
-    return passgen_random_open_file(random, device);
+    return passgen_random_file_open(random, device);
 
     passgen_random_reload(random);
 
     return random;
 }
 
-passgen_random *passgen_random_open_file(passgen_random *random, FILE *file) {
+passgen_random *passgen_random_file_open(passgen_random *random, FILE *file) {
     if(!random) {
         random = malloc(sizeof(passgen_random));
         if(!random) return NULL;

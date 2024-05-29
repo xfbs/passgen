@@ -70,13 +70,13 @@ passgen_random *passgen_random_system_open(passgen_random *random);
 ///
 /// @memberof passgen_random
 passgen_random *
-passgen_random_open_path(passgen_random *random, const char *path);
+passgen_random_path_open(passgen_random *random, const char *path);
 
 /// Opens a new random object with @p file as randomness source.
 ///
 /// @memberof passgen_random
 passgen_random *
-passgen_random_open_file(passgen_random *random, FILE *file);
+passgen_random_file_open(passgen_random *random, FILE *file);
 
 /// Opens a new random object using the xorshift PRNG.
 ///

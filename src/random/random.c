@@ -71,7 +71,7 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
 
     // check if we should read randomness from this file
     if(_strprefix("file:", desc)) {
-        return passgen_random_open_path(random, &desc[5]);
+        return passgen_random_path_open(random, &desc[5]);
     }
 
     // check if we should use the xorshift PRNG with the given seed
