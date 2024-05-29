@@ -51,7 +51,7 @@
 // with this software.  If not, see
 // <https://creativecommons.org/publicdomain/zero/1.0/>
 
-#include "passgen/crypto.h"
+#include "passgen/monocypher.h"
 
 #ifdef MONOCYPHER_CPP_NAMESPACE
 namespace MONOCYPHER_CPP_NAMESPACE {

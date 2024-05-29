@@ -1,5 +1,6 @@
 #include "passgen/random.h"
 #include "passgen/assert.h"
+#include "passgen/config.h"
 #include "passgen/util/endian.h"
 #include <stdlib.h>
 #include <string.h>
@@ -94,6 +95,7 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
         return passgen_random_system_open(random);
     }
 
+#ifdef PASSGEN_MONOCYPHER
     // use chacha20 with raw key and IV
     if(_strprefix("chacha20:", desc)) {
         const char *key_ptr = &desc[9];
@@ -116,6 +118,7 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
 
         return passgen_random_chacha20_open(random, key, iv);
     }
+#endif
 
     return NULL;
 }

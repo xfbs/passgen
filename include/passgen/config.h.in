@@ -6,7 +6,7 @@
 #cmakedefine PASSGEN_MONOCYPHER
 
 #ifdef PASSGEN_MONOCYPHER
-#include <passgen/crypto.h>
+#include <passgen/monocypher.h>
 #define PASSGEN_CLEAR(value) passgen_wipe((value), sizeof(*(value)))
 #else
 #include <string.h>

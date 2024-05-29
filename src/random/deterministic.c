@@ -1,6 +1,6 @@
 #include "passgen/assert.h"
 #include "passgen/config.h"
-#include "passgen/crypto.h"
+#include "passgen/monocypher.h"
 #include "passgen/random.h"
 #include <stdlib.h>
 #include <string.h>

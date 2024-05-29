@@ -7,11 +7,11 @@ set(SOURCE_LIST
     "container/hashmap.c"
     "container/stack.c"
     "context.c"
-    "crypto.c"
     "env.c"
     "error.c"
     "generate.c"
     "markov.c"
+    $<$<BOOL:${PASSGEN_MONOCYPHER}>:monocypher.c>
     "parser/parser.c"
     "parser/token.c"
     "passgen.c"
@@ -23,7 +23,7 @@ set(SOURCE_LIST
     "pattern/segment_item.c"
     "pattern/set.c"
     "pattern/special.c"
-    "random/deterministic.c"
+    $<$<BOOL:${PASSGEN_MONOCYPHER}>:random/deterministic.c>
     "random/random.c"
     "random/system.c"
     "random/xorshift.c"

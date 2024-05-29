@@ -10,7 +10,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <passgen/crypto.h>
+
+#include <passgen/config.h>
+
+#ifdef PASSGEN_MONOCYPHER
+#include <passgen/monocypher.h>
+#endif
 
 /// Size of the random data ring buffer.
 ///
@@ -168,6 +173,7 @@ passgen_random_xorshift_open(passgen_random *random, uint64_t seed);
 passgen_random *
 passgen_random_zero_open(passgen_random *random);
 
+#ifdef PASSGEN_MONOCYPHER
 /// Opens a new random object using pseudorandom data generated using the
 /// ChaCha20 stream cipher.
 ///
@@ -190,6 +196,7 @@ passgen_random *passgen_random_chacha20_argon2_open(
     const uint8_t *domain,
     const uint8_t *token,
     passgen_argon2_config *config);
+#endif
 
 /// Close @p random.
 ///

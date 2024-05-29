@@ -1,4 +1,5 @@
 #include "bench.h"
+#include <passgen/config.h>
 #include <passgen/random.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -42,15 +43,6 @@ static void *bench_data_prepare_zero(const passgen_hashmap *opts) {
     return data;
 }
 
-static void *bench_data_prepare_chacha20(const passgen_hashmap *opts) {
-    struct bench_data *data = bench_data_prepare(opts);
-    passgen_random_chacha20_open(
-        &data->random,
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        "passgen");
-    return data;
-}
-
 static void bench_prepare_data(struct bench_data *data) {
     data->data = malloc(data->count);
 }
@@ -73,11 +65,22 @@ static void *bench_data_prepare_zero_data(const passgen_hashmap *opts) {
     return data;
 }
 
+#ifdef PASSGEN_MONOCYPHER
+static void *bench_data_prepare_chacha20(const passgen_hashmap *opts) {
+    struct bench_data *data = bench_data_prepare(opts);
+    passgen_random_chacha20_open(
+        &data->random,
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "passgen");
+    return data;
+}
+
 static void *bench_data_prepare_chacha20_data(const passgen_hashmap *opts) {
     struct bench_data *data = bench_data_prepare_chacha20(opts);
     bench_prepare_data(data);
     return data;
 }
+#endif
 
 static void *bench_random_u8(void *raw_data) {
     struct bench_data *data = raw_data;
@@ -330,6 +333,7 @@ const bench random_zero_read = {
     .unit = "bytes",
 };
 
+#ifdef PASSGEN_MONOCYPHER
 const bench random_chacha20_u8 = {
     .name = "random_chacha20_u8",
     .desc = "Stack push benchmark",
@@ -389,3 +393,4 @@ const bench random_chacha20_read = {
     .consumes = false,
     .unit = "bytes",
 };
+#endif

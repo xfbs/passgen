@@ -1,4 +1,5 @@
 #include "passgen/random.h"
+#include "passgen/config.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -430,6 +431,7 @@ test_result test_random_xorshift(void) {
     assert(passgen_random_u64(random) == 7745812445609307379ULL);  \
     assert(passgen_random_u64(random) == 6756294678665739130ULL)
 
+#ifdef PASSGEN_MONOCYPHER
 test_result test_random_chacha20_seek(void) {
     passgen_random random;
 
@@ -504,3 +506,5 @@ test_result test_random_chacha20_argon2(void) {
 
     return test_ok;
 }
+
+#endif

@@ -6,8 +6,9 @@
 const char example_wordlist[] = "abacus\nbrother\nculling";
 size_t example_wordlist_size = sizeof(example_wordlist);
 
+#ifndef _WIN32 // fmemopen does not exist on windows
+
 test_result test_wordlist_load(void) {
-#ifndef _WIN32
     FILE *file =
         fmemopen((void *) example_wordlist, example_wordlist_size, "r");
     assert(file);
@@ -21,7 +22,6 @@ test_result test_wordlist_load(void) {
     assert(0 == strcmp(wordlist.words[2], "culling"));
 
     passgen_wordlist_free(&wordlist);
-#endif
 
     return test_ok;
 }
@@ -39,7 +39,6 @@ test_result test_wordlist_load_long(void) {
     // null-terminate
     wordlist_data[26 * 26 * 3 - 1] = 0;
 
-#ifndef _WIN32
     FILE *file = fmemopen((void *) wordlist_data, strlen(wordlist_data), "r");
     assert(file);
 
@@ -57,7 +56,6 @@ test_result test_wordlist_load_long(void) {
     assert(0 == strcmp(wordlist.words[26 * 26 - 1], "zz"));
 
     passgen_wordlist_free(&wordlist);
-#endif
 
     free(wordlist_data);
 
@@ -65,7 +63,6 @@ test_result test_wordlist_load_long(void) {
 }
 
 test_result test_wordlist_random(void) {
-#ifndef _WIN32
     FILE *file =
         fmemopen((void *) example_wordlist, example_wordlist_size, "r");
     assert(file);
@@ -92,13 +89,11 @@ test_result test_wordlist_random(void) {
 
     passgen_wordlist_free(&wordlist);
     passgen_random_close(&random);
-#endif
 
     return test_ok;
 }
 
 test_result test_wordlist_random_uninit(void) {
-#ifndef _WIN32
     FILE *file =
         fmemopen((void *) example_wordlist, example_wordlist_size, "r");
     assert(file);
@@ -115,7 +110,8 @@ test_result test_wordlist_random_uninit(void) {
 
     passgen_wordlist_free(&wordlist);
     passgen_random_close(&random);
-#endif
 
     return test_ok;
 }
+
+#endif

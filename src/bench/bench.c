@@ -1,4 +1,5 @@
 #include "bench.h"
+#include "passgen/config.h"
 #include <getopt.h>
 #include <locale.h>
 #include <math.h>
@@ -123,16 +124,19 @@ extern const bench random_zero_u16;
 extern const bench random_zero_u32;
 extern const bench random_zero_u64;
 extern const bench random_zero_read;
-extern const bench random_chacha20_u8;
-extern const bench random_chacha20_u16;
-extern const bench random_chacha20_u32;
-extern const bench random_chacha20_u64;
-extern const bench random_chacha20_read;
 extern const bench hashmap_insert;
 extern const bench hashmap_lookup;
 extern const bench token_parse;
 extern const bench bench_passgen_parse;
 extern const bench bench_utf8_decode;
+
+#ifdef PASSGEN_MONOCYPHER
+extern const bench random_chacha20_u8;
+extern const bench random_chacha20_u16;
+extern const bench random_chacha20_u32;
+extern const bench random_chacha20_u64;
+extern const bench random_chacha20_read;
+#endif
 
 const bench *benches[] = {
     &dummy,
@@ -153,11 +157,13 @@ const bench *benches[] = {
     &random_zero_u32,
     &random_zero_u64,
     &random_zero_read,
+#ifdef PASSGEN_MONOCYPHER
     &random_chacha20_u8,
     &random_chacha20_u16,
     &random_chacha20_u32,
     &random_chacha20_u64,
     &random_chacha20_read,
+#endif
     &hashmap_insert,
     &hashmap_lookup,
     &token_parse,
