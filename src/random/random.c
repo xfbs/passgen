@@ -94,6 +94,29 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
         return passgen_random_system_open(random);
     }
 
+    // use chacha20 with raw key and IV
+    if(_strprefix("chacha20:", desc)) {
+        const char *key_ptr = &desc[9];
+        const char *key_end = strchr(key_ptr, ':');
+        if(!key_end) {
+            key_end = key_ptr + strlen(key_ptr);
+        }
+        char key[32] = {0};
+        memcpy(key, key_ptr, key_end - key_ptr);
+
+        char iv[] = "passgen";
+
+        if(*key_end == ':') {
+            const char *iv_ptr = key_end + 1;
+            size_t iv_len = strlen(iv_ptr);
+            iv_len = iv_len > 8 ? 8 : iv_len;
+            memset(iv, 0, 8);
+            memcpy(iv, iv_ptr, iv_len);
+        }
+
+        return passgen_random_chacha20_open(random, key, iv);
+    }
+
     return NULL;
 }
 
