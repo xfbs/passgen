@@ -190,6 +190,9 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->json = false;
     opts->markov_length = 3;
     opts->entropy = false;
+    opts->master_passphrase = NULL;
+    opts->master_domain = NULL;
+    opts->master_token = NULL;
     passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_utf8);
     passgen_env_init(&opts->env, NULL);
 
@@ -267,14 +270,14 @@ void passgen_cli_presets_list(const passgen_cli_opts *opts) {
 }
 
 int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
-    const char *short_opts = "a:p:P:d:w:r:m:ezhvjl";
+    const char *short_opts = "a:p:P:d:w:r:m:D:M:t:ezhvjl";
     const char *preset = NULL;
 
     static struct option long_opts[] = {
         {"amount", required_argument, NULL, 'a'},
         {"help", no_argument, NULL, 'h'},
         {"preset", required_argument, NULL, 'p'},
-        {"depth", required_argument, NULL, 'd'},
+        {"depth", required_argument, NULL, 'D'},
         {"version", no_argument, NULL, 'v'},
         {"null", no_argument, NULL, 'z'},
         {"entropy", no_argument, NULL, 'e'},
@@ -283,7 +286,10 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
         {"list", no_argument, NULL, 'l'},
         {"define-preset", required_argument, NULL, 'P'},
         {"json", no_argument, NULL, 'j'},
-        {"markov-length", required_argument, NULL, 'm'},
+        {"markov-length", required_argument, NULL, 'M'},
+        {"master", required_argument, NULL, 'm'},
+        {"domain", required_argument, NULL, 'd'},
+        {"token", required_argument, NULL, 't'},
         {NULL, no_argument, NULL, 0}};
 
     while(true) {
@@ -303,10 +309,19 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 }
                 opts->amount = opt;
                 break;
+            case 'm':
+                opts->master_passphrase = optarg;
+                break;
+            case 'd':
+                opts->master_domain = optarg;
+                break;
+            case 't':
+                opts->master_token = optarg;
+                break;
             case 'p':
                 preset = optarg;
                 break;
-            case 'd':
+            case 'D':
                 opt = atoi(optarg);
                 opts->depth = opt;
                 break;
@@ -324,7 +339,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             case 'w':
                 try(passgen_cli_opts_wordlist(opts, optarg));
                 break;
-            case 'm':
+            case 'M':
                 opt = atoi(optarg);
                 if(opt < 1) {
                     return passgen_cli_bail(
@@ -382,6 +397,12 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     }
 
     // fallback to system randomness if nothing else is defined
+#ifdef PASSGEN_MONOCYPHER
+    if(!opts->env.random && opts->master_passphrase) {
+        opts->env.random = passgen_random_chacha20_argon2_open(NULL, opts->master_passphrase, opts->master_domain, opts->master_token, NULL);
+    }
+#endif
+
     if(!opts->env.random) {
         opts->env.random = passgen_random_open(NULL, NULL);
         assert(opts->env.random);
@@ -412,17 +433,20 @@ void passgen_cli_usage(const char *executable) {
         "\n"
         "OPTIONS\n"
         "    -a, --amount       Amount of passwords to generate\n"
+        "    -d, --domain DOMAIN  Domain to use (for master-passphrase mode)\n"
         "    -e, --entropy      Compute entropy for each password in bits.\n"
         "    -h, --help         Show this help information\n"
         "    -j, --json         Output as JSON\n"
-        "    -v, --version      Show the version of this build\n"
-        "    -p, --preset NAME  Use the given preset\n"
         "    -l, --list         List loaded presets\n"
+        "    -m, --master PASS  Master passphrase to use\n"
+        "    -M, --markov-length LENGTH\n"
+        "                       Specify markov chain length for next wordlist\n"
+        "    -p, --preset NAME  Use the given preset\n"
         "    -r, --random RAND  Source of randomness to use\n"
+        "    -t, --token TOKEN  Token to use (for master-passphrase mode)\n"
+        "    -v, --version      Show the version of this build\n"
         "    -w, --wordlist NAME:PATH\n"
         "                       Load wordlist NAME from PATH\n"
-        "    -m, --markov-length LENGTH\n"
-        "                       Specify markov chain length for next wordlist\n"
         "    -z, --null         Use NUL instead of newline to separate "
         "outputs\n"
         "\n"

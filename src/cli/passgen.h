@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <passgen/random.h>
+#include <passgen/config.h>
 #include <passgen/container/hashmap.h>
 #include "passgen/pattern/pattern.h"
 #include "passgen/pattern/env.h"
@@ -46,6 +47,16 @@ typedef struct {
     size_t depth;
     /// Length of markov chain
     size_t markov_length;
+
+#ifdef PASSGEN_MONOCYPHER
+    /// Master passphrase to use for mater-passphrase mode
+    const char *master_passphrase;
+    /// Domain name to use for master-passphrase mode
+    const char *master_domain;
+    /// Token to use for master-passphrase mode
+    const char *master_token;
+#endif
+
     /// Presets to choose from.
     passgen_hashmap presets;
     /// Environment for passgen

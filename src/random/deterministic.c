@@ -130,9 +130,9 @@ passgen_random *passgen_random_chacha20_argon2_open(
 
     passgen_argon2_extras extras = {
         .key = domain,
-        .key_size = strlen(domain),
+        .key_size = domain ? strlen(domain) : 0,
         .ad = token,
-        .ad_size = strlen(token),
+        .ad_size = token ? strlen(token) : 0,
     };
 
     passgen_argon2_config config = PASSGEN_ARGON2_CONFIG_DEFAULT;
