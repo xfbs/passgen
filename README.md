@@ -1,9 +1,11 @@
 # Passgen [![CI Pipelines](https://gitlab.com/xfbs/passgen/badges/master/pipeline.svg)](https://gitlab.com/xfbs/passgen/-/pipelines) [![Documentation](https://xfbs.gitlab.io/passgen/badges/docs.svg)](https://passgen.it/docs/index.html)
 
-Passgen is a tool to generate random passphrases from a regular expression. It
-supports choosing words from a wordlist, building a markov-chain from a
-wordlist to generate high-entropy, but pronounceable sequences. It can also be
-used with a master passphrase.
+Passgen is a tool to generate random sequences from a [regular
+expression](https://en.wikipedia.org/wiki/Regular_expression).  It has some
+features that make it uniquely useful for generating secure passphrases, such
+as supporting choosing words from a wordlist, building a markov-chain from a
+wordlist to generate high-entropy, but pronounceable sequences, and being able
+to measure the actual entropy of every sequence it generates. 
 
 * Website: [passgen.it](https://passgen.it)
 * Source Documentation: [Doxygen](https://passgen.it/docs/index.html)
@@ -12,6 +14,20 @@ used with a master passphrase.
 * Releases: [Releases](https://passgen.it/releases)
 
 ## Features
+
+- Generates secure, random sequences using your system's cryptographic number generator
+  or a master passphrase.
+- Customizable to fit any password policy due to it's use of regular expressions.
+- Ability to measure the entropy of the generated sequences, to target passphrases to
+  any security level.
+- Can read wordlists to choose words at random (like [diceware](https://diceware.dmuth.org/)),
+  or create high-entropy but pronounceable phrases using a markov chain.
+- Comes with some presets that offer good security.
+- Can be embedded into other applications (as a C shared library) or used programmatically
+  (using JSON output).
+- Permissively licensed (MIT license).
+
+## Examples
 
 Passgen can generate random sequences from a format string with a
 regular-expression-like syntax.  This can be used to generate random data for
@@ -22,6 +38,7 @@ policy. Here are some examples:
 ```
 $ passgen '[a-z]{20}'
 jficsnasvtkpjwcimitz
+
 $ passgen '([a-zA-Z]{2}[0-9]){7}'
 eJ4YP8bb4UH5Gk3Ue3ds3
 ```
@@ -30,11 +47,13 @@ If you are not comfortable with regular expressions, it also comes with a list
 of preset formats that you can use:
 
 ```
-$ passgen -p apple2
+$ passgen --preset apple2
 MKCvtR-N2YNJP-29KRae
-$ passgen -p firefox
+
+$ passgen --preset firefox
 kmRxBcUCnvQNAL4
-$ passgen -p proquint64
+
+$ passgen --preset proquint64
 zabil-pukug-punud-lasup
 ```
 
@@ -43,10 +62,11 @@ generate it, so that you have a reasonable estimation of how difficult it would
 be to crack the sequence using a brute-force approach.
 
 ```
-$ passgen -e '[a-c]{3}'
+$ passgen --entropy '[a-c]{3}'
 entropy: 4.75 bits
 cab
-passgen -e '[a-zA-Z0-9]{32}'
+
+passgen --entropy '[a-zA-Z0-9]{32}'
 entropy: 190.53 bits
 QjKV1q0DKZ8Pc2GM5ccQbYxXfwAbjECk
 ```
@@ -56,9 +76,11 @@ diceware-like passphrases, for example. Since it has full Unicode support, it
 can read wordlist for any language.  Here are some examples:
 
 ```
-$ passgen -w english:/usr/share/dict/words '\w{english}(-\w{english}){4}'
+$ passgen --entropy --wordlist english:/usr/share/dict/words '\w{english}(-\w{english}){4}'
+entropy: 83.35 bits
 limelight-icicles-commoner-stamped-garnet
-$ passgen -w german:/usr/share/dict/ngerman '\w{german}(-\w{german}){4}'
+
+$ passgen --wordlist german:/usr/share/dict/ngerman '\w{german}(-\w{german}){4}'
 Handlinie-streitbareren-Fischleim-punktiere-Nationalteam
 ```
 
@@ -71,6 +93,7 @@ still pronounceable.
 $ passgen -w english:/usr/share/dict/words '\m{english}(-\m{english}){4}' -e
 entropy: 117.37 bits
 Eucleased-pendled-Villish-Corld's-capirators
+
 $ passgen -w english:/usr/share/dict/words '\m{english}(-\m{english}){4}' -e
 entropy: 118.00 bits
 maltry-oblinkgo-Langkor-impularian's-vi
@@ -102,7 +125,7 @@ but it has some additional features. These are the operations that Passgen under
 | Syntax | Explanation |
 | --- | --- |
 | `[a-z]`, `[a-zA-Z0-9]`, `[abcdefg]` | Range. Choose a letter at random. You can give it ranges (`a-z`) or individual letters. If you want to use the literal dash as a letter, either place it last or escape it with a backslash. |
-| `(abc|def)` | Group. Choose one at random: `abc` or `def`. |
+| `(abc\|def)` | Group. Choose one at random: `abc` or `def`. |
 | `a{7}`, `[a-z]{4,6}` | Repetition. Appending a `{n}` to any syntax repeats the last thing *n* times. Appending a `{n,m}` to any syntax repeats the last thing a random amount between *n* and *m* times. If you want to repeat a whole sequence of things, put them into a group (in parentheses). |
 | `\w{english}` | Word. Picks a random word from the wordlist with the name `english`. You can use the `-w name:/path/to/list` command-line option to load wordlists. You can load multiple wordlists. |
 | `\m{english}` | Markov-Chain. Generates a high-entropy, but pronounceable word by building a Markov-Chain of the wordlist `english`. This allows you to make a tradeoff between memorability and strength: words are easier to remember than completely random sequences. The Markov chain lets you generate random sequences of letters that follow the same probability distribution as the words in the wordlist, meaning that they are pronounceable and thus easier to remember. |
@@ -125,6 +148,9 @@ You may also download [signed nightly releases](https://passgen.it/nightly/) fro
 * [apg](https://linux.die.net/man/1/apg): generates random passwords, can either be generated such that they are pronounceable, or taken from a predefined list of symbols.
 * [z-tokens](https://github.com/volution/z-tokens), has fixed presets.
 * [rpass](https://github.com/timkuijsten/rpass)
+* [LessPass](https://www.lesspass.com/#/)
+* [passacre](https://github.com/habnabit/passacre)
+* [ssh-keydgen](https://github.com/cornfeedhobo/ssh-keydgen)
 
 ## License
 
