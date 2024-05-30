@@ -214,12 +214,16 @@ size_t passgen_generate_fill_unicode(
         .cur = 0,
     };
 
-    try(passgen_generate(
+    int ret = passgen_generate(
         pattern,
         env,
         entropy,
         &fillpos,
-        passgen_generate_write_buffer));
+        passgen_generate_write_buffer);
+
+    if(ret != 0) {
+        return 0;
+    }
 
     return fillpos.cur;
 }
@@ -236,12 +240,16 @@ size_t passgen_generate_fill_utf8(
         .cur = 0,
     };
 
-    try(passgen_generate(
+    int ret = passgen_generate(
         pattern,
         env,
         entropy,
         &fillpos,
-        passgen_generate_write_buffer_utf8));
+        passgen_generate_write_buffer_utf8);
+
+    if(ret != 0) {
+        return 0;
+    }
 
     return fillpos.cur;
 }
@@ -258,12 +266,16 @@ size_t passgen_generate_fill_json_utf8(
         .cur = 0,
     };
 
-    try(passgen_generate(
+    int ret = passgen_generate(
         pattern,
         env,
         entropy,
         &fillpos,
-        passgen_generate_write_buffer_json_utf8));
+        passgen_generate_write_buffer_json_utf8);
+
+    if(ret != 0) {
+        return 0;
+    }
 
     return fillpos.cur;
 }
@@ -395,10 +407,19 @@ static int passgen_generate_special_wordlist(
     if(!wordlist->parsed) {
         passgen_wordlist_parse(wordlist);
     }
-    const char *word = passgen_wordlist_random(wordlist, context->env->random);
-    while(*word) {
-        try(emit(context, *word));
-        word++;
+
+    // pick word at random
+    const unsigned char *word = passgen_wordlist_random(wordlist, context->env->random);
+
+    // UTF8-decode word and write codepoints
+    // TODO: handle longer words
+    size_t word_len = strlen(word);
+    const char *word_pos = &word;
+    uint32_t codepoints[128];
+    uint32_t *codepoints_pos = &codepoints[0];
+    try(passgen_utf8_decode(&codepoints_pos, 128, NULL, word_pos, word_len));
+    for(int i = 0; &codepoints[i] < codepoints_pos; i++) {
+        try(emit(context, codepoints[i]));
     }
 
     if(context->entropy) {
