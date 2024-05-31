@@ -386,7 +386,7 @@ website:coverage:
       - public
     expire_in: 30 days
 
-release:
+release:assets:
   image: alpine
   stage: deploy
   dependencies:
@@ -399,11 +399,6 @@ release:
     - build:wasi
   script:
     - bash scripts/ci-publish-release.sh
-    - echo "${CI_JOB_ID}" > CI_JOB_ID.txt
-  artifacts:
-    paths:
-      - public
-    expire_in: never
   rules:
     - if: $CI_COMMIT_TAG
 
