@@ -387,8 +387,8 @@ website:coverage:
     expire_in: 30 days
 
 release:assets:
-  image: alpine
-  stage: deploy
+  image: registry.gitlab.com/xfbs/passgen/deploy
+  stage: post
   dependencies:
     - build:alpine
     - build:amd64
