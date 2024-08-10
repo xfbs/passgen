@@ -9,3 +9,7 @@ passgen_target_defaults(sizes)
 add_executable(wordlist wordlist.c)
 target_link_libraries(wordlist PUBLIC ${PASSGEN_LIB})
 passgen_target_defaults(wordlist)
+
+add_executable(tokenize tokenize.c)
+target_link_libraries(tokenize PUBLIC ${PASSGEN_LIB})
+passgen_target_defaults(tokenize)
