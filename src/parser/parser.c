@@ -377,10 +377,22 @@ int passgen_parse_set(
         return 0;
     }
 
+    uint32_t codepoint = token->codepoint;
+    if(codepoint & PASSGEN_TOKEN_ESCAPED_BIT) {
+        // no reason to expect an escaped token here unless it's a dash.
+        switch(codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT) {
+            case '-':
+                codepoint &= ~PASSGEN_TOKEN_ESCAPED_BIT;
+                break;
+            default:
+                return -1;
+        }
+    }
+
     passgen_pattern_range *range = passgen_pattern_set_range_append(set);
 
-    range->start = token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT;
-    range->end = token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT;
+    range->start = codepoint;
+    range->end = codepoint;
 
     state->data.set.range = range;
 
