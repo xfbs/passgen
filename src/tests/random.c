@@ -139,7 +139,7 @@ test_result test_random_u64(void) {
     assert(passgen_random_open(&random, NULL));
 
     // FIXME
-    // TEST_COVERAGE(UINT64_MAX, 1ULL << 48, 1024, passgen_random_u32(&random));
+    //TEST_COVERAGE(UINT64_MAX, 1ULL << 48, 1024, passgen_random_u32(&random));
     TEST_DISTRIBUTION(
         UINT64_MAX,
         1 << 10,

@@ -10,6 +10,8 @@
 #define passgen_markov_leaf_codepoint_raw(leaf, index) \
     leaf->entries[0].codepoint[index % leaf->capacity]
 
+#define passgen_random_unicode(rand) (passgen_random_u32(rand) & 0x10FFFF)
+
 test_result test_markov_node_layout(void) {
     passgen_markov_node *node = passgen_markov_node_new(0);
 
@@ -295,14 +297,20 @@ test_result test_markov_add_random(void) {
     passgen_random rand;
     passgen_random_xorshift_open(&rand, SEED);
     uint32_t word[12] = {0};
+    size_t word_count = 200;
 
+    // try this for varying markov chain lengths
     for(size_t length = 3; length < 10; length++) {
         passgen_markov_init(&markov, length);
 
-        // FIXME: if you set count to 1000, it breaks.
-        for(size_t count = 0; count < 100; count++) {
+        // insert words
+        for(size_t count = 0; count < word_count; count++) {
+            // generate random word
             for(size_t offset = 0; offset < 12; offset++) {
-                word[offset] = passgen_random_u32(&rand);
+                // generate only non-null, valid unicode codepoints.
+                do {
+                    word[offset] = passgen_random_unicode(&rand);
+                } while(word[offset] == 0);
             }
 
             passgen_markov_add(&markov, &word[0], 12, 1);
@@ -316,14 +324,63 @@ test_result test_markov_add_random(void) {
     return test_ok;
 }
 
+test_result test_markov_generate_random(void) {
+    passgen_markov markov;
+    passgen_random rand;
+    passgen_random_xorshift_open(&rand, SEED);
+    uint32_t word[12] = {0};
+    size_t word_count = 1000;
+    size_t length = 3;
+
+    passgen_markov_init(&markov, length);
+
+    // insert words
+    for(size_t count = 0; count < word_count; count++) {
+        // generate random word
+        for(size_t offset = 0; offset < 12; offset++) {
+            do {
+                word[offset] = passgen_random_unicode(&rand);
+            } while(word[offset] == 0);
+        }
+
+        passgen_markov_add(&markov, &word[0], 12, 1);
+    }
+
+    // generate word_count words
+    for(size_t count = 0; count < word_count; count++) {
+        // clear word
+        for(int i = 0; i < length; i++) {
+            word[i] = 0;
+        }
+
+        uint32_t next;
+        do {
+            // generate next codepoint
+            next = passgen_markov_generate(&markov, &word[0], &rand, NULL);
+
+            // shift characters
+            for(int i = 1; i < length; i++) {
+                word[i - 1] = word[i];
+            }
+
+            // save next
+            word[length - 1] = next;
+        } while(next);
+    }
+
+    passgen_markov_free(&markov);
+    passgen_random_close(&rand);
+
+    return test_ok;
+}
+
 test_result test_markov_leaf_count_random(void) {
     passgen_random rand;
     passgen_random_xorshift_open(&rand, SEED);
     passgen_markov_leaf *leaf = passgen_markov_leaf_new(0);
 
-    /// FIXME: if you 10x the count, it breaks.
-    for(size_t count = 0; count < 1000; count++) {
-        uint32_t codepoint = passgen_random_u32(&rand);
+    for(size_t count = 0; count < 10000; count++) {
+        uint32_t codepoint = passgen_random_unicode(&rand);
         uint32_t before = passgen_markov_leaf_count(leaf, codepoint);
         assert_eq(before, 0);
     }
@@ -339,8 +396,8 @@ test_result test_markov_leaf_insert_random(void) {
     passgen_random_xorshift_open(&rand, SEED);
     passgen_markov_leaf *leaf = passgen_markov_leaf_new(0);
 
-    for(size_t count = 0; count < 10000; count++) {
-        uint32_t codepoint = passgen_random_u32(&rand);
+    for(size_t count = 0; count < 1000; count++) {
+        uint32_t codepoint = passgen_random_unicode(&rand);
         uint32_t weight = passgen_random_u16(&rand);
         uint32_t before = passgen_markov_leaf_count(leaf, codepoint);
         leaf = passgen_markov_leaf_insert(leaf, codepoint, weight);

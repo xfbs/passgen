@@ -311,11 +311,8 @@ static int passgen_generate_set(
     }
 
     // compute number of possible codepoints
-    // TODO: generate this on the fly or on demand?
     size_t possible = set->choices_list[set->items.len - 1];
-
     passgen_assert(possible != 0);
-
     size_t choice = passgen_random_u64_max(context->env->random, possible);
 
     // keep track of entropy

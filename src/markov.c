@@ -82,8 +82,7 @@ void passgen_markov_node_free(passgen_markov_node *node, size_t level) {
         }
     }
 
-    // TODO: clear
-
+    PASSGEN_CLEAR(node);
     free(node);
 }
 
