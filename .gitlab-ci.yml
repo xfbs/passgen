@@ -143,7 +143,7 @@ docker:wasi:
       - scripts/wasi.dockerfile
 
 sanitize:
-  image: registry.gitlab.com/xfbs/passgen/amd64
+  image: "$CI_REGISTRY_IMAGE/amd64"
   stage: pre
   script:
     - CC=clang scripts/sanitizer.sh Address
@@ -152,7 +152,7 @@ sanitize:
     - CC=clang scripts/sanitizer.sh Leak
 
 test:aarch64:
-  image: registry.gitlab.com/xfbs/passgen/aarch64
+  image: "$CI_REGISTRY_IMAGE/aarch64"
   stage: pre
   script:
     - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_GIT_INFO=No
@@ -160,7 +160,7 @@ test:aarch64:
     - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./build-aarch64/src/tests/passgen-test
 
 test:amd64:
-  image: registry.gitlab.com/xfbs/passgen/amd64
+  image: "$CI_REGISTRY_IMAGE/amd64"
   stage: pre
   script:
     - CC=clang ./scripts/coverage.sh build-clang
@@ -173,7 +173,7 @@ test:amd64:
     expire_in: 1 week
 
 test:alpine:
-  image: registry.gitlab.com/xfbs/passgen/alpine
+  image: "$CI_REGISTRY_IMAGE/alpine"
   stage: pre
   script:
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DUSE_BACKTRACE=NO -GNinja
@@ -184,7 +184,7 @@ test:alpine:
     - ninja -C build symbols-check
 
 test:riscv64:
-  image: registry.gitlab.com/xfbs/passgen/riscv64
+  image: "$CI_REGISTRY_IMAGE/riscv64"
   stage: pre
   script:
     - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_GIT_INFO=No
@@ -211,7 +211,7 @@ wordlists:
     expire_in: 1 week
 
 build:mingw64:
-  image: registry.gitlab.com/xfbs/passgen/mingw64
+  image: "$CI_REGISTRY_IMAGE/mingw64"
   stage: build
   dependencies:
     - wordlists
@@ -228,7 +228,7 @@ build:mingw64:
     expire_in: 1 week
 
 build:macos:
-  image: registry.gitlab.com/xfbs/passgen/macos
+  image: "$CI_REGISTRY_IMAGE/macos"
   stage: build
   dependencies:
     - wordlists
@@ -242,7 +242,7 @@ build:macos:
     expire_in: 1 week
 
 build:aarch64:
-  image: registry.gitlab.com/xfbs/passgen/aarch64
+  image: "$CI_REGISTRY_IMAGE/aarch64"
   stage: build
   dependencies:
     - wordlists
@@ -262,7 +262,7 @@ build:aarch64:
     expire_in: 1 week
 
 build:riscv64:
-  image: registry.gitlab.com/xfbs/passgen/riscv64
+  image: "$CI_REGISTRY_IMAGE/riscv64"
   stage: build
   dependencies:
     - wordlists
@@ -283,7 +283,7 @@ build:riscv64:
 
 # build stuff on ubuntu.
 build:amd64:
-  image: registry.gitlab.com/xfbs/passgen/amd64
+  image: "$CI_REGISTRY_IMAGE/amd64"
   stage: build
   dependencies:
     - wordlists
@@ -304,7 +304,7 @@ build:amd64:
 
 # build stuff on alpine.
 build:alpine:
-  image: registry.gitlab.com/xfbs/passgen/alpine
+  image: "$CI_REGISTRY_IMAGE/alpine"
   stage: build
   dependencies:
     - wordlists
@@ -321,7 +321,7 @@ build:alpine:
     expire_in: 1 week
 
 build:wasi:
-  image: registry.gitlab.com/xfbs/passgen/wasi
+  image: "$CI_REGISTRY_IMAGE/wasi"
   stage: build
   dependencies:
     - wordlists
@@ -335,7 +335,7 @@ build:wasi:
     expire_in: 1 week
 
 website:mkdocs:
-  image: registry.gitlab.com/xfbs/passgen/deploy
+  image: "$CI_REGISTRY_IMAGE/deploy"
   stage: post
   script:
     - bash scripts/ci-publish-website.sh
@@ -345,7 +345,7 @@ website:mkdocs:
     expire_in: 30 days
 
 website:builds:
-  image: registry.gitlab.com/xfbs/passgen/deploy
+  image: "$CI_REGISTRY_IMAGE/deploy"
   stage: post
   dependencies:
     - build:alpine
@@ -365,7 +365,7 @@ website:builds:
     - master
 
 website:doxygen:
-  image: registry.gitlab.com/xfbs/passgen/deploy
+  image: "$CI_REGISTRY_IMAGE/deploy"
   stage: post
   script:
     - bash scripts/ci-publish-doxygen.sh
@@ -375,7 +375,7 @@ website:doxygen:
     expire_in: 30 days
 
 website:coverage:
-  image: registry.gitlab.com/xfbs/passgen/deploy
+  image: "$CI_REGISTRY_IMAGE/deploy"
   stage: post
   dependencies:
     - test:amd64
