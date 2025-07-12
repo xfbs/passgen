@@ -27,7 +27,7 @@ set(TEST_LIST
 # little ruby script.
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/test_list.c
-  COMMAND ${PROJECT_SOURCE_DIR}/scripts/generate_test_list.rb
+  COMMAND ruby ${PROJECT_SOURCE_DIR}/scripts/generate_test_list.rb
           ${CMAKE_CURRENT_BINARY_DIR}/test_list.c ${TEST_LIST}
   DEPENDS ${PROJECT_SOURCE_DIR}/scripts/generate_test_list.rb ${TEST_LIST}
   COMMENT "Generating test list"

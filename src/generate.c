@@ -135,7 +135,7 @@ static int passgen_generate_write_buffer_utf8(void *data, uint32_t codepoint) {
             return -1;
         }
 
-        if(bytes <= (fillpos->len - fillpos->cur)) {
+        if((size_t)bytes <= (fillpos->len - fillpos->cur)) {
             memcpy(&fillpos->buffer[fillpos->cur], &buffer[0], bytes);
             fillpos->cur += bytes;
         } else {
@@ -406,15 +406,15 @@ static int passgen_generate_special_wordlist(
     }
 
     // pick word at random
-    const unsigned char *word = passgen_wordlist_random(wordlist, context->env->random);
+    const char *word = passgen_wordlist_random(wordlist, context->env->random);
 
     // UTF8-decode word and write codepoints
     // TODO: handle longer words
     size_t word_len = strlen(word);
-    const char *word_pos = &word;
+    const char **word_pos = &word;
     uint32_t codepoints[128];
     uint32_t *codepoints_pos = &codepoints[0];
-    try(passgen_utf8_decode(&codepoints_pos, 128, NULL, word_pos, word_len));
+    try(passgen_utf8_decode(&codepoints_pos, 128, NULL, (const uint8_t **) word_pos, word_len));
     for(int i = 0; &codepoints[i] < codepoints_pos; i++) {
         try(emit(context, codepoints[i]));
     }
@@ -429,6 +429,7 @@ static int passgen_generate_special_wordlist(
 static int passgen_generate_special_preset(
     passgen_generate_context *context,
     const passgen_pattern_special *special) {
+    (void) context;
     (void) special;
     // TODO: implement
     return 0;
