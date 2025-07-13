@@ -1,11 +1,11 @@
 # makes git submodules work
 variables:
-  GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SUBMODULE_STRATEGY: recursive
 
 # by default, retry failed jobs up to three times. sometimes jobs can fail due to
 # temporary blips like network connectivity issues.
 default:
-  retry: 1
+    retry: 1
 
 # stages
 # image stage builds prerequisite docker containers.
@@ -14,391 +14,391 @@ default:
 # post stage runs integration tests
 # deploy deploys the resulting artifacts and builds docs.
 stages:
-  - images
-  - pre
-  - build
-  - post
-  - deploy
+    - images
+    - pre
+    - build
+    - post
+    - deploy
 
 # rebuild alpine docker container.
 docker:alpine:
-  image: docker
-  stage: images
-  services:
-    - docker:dind
-  script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f scripts/alpine.dockerfile -t "$CI_REGISTRY_IMAGE/alpine"
-    - docker push "$CI_REGISTRY_IMAGE/alpine"
-  only:
-    refs:
-      - master
-    changes:
-      - scripts/alpine.dockerfile
+    image: docker
+    stage: images
+    services:
+        - docker:dind
+    script:
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+        - docker build . -f scripts/alpine.dockerfile -t "$CI_REGISTRY_IMAGE/alpine"
+        - docker push "$CI_REGISTRY_IMAGE/alpine"
+    only:
+        refs:
+            - master
+        changes:
+            - scripts/alpine.dockerfile
 
 # rebuild deploy docker container.
 docker:deploy:
-  image: docker
-  stage: images
-  services:
-    - docker:dind
-  script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f scripts/deploy.dockerfile -t "$CI_REGISTRY_IMAGE/deploy"
-    - docker push "$CI_REGISTRY_IMAGE/deploy"
-  only:
-    refs:
-      - master
-    changes:
-      - scripts/deploy.dockerfile
+    image: docker
+    stage: images
+    services:
+        - docker:dind
+    script:
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+        - docker build . -f scripts/deploy.dockerfile -t "$CI_REGISTRY_IMAGE/deploy"
+        - docker push "$CI_REGISTRY_IMAGE/deploy"
+    only:
+        refs:
+            - master
+        changes:
+            - scripts/deploy.dockerfile
 
 docker:mingw64:
-  image: docker
-  stage: images
-  services:
-    - docker:dind
-  script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f scripts/mingw64.dockerfile -t "$CI_REGISTRY_IMAGE/mingw64"
-    - docker push "$CI_REGISTRY_IMAGE/mingw64"
-  only:
-    refs:
-      - master
-    changes:
-      - scripts/mingw64.dockerfile
+    image: docker
+    stage: images
+    services:
+        - docker:dind
+    script:
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+        - docker build . -f scripts/mingw64.dockerfile -t "$CI_REGISTRY_IMAGE/mingw64"
+        - docker push "$CI_REGISTRY_IMAGE/mingw64"
+    only:
+        refs:
+            - master
+        changes:
+            - scripts/mingw64.dockerfile
 
 docker:riscv64:
-  image: docker
-  stage: images
-  services:
-    - docker:dind
-  script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f scripts/riscv64.dockerfile -t "$CI_REGISTRY_IMAGE/riscv64"
-    - docker push "$CI_REGISTRY_IMAGE/riscv64"
-  only:
-    refs:
-      - master
-    changes:
-      - scripts/riscv64.dockerfile
+    image: docker
+    stage: images
+    services:
+        - docker:dind
+    script:
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+        - docker build . -f scripts/riscv64.dockerfile -t "$CI_REGISTRY_IMAGE/riscv64"
+        - docker push "$CI_REGISTRY_IMAGE/riscv64"
+    only:
+        refs:
+            - master
+        changes:
+            - scripts/riscv64.dockerfile
 
 docker:macos:
-  image: docker
-  stage: images
-  services:
-    - docker:dind
-  script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f scripts/macos.dockerfile -t "$CI_REGISTRY_IMAGE/macos"
-    - docker push "$CI_REGISTRY_IMAGE/macos"
-  only:
-    refs:
-      - master
-    changes:
-      - scripts/macos.dockerfile
+    image: docker
+    stage: images
+    services:
+        - docker:dind
+    script:
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+        - docker build . -f scripts/macos.dockerfile -t "$CI_REGISTRY_IMAGE/macos"
+        - docker push "$CI_REGISTRY_IMAGE/macos"
+    only:
+        refs:
+            - master
+        changes:
+            - scripts/macos.dockerfile
 
 docker:amd64:
-  image: docker
-  stage: images
-  services:
-    - docker:dind
-  script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f scripts/amd64.dockerfile -t "$CI_REGISTRY_IMAGE/amd64"
-    - docker push "$CI_REGISTRY_IMAGE/amd64"
-  only:
-    refs:
-      - master
-    changes:
-      - scripts/amd64.dockerfile
+    image: docker
+    stage: images
+    services:
+        - docker:dind
+    script:
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+        - docker build . -f scripts/amd64.dockerfile -t "$CI_REGISTRY_IMAGE/amd64"
+        - docker push "$CI_REGISTRY_IMAGE/amd64"
+    only:
+        refs:
+            - master
+        changes:
+            - scripts/amd64.dockerfile
 
 docker:aarch64:
-  image: docker
-  stage: images
-  services:
-    - docker:dind
-  script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f scripts/aarch64.dockerfile -t "$CI_REGISTRY_IMAGE/aarch64"
-    - docker push "$CI_REGISTRY_IMAGE/aarch64"
-  only:
-    refs:
-      - master
-    changes:
-      - scripts/aarch64.dockerfile
+    image: docker
+    stage: images
+    services:
+        - docker:dind
+    script:
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+        - docker build . -f scripts/aarch64.dockerfile -t "$CI_REGISTRY_IMAGE/aarch64"
+        - docker push "$CI_REGISTRY_IMAGE/aarch64"
+    only:
+        refs:
+            - master
+        changes:
+            - scripts/aarch64.dockerfile
 
 docker:wasi:
-  image: docker
-  stage: images
-  services:
-    - docker:dind
-  script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build . -f scripts/wasi.dockerfile -t "$CI_REGISTRY_IMAGE/wasi"
-    - docker push "$CI_REGISTRY_IMAGE/wasi"
-  only:
-    refs:
-      - master
-    changes:
-      - scripts/wasi.dockerfile
+    image: docker
+    stage: images
+    services:
+        - docker:dind
+    script:
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+        - docker build . -f scripts/wasi.dockerfile -t "$CI_REGISTRY_IMAGE/wasi"
+        - docker push "$CI_REGISTRY_IMAGE/wasi"
+    only:
+        refs:
+            - master
+        changes:
+            - scripts/wasi.dockerfile
 
 sanitize:
-  image: "$CI_REGISTRY_IMAGE/amd64"
-  stage: pre
-  script:
-    - CC=clang scripts/sanitizer.sh Address
-    - CC=clang scripts/sanitizer.sh Memory
-    - CC=clang scripts/sanitizer.sh Undefined
-    - CC=clang scripts/sanitizer.sh Leak
+    image: "$CI_REGISTRY_IMAGE/amd64"
+    stage: pre
+    script:
+        - CC=clang scripts/sanitizer.sh Address
+        - CC=clang scripts/sanitizer.sh Memory
+        - CC=clang scripts/sanitizer.sh Undefined
+        - CC=clang scripts/sanitizer.sh Leak
 
 test:aarch64:
-  image: "$CI_REGISTRY_IMAGE/aarch64"
-  stage: pre
-  script:
-    - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_GIT_INFO=No
-    - cmake --build build-aarch64
-    - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./build-aarch64/src/tests/passgen-test
+    image: "$CI_REGISTRY_IMAGE/aarch64"
+    stage: pre
+    script:
+        - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_GIT_INFO=No
+        - cmake --build build-aarch64
+        - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./build-aarch64/src/tests/passgen-test
 
 test:amd64:
-  image: "$CI_REGISTRY_IMAGE/amd64"
-  stage: pre
-  script:
-    - CC=clang ./scripts/coverage.sh build-clang
-    - CC=gcc ./scripts/coverage.sh build-gcc
-  artifacts:
-    paths:
-      - build-clang/ccov/passgen-test
-      - build-gcc/ccov/passgen-test
-      - make symbols-check
-    expire_in: 1 week
+    image: "$CI_REGISTRY_IMAGE/amd64"
+    stage: pre
+    script:
+        - CC=clang ./scripts/coverage.sh build-clang
+        - CC=gcc ./scripts/coverage.sh build-gcc
+    artifacts:
+        paths:
+            - build-clang/ccov/passgen-test
+            - build-gcc/ccov/passgen-test
+            - make symbols-check
+        expire_in: 1 week
 
 test:alpine:
-  image: "$CI_REGISTRY_IMAGE/alpine"
-  stage: pre
-  script:
-    - cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DUSE_BACKTRACE=NO -GNinja
-    - cmake --build build
-    - ./build/src/tests/passgen-test -v
-    - valgrind ./build/src/tests/passgen-test -v
-    - valgrind ./build/src/bench/passgen-bench -i1 -t0s
-    - ninja -C build symbols-check
+    image: "$CI_REGISTRY_IMAGE/alpine"
+    stage: pre
+    script:
+        - cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DUSE_BACKTRACE=NO -GNinja
+        - cmake --build build
+        - ./build/src/tests/passgen-test -v
+        - valgrind ./build/src/tests/passgen-test -v
+        - valgrind ./build/src/bench/passgen-bench -i1 -t0s
+        - ninja -C build symbols-check
 
 test:riscv64:
-  image: "$CI_REGISTRY_IMAGE/riscv64"
-  stage: pre
-  script:
-    - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_GIT_INFO=No
-    - cmake --build build-riscv64
-    - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./build-riscv64/src/tests/passgen-test
+    image: "$CI_REGISTRY_IMAGE/riscv64"
+    stage: pre
+    script:
+        - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_GIT_INFO=No
+        - cmake --build build-riscv64
+        - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./build-riscv64/src/tests/passgen-test
 
 test:nix:
-  image: nixos/nix
-  stage: pre
-  script:
-    - nix --extra-experimental-features nix-command --extra-experimental-features flakes run
+    image: nixos/nix
+    stage: pre
+    script:
+        - nix --extra-experimental-features nix-command --extra-experimental-features flakes run
 
 # fetch wordlists
 wordlists:
-  image: alpine
-  stage: pre
-  before_script:
-    - apk add curl
-  script:
-    - ./scripts/fetch-wordlists.sh
-  artifacts:
-    paths:
-      - data/
-    expire_in: 1 week
+    image: alpine
+    stage: pre
+    before_script:
+        - apk add curl
+    script:
+        - ./scripts/fetch-wordlists.sh
+    artifacts:
+        paths:
+            - data/
+        expire_in: 1 week
 
 build:mingw64:
-  image: "$CI_REGISTRY_IMAGE/mingw64"
-  stage: build
-  dependencies:
-    - wordlists
-  before_script:
-    - git config --global --add safe.directory '*'
-  script:
-    - cmake -S . -B build-mingw64 -DCMAKE_TOOLCHAIN_FILE=cmake/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y -DPASSGEN_MLOCK=OFF
-    - cd build-mingw64
-    - make -j
-    - cpack -G ZIP
-  artifacts:
-    paths:
-      - build-mingw64
-    expire_in: 1 week
+    image: "$CI_REGISTRY_IMAGE/mingw64"
+    stage: build
+    dependencies:
+        - wordlists
+    before_script:
+        - git config --global --add safe.directory '*'
+    script:
+        - cmake -S . -B build-mingw64 -DCMAKE_TOOLCHAIN_FILE=cmake/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y -DPASSGEN_MLOCK=OFF
+        - cd build-mingw64
+        - make -j
+        - cpack -G ZIP
+    artifacts:
+        paths:
+            - build-mingw64
+        expire_in: 1 week
 
 build:macos:
-  image: "$CI_REGISTRY_IMAGE/macos"
-  stage: build
-  dependencies:
-    - wordlists
-  script:
-    - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_TOOLCHAIN_FILE=cmake/macos-toolchain.cmake
-    - cmake --build build-macos
-    - cd build-macos && cpack -G TXZ
-  artifacts:
-    paths:
-      - build-macos
-    expire_in: 1 week
+    image: "$CI_REGISTRY_IMAGE/macos"
+    stage: build
+    dependencies:
+        - wordlists
+    script:
+        - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_TOOLCHAIN_FILE=cmake/macos-toolchain.cmake
+        - cmake --build build-macos
+        - cd build-macos && cpack -G TXZ
+    artifacts:
+        paths:
+            - build-macos
+        expire_in: 1 week
 
 build:aarch64:
-  image: "$CI_REGISTRY_IMAGE/aarch64"
-  stage: build
-  dependencies:
-    - wordlists
-  before_script:
-    - git config --global --add safe.directory '*'
-  script:
-    - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
-    - cd build-aarch64
-    - ninja
-    - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/tests/passgen-test
-    - ../scripts/test-passgen-cli.sh qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/cli/passgen
-    - cpack -G TXZ
-    - cpack -G DEB
-  artifacts:
-    paths:
-      - build-aarch64
-    expire_in: 1 week
+    image: "$CI_REGISTRY_IMAGE/aarch64"
+    stage: build
+    dependencies:
+        - wordlists
+    before_script:
+        - git config --global --add safe.directory '*'
+    script:
+        - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
+        - cd build-aarch64
+        - ninja
+        - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/tests/passgen-test
+        - ../scripts/test-passgen-cli.sh qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/cli/passgen
+        - cpack -G TXZ
+        - cpack -G DEB
+    artifacts:
+        paths:
+            - build-aarch64
+        expire_in: 1 week
 
 build:riscv64:
-  image: "$CI_REGISTRY_IMAGE/riscv64"
-  stage: build
-  dependencies:
-    - wordlists
-  before_script:
-    - git config --global --add safe.directory '*'
-  script:
-    - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
-    - cd build-riscv64
-    - ninja
-    - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./src/tests/passgen-test
-    - ../scripts/test-passgen-cli.sh qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./src/cli/passgen
-    - cpack -G TXZ
-    - cpack -G DEB
-  artifacts:
-    paths:
-      - build-riscv64
-    expire_in: 1 week
+    image: "$CI_REGISTRY_IMAGE/riscv64"
+    stage: build
+    dependencies:
+        - wordlists
+    before_script:
+        - git config --global --add safe.directory '*'
+    script:
+        - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
+        - cd build-riscv64
+        - ninja
+        - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./src/tests/passgen-test
+        - ../scripts/test-passgen-cli.sh qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./src/cli/passgen
+        - cpack -G TXZ
+        - cpack -G DEB
+    artifacts:
+        paths:
+            - build-riscv64
+        expire_in: 1 week
 
 # build stuff on ubuntu.
 build:amd64:
-  image: "$CI_REGISTRY_IMAGE/amd64"
-  stage: build
-  dependencies:
-    - wordlists
-  before_script:
-    - git config --global --add safe.directory '*'
-  script:
-    - mkdir build-amd64 && cd build-amd64
-    - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_SECCOMP=YES ..
-    - ninja
-    - ./src/tests/passgen-test
-    - ../scripts/test-passgen-cli.sh ./src/cli/passgen
-    - cpack -G TXZ
-    - cpack -G DEB
-  artifacts:
-    paths:
-      - build-amd64
-    expire_in: 1 week
+    image: "$CI_REGISTRY_IMAGE/amd64"
+    stage: build
+    dependencies:
+        - wordlists
+    before_script:
+        - git config --global --add safe.directory '*'
+    script:
+        - mkdir build-amd64 && cd build-amd64
+        - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_SECCOMP=YES ..
+        - ninja
+        - ./src/tests/passgen-test
+        - ../scripts/test-passgen-cli.sh ./src/cli/passgen
+        - cpack -G TXZ
+        - cpack -G DEB
+    artifacts:
+        paths:
+            - build-amd64
+        expire_in: 1 week
 
 # build stuff on alpine.
 build:alpine:
-  image: "$CI_REGISTRY_IMAGE/alpine"
-  stage: build
-  dependencies:
-    - wordlists
-  script:
-    - mkdir -p build-alpine-release && cd build-alpine-release
-    - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=Yes -DPASSGEN_SECCOMP=Yes ..
-    - ninja
-    - ./src/tests/passgen-test
-    - ../scripts/test-passgen-cli.sh ./src/cli/passgen
-    - cpack -G TXZ
-  artifacts:
-    paths:
-      - build-alpine-release
-    expire_in: 1 week
+    image: "$CI_REGISTRY_IMAGE/alpine"
+    stage: build
+    dependencies:
+        - wordlists
+    script:
+        - mkdir -p build-alpine-release && cd build-alpine-release
+        - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=Yes -DPASSGEN_SECCOMP=No ..
+        - ninja
+        - ./src/tests/passgen-test
+        - ../scripts/test-passgen-cli.sh ./src/cli/passgen
+        - cpack -G TXZ
+    artifacts:
+        paths:
+            - build-alpine-release
+        expire_in: 1 week
 
 build:wasi:
-  image: "$CI_REGISTRY_IMAGE/wasi"
-  stage: build
-  dependencies:
-    - wordlists
-  script:
-    - mkdir build-wasi && cd build-wasi
-    - cmake -DLIBPASSGEN_SHARED=OFF -DPASSGEN_MLOCK=OFF ..
-    - make -j passgen-cli
-  artifacts:
-    paths:
-      - build-wasi
-    expire_in: 1 week
+    image: "$CI_REGISTRY_IMAGE/wasi"
+    stage: build
+    dependencies:
+        - wordlists
+    script:
+        - mkdir build-wasi && cd build-wasi
+        - cmake -DLIBPASSGEN_SHARED=OFF -DPASSGEN_MLOCK=OFF ..
+        - make -j passgen-cli
+    artifacts:
+        paths:
+            - build-wasi
+        expire_in: 1 week
 
 website:mkdocs:
-  image: "$CI_REGISTRY_IMAGE/deploy"
-  stage: post
-  script:
-    - bash scripts/ci-publish-website.sh
-  artifacts:
-    paths:
-      - public
-    expire_in: 30 days
+    image: "$CI_REGISTRY_IMAGE/deploy"
+    stage: post
+    script:
+        - bash scripts/ci-publish-website.sh
+    artifacts:
+        paths:
+            - public
+        expire_in: 30 days
 
 website:builds:
-  image: "$CI_REGISTRY_IMAGE/deploy"
-  stage: post
-  dependencies:
-    - build:alpine
-    - build:amd64
-    - build:aarch64
-    - build:macos
-    - build:riscv64
-    - build:mingw64
-    - build:wasi
-  script:
-    - bash scripts/ci-publish-builds.sh
-  artifacts:
-    paths:
-      - public
-    expire_in: 30 days
-  only:
-    - master
+    image: "$CI_REGISTRY_IMAGE/deploy"
+    stage: post
+    dependencies:
+        - build:alpine
+        - build:amd64
+        - build:aarch64
+        - build:macos
+        - build:riscv64
+        - build:mingw64
+        - build:wasi
+    script:
+        - bash scripts/ci-publish-builds.sh
+    artifacts:
+        paths:
+            - public
+        expire_in: 30 days
+    only:
+        - master
 
 website:doxygen:
-  image: "$CI_REGISTRY_IMAGE/deploy"
-  stage: post
-  script:
-    - bash scripts/ci-publish-doxygen.sh
-  artifacts:
-    paths:
-      - public
-    expire_in: 30 days
+    image: "$CI_REGISTRY_IMAGE/deploy"
+    stage: post
+    script:
+        - bash scripts/ci-publish-doxygen.sh
+    artifacts:
+        paths:
+            - public
+        expire_in: 30 days
 
 website:coverage:
-  image: "$CI_REGISTRY_IMAGE/deploy"
-  stage: post
-  dependencies:
-    - test:amd64
-  script:
-    - bash scripts/ci-publish-coverage.sh
-  artifacts:
-    paths:
-      - public
-    expire_in: 30 days
+    image: "$CI_REGISTRY_IMAGE/deploy"
+    stage: post
+    dependencies:
+        - test:amd64
+    script:
+        - bash scripts/ci-publish-coverage.sh
+    artifacts:
+        paths:
+            - public
+        expire_in: 30 days
 
 pages:
-  image: alpine
-  stage: deploy
-  dependencies:
-    - website:mkdocs
-    - website:builds
-    - website:doxygen
-    - website:coverage
-  script:
-    - "true"
-  artifacts:
-    paths:
-      - public
-    expire_in: 30 days
-  only:
-    - master
+    image: alpine
+    stage: deploy
+    dependencies:
+        - website:mkdocs
+        - website:builds
+        - website:doxygen
+        - website:coverage
+    script:
+        - "true"
+    artifacts:
+        paths:
+            - public
+        expire_in: 30 days
+    only:
+        - master
