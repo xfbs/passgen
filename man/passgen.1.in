@@ -171,9 +171,10 @@ is empty.
 .Pp
 The following escape sequences can be used:
 .Bl -tag -width Ds
-.It Li \e( , \e) , \e[ , \e] , \e{ , \e} , \e|
+.It Li \e( , \e) , \e[ , \e] , \e{ , \e} , \e| , \e\&?
 The character itself, without its meaning in a pattern.
-These cannot be used inside of a set.
+These cannot be used inside of a set, where only the dash and the closing
+bracket have a meaning.
 .It Li \ea , \eb , \ee , \ef , \en , \er , \et , \ev
 The control characters bell, backspace, escape, form feed, newline, carriage
 return, tab and vertical tab.
@@ -191,7 +192,6 @@ this way.
 .El
 .Pp
 Any other character after a backslash is an error.
-Note that there is no way to have a question mark in the output.
 .Sh PRESETS
 These presets are predefined, more can be defined with
 .Fl -define-preset

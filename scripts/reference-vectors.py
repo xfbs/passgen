@@ -304,6 +304,7 @@ PATTERNS = [
     "(a|b|c|d){8}",
     "[a-z]{4,12}",
     "(ab?c?){6}",
+    "(why|how|what)\\?{1,3}",
     "([a-z]{2,4}-){3}[0-9]{2}",
     # characters whose codepoints end in the same byte as characters which
     # have a meaning in patterns

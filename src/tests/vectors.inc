@@ -36,6 +36,9 @@ VECTOR("chacha20-argon2:master",
        "(ab?c?){6}",
        "aabcacababcab")
 VECTOR("chacha20-argon2:master",
+       "(why|how|what)\\?{1,3}",
+       "why??")
+VECTOR("chacha20-argon2:master",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "pas-xhba-dgcl-31")
 VECTOR("chacha20-argon2:master",
@@ -77,6 +80,9 @@ VECTOR("chacha20-argon2:master:example.com",
 VECTOR("chacha20-argon2:master:example.com",
        "(ab?c?){6}",
        "abcaabcaaac")
+VECTOR("chacha20-argon2:master:example.com",
+       "(why|how|what)\\?{1,3}",
+       "how???")
 VECTOR("chacha20-argon2:master:example.com",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "stv-arp-sur-28")
@@ -120,6 +126,9 @@ VECTOR("chacha20-argon2:master:example.com:user",
        "(ab?c?){6}",
        "acaabacabcac")
 VECTOR("chacha20-argon2:master:example.com:user",
+       "(why|how|what)\\?{1,3}",
+       "why???")
+VECTOR("chacha20-argon2:master:example.com:user",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "cb-ykh-iwyg-80")
 VECTOR("chacha20-argon2:master:example.com:user",
@@ -161,6 +170,9 @@ VECTOR("chacha20-argon2:other:example.com:user",
 VECTOR("chacha20-argon2:other:example.com:user",
        "(ab?c?){6}",
        "aabcabcababcac")
+VECTOR("chacha20-argon2:other:example.com:user",
+       "(why|how|what)\\?{1,3}",
+       "why??")
 VECTOR("chacha20-argon2:other:example.com:user",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "niv-ntfg-xken-91")
@@ -204,6 +216,9 @@ VECTOR("chacha20-argon2:master:example.org:user",
        "(ab?c?){6}",
        "acacababaab")
 VECTOR("chacha20-argon2:master:example.org:user",
+       "(why|how|what)\\?{1,3}",
+       "why??")
+VECTOR("chacha20-argon2:master:example.org:user",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "npa-rvl-ep-51")
 VECTOR("chacha20-argon2:master:example.org:user",
@@ -245,6 +260,9 @@ VECTOR("chacha20-argon2:master:example.com:admin",
 VECTOR("chacha20-argon2:master:example.com:admin",
        "(ab?c?){6}",
        "ababcabcabcabcab")
+VECTOR("chacha20-argon2:master:example.com:admin",
+       "(why|how|what)\\?{1,3}",
+       "why???")
 VECTOR("chacha20-argon2:master:example.com:admin",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "pfoz-rptj-qih-79")
@@ -288,6 +306,9 @@ VECTOR("chacha20-argon2:master::user",
        "(ab?c?){6}",
        "aacacabcababc")
 VECTOR("chacha20-argon2:master::user",
+       "(why|how|what)\\?{1,3}",
+       "what??")
+VECTOR("chacha20-argon2:master::user",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "tyx-xcq-sv-48")
 VECTOR("chacha20-argon2:master::user",
@@ -329,6 +350,9 @@ VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
 VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
        "(ab?c?){6}",
        "abcaabcabcaab")
+VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "(why|how|what)\\?{1,3}",
+       "what??")
 VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "zyzy-rz-bgqf-50")
@@ -372,6 +396,9 @@ VECTOR("chacha20-argon2:correct horse battery staple:example.com",
        "(ab?c?){6}",
        "abababcabcaca")
 VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "(why|how|what)\\?{1,3}",
+       "how?")
+VECTOR("chacha20-argon2:correct horse battery staple:example.com",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "ekw-smja-iz-12")
 VECTOR("chacha20-argon2:correct horse battery staple:example.com",
@@ -413,6 +440,9 @@ VECTOR("chacha20:key",
 VECTOR("chacha20:key",
        "(ab?c?){6}",
        "abcaacabcaca")
+VECTOR("chacha20:key",
+       "(why|how|what)\\?{1,3}",
+       "what???")
 VECTOR("chacha20:key",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "sglb-zhdl-rdy-68")
@@ -456,6 +486,9 @@ VECTOR("chacha20:key:iv",
        "(ab?c?){6}",
        "acacaabcabcabc")
 VECTOR("chacha20:key:iv",
+       "(why|how|what)\\?{1,3}",
+       "why???")
+VECTOR("chacha20:key:iv",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "izqx-lbte-xvq-65")
 VECTOR("chacha20:key:iv",
@@ -497,6 +530,9 @@ VECTOR("chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
 VECTOR("chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
        "(ab?c?){6}",
        "acaabcabaab")
+VECTOR("chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
+       "(why|how|what)\\?{1,3}",
+       "why???")
 VECTOR("chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "kr-oaf-zk-49")
@@ -540,6 +576,9 @@ VECTOR("xorshift:1",
        "(ab?c?){6}",
        "abcabcacaabcab")
 VECTOR("xorshift:1",
+       "(why|how|what)\\?{1,3}",
+       "how??")
+VECTOR("xorshift:1",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "ffb-oej-fr-09")
 VECTOR("xorshift:1",
@@ -582,6 +621,9 @@ VECTOR("xorshift:1234",
        "(ab?c?){6}",
        "abababcacababc")
 VECTOR("xorshift:1234",
+       "(why|how|what)\\?{1,3}",
+       "why???")
+VECTOR("xorshift:1234",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "nw-cwsm-qv-60")
 VECTOR("xorshift:1234",
@@ -623,6 +665,9 @@ VECTOR("xorshift:18446744073709551615",
 VECTOR("xorshift:18446744073709551615",
        "(ab?c?){6}",
        "acaacababcabc")
+VECTOR("xorshift:18446744073709551615",
+       "(why|how|what)\\?{1,3}",
+       "why?")
 VECTOR("xorshift:18446744073709551615",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "ee-eqpa-geq-48")

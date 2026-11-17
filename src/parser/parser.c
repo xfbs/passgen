@@ -248,6 +248,7 @@ int passgen_parse_group(
             case '}':
             case '[':
             case ']':
+            case '?':
                 // escaped token which would normally do something but
                 // should be treated as text
                 break;

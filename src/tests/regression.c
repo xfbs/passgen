@@ -323,6 +323,48 @@ test_result test_regression_parse_unicode_syntax(void) {
     return test_ok;
 }
 
+/// There was no way to have a question mark in the output, as it could not be
+/// escaped like the other characters which have a meaning in patterns.
+test_result test_regression_parse_escaped_question_mark(void) {
+    passgen_pattern pattern;
+    passgen_error error;
+    passgen_env env;
+    passgen_env_init(&env, passgen_random_open(NULL, "zero"));
+    assert(env.random);
+
+    uint8_t output[32] = {0};
+    assert(0 == passgen_parse(&pattern, &error, "why\\?\\?{2}(\\?)"));
+    size_t len = passgen_generate_fill_utf8(
+        &pattern,
+        &env,
+        NULL,
+        output,
+        sizeof(output) - 1);
+    output[len] = 0;
+    assert_streq((const char *) output, "why????");
+    passgen_pattern_free(&pattern);
+
+    // in a set, it does not have a meaning, and is not escaped.
+    assert(0 == passgen_parse(&pattern, &error, "[?]"));
+    len = passgen_generate_fill_utf8(
+        &pattern,
+        &env,
+        NULL,
+        output,
+        sizeof(output) - 1);
+    output[len] = 0;
+    assert_streq((const char *) output, "?");
+    passgen_pattern_free(&pattern);
+
+    // other characters still cannot be escaped.
+    assert(0 != passgen_parse(&pattern, &error, "a\\.b"));
+    passgen_pattern_free(&pattern);
+
+    passgen_env_free(&env);
+
+    return test_ok;
+}
+
 static int count_codepoints(void *data, uint32_t codepoint) {
     (void) codepoint;
     *((size_t *) data) += 1;
