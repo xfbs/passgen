@@ -10,9 +10,12 @@
     utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
+        # the version is defined in CMakeLists.txt, as `VERSION x.y.z`.
+        version = builtins.head (builtins.match ".*VERSION ([0-9]+\\.[0-9]+\\.[0-9]+)\n.*"
+          (builtins.readFile ./CMakeLists.txt));
         passgen = pkgs.stdenv.mkDerivation {
           pname = "passgen";
-          version = "1.0";
+          inherit version;
           src = self;
           nativeBuildInputs = [ pkgs.cmake pkgs.git pkgs.clang ];
           cmakeFlags = [ "-DBUILD_GIT_INFO=OFF" ];
@@ -20,7 +23,7 @@
         passgen-with-sanitizer = name:
           pkgs.clangStdenv.mkDerivation {
             pname = "passgen-${name}Sanitizier";
-            version = "1.0";
+            inherit version;
             src = ./.;
             nativeBuildInputs = [ pkgs.cmake pkgs.git pkgs.ruby pkgs.bash ];
             buildPhase = ''

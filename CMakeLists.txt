@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(
     passgen
-    VERSION 1.0.0
+    VERSION 0.2.0
     DESCRIPTION "Regex-based password generator"
     LANGUAGES C)
 

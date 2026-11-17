@@ -24,7 +24,13 @@ typedef struct passgen_version {
 /// @related passgen_version
 passgen_version passgen_version_get();
 
-/// Test if the version of passgen is at least as big as the one passed.
+/// Test if the version of passgen is compatible with the one passed, which
+/// is typically the one that the caller was built against (see
+/// `PASSGEN_VERSION_MAJOR` and friends in `passgen/config.h`).
+///
+/// This follows semantic versioning: the major version has to be the same,
+/// and the minor and patch version must not be smaller. Before version 1.0.0,
+/// the minor version has to be the same as well.
 ///
 /// @related passgen_version
 /// @param version Minimum version that is expected

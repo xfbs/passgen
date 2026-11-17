@@ -21,6 +21,12 @@ bool passgen_version_compatible(passgen_version version) {
         return false;
     }
 
+    // before version 1.0.0, minor versions are not compatible with each
+    // other, so the minor version must match exactly as well.
+    if(current.major == 0 && current.minor != version.minor) {
+        return false;
+    }
+
     // minor version must not be smaller
     if(current.minor < version.minor) {
         return false;

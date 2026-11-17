@@ -1,5 +1,13 @@
 #pragma once
 
+/// Version of passgen that these headers belong to. Use
+/// passgen_version_get() to get the version of the library which is used at
+/// runtime, which may be another one.
+#define PASSGEN_VERSION_MAJOR  @PROJECT_VERSION_MAJOR@
+#define PASSGEN_VERSION_MINOR  @PROJECT_VERSION_MINOR@
+#define PASSGEN_VERSION_PATCH  @PROJECT_VERSION_PATCH@
+#define PASSGEN_VERSION_STRING "@PROJECT_VERSION@"
+
 #cmakedefine PASSGEN_DEBUG
 #cmakedefine PASSGEN_MEMORY
 #cmakedefine PASSGEN_MLOCK
