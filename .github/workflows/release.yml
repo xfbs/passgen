@@ -1,0 +1,220 @@
+name: Release
+
+# Pushing a tag like `v1.2.3` builds release artifacts for all supported
+# platforms and publishes them as a GitHub release. The tag has to match the
+# version in CMakeLists.txt.
+#
+# Running this workflow manually builds the artifacts without publishing
+# anything, which is useful to check that a release would work.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    name: check version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine version
+        id: version
+        run: |
+          version="$(sed -n 's/^ *VERSION \([0-9.]*\)$/\1/p' CMakeLists.txt | head -n 1)"
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Version in CMakeLists.txt is $version"
+
+      - name: Check that the tag matches the version
+        if: github.ref_type == 'tag'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if test "v$VERSION" != "$GITHUB_REF_NAME"; then
+            echo "::error::tag $GITHUB_REF_NAME does not match version $VERSION in CMakeLists.txt"
+            exit 1
+          fi
+
+  # Statically linked binaries (built on Alpine against musl), these run on
+  # any Linux distribution.
+  linux-static:
+    name: linux / ${{ matrix.arch }} / static
+    needs: version
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    env:
+      PACKAGE: passgen-${{ needs.version.outputs.version }}-linux-${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch wordlists
+        run: ./scripts/fetch-wordlists.sh
+
+      # This runs in a plain `docker run` rather than a job container, because
+      # JavaScript actions don't work in Alpine containers on ARM runners.
+      - name: Build, test and package
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src -e PACKAGE alpine:3.22 sh -euxc '
+            apk add --no-cache build-base cmake ninja ruby bash git
+            cmake -S . -B build -G Ninja \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DPASSGEN_STATIC=ON \
+              -DLIBPASSGEN_SHARED=OFF \
+              -DUSE_BACKTRACE=OFF \
+              -DBUILD_BENCH=OFF \
+              -DBUILD_GIT_INFO=OFF
+            cmake --build build
+            ctest --test-dir build --output-on-failure
+            cd build
+            cpack -G TXZ -D CPACK_PACKAGE_FILE_NAME="$PACKAGE"
+          '
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-static-${{ matrix.arch }}
+          path: build/${{ env.PACKAGE }}.tar.xz
+          if-no-files-found: error
+
+  # Debian packages, dynamically linked against glibc.
+  linux-deb:
+    name: linux / ${{ matrix.arch }} / deb
+    needs: version
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-22.04
+          - arch: arm64
+            runner: ubuntu-22.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y ninja-build ruby
+
+      - name: Fetch wordlists
+        run: ./scripts/fetch-wordlists.sh
+
+      - name: Build
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DBUILD_BENCH=OFF \
+            -DBUILD_GIT_INFO=OFF
+          cmake --build build
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Package
+        working-directory: build
+        run: cpack -G DEB
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-deb-${{ matrix.arch }}
+          path: build/*.deb
+          if-no-files-found: error
+
+  macos:
+    name: macos / arm64
+    needs: version
+    runs-on: macos-latest
+    env:
+      PACKAGE: passgen-${{ needs.version.outputs.version }}-macos-arm64
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: brew install ninja
+
+      - name: Fetch wordlists
+        run: ./scripts/fetch-wordlists.sh
+
+      # The CLI is linked against the static libpassgen, so that the binary
+      # does not depend on where libpassgen.dylib ends up.
+      - name: Build
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DLIBPASSGEN_SHARED=OFF \
+            -DBUILD_BENCH=OFF \
+            -DBUILD_GIT_INFO=OFF
+          cmake --build build
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Package
+        working-directory: build
+        run: cpack -G TXZ -D CPACK_PACKAGE_FILE_NAME="$PACKAGE"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-arm64
+          path: build/${{ env.PACKAGE }}.tar.xz
+          if-no-files-found: error
+
+  source:
+    name: source
+    needs: version
+    runs-on: ubuntu-latest
+    env:
+      PACKAGE: passgen-${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create source archive
+        run: git archive --format=tar.gz --prefix="$PACKAGE/" -o "$PACKAGE-source.tar.gz" HEAD
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source
+          path: ${{ env.PACKAGE }}-source.tar.gz
+          if-no-files-found: error
+
+  publish:
+    name: publish release
+    if: github.ref_type == 'tag'
+    needs: [version, linux-static, linux-deb, macos, source]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Checksums
+        working-directory: artifacts
+        run: |
+          sha256sum * > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --verify-tag \
+            --title "Passgen $GITHUB_REF_NAME" \
+            --generate-notes \
+            artifacts/*

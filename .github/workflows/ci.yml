@@ -1,0 +1,118 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Build and run the unit tests and the CLI tests.
+  test:
+    name: ${{ matrix.os }} / ${{ matrix.cc }} / ${{ matrix.build_type }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+        cc: [gcc, clang]
+        build_type: [Debug, Release]
+        include:
+          - os: macos-latest
+            cc: clang
+            build_type: Debug
+          - os: macos-latest
+            cc: clang
+            build_type: Release
+    env:
+      CC: ${{ matrix.cc }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build ruby
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Check exported symbols
+        if: runner.os == 'Linux'
+        run: cmake --build build --target symbols-check
+
+  # Run the tests with sanitizers enabled. Any finding fails the job.
+  sanitize:
+    name: sanitizer / ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: address+undefined
+            sanitizer: "Address;Undefined"
+          - name: memory
+            sanitizer: "Memory"
+    env:
+      CC: clang
+      CFLAGS: -fno-sanitize-recover=all
+      ASAN_OPTIONS: detect_leaks=1:strict_string_checks=1
+      UBSAN_OPTIONS: print_stacktrace=1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y ninja-build ruby
+
+      - name: Configure
+        run: >
+          cmake -S . -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=Debug
+          "-DUSE_SANITIZER=${{ matrix.sanitizer }}"
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  # Fully static build against musl, which is what the release binaries are.
+  static:
+    name: alpine / static
+    runs-on: ubuntu-latest
+    container: alpine:3.22
+    steps:
+      - name: Install dependencies
+        run: apk add --no-cache build-base cmake ninja ruby bash git
+
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: >
+          cmake -S . -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DPASSGEN_STATIC=ON
+          -DUSE_BACKTRACE=OFF
+          -DBUILD_GIT_INFO=OFF
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
