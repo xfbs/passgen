@@ -51,14 +51,15 @@ welcome.
 | `cmake/` | CMake modules. |
 | `data/` | The example configuration, the public key which nightly builds are signed with, and the wordlists (once downloaded with `scripts/fetch-wordlists.sh`). |
 | `docs/` | This documentation. |
-| `include/passgen/` | The public headers of `libpassgen`. |
-| `include/passgen/container/` | Data structures. |
-| `include/passgen/parser/` | The tokenizer and the parser for patterns. |
-| `include/passgen/pattern/` | What patterns are parsed into. |
-| `include/passgen/util/` | Utilities, such as UTF-8 and SipHash. |
+| `include/passgen/` | The public headers of `libpassgen`. These are what is installed, and what the API documentation is generated from. |
+| `src/include/passgen/` | The headers for the internals of `libpassgen`. They are not installed, and can only be used by what is built as part of this repository, such as the tests. |
+| `src/include/passgen/container/` | Data structures. |
+| `src/include/passgen/parser/` | The tokenizer and the parser for patterns. |
+| `src/include/passgen/pattern/` | What patterns are parsed into. |
+| `src/include/passgen/util/` | Utilities, such as UTF-8 and SipHash. |
 | `man/` | The man page. |
 | `scripts/` | Scripts, most of which are run by continuous integration. |
-| `src/` | The sources of `libpassgen`, laid out like the headers. |
+| `src/` | The sources of `libpassgen`, laid out like the headers for the internals. |
 | `src/bench/` | The benchmark tool, and the benchmarks. |
 | `src/cli/` | The sources of `passgen`, the command-line tool. |
 | `src/fuzz/` | The fuzzing harnesses, and their corpus. |

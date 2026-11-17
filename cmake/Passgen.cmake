@@ -34,6 +34,13 @@ function(passgen_check_symbols target)
 endfunction()
 
 function(passgen_target_defaults target)
+  # the headers in include/ are the public interface, and are what is
+  # installed. the ones for the internals are in src/include/, and can only be
+  # used by what is built as part of this project: the library itself, the
+  # tests, the benchmarks, the tools and the command-line interface.
+  target_include_directories(${target}
+      PRIVATE ${PROJECT_SOURCE_DIR}/src/include)
+
   # enable clang-format
   target_clangformat_setup(${target})
 

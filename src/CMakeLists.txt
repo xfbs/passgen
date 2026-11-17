@@ -87,7 +87,8 @@ if(NOT LIBPASSGEN_SHARED)
     set_target_properties(passgen-shared PROPERTIES EXCLUDE_FROM_ALL TRUE)
 endif()
 
-# the templates for generated headers are not headers themselves.
+# only the public headers are installed. the templates for generated headers
+# are not headers themselves.
 install(
     DIRECTORY ../include/passgen
     DESTINATION include

@@ -8,7 +8,7 @@ licenses. The files have the full text of their license at the top.
 
 | Code | Files | License |
 | --- | --- | --- |
-| [Monocypher](https://monocypher.org/) 4.0.2, by Loup Vaillant and others. Used for Argon2 and ChaCha20, with its symbols renamed. | `src/monocypher.c`, `include/passgen/monocypher.h` | BSD-2-Clause or CC0-1.0 |
+| [Monocypher](https://monocypher.org/) 4.0.2, by Loup Vaillant and others. Used for Argon2 and ChaCha20, with its symbols renamed. | `src/monocypher.c`, `src/include/passgen/monocypher.h` | BSD-2-Clause or CC0-1.0 |
 | [SipHash](https://github.com/veorq/SipHash) reference implementation, by Jean-Philippe Aumasson and Daniel J. Bernstein. | `src/util/siphash.c` | CC0-1.0 |
 | [UTF-8 decoder](https://bjoern.hoehrmann.de/utf-8/decoder/dfa/), by Björn Höhrmann. | `src/util/utf8.c` | MIT |
 | UTF-8 encoder, by Ondřej Hruška. | `src/util/utf8.c` | MIT |
