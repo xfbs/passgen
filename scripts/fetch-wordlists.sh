@@ -1,14 +1,21 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # Fetch Wordlists
-set -euxo pipefail
+#
+# This is run in a plain Alpine container in CI, so it has to work with any
+# POSIX shell, not just with bash.
+set -eux
 
 # fetch EFF wordlist
-function eff_fetch() {
+eff_fetch() {
     filename="$1"
     url="$2"
     trim="$3"
 
-    curl -s "$url" | cut -c$trim- > "data/$filename.txt"
+    # download first and trim after (rather than piping one into the other), so
+    # that a failed download is noticed without needing `set -o pipefail`.
+    curl -sf "$url" -o "data/$filename.download"
+    cut -c"$trim"- "data/$filename.download" > "data/$filename.txt"
+    rm "data/$filename.download"
 }
 
 eff_fetch "eff-large" "https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt" 7
