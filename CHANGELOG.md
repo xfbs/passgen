@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Regression tests and more CLI tests.
 - Test vectors for the deterministic randomness sources, with a reference
   implementation to generate them.
+- Fuzzing harnesses, with a script and `fuzz` target to run them.
 
 ### Changed
 - Master passphrase mode uses stronger Argon2 parameters and a longer salt.
@@ -22,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - User configuration is read from `$XDG_CONFIG_HOME`.
 - Optional items (`a?`) count towards entropy.
 - Repetitions like `a{5,2}` are rejected.
+- Unicode escapes above `\u{10ffff}` are rejected.
+- UTF-8 which ends in the middle of a sequence is rejected.
 - Locking memory is best-effort, and no longer makes large allocations fail.
 - `passgen_random_chacha20_argon2_open()` takes strings.
 - Requires CMake 3.16.
@@ -34,6 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stack overflow generating long words from a Markov chain.
 - Exhausted randomness sources going unnoticed in release builds.
 - Infinite loop with empty wordlists.
+- Crash for wordlists without a name (`\w{}`).
+- Crash when a segment has more than one multiplier (`{4}{1}a`).
+- Out of bounds write for invalid unicode escapes in wordlist names.
 - Buffer overflows loading the configuration.
 - `--depth` having no effect.
 - Unescaped control characters in JSON output.
