@@ -12,14 +12,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "passgen/passgen.h"
 #include "passgen/pattern/env.h"
-#include "passgen/pattern/group.h"
-#include "passgen/pattern/segment.h"
-#include "passgen/pattern/repeat.h"
-#include "passgen/pattern/set.h"
-#include "passgen/pattern/special.h"
-#include "passgen/pattern/pattern.h"
-#include "passgen/pattern/literal.h"
 
 /// Callback for generation. Takes an arbitrary data pointer and the codepoint
 /// that was generated. If it returns anything other than zero, generating

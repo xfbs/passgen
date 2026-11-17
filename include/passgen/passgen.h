@@ -4,24 +4,34 @@
 #pragma once
 #include <stddef.h>
 #include <passgen/error.h>
-#include <passgen/pattern/pattern.h>
+
+/// A parsed pattern, such as `abc(def|ghi)[a-z]{5}`.
+///
+/// Patterns are created by parsing them with @ref passgen_parse, and have to
+/// be freed with @ref passgen_pattern_free. What is inside of them is not part
+/// of the public interface.
+typedef struct passgen_pattern passgen_pattern;
 
 /// Parse a pattern.
 ///
-/// The pattern has to be freed with @ref passgen_pattern_free when it is no
-/// longer needed. This is the case even if parsing it fails.
-///
-/// @param pattern Pointer to a pattern, which is the output of this function.
-///   It does not need to be initialized.
+/// @param pattern Where to store the pattern. If parsing succeeds, this is set
+///   to a newly allocated pattern, which has to be freed with @ref
+///   passgen_pattern_free when it is no longer needed. If parsing fails, it is
+///   set to NULL, and there is nothing to free.
 /// @param error Pointer to a @ref passgen_error struct. If parsing fails, this
 ///   has a message describing what is wrong, and where in the string. It is
 ///   only set in that case, and does not need to be freed.
 /// @param string The pattern to parse, as a NUL-terminated, UTF-8 encoded
 ///   string
-/// @returns Zero on success, nonzero otherwise. If it returns zero, it means that @ref pattern
-///   contains a fully parsed passgen pattern. If it returns nonzero, it means that @ref error
-///   contains information about what went wrong.
+/// @returns Zero on success, nonzero otherwise.
 int passgen_parse(
-    passgen_pattern *pattern,
+    passgen_pattern **pattern,
     passgen_error *error,
     const char *string);
+
+/// Free a pattern which was created by @ref passgen_parse.
+///
+/// @memberof passgen_pattern
+/// @param pattern Pattern to free. May be NULL, in which case this does
+///   nothing.
+void passgen_pattern_free(passgen_pattern *pattern);

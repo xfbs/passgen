@@ -145,10 +145,10 @@ test_result test_regression_utf8_truncated(void) {
     assert(codepoints[2] == 0x65e5);
 
     // a pattern which ends this way is not valid.
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     assert(0 != passgen_parse(&pattern, &error, "ab\xe6\x97"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     return test_ok;
 }
@@ -196,29 +196,29 @@ test_result test_regression_random_open_overlong(void) {
 /// Repetitions where the maximum is smaller than the minimum, or that
 /// overflow, must be rejected by the parser.
 test_result test_regression_parse_repeat_range(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
 
     assert(0 != passgen_parse(&pattern, &error, "a{5,2}"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     assert(0 != passgen_parse(&pattern, &error, "a{1,0}"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     assert(
         0 != passgen_parse(&pattern, &error, "a{99999999999999999999999999}"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     assert(
         0 !=
         passgen_parse(&pattern, &error, "a{1,99999999999999999999999999}"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "a{2,5}"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "a{2,2}"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     return test_ok;
 }
@@ -227,16 +227,16 @@ test_result test_regression_parse_repeat_range(void) {
 /// the group with a sum of multipliers which did not match the segments, so
 /// that choosing a segment could run past the last one.
 test_result test_regression_parse_multiplier_twice(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
 
     assert(0 == passgen_parse(&pattern, &error, "{4}{1}a|b"));
-    assert(pattern.group.multiplier_sum == 2);
-    passgen_pattern_free(&pattern);
+    assert(pattern->group.multiplier_sum == 2);
+    passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "{1}{4}a|{2}b"));
-    assert(pattern.group.multiplier_sum == 6);
-    passgen_pattern_free(&pattern);
+    assert(pattern->group.multiplier_sum == 6);
+    passgen_pattern_free(pattern);
 
     // the sum must not overflow either.
     assert(
@@ -244,7 +244,7 @@ test_result test_regression_parse_multiplier_twice(void) {
                  &pattern,
                  &error,
                  "{18446744073709551615}a|{18446744073709551615}b"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     return test_ok;
 }
@@ -253,23 +253,23 @@ test_result test_regression_parse_multiplier_twice(void) {
 /// is a valid codepoint. Those used to be accepted, and corrupted memory when
 /// used in the name of a wordlist.
 test_result test_regression_parse_unicode_escape_range(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
 
     assert(0 == passgen_parse(&pattern, &error, "\\u{10ffff}"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     assert(0 != passgen_parse(&pattern, &error, "\\u{110000}"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     assert(0 != passgen_parse(&pattern, &error, "\\u{ffffff}"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     assert(0 != passgen_parse(&pattern, &error, "\\w{a\\u{fc1f30}b}"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "\\w{a\\u{fc}b}"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     return test_ok;
 }
@@ -279,7 +279,7 @@ test_result test_regression_parse_unicode_escape_range(void) {
 /// dot above), which ends in the same byte as the pipe (U+007C), were taken
 /// for syntax.
 test_result test_regression_parse_unicode_syntax(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     passgen_env env;
     passgen_env_init(&env, passgen_random_open(NULL, "zero"));
@@ -304,19 +304,19 @@ test_result test_regression_parse_unicode_syntax(void) {
         uint8_t output[32] = {0};
         assert(0 == passgen_parse(&pattern, &error, patterns[i]));
         size_t len = passgen_generate_fill_utf8(
-            &pattern,
+            pattern,
             &env,
             NULL,
             output,
             sizeof(output) - 1);
         output[len] = 0;
         assert_streq((const char *) output, patterns[i]);
-        passgen_pattern_free(&pattern);
+        passgen_pattern_free(pattern);
     }
 
     // escaping them does not give them a meaning either.
     assert(0 != passgen_parse(&pattern, &error, "a\\\xc5\xbcz"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     passgen_env_free(&env);
 
@@ -326,7 +326,7 @@ test_result test_regression_parse_unicode_syntax(void) {
 /// There was no way to have a question mark in the output, as it could not be
 /// escaped like the other characters which have a meaning in patterns.
 test_result test_regression_parse_escaped_question_mark(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     passgen_env env;
     passgen_env_init(&env, passgen_random_open(NULL, "zero"));
@@ -335,30 +335,30 @@ test_result test_regression_parse_escaped_question_mark(void) {
     uint8_t output[32] = {0};
     assert(0 == passgen_parse(&pattern, &error, "why\\?\\?{2}(\\?)"));
     size_t len = passgen_generate_fill_utf8(
-        &pattern,
+        pattern,
         &env,
         NULL,
         output,
         sizeof(output) - 1);
     output[len] = 0;
     assert_streq((const char *) output, "why????");
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     // in a set, it does not have a meaning, and is not escaped.
     assert(0 == passgen_parse(&pattern, &error, "[?]"));
     len = passgen_generate_fill_utf8(
-        &pattern,
+        pattern,
         &env,
         NULL,
         output,
         sizeof(output) - 1);
     output[len] = 0;
     assert_streq((const char *) output, "?");
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     // other characters still cannot be escaped.
     assert(0 != passgen_parse(&pattern, &error, "a\\.b"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     passgen_env_free(&env);
 
@@ -369,7 +369,7 @@ test_result test_regression_parse_escaped_question_mark(void) {
 /// an escaped character also kept the marker for escaped characters as part
 /// of the codepoint, so it was far too large, and generating from it failed.
 test_result test_regression_parse_set_escapes(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     passgen_env env;
     passgen_env_init(&env, passgen_random_open(NULL, "xorshift:1234"));
@@ -394,7 +394,7 @@ test_result test_regression_parse_set_escapes(void) {
         for(size_t n = 0; n < 200; n++) {
             uint8_t output[8] = {0};
             size_t len = passgen_generate_fill_utf8(
-                &pattern,
+                pattern,
                 &env,
                 NULL,
                 output,
@@ -409,15 +409,15 @@ test_result test_regression_parse_set_escapes(void) {
             assert(seen[c]);
         }
 
-        passgen_pattern_free(&pattern);
+        passgen_pattern_free(pattern);
     }
 
     // other characters cannot be escaped in a set, and a range still cannot
     // end before it starts.
     assert(0 != passgen_parse(&pattern, &error, "[\\q]"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
     assert(0 != passgen_parse(&pattern, &error, "[a-\\-]"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     passgen_env_free(&env);
 
@@ -427,18 +427,18 @@ test_result test_regression_parse_set_escapes(void) {
 /// An empty set used to be accepted, and generated nothing. A set stands for
 /// one of its characters, so there is nothing that it could generate.
 test_result test_regression_parse_set_empty(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
 
     const char *patterns[] = {"[]", "a[]b", "[]{3}", "([])", "[]?", NULL};
     for(size_t i = 0; patterns[i]; i++) {
         assert(0 != passgen_parse(&pattern, &error, patterns[i]));
-        passgen_pattern_free(&pattern);
+        passgen_pattern_free(pattern);
     }
 
     // brackets which are escaped are not a set.
     assert(0 == passgen_parse(&pattern, &error, "\\[\\]"));
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     return test_ok;
 }
@@ -452,7 +452,7 @@ static int count_codepoints(void *data, uint32_t codepoint) {
 /// Optional items (`a?`) are a choice between two options, which needs to be
 /// reflected in the entropy.
 test_result test_regression_entropy_maybe(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     passgen_env env;
     passgen_env_init(&env, passgen_random_open(NULL, "zero"));
@@ -462,16 +462,16 @@ test_result test_regression_entropy_maybe(void) {
     size_t count = 0;
 
     assert(0 == passgen_parse(&pattern, &error, "a?"));
-    assert(0 == passgen_generate(&pattern, &env, &entropy, &count, count_codepoints));
+    assert(0 == passgen_generate(pattern, &env, &entropy, &count, count_codepoints));
     assert(fabs(entropy - 2.0) < 0.0001);
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "a?[ab]?(c|d)?"));
-    assert(0 == passgen_generate(&pattern, &env, &entropy, &count, count_codepoints));
+    assert(0 == passgen_generate(pattern, &env, &entropy, &count, count_codepoints));
     // with the zero randomness source, every optional item is emitted, so
     // this is 2 * (2 * 2) * (2 * 2).
     assert(fabs(entropy - 32.0) < 0.0001);
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     passgen_env_free(&env);
 
@@ -480,7 +480,7 @@ test_result test_regression_entropy_maybe(void) {
 
 /// The JSON output must escape all control characters.
 test_result test_regression_json_control_chars(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     passgen_env env;
     passgen_env_init(&env, passgen_random_open(NULL, "zero"));
@@ -491,7 +491,7 @@ test_result test_regression_json_control_chars(void) {
 
     uint8_t buffer[64] = {0};
     size_t len = passgen_generate_fill_json_utf8(
-        &pattern,
+        pattern,
         &env,
         NULL,
         buffer,
@@ -499,7 +499,7 @@ test_result test_regression_json_control_chars(void) {
     buffer[len] = 0;
     assert_streq((const char *) buffer, "\\u0001\\t\\\"\\\\");
 
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
     passgen_env_free(&env);
 
     return test_ok;
@@ -538,26 +538,26 @@ static bool wordlist_env(
 /// Picking from an empty wordlist used to hang (release builds) or trip an
 /// assertion (debug builds). It should just be an error.
 test_result test_regression_wordlist_empty(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     passgen_env env;
     size_t count = 0;
 
     assert(wordlist_env(&env, "zero", NULL, 0, 3));
     assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
-    assert(0 != passgen_generate(&pattern, &env, NULL, &count, count_codepoints));
-    passgen_pattern_free(&pattern);
+    assert(0 != passgen_generate(pattern, &env, NULL, &count, count_codepoints));
+    passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "\\m{list}"));
-    assert(0 != passgen_generate(&pattern, &env, NULL, &count, count_codepoints));
-    passgen_pattern_free(&pattern);
+    assert(0 != passgen_generate(pattern, &env, NULL, &count, count_codepoints));
+    passgen_pattern_free(pattern);
     passgen_env_free(&env);
 
     // wordlist that does not exist at all
     passgen_env_init(&env, passgen_random_open(NULL, "zero"));
     assert(0 == passgen_parse(&pattern, &error, "\\w{nope}\\m{nope}"));
-    assert(0 != passgen_generate(&pattern, &env, NULL, &count, count_codepoints));
-    passgen_pattern_free(&pattern);
+    assert(0 != passgen_generate(pattern, &env, NULL, &count, count_codepoints));
+    passgen_pattern_free(pattern);
     passgen_env_free(&env);
 
     return test_ok;
@@ -566,7 +566,7 @@ test_result test_regression_wordlist_empty(void) {
 /// A wordlist without a name (as in `\w{}`) used to be looked up using a null
 /// pointer, which crashed as soon as any wordlist was defined.
 test_result test_regression_wordlist_no_name(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     passgen_env env;
     char data[] = "alpha\nbravo\n";
@@ -575,12 +575,12 @@ test_result test_regression_wordlist_no_name(void) {
     assert(wordlist_env(&env, "zero", data, strlen(data), 2));
 
     assert(0 == passgen_parse(&pattern, &error, "\\w{}"));
-    assert(0 != passgen_generate(&pattern, &env, NULL, &count, count_codepoints));
-    passgen_pattern_free(&pattern);
+    assert(0 != passgen_generate(pattern, &env, NULL, &count, count_codepoints));
+    passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "\\m{}"));
-    assert(0 != passgen_generate(&pattern, &env, NULL, &count, count_codepoints));
-    passgen_pattern_free(&pattern);
+    assert(0 != passgen_generate(pattern, &env, NULL, &count, count_codepoints));
+    passgen_pattern_free(pattern);
 
     passgen_env_free(&env);
 
@@ -590,7 +590,7 @@ test_result test_regression_wordlist_no_name(void) {
 /// Words longer than 128 codepoints used to fail (wordlist) or overflow a
 /// stack buffer (markov chain).
 test_result test_regression_wordlist_long_words(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     passgen_env env;
 
@@ -604,9 +604,9 @@ test_result test_regression_wordlist_long_words(void) {
 
     size_t count = 0;
     assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
-    assert(0 == passgen_generate(&pattern, &env, NULL, &count, count_codepoints));
+    assert(0 == passgen_generate(pattern, &env, NULL, &count, count_codepoints));
     assert_eq(count, word_len);
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     // at every step, the markov chain has a 599/600 chance of generating
     // another a, so these words get long: on average 600 codepoints.
@@ -615,10 +615,10 @@ test_result test_regression_wordlist_long_words(void) {
     assert(0 == passgen_parse(&pattern, &error, "\\m{list}{100}"));
     assert(
         0 ==
-        passgen_generate(&pattern, &env, &entropy, &count, count_codepoints));
+        passgen_generate(pattern, &env, &entropy, &count, count_codepoints));
     assert(count > 128 * 100);
     assert(entropy > 1.0);
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     passgen_env_free(&env);
     free(data);
@@ -628,7 +628,7 @@ test_result test_regression_wordlist_long_words(void) {
 
 /// Defining a wordlist twice replaces the first one (and must not leak it).
 test_result test_regression_wordlist_redefine(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     passgen_env env;
     char first[] = "first\n";
@@ -643,7 +643,7 @@ test_result test_regression_wordlist_redefine(void) {
     uint8_t buffer[32] = {0};
     assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
     size_t len = passgen_generate_fill_utf8(
-        &pattern,
+        pattern,
         &env,
         NULL,
         buffer,
@@ -651,7 +651,7 @@ test_result test_regression_wordlist_redefine(void) {
     buffer[len] = 0;
     assert_streq((const char *) buffer, "second");
 
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
     passgen_env_free(&env);
 
     return test_ok;

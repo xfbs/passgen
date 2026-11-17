@@ -58,7 +58,7 @@ static bool vector_check(const vector *vector, passgen_random *random) {
     passgen_env_init(&env, random);
     bool okay = (0 == passgen_env_wordlist_add(&env, name, file, 3));
 
-    passgen_pattern pattern;
+    passgen_pattern *pattern = NULL;
     passgen_error error;
     okay = okay && (0 == passgen_parse(&pattern, &error, vector->pattern));
 
@@ -66,7 +66,7 @@ static bool vector_check(const vector *vector, passgen_random *random) {
         // none of the vectors are longer than this
         static uint8_t output[2048];
         size_t length = passgen_generate_fill_utf8(
-            &pattern,
+            pattern,
             &env,
             NULL,
             output,
@@ -87,7 +87,7 @@ static bool vector_check(const vector *vector, passgen_random *random) {
         }
     }
 
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     // the randomness source is not ours to free.
     env.random = NULL;

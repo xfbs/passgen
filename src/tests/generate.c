@@ -53,7 +53,7 @@
         output[len] = 0;                                                   \
                                                                            \
         passgen_parser_free(&parser);                                      \
-        passgen_pattern_free(&parsed_pattern);                             \
+        passgen_pattern_deinit(&parsed_pattern);                             \
     } while(0)
 
 #define POSTAMBLE() passgen_random_close(&random)
@@ -110,10 +110,10 @@ test_result test_generate_chars(void) {
 /// numbers, unlike comparing against the output for a specific seed.
 static bool
 generates_exactly(const char *pattern_string, const char *const *expected) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     if(0 != passgen_parse(&pattern, &error, pattern_string)) {
-        passgen_pattern_free(&pattern);
+        passgen_pattern_free(pattern);
         return false;
     }
 
@@ -124,7 +124,7 @@ generates_exactly(const char *pattern_string, const char *const *expected) {
 
     passgen_random random;
     if(!passgen_random_xorshift_open(&random, SEED)) {
-        passgen_pattern_free(&pattern);
+        passgen_pattern_free(pattern);
         return false;
     }
 
@@ -141,7 +141,7 @@ generates_exactly(const char *pattern_string, const char *const *expected) {
     for(size_t i = 0; okay && seen_count < expected_len && i < 10000; i++) {
         uint8_t output[64];
         size_t len = passgen_generate_fill_utf8(
-            &pattern,
+            pattern,
             &env,
             NULL,
             output,
@@ -162,7 +162,7 @@ generates_exactly(const char *pattern_string, const char *const *expected) {
     }
 
     passgen_random_close(&random);
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     return okay && seen_count == expected_len;
 }
@@ -264,7 +264,7 @@ static int dummy_callback(void *data, uint32_t codepoint) {
 }
 
 test_result test_generate_depth_limit_zero(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     assert_eq(0, passgen_parse(&pattern, &error, "abc"));
 
@@ -275,12 +275,12 @@ test_result test_generate_depth_limit_zero(void) {
     passgen_env_init(&env, &random);
     env.depth_limit = 0;
 
-    int ret = passgen_generate(&pattern, &env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, &env, NULL, NULL, dummy_callback);
 
     // can't generate
     assert(ret != 0);
 
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
     // FIXME: don't free random in env_free
     env.random = NULL;
     passgen_env_free(&env);
@@ -289,7 +289,7 @@ test_result test_generate_depth_limit_zero(void) {
 }
 
 test_result test_generate_depth_limit_one(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     assert_eq(0, passgen_parse(&pattern, &error, "abc"));
 
@@ -300,10 +300,10 @@ test_result test_generate_depth_limit_one(void) {
     passgen_env_init(&env, &random);
     env.depth_limit = 1;
 
-    int ret = passgen_generate(&pattern, &env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, &env, NULL, NULL, dummy_callback);
     assert_eq(ret, 0);
 
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
     // FIXME: don't free random in env_free
     env.random = NULL;
     passgen_env_free(&env);
@@ -312,7 +312,7 @@ test_result test_generate_depth_limit_one(void) {
 }
 
 test_result test_generate_depth_limit_one_over(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     assert_eq(0, passgen_parse(&pattern, &error, "(abc)"));
 
@@ -323,10 +323,10 @@ test_result test_generate_depth_limit_one_over(void) {
     passgen_env_init(&env, &random);
     env.depth_limit = 1;
 
-    int ret = passgen_generate(&pattern, &env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, &env, NULL, NULL, dummy_callback);
     assert(ret != 0);
 
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
     // FIXME: don't free random in env_free
     env.random = NULL;
     passgen_env_free(&env);
@@ -335,7 +335,7 @@ test_result test_generate_depth_limit_one_over(void) {
 }
 
 test_result test_generate_depth_limit_two(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     assert_eq(0, passgen_parse(&pattern, &error, "(abc|def|[ghi]{2})"));
 
@@ -346,10 +346,10 @@ test_result test_generate_depth_limit_two(void) {
     passgen_env_init(&env, &random);
     env.depth_limit = 2;
 
-    int ret = passgen_generate(&pattern, &env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, &env, NULL, NULL, dummy_callback);
     assert(ret == 0);
 
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
     // FIXME: don't free random in env_free
     env.random = NULL;
     passgen_env_free(&env);
@@ -358,7 +358,7 @@ test_result test_generate_depth_limit_two(void) {
 }
 
 test_result test_generate_depth_limit_two_over(void) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     assert_eq(0, passgen_parse(&pattern, &error, "((abc)|(def|ghi))"));
 
@@ -369,10 +369,10 @@ test_result test_generate_depth_limit_two_over(void) {
     passgen_env_init(&env, &random);
     env.depth_limit = 2;
 
-    int ret = passgen_generate(&pattern, &env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, &env, NULL, NULL, dummy_callback);
     assert(ret != 0);
 
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
     // FIXME: don't free random in env_free
     env.random = NULL;
     passgen_env_free(&env);

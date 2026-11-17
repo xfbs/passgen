@@ -5,7 +5,7 @@
 
 double entropy(const char *p) {
     // parse pattern
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     if(0 != passgen_parse(&pattern, &error, p)) {
         return NAN;
@@ -20,13 +20,13 @@ double entropy(const char *p) {
     passgen_env_init(&env, &random);
     double entropy;
     int length = passgen_generate_fill_utf8(
-        &pattern,
+        pattern,
         &env,
         &entropy,
         &buffer[0],
         buffer_len);
     buffer[length] = 0;
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     return entropy;
 }

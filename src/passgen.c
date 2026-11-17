@@ -5,9 +5,30 @@
 #include "passgen/util/utf8.h"
 #include <assert.h>
 #include <passgen/passgen.h>
+#include <stdlib.h>
 #include <string.h>
 
 int passgen_parse(
+    passgen_pattern **pattern,
+    passgen_error *error,
+    const char *string) {
+    *pattern = malloc(sizeof(passgen_pattern));
+    if(!*pattern) {
+        passgen_error_init(error, "out of memory");
+        return -1;
+    }
+
+    int ret = passgen_pattern_parse(*pattern, error, string);
+    if(ret != 0) {
+        // whatever was parsed up to the error is of no use to anyone.
+        passgen_pattern_free(*pattern);
+        *pattern = NULL;
+    }
+
+    return ret;
+}
+
+int passgen_pattern_parse(
     passgen_pattern *output,
     passgen_error *error,
     const char *string) {

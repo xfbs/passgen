@@ -20,7 +20,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     data += 1;
     size -= 1;
 
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     if(0 != passgen_parse(&pattern, &error, "\\w{w}-\\m{w}{3}")) {
         abort();
@@ -45,7 +45,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
             double entropy;
             size_t budget = FUZZ_OUTPUT_BUDGET;
-            passgen_generate(&pattern, &env, &entropy, &budget, fuzz_output);
+            passgen_generate(pattern, &env, &entropy, &budget, fuzz_output);
         } else {
             if(file) fclose(file);
             free(name);
@@ -58,7 +58,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         passgen_env_free(env_ptr);
     }
 
-    passgen_pattern_free(&pattern);
+    passgen_pattern_free(pattern);
 
     return 0;
 }

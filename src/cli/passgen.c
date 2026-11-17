@@ -50,18 +50,18 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
 }
 
 int passgen_cli_run(passgen_cli_opts opts) {
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
     passgen_error error;
     int ret = passgen_parse(&pattern, &error, opts.pattern);
     if(ret != 0) {
         passgen_error_print(&error, opts.pattern);
         // the pattern is partially built at this point.
-        passgen_pattern_free(&pattern);
+        passgen_pattern_free(pattern);
         return PASSGEN_ERROR_PATTERN_PARSE;
     }
 
-    ret = passgen_cli_generate(opts, &pattern);
-    passgen_pattern_free(&pattern);
+    ret = passgen_cli_generate(opts, pattern);
+    passgen_pattern_free(pattern);
     return ret;
 }
 

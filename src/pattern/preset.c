@@ -15,6 +15,6 @@ int passgen_preset_parse(passgen_preset *preset) {
 }
 
 void passgen_preset_free(passgen_preset *preset) {
-    passgen_pattern_free(&preset->pattern);
+    passgen_pattern_deinit(&preset->pattern);
     PASSGEN_CLEAR(preset);
 }

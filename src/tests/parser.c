@@ -29,7 +29,7 @@
 #define POSTAMBLE()                              \
     assert_eq(0, passgen_parse_finish(&parser)); \
     passgen_parser_free(&parser);                \
-    passgen_pattern_free(&parsed_pattern);
+    passgen_pattern_deinit(&parsed_pattern);
 
 #define PARSE_CODEPOINT(codepoint)                                  \
     assert(                                                         \
@@ -308,7 +308,7 @@ test_result test_parser_depth_limit(void) {
 
     assert(0 != passgen_parse_finish(&parser));
     passgen_parser_free(&parser);
-    passgen_pattern_free(&parsed_pattern);
+    passgen_pattern_deinit(&parsed_pattern);
 
     return test_ok;
 }
@@ -536,7 +536,7 @@ test_result test_parser_char_repeat(void) {
     assert(item->repeat.max == 2);
 
     passgen_parser_free(&parser);
-    passgen_pattern_free(&parsed_pattern);
+    passgen_pattern_deinit(&parsed_pattern);
 
     return test_ok;
 }
@@ -935,10 +935,10 @@ const char *pattern_broken[] = {
 /// patterns.
 test_result test_parser_parse_broken(void) {
     for(int i = 0; pattern_broken[i]; i++) {
-        passgen_pattern pattern;
+        passgen_pattern *pattern;
         passgen_error error;
         int ret = passgen_parse(&pattern, &error, pattern_broken[i]);
-        passgen_pattern_free(&pattern);
+        passgen_pattern_free(pattern);
         assert(ret != 0);
     }
 
@@ -1006,11 +1006,11 @@ const char *pattern_working[] = {
 /// Make sure that we can parse patterns that are known to be good.
 test_result test_parser_parse_working(void) {
     for(int i = 0; pattern_working[i]; i++) {
-        passgen_pattern pattern;
+        passgen_pattern *pattern;
         passgen_error error;
         int ret = passgen_parse(&pattern, &error, pattern_working[i]);
         assert(ret == 0);
-        passgen_pattern_free(&pattern);
+        passgen_pattern_free(pattern);
     }
 
     return test_ok;
@@ -1049,10 +1049,10 @@ test_result test_parser_parse_random_selected(void) {
         string[length] = 0;
 
         // Parse the string.
-        passgen_pattern pattern;
+        passgen_pattern *pattern;
         passgen_error error;
         passgen_parse(&pattern, &error, string);
-        passgen_pattern_free(&pattern);
+        passgen_pattern_free(pattern);
     }
 
     passgen_random_free(random);
@@ -1076,10 +1076,10 @@ test_result test_parser_parse_random_ascii_printable(void) {
         string[string_length] = 0;
 
         // Parse the string.
-        passgen_pattern pattern;
+        passgen_pattern *pattern;
         passgen_error error;
         passgen_parse(&pattern, &error, string);
-        passgen_pattern_free(&pattern);
+        passgen_pattern_free(pattern);
     }
 
     passgen_random_free(random);
@@ -1104,7 +1104,7 @@ test_result test_parser_parse_random_unicode(void) {
         passgen_pattern pattern;
         passgen_parser_init(&parser, &pattern);
         passgen_parser_unicode(&parser, string, string_length);
-        passgen_pattern_free(parser.pattern);
+        passgen_pattern_deinit(parser.pattern);
         passgen_parser_free(&parser);
     }
 

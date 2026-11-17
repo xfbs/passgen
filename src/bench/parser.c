@@ -12,7 +12,7 @@ static const char *pattern_fragment =
 struct bench_parser_data {
     size_t repeat;
     const char *input;
-    passgen_pattern pattern;
+    passgen_pattern *pattern;
 };
 
 static double bench_parser_mult(void *raw_data) {
@@ -48,7 +48,7 @@ static void *bench_parser_iterate(void *raw_data) {
 static void bench_parser_cleanup(void *raw_data) {
     struct bench_parser_data *data = raw_data;
     free((void *) data->input);
-    passgen_pattern_free(&data->pattern);
+    passgen_pattern_free(data->pattern);
     memset(data, 0, sizeof(*data));
     free(data);
 }

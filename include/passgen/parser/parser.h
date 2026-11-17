@@ -27,8 +27,8 @@
 ///     // use the pattern
 /// }
 ///
-/// // the pattern has to be freed even if parsing it failed
-/// passgen_pattern_free(&pattern);
+/// // the pattern has to be released even if parsing it failed
+/// passgen_pattern_deinit(&pattern);
 /// ```
 #pragma once
 #include <stdint.h>
@@ -182,7 +182,8 @@ passgen_parser_state *passgen_parser_state_push_special(
 ///
 /// Must be called once before the parser can be used. If @ref pattern is not
 /// supplied, a new pattern will be allocated. This needs to be deallocated
-/// (using @ref passgen_pattern_free and free).
+/// using @ref passgen_pattern_free. A pattern which is supplied has to be
+/// released with @ref passgen_pattern_deinit.
 /// @memberof passgen_parser
 void passgen_parser_init(passgen_parser *parser, passgen_pattern *pattern);
 
