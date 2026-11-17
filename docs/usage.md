@@ -151,21 +151,41 @@ typically the best.
 
 You can customize passgen by writing your own configuration file. On startup,
 passgen will read the system configuration file located at `/etc/passgen.conf`,
-and your use configuration file at `~/.config/passgen.conf`, if either of them
-exist. 
+and then your user configuration file at `~/.config/passgen.conf` (or
+`$XDG_CONFIG_HOME/passgen.conf`, if that variable is set), if they exist.
+Options given on the command line come after both of them.
 
-In these configuration files, you can specify pattern presets and wordlists.
-The syntax for this file looks like this:
+In these configuration files, you can define presets, load wordlists and set
+the source of randomness. Every line starts with what it does, followed by the
+same value that the corresponding command-line option takes: a name and a
+pattern or a path, separated by a colon. Lines starting with `#` are comments.
 
 ```
-preset mypreset [a-z]{8}
-preset otherpreset [a-zA-Z0-9]{18}
-wordlist english /usr/share/dict/words
-wordlist other /usr/share/dict/other
+# presets, as with --define-preset
+preset mypreset:[a-z]{8}
+preset otherpreset:[a-zA-Z0-9]{18}
+
+# wordlists, as with --wordlist
+wordlist english:/usr/share/dict/words
+wordlist other:/usr/share/dict/other
+
+# source of randomness, as with --random
+random system
 ```
 
 If you save this at `~/.config/passgen.conf`, then you can use the presets you
-have defined in there just like any built-in presets.
+have defined in there just like any built-in presets, and the wordlists in any
+pattern:
+
+```
+$ passgen --preset mypreset
+$ passgen '\w{english}(-\w{english}){3}'
+```
+
+!!! warning
+
+    The format of the configuration file is not stable yet, and may change in
+    a future version.
 
 ## Help
 

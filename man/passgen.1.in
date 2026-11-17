@@ -288,6 +288,8 @@ reads the configuration files listed in
 .Sx FILES ,
 if they exist.
 Options on the command line come after the configuration.
+The format of these files is not stable yet, and may change in a future
+version.
 .Pp
 Every line of a configuration file is one of the following.
 Empty lines, and lines which start with
