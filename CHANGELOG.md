@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test vectors for the deterministic randomness sources, with a reference
   implementation to generate them.
 - Fuzzing harnesses, with a script and `fuzz` target to run them.
+- Version macros in `passgen/config.h`.
 
 ### Changed
 - Master passphrase mode uses stronger Argon2 parameters and a longer salt.
@@ -27,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - UTF-8 which ends in the middle of a sequence is rejected.
 - Locking memory is best-effort, and no longer makes large allocations fail.
 - `passgen_random_chacha20_argon2_open()` takes strings.
+- The shared library is versioned (`libpassgen.so.0.2`).
+- `passgen_version_compatible()` requires the same minor version before 1.0.0.
 - Requires CMake 3.16.
 
 ### Fixed
