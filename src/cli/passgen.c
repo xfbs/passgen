@@ -28,7 +28,7 @@
 #include "passgen/wordlist.h"
 
 #define UNUSED(x)              (void) x
-#define strprefix(prefix, str) memcmp(prefix, str, strlen(prefix))
+#define strprefix(prefix, str) strncmp(prefix, str, strlen(prefix))
 
 int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
     if(opts->env.random) {
@@ -614,10 +614,31 @@ void passgen_cli_opts_free(passgen_cli_opts *opts) {
 }
 
 int passgen_cli_opts_config_load(passgen_cli_opts *opts, FILE *file) {
-    // TODO: use something like passgen_buffer to do this
-    char *config = malloc(10240);
-    size_t read = fread(config, 1, 10240, file);
-    config[read] = 0;
+    // read the whole file, however large it is.
+    size_t capacity = 4096;
+    size_t length = 0;
+    char *config = malloc(capacity);
+    if(!config) {
+        return PASSGEN_ERROR_ALLOC;
+    }
+
+    while(true) {
+        // always leaves room for the NUL terminator
+        length += fread(&config[length], 1, capacity - length - 1, file);
+        if(length < capacity - 1) {
+            break;
+        }
+
+        capacity *= 2;
+        char *new_config = realloc(config, capacity);
+        if(!new_config) {
+            free(config);
+            return PASSGEN_ERROR_ALLOC;
+        }
+        config = new_config;
+    }
+
+    config[length] = 0;
     int ret = passgen_cli_opts_config_parse(opts, config);
     free(config);
     return ret;
@@ -687,19 +708,31 @@ int passgen_cli_opts_config_system(passgen_cli_opts *opts) {
 }
 
 int passgen_cli_opts_config_user(passgen_cli_opts *opts) {
-    char config_path[256];
-    const char *xdg_config_path = getenv("XDG_CONFIG_PATH");
-    if(xdg_config_path) {
-        sprintf(config_path, "%s/passgen.conf", xdg_config_path);
-    } else {
-        const char *home = getenv("HOME");
-        if(!home) {
+    // $XDG_CONFIG_HOME is what the XDG base directory specification defines,
+    // $XDG_CONFIG_PATH is what earlier versions of passgen looked at.
+    const char *dir = getenv("XDG_CONFIG_HOME");
+    if(!dir || !*dir) {
+        dir = getenv("XDG_CONFIG_PATH");
+    }
+
+    const char *suffix = "/passgen.conf";
+    if(!dir || !*dir) {
+        dir = getenv("HOME");
+        suffix = "/.config/passgen.conf";
+        if(!dir) {
             fprintf(stderr, "warning: cannot locate home directory\n");
             return 0;
         }
-        sprintf(config_path, "%s/.config/passgen.conf", home);
     }
+
+    size_t config_path_len = strlen(dir) + strlen(suffix) + 1;
+    char *config_path = malloc(config_path_len);
+    if(!config_path) {
+        return PASSGEN_ERROR_ALLOC;
+    }
+    snprintf(config_path, config_path_len, "%s%s", dir, suffix);
     FILE *file = fopen(config_path, "r");
+    free(config_path);
     if(file) {
         int ret = passgen_cli_opts_config_load(opts, file);
         fclose(file);
