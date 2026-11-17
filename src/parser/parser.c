@@ -564,6 +564,10 @@ int passgen_parse_special_name(
     (void) parser;
 
     if(token->codepoint == '}') {
+        // there has to be a name, as in `\w{name}`.
+        if(state->data.special.special->parameters_len == 0) {
+            return PASSGEN_ERROR_SPECIAL;
+        }
         passgen_stack_pop(&parser->state, NULL);
     } else {
         passgen_pattern_special_push(

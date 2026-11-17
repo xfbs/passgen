@@ -14,6 +14,7 @@
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/special.h"
+#include "passgen/util/error.h"
 #include "passgen/util/utf8.h"
 #include "passgen/wordlist.h"
 #include "try.h"
@@ -25,19 +26,40 @@ typedef struct {
     passgen_env *env;
     size_t depth;
     double *entropy;
+    passgen_error *error;
     void *data;
     passgen_generate_cb *func;
 } passgen_generate_context;
 
+// Fail, for the given reason. Everything below returns a passgen_status as an
+// int, so that it can be passed up with try().
+static inline int fail(passgen_generate_context *context, passgen_status kind) {
+    return passgen_error_set(context->error, kind);
+}
+
+// Fail because of something to do with a wordlist, which is named.
+static inline int fail_wordlist(
+    passgen_generate_context *context,
+    passgen_status kind,
+    const char *name) {
+    passgen_error_set(context->error, kind);
+    passgen_error_detail_set(context->error, name);
+    return kind;
+}
+
 // Emit a character
 static inline int emit(passgen_generate_context *context, uint32_t codepoint) {
-    return context->func(context->data, codepoint);
+    if(0 != context->func(context->data, codepoint)) {
+        return fail(context, PASSGEN_ERROR_ABORTED);
+    }
+
+    return PASSGEN_OK;
 }
 
 // Recurse
 static inline int descend(passgen_generate_context *context) {
     if(!context->depth) {
-        return 1;
+        return fail(context, PASSGEN_ERROR_DEPTH_LIMIT);
     }
 
     context->depth -= 1;
@@ -84,22 +106,27 @@ static int passgen_generate_segment(
     passgen_generate_context *context,
     const passgen_pattern_segment *segment);
 
+// the callbacks which fill a buffer can only say that generating should stop,
+// so they remember why here.
 struct fillpos {
     uint32_t *buffer;
     size_t cur;
     size_t len;
+    passgen_status status;
 };
 
 struct fillpos_utf8 {
     uint8_t *buffer;
     size_t cur;
     size_t len;
+    passgen_status status;
 };
 
 static int passgen_generate_write_buffer(void *data, uint32_t codepoint) {
     struct fillpos *fillpos = data;
 
     if(fillpos->cur == fillpos->len) {
+        fillpos->status = PASSGEN_ERROR_BUFFER_TOO_SMALL;
         return -1;
     }
 
@@ -113,6 +140,7 @@ static int passgen_generate_write_buffer_utf8(void *data, uint32_t codepoint) {
     struct fillpos_utf8 *fillpos = data;
 
     if(fillpos->cur == fillpos->len) {
+        fillpos->status = PASSGEN_ERROR_BUFFER_TOO_SMALL;
         return -1;
     }
 
@@ -123,6 +151,7 @@ static int passgen_generate_write_buffer_utf8(void *data, uint32_t codepoint) {
 
         if(bytes < 0) {
             // error happened during encoding.
+            fillpos->status = PASSGEN_ERROR_INTERNAL;
             return -1;
         }
 
@@ -134,6 +163,7 @@ static int passgen_generate_write_buffer_utf8(void *data, uint32_t codepoint) {
 
         if(bytes < 0) {
             // error happened during encoding.
+            fillpos->status = PASSGEN_ERROR_INTERNAL;
             return -1;
         }
 
@@ -142,6 +172,7 @@ static int passgen_generate_write_buffer_utf8(void *data, uint32_t codepoint) {
             fillpos->cur += bytes;
         } else {
             // error: encoded doesn't fit in buffer.
+            fillpos->status = PASSGEN_ERROR_BUFFER_TOO_SMALL;
             return -1;
         }
     }
@@ -155,6 +186,7 @@ passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
     struct fillpos_utf8 *fillpos = data;
 
     if(fillpos->cur == fillpos->len) {
+        fillpos->status = PASSGEN_ERROR_BUFFER_TOO_SMALL;
         return -1;
     }
 
@@ -201,6 +233,7 @@ passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
 
     // check that no error happened.
     if(bytes <= 0) {
+        fillpos->status = PASSGEN_ERROR_INTERNAL;
         return -1;
     }
 
@@ -209,88 +242,89 @@ passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
         memcpy(&fillpos->buffer[fillpos->cur], &buffer[0], bytes);
         fillpos->cur += bytes;
     } else {
+        fillpos->status = PASSGEN_ERROR_BUFFER_TOO_SMALL;
         return -1;
     }
 
     return 0;
 }
 
-size_t passgen_generate_fill_unicode(
+// Runs a callback which fills a buffer, and works out the status from what
+// it has to say about why it stopped.
+#define PASSGEN_GENERATE_FILL(fillpos, callback)                             \
+    do {                                                                     \
+        passgen_status status = passgen_generate(                            \
+            pattern,                                                         \
+            env,                                                             \
+            error,                                                           \
+            entropy,                                                         \
+            &fillpos,                                                        \
+            callback);                                                       \
+                                                                             \
+        /* if the callback is what stopped it, it knows the reason. */       \
+        if(status == PASSGEN_ERROR_ABORTED && fillpos.status != PASSGEN_OK) { \
+            status = passgen_error_set(error, fillpos.status);               \
+        }                                                                    \
+                                                                             \
+        if(written) {                                                        \
+            *written = (status == PASSGEN_OK) ? fillpos.cur : 0;             \
+        }                                                                    \
+                                                                             \
+        return status;                                                       \
+    } while(0)
+
+passgen_status passgen_generate_fill_unicode(
     const passgen_pattern *pattern,
     passgen_env *env,
+    passgen_error *error,
     double *entropy,
     uint32_t *buffer,
-    size_t len) {
+    size_t len,
+    size_t *written) {
     struct fillpos fillpos = {
         .buffer = buffer,
         .len = len,
         .cur = 0,
+        .status = PASSGEN_OK,
     };
 
-    int ret = passgen_generate(
-        pattern,
-        env,
-        entropy,
-        &fillpos,
-        passgen_generate_write_buffer);
-
-    if(ret != 0) {
-        return 0;
-    }
-
-    return fillpos.cur;
+    PASSGEN_GENERATE_FILL(fillpos, passgen_generate_write_buffer);
 }
 
-size_t passgen_generate_fill_utf8(
+passgen_status passgen_generate_fill_utf8(
     const passgen_pattern *pattern,
     passgen_env *env,
+    passgen_error *error,
     double *entropy,
     uint8_t *buffer,
-    size_t len) {
+    size_t len,
+    size_t *written) {
     struct fillpos_utf8 fillpos = {
         .buffer = buffer,
         .len = len,
         .cur = 0,
+        .status = PASSGEN_OK,
     };
 
-    int ret = passgen_generate(
-        pattern,
-        env,
-        entropy,
-        &fillpos,
-        passgen_generate_write_buffer_utf8);
-
-    if(ret != 0) {
-        return 0;
-    }
-
-    return fillpos.cur;
+    PASSGEN_GENERATE_FILL(fillpos, passgen_generate_write_buffer_utf8);
 }
 
-size_t passgen_generate_fill_json_utf8(
+passgen_status passgen_generate_fill_json_utf8(
     const passgen_pattern *pattern,
     passgen_env *env,
+    passgen_error *error,
     double *entropy,
     uint8_t *buffer,
-    size_t len) {
+    size_t len,
+    size_t *written) {
     struct fillpos_utf8 fillpos = {
         .buffer = buffer,
         .len = len,
         .cur = 0,
+        .status = PASSGEN_OK,
     };
 
-    int ret = passgen_generate(
-        pattern,
-        env,
-        entropy,
-        &fillpos,
-        passgen_generate_write_buffer_json_utf8);
-
-    if(ret != 0) {
-        return 0;
-    }
-
-    return fillpos.cur;
+    PASSGEN_GENERATE_FILL(fillpos, passgen_generate_write_buffer_json_utf8);
 }
 
 static size_t passgen_generate_repeat(
@@ -370,14 +404,15 @@ static int passgen_generate_literal(
 static int passgen_generate_special_markov(
     passgen_generate_context *context,
     const passgen_pattern_special *special) {
+    const char *name = special->parameters;
     passgen_hashmap_entry *entry =
-        passgen_hashmap_lookup(&context->env->wordlists, special->parameters);
+        passgen_hashmap_lookup(&context->env->wordlists, name);
     if(!entry) {
-        return -1;
+        return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_NOT_FOUND, name);
     }
     passgen_wordlist *wordlist = entry->value;
-    if(!wordlist->parsed) {
-        try(passgen_wordlist_parse(wordlist));
+    if(!wordlist->parsed && 0 != passgen_wordlist_parse(wordlist)) {
+        return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_READ, name);
     }
     if(!wordlist->parsed_markov) {
         passgen_wordlist_parse_markov(wordlist);
@@ -386,7 +421,7 @@ static int passgen_generate_special_markov(
 
     // an empty markov chain (from an empty wordlist) cannot generate anything.
     if(markov->count == 0) {
-        return -1;
+        return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_EMPTY, name);
     }
 
     // sliding window of the previous `level` codepoints (initially all zero,
@@ -415,19 +450,20 @@ static int passgen_generate_special_markov(
 static int passgen_generate_special_wordlist(
     passgen_generate_context *context,
     const passgen_pattern_special *special) {
+    const char *name = special->parameters;
     passgen_hashmap_entry *entry =
-        passgen_hashmap_lookup(&context->env->wordlists, special->parameters);
+        passgen_hashmap_lookup(&context->env->wordlists, name);
     if(!entry) {
-        return -1;
+        return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_NOT_FOUND, name);
     }
     passgen_wordlist *wordlist = entry->value;
-    if(!wordlist->parsed) {
-        try(passgen_wordlist_parse(wordlist));
+    if(!wordlist->parsed && 0 != passgen_wordlist_parse(wordlist)) {
+        return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_READ, name);
     }
 
     // cannot pick a word from an empty wordlist.
     if(passgen_wordlist_count(wordlist) == 0) {
-        return -1;
+        return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_EMPTY, name);
     }
 
     // pick word at random
@@ -448,7 +484,8 @@ static int passgen_generate_special_wordlist(
             &word_pos,
             word_end - word_pos);
         if(decode_ret < PASSGEN_UTF8_SUCCESS) {
-            return -1;
+            // the word which was picked is not valid UTF-8.
+            return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_READ, name);
         }
         for(size_t i = 0; &codepoints[i] < codepoints_pos; i++) {
             try(emit(context, codepoints[i]));
@@ -474,9 +511,10 @@ static int passgen_generate_special_preset(
 static int passgen_generate_special(
     passgen_generate_context *context,
     const passgen_pattern_special *special) {
-    // without a name (as in `\w{}`), there is nothing to look up.
+    // the parser does not let through a wordlist without a name (as in
+    // `\w{}`), but a pattern which was built by hand may have one.
     if(!special->parameters) {
-        return -1;
+        return fail(context, PASSGEN_ERROR_INTERNAL);
     }
 
     switch(special->kind) {
@@ -487,9 +525,8 @@ static int passgen_generate_special(
         case PASSGEN_PATTERN_SPECIAL_PRESET:
             return passgen_generate_special_preset(context, special);
         default:
-            return 1;
+            return fail(context, PASSGEN_ERROR_INTERNAL);
     }
-    return 0;
 }
 
 static int passgen_generate_item(
@@ -552,8 +589,9 @@ static int passgen_generate_group(
     // descend in depth
     try(descend(context));
 
+    // every segment of the group has a multiplier of zero.
     if(group->multiplier_sum == 0) {
-        return 1;
+        return fail(context, PASSGEN_ERROR_GROUP_EMPTY);
     }
 
     // choose random segment from segments
@@ -573,7 +611,7 @@ static int passgen_generate_group(
     // multipliers of the segments add up to, which would be a bug in the
     // parser.
     if(!segment) {
-        return -1;
+        return fail(context, PASSGEN_ERROR_INTERNAL);
     }
 
     // keep track of entropy
@@ -591,9 +629,10 @@ static int passgen_generate_group(
     return 0;
 }
 
-int passgen_generate(
+passgen_status passgen_generate(
     const passgen_pattern *pattern,
     passgen_env *env,
+    passgen_error *error,
     double *entropy,
     void *data,
     passgen_generate_cb *func) {
@@ -609,7 +648,8 @@ int passgen_generate(
         .func = func,
         .data = data,
         .entropy = entropy,
+        .error = error,
     };
 
-    return passgen_generate_group(&context, &pattern->group);
+    return (passgen_status) passgen_generate_group(&context, &pattern->group);
 }

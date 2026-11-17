@@ -66,10 +66,27 @@ typedef enum passgen_status {
     /// optional, such as `?a`.
     PASSGEN_ERROR_OPTIONAL,
     /// A wordlist is referred to without a name in braces following it, such
-    /// as `\wabc` or `\w{abc`.
+    /// as `\wabc`, `\w{abc` or `\w{}`.
     PASSGEN_ERROR_SPECIAL,
     /// Groups are nested more deeply than the limit.
     PASSGEN_ERROR_DEPTH_LIMIT,
+
+    /// The pattern uses a wordlist which is not in the environment. The
+    /// detail of the error is its name.
+    PASSGEN_ERROR_WORDLIST_NOT_FOUND,
+    /// The pattern uses a wordlist which does not have any words. The detail
+    /// of the error is its name.
+    PASSGEN_ERROR_WORDLIST_EMPTY,
+    /// The pattern uses a wordlist which could not be read, or which has
+    /// words that are not valid UTF-8. The detail of the error is its name.
+    PASSGEN_ERROR_WORDLIST_READ,
+    /// All of the segments of a group have a multiplier of zero, such as
+    /// `{0}a`, so there is nothing to choose from.
+    PASSGEN_ERROR_GROUP_EMPTY,
+    /// What was generated does not fit into the buffer for it.
+    PASSGEN_ERROR_BUFFER_TOO_SMALL,
+    /// The callback which is given what is generated asked to stop.
+    PASSGEN_ERROR_ABORTED,
 } passgen_status;
 
 /// A position in a pattern. Both count from zero.

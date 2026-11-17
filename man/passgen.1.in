@@ -361,8 +361,10 @@ before it.
 There is no preset with this name, or the definition of a preset is not
 valid.
 .It 9
-Generating failed, because the pattern uses a wordlist which was not loaded
-or is empty, or because it is nested more deeply than the depth limit.
+Generating failed, for example because the pattern uses a wordlist which was
+not loaded or is empty, or because it is nested more deeply than the depth
+limit.
+The message says which.
 .It 10
 A wordlist could not be opened, or its definition is not valid.
 .It 11

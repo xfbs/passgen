@@ -41,7 +41,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
             double entropy;
             size_t budget = FUZZ_OUTPUT_BUDGET;
-            passgen_generate(pattern, env, &entropy, &budget, fuzz_output);
+            passgen_generate(pattern, env, NULL, &entropy, &budget, fuzz_output);
         } else if(file) {
             fclose(file);
         }

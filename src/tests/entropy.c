@@ -19,12 +19,15 @@ double entropy(const char *p) {
     passgen_env *env = passgen_env_new(&random);
     double entropy = NAN;
     if(env) {
-        int length = passgen_generate_fill_utf8(
+        size_t length = 0;
+        passgen_generate_fill_utf8(
             pattern,
             env,
+            NULL,
             &entropy,
             &buffer[0],
-            buffer_len);
+            buffer_len,
+            &length);
         buffer[length] = 0;
     }
     passgen_env_free(env);

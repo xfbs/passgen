@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   all of what is wrong.
 - `passgen_parse()` returns a `passgen_status`. `passgen_error` has the kind of
   error, where it is, and what it was caused by.
+- The functions for generating return a `passgen_status`, take an error to
+  fill in, and return the length through a pointer. Failing to generate says
+  why, such as which wordlist is missing.
+- A wordlist without a name (`\w{}`) is not a valid pattern.
 - Entropy is in bits in the API, rather than a number of possibilities.
 - Empty sets (`[]`) are rejected.
 - `passgen_random_chacha20_argon2_open()` takes `passgen_argon2_params`.

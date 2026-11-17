@@ -64,7 +64,14 @@ int main(void) {
 
     // without the wordlist, this cannot be generated.
     uint8_t output[64];
-    check(0 == passgen_generate_fill_utf8(pattern, env, NULL, output, 63));
+    size_t length = 0;
+    check(
+        PASSGEN_ERROR_WORDLIST_NOT_FOUND ==
+        passgen_generate_fill_utf8(pattern, env, &error, NULL, output, 63, &length));
+    check(length == 0);
+    check(error.kind == PASSGEN_ERROR_WORDLIST_NOT_FOUND);
+    check(0 == strcmp(error.detail, "words"));
+    passgen_error_free(&error);
 
     FILE *file = tmpfile();
     check(file != NULL);
@@ -72,8 +79,14 @@ int main(void) {
     check(0 == passgen_env_wordlist_add(env, "words", file, 3));
 
     double entropy = 0;
-    size_t length =
-        passgen_generate_fill_utf8(pattern, env, &entropy, output, 63);
+    passgen_generate_fill_utf8(
+        pattern,
+        env,
+        NULL,
+        &entropy,
+        output,
+        63,
+        &length);
     output[length] = 0;
     check(length >= strlen("alpha-abcd"));
     check(strchr((const char *) output, '-') != NULL);
@@ -82,23 +95,43 @@ int main(void) {
     check(entropy < 20.40);
 
     uint32_t codepoints[64];
-    check(0 != passgen_generate_fill_unicode(pattern, env, NULL, codepoints, 64));
-    check(0 != passgen_generate_fill_json_utf8(pattern, env, NULL, output, 63));
+    check(
+        PASSGEN_OK ==
+        passgen_generate_fill_unicode(pattern, env, NULL, NULL, codepoints, 64, &length));
+    check(length >= strlen("alpha-abcd"));
+    check(
+        PASSGEN_OK ==
+        passgen_generate_fill_json_utf8(pattern, env, NULL, NULL, output, 63, &length));
+    check(length >= strlen("alpha-abcd"));
+
+    // a buffer which is too small is an error, and not the same as nothing
+    // being generated.
+    check(
+        PASSGEN_ERROR_BUFFER_TOO_SMALL ==
+        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 3, &length));
+    check(length == 0);
 
     size_t codepoint_count = 0;
-    check(0 == passgen_generate(pattern, env, NULL, &codepoint_count, count));
+    check(0 == passgen_generate(pattern, env, NULL, NULL, &codepoint_count, count));
     check(codepoint_count >= strlen("alpha-abcd"));
 
     // with a depth limit of zero, nothing can be generated.
     passgen_env_depth_limit_set(env, 0);
-    check(0 != passgen_generate(pattern, env, NULL, &codepoint_count, count));
+    check(0 != passgen_generate(pattern, env, NULL, NULL, &codepoint_count, count));
 
     // another source of randomness can be set later.
     passgen_random *zero = passgen_random_open(NULL, "zero");
     check(zero != NULL);
     passgen_env_random_set(env, zero);
     passgen_env_depth_limit_set(env, 100);
-    length = passgen_generate_fill_utf8(pattern, env, NULL, output, 63);
+    passgen_generate_fill_utf8(
+        pattern,
+        env,
+        NULL,
+        NULL,
+        output,
+        63,
+        &length);
     output[length] = 0;
     check(0 == strcmp((const char *) output, "alpha-aaaa"));
 

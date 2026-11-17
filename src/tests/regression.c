@@ -305,12 +305,15 @@ test_result test_regression_parse_unicode_syntax(void) {
         // they are literals, so the pattern generates itself.
         uint8_t output[32] = {0};
         assert(0 == passgen_parse(&pattern, &error, patterns[i]));
-        size_t len = passgen_generate_fill_utf8(
+        size_t len = 0;
+        passgen_generate_fill_utf8(
             pattern,
             env,
             NULL,
+            NULL,
             output,
-            sizeof(output) - 1);
+            sizeof(output) - 1,
+            &len);
         output[len] = 0;
         assert_streq((const char *) output, patterns[i]);
         passgen_pattern_free(pattern);
@@ -338,24 +341,29 @@ test_result test_regression_parse_escaped_question_mark(void) {
 
     uint8_t output[32] = {0};
     assert(0 == passgen_parse(&pattern, &error, "why\\?\\?{2}(\\?)"));
-    size_t len = passgen_generate_fill_utf8(
+    size_t len = 0;
+    passgen_generate_fill_utf8(
         pattern,
         env,
         NULL,
+        NULL,
         output,
-        sizeof(output) - 1);
+        sizeof(output) - 1,
+        &len);
     output[len] = 0;
     assert_streq((const char *) output, "why????");
     passgen_pattern_free(pattern);
 
     // in a set, it does not have a meaning, and is not escaped.
     assert(0 == passgen_parse(&pattern, &error, "[?]"));
-    len = passgen_generate_fill_utf8(
+    passgen_generate_fill_utf8(
         pattern,
         env,
         NULL,
+        NULL,
         output,
-        sizeof(output) - 1);
+        sizeof(output) - 1,
+        &len);
     output[len] = 0;
     assert_streq((const char *) output, "?");
     passgen_pattern_free(pattern);
@@ -399,12 +407,15 @@ test_result test_regression_parse_set_escapes(void) {
         size_t expected_len = strlen(sets[i][1]);
         for(size_t n = 0; n < 200; n++) {
             uint8_t output[8] = {0};
-            size_t len = passgen_generate_fill_utf8(
+            size_t len = 0;
+            passgen_generate_fill_utf8(
                 pattern,
                 env,
                 NULL,
+                NULL,
                 output,
-                sizeof(output) - 1);
+                sizeof(output) - 1,
+                &len);
             assert(len == 1);
             const char *found = strchr(sets[i][1], output[0]);
             assert(found);
@@ -470,12 +481,12 @@ test_result test_regression_entropy_maybe(void) {
     size_t count = 0;
 
     assert(0 == passgen_parse(&pattern, &error, "a?"));
-    assert(0 == passgen_generate(pattern, env, &entropy, &count, count_codepoints));
+    assert(0 == passgen_generate(pattern, env, NULL, &entropy, &count, count_codepoints));
     assert(fabs(entropy - 1.0) < 0.0001);
     passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "a?[ab]?(c|d)?"));
-    assert(0 == passgen_generate(pattern, env, &entropy, &count, count_codepoints));
+    assert(0 == passgen_generate(pattern, env, NULL, &entropy, &count, count_codepoints));
     // with the zero randomness source, every optional item is emitted, so
     // this is one bit for each of them, and one each for the set and the
     // group.
@@ -504,21 +515,21 @@ test_result test_regression_entropy_large(void) {
 
     // 300 lowercase letters have about 1410 bits.
     assert(0 == passgen_parse(&pattern, &error, "[a-z]{300}"));
-    assert(0 == passgen_generate(pattern, env, &entropy, &count, count_codepoints));
+    assert(0 == passgen_generate(pattern, env, NULL, &entropy, &count, count_codepoints));
     assert(isfinite(entropy));
     assert(fabs(entropy - 300 * log2(26)) < 0.001);
     passgen_pattern_free(pattern);
 
     // something which always generates the same has none.
     assert(0 == passgen_parse(&pattern, &error, "abc(def){3}"));
-    assert(0 == passgen_generate(pattern, env, &entropy, &count, count_codepoints));
+    assert(0 == passgen_generate(pattern, env, NULL, &entropy, &count, count_codepoints));
     assert(entropy == 0.0);
     passgen_pattern_free(pattern);
 
     // a segment which is more likely to be chosen has less. with the zero
     // source of randomness, the first one is chosen, which is three of four.
     assert(0 == passgen_parse(&pattern, &error, "{3}a|b"));
-    assert(0 == passgen_generate(pattern, env, &entropy, &count, count_codepoints));
+    assert(0 == passgen_generate(pattern, env, NULL, &entropy, &count, count_codepoints));
     assert(fabs(entropy - (log2(4) - log2(3))) < 0.0001);
     passgen_pattern_free(pattern);
 
@@ -541,12 +552,15 @@ test_result test_regression_json_control_chars(void) {
     assert(0 == passgen_parse(&pattern, &error, "\x01\t\"[\\\\]"));
 
     uint8_t buffer[64] = {0};
-    size_t len = passgen_generate_fill_json_utf8(
+    size_t len = 0;
+    passgen_generate_fill_json_utf8(
         pattern,
         env,
         NULL,
+        NULL,
         buffer,
-        sizeof(buffer) - 1);
+        sizeof(buffer) - 1,
+        &len);
     buffer[len] = 0;
     assert_streq((const char *) buffer, "\\u0001\\t\\\"\\\\");
 
@@ -607,11 +621,11 @@ test_result test_regression_wordlist_empty(void) {
     env = wordlist_env(&random, "zero", NULL, 0, 3);
     assert(env);
     assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
-    assert(0 != passgen_generate(pattern, env, NULL, &count, count_codepoints));
+    assert(0 != passgen_generate(pattern, env, NULL, NULL, &count, count_codepoints));
     passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "\\m{list}"));
-    assert(0 != passgen_generate(pattern, env, NULL, &count, count_codepoints));
+    assert(0 != passgen_generate(pattern, env, NULL, NULL, &count, count_codepoints));
     passgen_pattern_free(pattern);
     passgen_env_free(env);
     passgen_random_free(random);
@@ -622,7 +636,7 @@ test_result test_regression_wordlist_empty(void) {
     env = passgen_env_new(random);
     assert(env);
     assert(0 == passgen_parse(&pattern, &error, "\\w{nope}\\m{nope}"));
-    assert(0 != passgen_generate(pattern, env, NULL, &count, count_codepoints));
+    assert(0 != passgen_generate(pattern, env, NULL, NULL, &count, count_codepoints));
     passgen_pattern_free(pattern);
     passgen_env_free(env);
     passgen_random_free(random);
@@ -631,28 +645,17 @@ test_result test_regression_wordlist_empty(void) {
 }
 
 /// A wordlist without a name (as in `\w{}`) used to be looked up using a null
-/// pointer, which crashed as soon as any wordlist was defined.
+/// pointer, which crashed as soon as any wordlist was defined. It is not a
+/// valid pattern now.
 test_result test_regression_wordlist_no_name(void) {
     passgen_pattern *pattern;
-    passgen_error error;
-    passgen_random *random;
-    passgen_env *env;
-    char data[] = "alpha\nbravo\n";
-    size_t count = 0;
 
-    env = wordlist_env(&random, "zero", data, strlen(data), 2);
-    assert(env);
+    assert(PASSGEN_ERROR_SPECIAL == passgen_parse(&pattern, NULL, "\\w{}"));
+    assert(PASSGEN_ERROR_SPECIAL == passgen_parse(&pattern, NULL, "\\m{}"));
+    assert(PASSGEN_ERROR_SPECIAL == passgen_parse(&pattern, NULL, "a\\w{}b"));
 
-    assert(0 == passgen_parse(&pattern, &error, "\\w{}"));
-    assert(0 != passgen_generate(pattern, env, NULL, &count, count_codepoints));
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\w{a}"));
     passgen_pattern_free(pattern);
-
-    assert(0 == passgen_parse(&pattern, &error, "\\m{}"));
-    assert(0 != passgen_generate(pattern, env, NULL, &count, count_codepoints));
-    passgen_pattern_free(pattern);
-
-    passgen_env_free(env);
-    passgen_random_free(random);
 
     return test_ok;
 }
@@ -676,7 +679,7 @@ test_result test_regression_wordlist_long_words(void) {
 
     size_t count = 0;
     assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
-    assert(0 == passgen_generate(pattern, env, NULL, &count, count_codepoints));
+    assert(0 == passgen_generate(pattern, env, NULL, NULL, &count, count_codepoints));
     assert_eq(count, word_len);
     passgen_pattern_free(pattern);
 
@@ -687,7 +690,7 @@ test_result test_regression_wordlist_long_words(void) {
     assert(0 == passgen_parse(&pattern, &error, "\\m{list}{100}"));
     assert(
         0 ==
-        passgen_generate(pattern, env, &entropy, &count, count_codepoints));
+        passgen_generate(pattern, env, NULL, &entropy, &count, count_codepoints));
     assert(count > 128 * 100);
     assert(entropy > 0.0);
     passgen_pattern_free(pattern);
@@ -717,12 +720,15 @@ test_result test_regression_wordlist_redefine(void) {
 
     uint8_t buffer[32] = {0};
     assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
-    size_t len = passgen_generate_fill_utf8(
+    size_t len = 0;
+    passgen_generate_fill_utf8(
         pattern,
         env,
         NULL,
+        NULL,
         buffer,
-        sizeof(buffer) - 1);
+        sizeof(buffer) - 1,
+        &len);
     buffer[len] = 0;
     assert_streq((const char *) buffer, "second");
 

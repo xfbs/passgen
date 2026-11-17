@@ -45,12 +45,15 @@
                                                                            \
         assert(token_parser_state == PASSGEN_TOKEN_INIT);                  \
         assert(0 == passgen_parse_finish(&parser));                        \
-        size_t len = passgen_generate_fill_unicode(                        \
+        size_t len = 0;                                                    \
+        passgen_generate_fill_unicode(                                     \
             parser.pattern,                                                \
             env,                                                           \
             NULL,                                                          \
+            NULL,                                                          \
             output,                                                        \
-            sizeof(output));                                               \
+            sizeof(output),                                                \
+            &len);                                                         \
         output[len] = 0;                                                   \
                                                                            \
         passgen_parser_free(&parser);                                      \
@@ -147,12 +150,15 @@ generates_exactly(const char *pattern_string, const char *const *expected) {
     // fixed, this is deterministic anyways.
     for(size_t i = 0; okay && seen_count < expected_len && i < 10000; i++) {
         uint8_t output[64];
-        size_t len = passgen_generate_fill_utf8(
+        size_t len = 0;
+        passgen_generate_fill_utf8(
             pattern,
             env,
             NULL,
+            NULL,
             output,
-            sizeof(output) - 1);
+            sizeof(output) - 1,
+            &len);
         output[len] = 0;
 
         okay = false;
@@ -283,7 +289,7 @@ test_result test_generate_depth_limit_zero(void) {
     assert(env);
     passgen_env_depth_limit_set(env, 0);
 
-    int ret = passgen_generate(pattern, env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, env, NULL, NULL, NULL, dummy_callback);
 
     // can't generate
     assert(ret != 0);
@@ -307,7 +313,7 @@ test_result test_generate_depth_limit_one(void) {
     assert(env);
     passgen_env_depth_limit_set(env, 1);
 
-    int ret = passgen_generate(pattern, env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, env, NULL, NULL, NULL, dummy_callback);
     assert_eq(ret, 0);
 
     passgen_pattern_free(pattern);
@@ -329,7 +335,7 @@ test_result test_generate_depth_limit_one_over(void) {
     assert(env);
     passgen_env_depth_limit_set(env, 1);
 
-    int ret = passgen_generate(pattern, env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, env, NULL, NULL, NULL, dummy_callback);
     assert(ret != 0);
 
     passgen_pattern_free(pattern);
@@ -351,7 +357,7 @@ test_result test_generate_depth_limit_two(void) {
     assert(env);
     passgen_env_depth_limit_set(env, 2);
 
-    int ret = passgen_generate(pattern, env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, env, NULL, NULL, NULL, dummy_callback);
     assert(ret == 0);
 
     passgen_pattern_free(pattern);
@@ -373,7 +379,7 @@ test_result test_generate_depth_limit_two_over(void) {
     assert(env);
     passgen_env_depth_limit_set(env, 2);
 
-    int ret = passgen_generate(pattern, env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, env, NULL, NULL, NULL, dummy_callback);
     assert(ret != 0);
 
     passgen_pattern_free(pattern);

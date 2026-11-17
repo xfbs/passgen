@@ -164,6 +164,23 @@ static int passgen_cli_buffer_emit(void *data, uint32_t codepoint) {
     return passgen_cli_buffer_push(buffer, encoded, bytes);
 }
 
+/// Reports why generating failed, and returns what to exit with.
+static int
+passgen_cli_generate_error(passgen_status status, passgen_error *error) {
+    // the only reason for the callback to stop generating is that the buffer
+    // for the output could not be made larger.
+    if(status == PASSGEN_ERROR_ABORTED) {
+        passgen_error_free(error);
+        return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+    }
+
+    fprintf(stderr, "\033[1;31merror\033[0m: ");
+    passgen_error_print(error, stderr);
+    passgen_error_free(error);
+
+    return PASSGEN_CLI_ERROR_GENERATE;
+}
+
 int passgen_cli_generate_normal(
     passgen_cli_opts opts,
     passgen_pattern *pattern) {
@@ -172,16 +189,18 @@ int passgen_cli_generate_normal(
 
     for(size_t i = 0; i < opts.amount; ++i) {
         double entropy;
+        passgen_error error;
         buffer.len = 0;
-        int ret = passgen_generate(
+        passgen_status status = passgen_generate(
             pattern,
             opts.env,
+            &error,
             opts.entropy ? &entropy : NULL,
             &buffer,
             passgen_cli_buffer_emit);
-        if(ret != 0) {
+        if(status != PASSGEN_OK) {
             free(buffer.data);
-            return passgen_cli_bail(PASSGEN_CLI_ERROR_GENERATE, NULL);
+            return passgen_cli_generate_error(status, &error);
         }
 
         if(opts.entropy) {
@@ -204,6 +223,8 @@ int passgen_cli_generate_json(passgen_cli_opts opts, passgen_pattern *pattern) {
     // the whole document is collected first, so that nothing is printed (rather
     // than truncated JSON) when generating fails.
     passgen_cli_buffer buffer = {.json = true};
+
+    // this is nonzero when the buffer could not be made larger.
     int ret = passgen_cli_buffer_puts(&buffer, "[");
 
     for(size_t i = 0; ret == 0 && i < opts.amount; ++i) {
@@ -215,14 +236,17 @@ int passgen_cli_generate_json(passgen_cli_opts opts, passgen_pattern *pattern) {
             break;
         }
 
-        ret = passgen_generate(
+        passgen_error error;
+        passgen_status status = passgen_generate(
             pattern,
             opts.env,
+            &error,
             opts.entropy ? &entropy : NULL,
             &buffer,
             passgen_cli_buffer_emit);
-        if(ret != 0) {
-            break;
+        if(status != PASSGEN_OK) {
+            free(buffer.data);
+            return passgen_cli_generate_error(status, &error);
         }
 
         if(opts.entropy) {
@@ -244,7 +268,7 @@ int passgen_cli_generate_json(passgen_cli_opts opts, passgen_pattern *pattern) {
 
     if(ret != 0) {
         free(buffer.data);
-        return passgen_cli_bail(PASSGEN_CLI_ERROR_GENERATE, NULL);
+        return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
     }
 
     fwrite(buffer.data, 1, buffer.len, stdout);
@@ -689,10 +713,7 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
                 *((const int *) data));
             break;
         case PASSGEN_CLI_ERROR_GENERATE:
-            fprintf(
-                stderr,
-                "\033[1;31merror\033[0m: failed to generate output (unknown "
-                "or empty wordlist, or depth limit exceeded)\n");
+            // what went wrong was printed by whoever noticed.
             break;
         case PASSGEN_CLI_ERROR_ALLOC:
             fprintf(stderr, "\033[1;31merror\033[0m: out of memory\n");

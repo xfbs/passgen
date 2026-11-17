@@ -64,12 +64,15 @@ static bool vector_check(const vector *vector, passgen_random *random) {
     if(okay) {
         // none of the vectors are longer than this
         static uint8_t output[2048];
-        size_t length = passgen_generate_fill_utf8(
+        size_t length = 0;
+        passgen_generate_fill_utf8(
             pattern,
             env,
             NULL,
+            NULL,
             output,
-            sizeof(output) - 1);
+            sizeof(output) - 1,
+            &length);
         output[length] = 0;
 
         okay = (0 == strcmp((const char *) output, vector->expected));

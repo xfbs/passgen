@@ -226,5 +226,21 @@ fails $passgen --nonexistent-option
 fails $passgen "a" "b"
 fails $passgen -p apple1 "a"
 
+# errors say what is wrong. the colors are left out for comparing.
+function error_of() {
+    "$@" 2>&1 >/dev/null | sed $'s/\033\\[[0-9;]*m//g' | head -n 1
+}
+
+test "$(error_of $passgen '[]')" = "error in pattern: set is empty"
+test "$(error_of $passgen '(abc')" = "error in pattern: group is not closed"
+test "$(error_of $passgen 'a{5,2}')" = "error in pattern: invalid repetition"
+test "$(error_of $passgen 'a\q')" = "error in pattern: unknown escape sequence"
+test "$(error_of $passgen '\w{}')" = "error in pattern: expected a name in braces"
+test "$(error_of $passgen '\w{undefined}')" = "error: wordlist not found: undefined"
+test "$(error_of $passgen '\m{undefined}')" = "error: wordlist not found: undefined"
+test "$(error_of $passgen -w "test:$tmpdir/empty.txt" '\w{test}')" = "error: wordlist is empty: test"
+test "$(error_of $passgen -D 2 '((((a))))')" = "error: nested too deeply"
+test "$(error_of $passgen '{0}a')" = "error: nothing to choose from"
+
 set +x
 echo "All CLI tests passed."
