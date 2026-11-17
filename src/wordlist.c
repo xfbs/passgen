@@ -17,6 +17,10 @@ void passgen_wordlist_init(
     wordlist->parsed_markov = false;
     wordlist->file = file;
     wordlist->should_close_file = true;
+    wordlist->data = NULL;
+    wordlist->size = 0;
+    wordlist->words = NULL;
+    wordlist->count = 0;
     passgen_markov_init(&wordlist->markov, markov_length);
 }
 
@@ -33,8 +37,21 @@ void passgen_wordlist_parse_markov(passgen_wordlist *wordlist) {
     passgen_assert(!wordlist->parsed_markov);
     wordlist->parsed_markov = true;
 
-    size_t unicode_buffer_len = 256;
-    uint32_t unicode_buffer[unicode_buffer_len];
+    // a word can never decode to more codepoints than it has bytes, so size
+    // the buffer for the longest word in the list.
+    size_t unicode_buffer_len = 1;
+    for(size_t i = 0; i < wordlist->count; i++) {
+        size_t word_length = strlen(wordlist->words[i]);
+        if(word_length > unicode_buffer_len) {
+            unicode_buffer_len = word_length;
+        }
+    }
+
+    uint32_t *unicode_buffer = malloc(unicode_buffer_len * sizeof(uint32_t));
+    if(!unicode_buffer) {
+        return;
+    }
+
     for(size_t i = 0; i < wordlist->count; i++) {
         uint32_t *unicode_buffer_pos = &unicode_buffer[0];
         const uint8_t *word = (const uint8_t *) wordlist->words[i];
@@ -48,8 +65,10 @@ void passgen_wordlist_parse_markov(passgen_wordlist *wordlist) {
             &word,
             word_length);
 
-        // make sure the conversion worked
-        passgen_assert(ret == PASSGEN_UTF8_SUCCESS);
+        // skip words that are not valid UTF-8.
+        if(ret != PASSGEN_UTF8_SUCCESS) {
+            continue;
+        }
 
         // add word to markov chain
         passgen_markov_add(
@@ -58,6 +77,8 @@ void passgen_wordlist_parse_markov(passgen_wordlist *wordlist) {
             unicode_buffer_pos - &unicode_buffer[0],
             1);
     }
+
+    free(unicode_buffer);
 }
 
 void passgen_wordlist_load(
@@ -65,19 +86,28 @@ void passgen_wordlist_load(
     FILE *file,
     size_t markov_length) {
     passgen_wordlist_init(wordlist, file, markov_length);
-    passgen_wordlist_parse(wordlist);
-    passgen_wordlist_parse_markov(wordlist);
+    if(0 == passgen_wordlist_parse(wordlist)) {
+        passgen_wordlist_parse_markov(wordlist);
+    }
 }
 
 int passgen_wordlist_read(passgen_wordlist *wordlist, FILE *file) {
-    // get size of file
-    fseek(file, 0, SEEK_END);
-    wordlist->size = ftell(file);
-    fseek(file, 0, SEEK_SET);
+    // get size of file. this fails for anything that is not seekable (such as
+    // a pipe).
+    if(0 != fseek(file, 0, SEEK_END)) {
+        return 1;
+    }
+    long size = ftell(file);
+    if(size < 0 || 0 != fseek(file, 0, SEEK_SET)) {
+        return 1;
+    }
+    wordlist->size = (size_t) size;
 
     // allocate buffer to hold entire file and read in (plus zero termination)
     wordlist->data = malloc(wordlist->size + 1);
-    passgen_assert(wordlist->data);
+    if(!wordlist->data) {
+        return 1;
+    }
 
     // read in entire wordlist
     size_t read = fread(wordlist->data, 1, wordlist->size, file);
@@ -101,14 +131,21 @@ void passgen_wordlist_scan(passgen_wordlist *wordlist) {
     size_t capacity = ALLOC_INITIAL;
     wordlist->words = malloc(sizeof(char *) * capacity);
     wordlist->count = 0;
+    if(!wordlist->words) {
+        return;
+    }
 
     token = strtok_r(wordlist->data, "\n", &state);
     while(token) {
         // expand array if needed
         if(capacity == wordlist->count) {
             capacity *= ALLOC_INCREASE;
-            wordlist->words =
-                realloc(wordlist->words, sizeof(char *) * capacity);
+            char **words = realloc(wordlist->words, sizeof(char *) * capacity);
+            if(!words) {
+                // out of memory: keep the words collected so far.
+                return;
+            }
+            wordlist->words = words;
         }
 
         // save word
@@ -120,13 +157,18 @@ void passgen_wordlist_scan(passgen_wordlist *wordlist) {
     }
 
     // resize array finally (shrink it down to what is really needed)
-    wordlist->words =
-        realloc(wordlist->words, sizeof(char *) * wordlist->count);
+    if(wordlist->count > 0) {
+        char **words =
+            realloc(wordlist->words, sizeof(char *) * wordlist->count);
+        if(words) {
+            wordlist->words = words;
+        }
+    }
 }
 
 const char *
 passgen_wordlist_random(passgen_wordlist *wordlist, passgen_random *random) {
-    if(!wordlist->parsed) {
+    if(!wordlist->parsed || wordlist->count == 0) {
         return NULL;
     }
     size_t index = passgen_random_u64_max(random, wordlist->count);
@@ -136,10 +178,8 @@ passgen_wordlist_random(passgen_wordlist *wordlist, passgen_random *random) {
 void passgen_wordlist_free(passgen_wordlist *wordlist) {
     passgen_markov_free(&wordlist->markov);
 
-    if(wordlist->parsed) {
-        free(wordlist->words);
-        free(wordlist->data);
-    }
+    free(wordlist->words);
+    free(wordlist->data);
 
     if(wordlist->should_close_file && wordlist->file) {
         fclose(wordlist->file);

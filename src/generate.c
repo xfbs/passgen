@@ -364,29 +364,36 @@ static int passgen_generate_special_markov(
     }
     passgen_wordlist *wordlist = entry->value;
     if(!wordlist->parsed) {
-        passgen_wordlist_parse(wordlist);
+        try(passgen_wordlist_parse(wordlist));
     }
     if(!wordlist->parsed_markov) {
         passgen_wordlist_parse_markov(wordlist);
     }
     passgen_markov *markov = &wordlist->markov;
-    uint32_t word[128];
-    size_t pos = markov->level;
-    memset(word, 0, pos * sizeof(uint32_t));
-    double *entropy = context->entropy ? &*context->entropy : NULL;
-    do {
-        word[pos] = passgen_markov_generate(
-            markov,
-            &word[pos - markov->level],
-            context->env->random,
-            entropy);
-        pos++;
-    } while(word[pos - 1]);
 
-    pos = markov->level;
-    while(word[pos]) {
-        try(emit(context, word[pos]));
-        pos++;
+    // an empty markov chain (from an empty wordlist) cannot generate anything.
+    if(markov->count == 0) {
+        return -1;
+    }
+
+    // sliding window of the previous `level` codepoints (initially all zero,
+    // which marks the start of a word), plus one slot for the next codepoint.
+    // generated words have no upper bound on their length, so they are emitted
+    // as they are generated rather than collected in a fixed-size buffer.
+    size_t level = markov->level;
+    uint32_t window[UINT8_MAX + 1] = {0};
+    while(true) {
+        uint32_t next = passgen_markov_generate(
+            markov,
+            window,
+            context->env->random,
+            context->entropy);
+        if(!next) {
+            break;
+        }
+        try(emit(context, next));
+        memmove(&window[0], &window[1], (level - 1) * sizeof(window[0]));
+        window[level - 1] = next;
     }
 
     return 0;
@@ -402,22 +409,38 @@ static int passgen_generate_special_wordlist(
     }
     passgen_wordlist *wordlist = entry->value;
     if(!wordlist->parsed) {
-        passgen_wordlist_parse(wordlist);
+        try(passgen_wordlist_parse(wordlist));
+    }
+
+    // cannot pick a word from an empty wordlist.
+    if(passgen_wordlist_count(wordlist) == 0) {
+        return -1;
     }
 
     // pick word at random
     const char *word = passgen_wordlist_random(wordlist, context->env->random);
 
-    // UTF8-decode word and write codepoints
-    // TODO: handle longer words
-    size_t word_len = strlen(word);
-    const char **word_pos = &word;
+    // UTF8-decode word and write codepoints, in chunks so that words of any
+    // length work.
+    const uint8_t *word_pos = (const uint8_t *) word;
+    const uint8_t *word_end = word_pos + strlen(word);
     uint32_t codepoints[128];
-    uint32_t *codepoints_pos = &codepoints[0];
-    try(passgen_utf8_decode(&codepoints_pos, 128, NULL, (const uint8_t **) word_pos, word_len));
-    for(int i = 0; &codepoints[i] < codepoints_pos; i++) {
-        try(emit(context, codepoints[i]));
-    }
+    int decode_ret;
+    do {
+        uint32_t *codepoints_pos = &codepoints[0];
+        decode_ret = passgen_utf8_decode(
+            &codepoints_pos,
+            128,
+            NULL,
+            &word_pos,
+            word_end - word_pos);
+        if(decode_ret < PASSGEN_UTF8_SUCCESS) {
+            return -1;
+        }
+        for(size_t i = 0; &codepoints[i] < codepoints_pos; i++) {
+            try(emit(context, codepoints[i]));
+        }
+    } while(decode_ret > PASSGEN_UTF8_SUCCESS);
 
     if(context->entropy) {
         *context->entropy *= passgen_wordlist_count(wordlist);

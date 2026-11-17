@@ -3,7 +3,11 @@
 /// Regression tests for bugs that were found and fixed. Most of these are
 /// only really meaningful when run with sanitizers enabled.
 #include "tests.h"
+#include <passgen/generate.h>
+#include <passgen/passgen.h>
+#include <passgen/pattern/env.h>
 #include <passgen/random.h>
+#include <stdlib.h>
 #include <string.h>
 
 /// Reads that straddle the end of the internal buffer must return the
@@ -80,4 +84,140 @@ test_result test_regression_random_open_overlong(void) {
 
     return test_ok;
 }
+#endif
+
+static int count_codepoints(void *data, uint32_t codepoint) {
+    (void) codepoint;
+    *((size_t *) data) += 1;
+    return 0;
+}
+
+#ifndef _WIN32 // fmemopen does not exist on windows
+
+static char *copy_string(const char *str) {
+    char *copy = malloc(strlen(str) + 1);
+    strcpy(copy, str);
+    return copy;
+}
+
+/// Sets up an environment with a single wordlist named `list`.
+static bool wordlist_env(
+    passgen_env *env,
+    const char *random,
+    char *data,
+    size_t len,
+    size_t level) {
+    // fmemopen() with an empty buffer is not portable, so use an empty file
+    // in that case.
+    FILE *file = len ? fmemopen(data, len, "r") : tmpfile();
+    if(!file) {
+        return false;
+    }
+
+    passgen_env_init(env, passgen_random_open(NULL, random));
+    if(!env->random) {
+        return false;
+    }
+
+    return 0 == passgen_env_wordlist_add(env, copy_string("list"), file, level);
+}
+
+/// Picking from an empty wordlist used to hang (release builds) or trip an
+/// assertion (debug builds). It should just be an error.
+test_result test_regression_wordlist_empty(void) {
+    passgen_pattern pattern;
+    passgen_error error;
+    passgen_env env;
+    size_t count = 0;
+
+    assert(wordlist_env(&env, "zero", NULL, 0, 3));
+    assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
+    assert(0 != passgen_generate(&pattern, &env, NULL, &count, count_codepoints));
+    passgen_pattern_free(&pattern);
+
+    assert(0 == passgen_parse(&pattern, &error, "\\m{list}"));
+    assert(0 != passgen_generate(&pattern, &env, NULL, &count, count_codepoints));
+    passgen_pattern_free(&pattern);
+    passgen_env_free(&env);
+
+    // wordlist that does not exist at all
+    passgen_env_init(&env, passgen_random_open(NULL, "zero"));
+    assert(0 == passgen_parse(&pattern, &error, "\\w{nope}\\m{nope}"));
+    assert(0 != passgen_generate(&pattern, &env, NULL, &count, count_codepoints));
+    passgen_pattern_free(&pattern);
+    passgen_env_free(&env);
+
+    return test_ok;
+}
+
+/// Words longer than 128 codepoints used to fail (wordlist) or overflow a
+/// stack buffer (markov chain).
+test_result test_regression_wordlist_long_words(void) {
+    passgen_pattern pattern;
+    passgen_error error;
+    passgen_env env;
+
+    // a single word consisting of 600 times the letter a.
+    size_t word_len = 600;
+    char *data = malloc(word_len + 1);
+    memset(data, 'a', word_len);
+    data[word_len] = '\n';
+
+    assert(wordlist_env(&env, "xorshift:1234", data, word_len + 1, 1));
+
+    size_t count = 0;
+    assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
+    assert(0 == passgen_generate(&pattern, &env, NULL, &count, count_codepoints));
+    assert_eq(count, word_len);
+    passgen_pattern_free(&pattern);
+
+    // at every step, the markov chain has a 599/600 chance of generating
+    // another a, so these words get long: on average 600 codepoints.
+    count = 0;
+    double entropy = 0;
+    assert(0 == passgen_parse(&pattern, &error, "\\m{list}{100}"));
+    assert(
+        0 ==
+        passgen_generate(&pattern, &env, &entropy, &count, count_codepoints));
+    assert(count > 128 * 100);
+    assert(entropy > 1.0);
+    passgen_pattern_free(&pattern);
+
+    passgen_env_free(&env);
+    free(data);
+
+    return test_ok;
+}
+
+/// Defining a wordlist twice replaces the first one (and must not leak it).
+test_result test_regression_wordlist_redefine(void) {
+    passgen_pattern pattern;
+    passgen_error error;
+    passgen_env env;
+    char first[] = "first\n";
+    char second[] = "second\n";
+
+    assert(wordlist_env(&env, "zero", first, strlen(first), 3));
+
+    FILE *file = fmemopen(second, strlen(second), "r");
+    assert(file);
+    assert(0 == passgen_env_wordlist_add(&env, copy_string("list"), file, 3));
+
+    uint8_t buffer[32] = {0};
+    assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
+    size_t len = passgen_generate_fill_utf8(
+        &pattern,
+        &env,
+        NULL,
+        buffer,
+        sizeof(buffer) - 1);
+    buffer[len] = 0;
+    assert_streq((const char *) buffer, "second");
+
+    passgen_pattern_free(&pattern);
+    passgen_env_free(&env);
+
+    return test_ok;
+}
+
 #endif

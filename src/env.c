@@ -38,8 +38,18 @@ int passgen_env_wordlist_add(
     FILE *file,
     size_t markov_length) {
     passgen_wordlist *wordlist = malloc(sizeof(passgen_wordlist));
-    passgen_hashmap_insert(&env->wordlists, name, wordlist);
+    if(!wordlist) {
+        return 1;
+    }
     passgen_wordlist_init(wordlist, file, markov_length);
+
+    // if a wordlist with this name was already defined, the new one replaces
+    // it.
+    passgen_hashmap_entry old =
+        passgen_hashmap_insert(&env->wordlists, name, wordlist);
+    if(old.key) {
+        wordlist_entry_free(NULL, &old);
+    }
 
     return 0;
 }
