@@ -1,260 +1,456 @@
-.Dd January 10, 2023
-.Dt PASSGEN 1 URM
+.Dd November 17, 2026
+.Dt PASSGEN 1
 .Os Passgen v@PROJECT_VERSION@
 .Sh NAME
 .Nm passgen
-.Nd Generate random sequences from a regex-like pattern.
+.Nd generate random sequences from a regex-like pattern
 .Sh SYNOPSIS
 .Nm
 .Op Fl ejz
 .Op Fl a Ar amount
+.Op Fl D Ar depth
+.Op Fl M Ar length
+.Op Fl P Ar name:pattern
 .Op Fl r Ar random
-.Op Fl w Ar wordlist
-.Ar pattern
+.Op Fl w Ar name:path
+.Op Fl m Ar master Op Fl d Ar domain Op Fl t Ar token
+.Ar pattern | Fl p Ar preset
 .Nm
-.Op Fl ejz
-.Op Fl a Ar amount
-.Op Fl r Ar random
-.Op Fl w Ar wordlist
-.Fl p
-.Ar preset
+.Fl l
 .Nm
--l
-.Op Fl j
-| -v | -h
+.Fl h | v
 .Sh DESCRIPTION
-Passgen is a tool for generating strong passphrases. Unlike other password
-generators, it does not have presets, but rather supports a
-regular-expression-like language for specifying the shape of the generated
-passphrases.
-
-In addition to that, it also supports reading wordlists and generating
-passphrases based on those. It is also able to use a markov-chain to generate
-pronounceable words.
-
-Finally, it also supports a master-passphrase mode, whereby the passphrases it
-generates are not fully random, but are deterministic. This allows for using it
-as a password manager.
-
-.Sh COMMAND-LINE FLAGS
+.Nm
+generates random sequences, such as passphrases, from a pattern.
+The pattern is written in a language which is similar to regular expressions,
+so it can describe sequences that fit any password policy.
+There are presets for some common kinds of sequences.
 .Pp
-General flags and their descriptions
-.Bl -tag -width -indent
-.It Fl a, Fl -amount Ar amount
-Set the amount of passphrases to generate. Must be a positive, non-zero
-integer. By default, only a single passphrase is generated and output.
-.It Fl e, Fl -entropy
-Compute and output the entropy of every generated sequence. This is a number
-that describes how much randomness went into generating a specific sequence. It
-is used to measure the difficulty of cracking the sequence if the pattern is
-known. The entropy is expressed as a power of two, meaning that if an entropy
-of 64 is achieved, it means that an adversary would need 2^64 guesses to crack
-the passphrase.
-.It Fl h, Fl -help
-Show help and quit.
-.It Fl j, Fl -json
-Outputs results as JSON instead of as text. This is useful when feeding the
-output of passgen into other command-line tools.
-.It Fl l, Fl -list
-List available presets, along with their format strings.
-.It Fl M, Fl -markov-length Ar length
-Set the markov chain length for the next wordlist. Must be a positive, non-zero
-integer. Every wordlist can be parsed into a markov chain in order to generate
-pronounceable, but random sequences. The default length is 3. Longer markov
-chains lengths may be able to generate more realistic words, at the expense of
-taking longer to parse and using up more memory.
-.It Fl p, Fl -preset Ar PRESET
-Use the specified preset to generate a password.
-.It Fl r, Fl -random Ar random
-Overrides the randomness source. By default, Passgen will use the secure system
-randomness source. On Linux, this means it will use the
-.Ar getrandom(2)
-syscall, on macOS it will use
-.Ar arc4random(3) .
-If it cannot detect an appropriate way to get randomness from the kernel, it falls back to using
-.Ar /dev/urandom .
-Using this flag, it is possible to override the source of randomness, see the
-RANDOM section for more information.
-.It Fl v, Fl -version
-Show version and build information and quit.
-.It Fl w, Fl -wordlist Ar name:/path/to/file
-Load an additional wordlist. Must be specified in the format
-.Ar name:/path/to/file .
-Wordlists can be referenced in patterns, and can be used to generate passphrases
-that are easier to remember.
-.El
-
+It can read wordlists, to pick random words from them, or to generate words
+which are random but pronounceable, using a Markov chain.
+It can also compute the entropy of what it generates, which says how hard it
+is to guess.
 .Pp
-Flags for master-passphrase mode. In this mode, the generated passphrases are not fully
-random, but are deterministic. Given the same master passphrase, domain and token, the same
-passphrase will always be generated. Domain and token are optional parameters.
-
-The intention is that you pick one master passphrase. For every account you
-have, you can use the domain field to set what domain it is on. If you have
-multiple accounts on a single service, you can use the token to distinguish
-between them.
-
-.Bl -tag -width -indent
-.It Fl m, Fl -master Ar master_passphrase
-Master passphrase to use, required for enabling master-passphrase mode.
-.It Fl d, Fl -domain Ar domain_name
-Domain name to generate passphrase for (for use in master-password mode).
-.It Fl t, Fl -token Ar token
-Token to use for master-passphrase mode.
+By default, the sequences are generated from the secure randomness source of
+the system.
+In master passphrase mode, they are derived from a master passphrase instead,
+so that the same inputs always result in the same sequence.
+.Sh OPTIONS
+.Bl -tag -width Ds
+.It Fl a , Fl -amount Ar amount
+Generate this many sequences, one per line.
+Has to be at least one, which is the default.
+.It Fl D , Fl -depth Ar depth
+Limit how deeply groups in the pattern may be nested when generating.
+Has to be at least one, the default is 1024.
+Generating fails for patterns which are nested more deeply.
+.It Fl e , Fl -entropy
+Compute the entropy of every generated sequence, in bits.
+This measures how much randomness went into the sequence: for an entropy of
+64 bits, someone who knows the pattern needs up to 2^64 guesses to find it.
+The entropy is printed to standard error before the sequence, or included in
+the output with
+.Fl -json .
+.It Fl h , Fl -help
+Show a summary of the options and exit.
+.It Fl j , Fl -json
+Output the sequences as a JSON array of objects, rather than as lines of text.
+Every object has the sequence as
+.Li output ,
+and its entropy as
+.Li entropy
+if
+.Fl -entropy
+is given.
+.It Fl l , Fl -list
+List the presets with their patterns and exit.
+This includes the ones defined in the configuration, and by options which
+come before this one.
+.It Fl M , Fl -markov-length Ar length
+Set the length of the Markov chain for the wordlists which are loaded by the
+following
+.Fl -wordlist
+options.
+This is how many of the previous letters are taken into account when choosing
+the next one.
+Has to be between 1 and 255, the default is 3.
+Longer chains generate words which are closer to those in the wordlist, but
+have less entropy and need more memory.
+.It Fl p , Fl -preset Ar name
+Use the pattern of the preset with this name, see
+.Sx PRESETS .
+Cannot be used together with a pattern.
+.It Fl P , Fl -define-preset Ar name:pattern
+Define a preset.
+If there is a preset with this name already, it is replaced.
+.It Fl r , Fl -random Ar random
+Use another source of randomness, see
+.Sx RANDOMNESS SOURCES .
+.It Fl v , Fl -version
+Show the version and exit.
+.It Fl w , Fl -wordlist Ar name:path
+Load the wordlist at
+.Ar path ,
+which is a file with one word per line, and make it available to patterns as
+.Ar name .
+If there is a wordlist with this name already, it is replaced.
+.It Fl z , Fl -null
+Separate the sequences by a NUL character instead of a newline.
 .El
 .Pp
-See EXAMPLES for examples on how to use this.
-
-.Sh RANDOMNESS SOURCE
-By default, passgen will use the system's built-in random number generator. This is chosen to be a secure source of randomness and is typically the best choice. Passgen can however be easily extended to support different sources of randomness, and the source of randomness can be specified at runtime using the
-.Fl -random
-command-line flag. This flag takes a textual description of which source to use and any arguments it might need.
+The following options are for master passphrase mode, in which the sequences
+are not random, but derived from a master passphrase.
+The same master passphrase, domain, token and pattern always result in the
+same sequence, so there is no need to store it anywhere.
+.Bl -tag -width Ds
+.It Fl m , Fl -master Ar master
+The master passphrase.
+Giving this option is what enables master passphrase mode.
+.It Fl d , Fl -domain Ar domain
+What the sequence is for, typically the domain of a website.
+Optional.
+.It Fl t , Fl -token Ar token
+Anything else which should result in a different sequence, such as the name of
+an account when there is more than one for a domain, or a counter to change a
+passphrase.
+Optional.
+.El
 .Pp
-List of built-in source of randomness and how to specify them:
-.Bl -tag -width -indent
-.It Ar system
-Use the system randomness source. This will pick whichever is the native method of getting access to secure random data on the system that passgen is running on. This is the default source of randomness.
-
-On Linux systems, this will use the
+See
+.Sx MASTER PASSPHRASE MODE
+for how the sequences are derived.
+.Sh PATTERNS
+A pattern describes what to generate.
+It may contain any Unicode characters, and has to be valid UTF-8.
+.Bl -tag -width Ds
+.It Li abc
+Literal: outputs
+.Ql abc .
+.It Li abc|def|ghi
+Alternatives: outputs one of them, chosen at random.
+An alternative can be made more likely by starting it with a number in curly
+braces:
+.Ql {3}abc|def
+outputs
+.Ql abc
+three times out of four.
+.It Li (abc|def)
+Group: outputs what is inside of it.
+Groups are used to limit how far alternatives extend, and to repeat or make
+optional more than a single character.
+They can be nested.
+.It Li [abc] , [a-z] , [a-zA-Z0-9_]
+Set: outputs one of the characters in it, chosen at random.
+It can list single characters, and ranges of characters, which include every
+character from the first to the last one by Unicode codepoint.
+The last character of a range must not come before the first one.
+To have a dash in a set, write it as
+.Ql \e- .
+A character which is listed more than once (also as part of a range) is more
+likely to be chosen, and counted more than once for the entropy.
+.It Li a{8} , [a-z]{8,12} , (ab){3}
+Repetition: outputs what comes before it the given number of times.
+With two numbers, it is a random number of times between the first and the
+second one, including both.
+The second number must not be smaller than the first one.
+.It Li a\&? , [a-z]\&? , (abc)\&?
+Optional: what comes before it is either output or left out, at random.
+.It Li \ew{name}
+Word: outputs a random word from the wordlist
+.Ar name .
+.It Li \em{name}
+Markov chain: outputs a random word, generated letter by letter such that it
+resembles the words in the wordlist
+.Ar name .
+These words are pronounceable, but mostly not real words, and their length is
+not fixed.
+.El
+.Pp
+Generating fails if a pattern uses a wordlist which was not loaded, or which
+is empty.
+.Pp
+The following escape sequences can be used:
+.Bl -tag -width Ds
+.It Li \e( , \e) , \e[ , \e] , \e{ , \e} , \e|
+The character itself, without its meaning in a pattern.
+These cannot be used inside of a set.
+.It Li \ea , \eb , \ee , \ef , \en , \er , \et , \ev
+The control characters bell, backspace, escape, form feed, newline, carriage
+return, tab and vertical tab.
+.It Li \e\e
+A backslash.
+.It Li \eu{...}
+The character with the given Unicode codepoint, as up to six hexadecimal
+digits, for example
+.Ql \eu{fc}
+for
+.Ql u
+with a diaeresis.
+A character which has a meaning in a pattern still has it when it is written
+this way.
+.El
+.Pp
+Any other character after a backslash is an error.
+Note that there is no way to have a question mark in the output.
+.Sh PRESETS
+These presets are predefined, more can be defined with
+.Fl -define-preset
+or in the configuration.
+.Bl -tag -width "proquint128"
+.It Li apple1
+Four groups of three letters or digits, separated by dashes, such as
+.Ql oKC-T37-Dew-Qyn .
+.It Li apple2
+Three groups of six letters or digits, separated by dashes, such as
+.Ql mHXr4X-CiK4w6-hbjF7T .
+.It Li edge
+15 characters which are letters, digits, colons, underscores or dashes.
+.It Li firefox
+15 letters or digits, such as
+.Ql aKTKyS9pPgAQ8Oz .
+.It Li proquint16 , proquint32 , ... , proquint128
+Pronounceable groups of five letters which alternate between consonants and
+vowels, separated by dashes, such as
+.Ql zabil-pukug-punud-lasup .
+Every group has 16 bits of entropy, and the number is the entropy in total,
+in steps of 16 up to 128.
+.It Li uuid
+A random (version 4) UUID, such as
+.Ql 0072ca58-5966-497c-8657-a59fca93bf25 .
+.El
+.Sh RANDOMNESS SOURCES
+By default, the secure random number generator of the system is used.
+Other than master passphrase mode, that is what should be used to generate
+anything that is meant to be secret.
+Other sources can be chosen with
+.Fl -random ,
+mostly for testing.
+.Bl -tag -width Ds
+.It Li system
+The random number generator of the system, which is the default.
+This is
 .Xr getrandom 2
-system call. On macOS, it uses the
-.Xr arc4random_buf 2
-system call to read secure, random data. Alternatively, it falls back to reading from
-.Ar /dev/urandom .
-.It Ar xorshift:seed
-Use the xorshift pseudorandom number generator. This is not recommended to produce random sequences, but has the advantage of being deterministic (using the same seed value with the same flags always produces the same output). The seed should be a large, nonzero number.
-.It Ar file:/path/to/file
-Read the file as source of randomness. This can be useful on systems where the source of randomness has a nonstandard path.
-.It Ar zero
-Use the zero random number generator. This does not produce random sequences, and is only useful for testing.
+on Linux and
+.Xr arc4random_buf 3
+on macOS.
+On other systems, it reads from
+.Pa /dev/urandom .
+.It Li file\&: Ns Ar path
+Read random data from a file.
+It has to supply as much data as is needed:
+.Nm
+aborts when it runs out.
+.It Li chacha20-argon2\&: Ns Ar master Ns Op : Ns Ar domain Ns Op : Ns Ar token
+What master passphrase mode uses, see
+.Sx MASTER PASSPHRASE MODE .
+Every part can be up to 128 bytes long, and cannot contain colons.
+.It Li chacha20\&: Ns Ar key Ns Op : Ns Ar iv
+The ChaCha20 stream cipher, with a key of up to 32 bytes and an initialization
+vector of up to 8 bytes, which are used as they are.
+This is deterministic, but the key is not derived from a passphrase, so this
+is not a substitute for master passphrase mode.
+.It Li xorshift\&: Ns Ar seed
+The xorshift pseudorandom number generator, with a seed between 1 and 2^64-1.
+This is deterministic, and not secure.
+.It Li zero
+Only zeroes.
+This is deterministic, and not random at all.
 .El
-.Sh PATTERN
-Patterns are regular-expression-like strings that allow specifying the format of
-generated passwords. The allowed grammar is a subset of what regular expressions
-support.
+.Sh MASTER PASSPHRASE MODE
+In master passphrase mode, a key is derived from the master passphrase, the
+domain and the token.
+The key is used to generate a stream of pseudorandom data, which takes the
+place of the randomness of the system.
 .Pp
-Patterns support any valid Unicode characters. It is also possible to use the escape sequence '\\u{...}' along with a hexidecimal representation of the codepoint. For example, the letter 'a' could also be written '\\u{61}'.
+The key is derived with Argon2id, using 19 MiB of memory, 2 passes and 1 lane.
+The master passphrase is the password, the salt is the fixed string
+.Ql passgen/argon2id ,
+the domain is the secret key and the token is the associated data.
+The 32 byte result is the key for the ChaCha20 stream cipher (the original
+variant, with a 64 bit counter starting at zero), with the initialization
+vector
+.Ql passgen
+followed by a NUL byte.
 .Pp
-Overview of syntax:
-.Bl -tag -width -indent
-.It Ar abc
-Literal: outputs 'abc'.
-.It Ar (abc|def|ihj)
-Group: outputs one of its members at random. In the first example, the output is any
-one of 'abc', 'def', or 'ihj'.  Groups are enclosed in parentheses and
-different cases are delimited by a pipe character.  Can contain any other
-syntax (literals, groups, ranges, wordlist or markov).
-.It Ar [abc], [a-z], [a-z0-9], [a-z0-9!@#]
-Range: outputs a single character in the range, chose at random.  Must be
-enclosed in square brackets and can contain either individual listed characters
-(for example [abc]) or ranges of characters (for example [a-zA-Z]), or both.
-When specifying ranges of characters, they should be listed in lexicographical
-order.
-
-If a literal dash is desired, it may need to be escaped with a backslash (for
-example [a\\-b]). For some languages, using ranges might produce unexpected
-results, because the characters do not have sequential Unicode codepoints.
-.It Ar a{8}, [a-z]{12}, (\[rs]m{english}-){4}\[rs]m{english}
-Repetition: the repetition modifier {n} repeats whatever comes before it the
-given amount of times. When putting a repetition mark after any syntax element,
-this syntax element will be repeated the specified amount. Denoted by curly
-braces with a single or two comma-separated numbers. When two numbers are
-given, they are treated as a range, for example '[a-z]{8,12}' will yield
-between eight and twelve lowercase alphabetic characters.
-.It Ar \[rs]w{name}
-Wordlist: this will pick a random word from the wordlist
-.Ar name .
-It is an error to specify this if a wordlist with the given name has not been loaded. Use the
-.Fl -wordlist
-flag to load additional wordlists.
-.It Ar \[rs]m{name}
-Markov: this generates a random, but pronounceable word using a markov chain trained on the wordlist
-.Ar name .
-It is an error to specify this if a wordlist with the given name has not been loaded. Use the
-.Fl -wordlist
-flag to load additional wordlists.
+What is generated depends on all of the master passphrase, the domain, the
+token and the pattern.
+When the pattern uses a wordlist, it also depends on the contents of the
+wordlist.
+.Pp
+If
+.Fl -random
+is given as well, it takes precedence, and the options for master passphrase
+mode are ignored.
+.Sh CONFIGURATION
+On startup,
+.Nm
+reads the configuration files listed in
+.Sx FILES ,
+if they exist.
+Options on the command line come after the configuration.
+.Pp
+Every line of a configuration file is one of the following.
+Empty lines, and lines which start with
+.Ql # ,
+are ignored.
+.Bl -tag -width Ds
+.It Li preset Ar name:pattern
+Define a preset, like
+.Fl -define-preset .
+.It Li wordlist Ar name:path
+Load a wordlist, like
+.Fl -wordlist .
+.It Li random Ar random
+Set the source of randomness, like
+.Fl -random .
 .El
-.Sh EXAMPLES
-Generate a password using the "apple" preset.
-.Pp
-    $ passgen -p apple1
-    fnK-Nvo-Ipj-W3M
-.Pp
-Generate a passphrase with 16 random lowercase letters.
-.Pp
-    $ passgen -a 5 "[a-z]{16}"
-    xqtrisxewuocrbrx
-.Pp
-Generate five lowercase alphanumeric passwords with length 12.
-.Pp
-    $ passgen -a 5 "[a-z0-9]{12}"
-    k8taknzsj324
-    lywtyf0dw6r9
-    qayn8jveduri
-    ddtoolrwmlk3
-    541kdz29gfdi
-.Pp
-Generate a passphrase with 16 random alphanumeric letters and symbols, and measure the entropy.
-.Pp
-    $ passgen -e '[a-zA-Z0-9@#$()_=+]{16}'
-    entropy: 98.07 bits
-    9oqosbO@iEqH=nT6
-.Pp
-Generate a passphrase with 5 random words separated by dashes.
-.Pp
-    $ passgen --wordlist english:/path/to/wordlist.txt '(\[rs]w{english}-){4}\[rs]w{english}'
-    nocturnal-evident-latter-is-five
-.Pp
-Generate a passphrase with 5 random pronounceable words generated by a markov
-chain. The advantage of using a markov chain is that you get a higher entropy
-for the same length as compared to using random words from a wordlist, while
-still being memorable.
-.Pp
-    $ passgen --wordlist english:/path/to/wordlist.txt '(\[rs]m{english}-){4}\[rs]m{english}'
-    vuvulvers-Bachmer-rebacks-perventercizes-exually
+.Sh ENVIRONMENT
+.Bl -tag -width Ds
+.It Ev XDG_CONFIG_HOME
+Where to look for the configuration file of the user.
+Defaults to
+.Pa ~/.config .
+.It Ev HOME
+The home directory of the user.
+.El
 .Sh FILES
-.Bl -tag -width Ds -indent
+.Bl -tag -width Ds
 .It Pa /etc/passgen.conf
-System configuration file for presets and wordlists. See
-.Xr passgen.conf 5
-for information on the syntax of this file.
-.It Pa ~/.config/passgen.conf
-User-local configuration for presets and wordlists. See
-.Xr passgen.conf 5
-for information on the syntax of this file.
+Configuration for all users.
+.It Pa $XDG_CONFIG_HOME/passgen.conf , ~/.config/passgen.conf
+Configuration of the user, which is read after the one for all users.
 .El
 .Sh EXIT STATUS
-On success, the tool returns 0. When an error is encountered, it will return a different exit code, depending on the error. Note that this list can change between minor releases of the tool.
+.Nm
+exits with 0 on success.
+When there is an error, a message is printed to standard error, and it exits
+with one of the following.
+These may change between versions.
 .Pp
-.Bl -tag -width -indent -compact
-.It Ar 1
-Multiple patterns have been specified on the command line. Only specify a single pattern per run of the tool.
-.It Ar 2
-There has been an issue allocating the random number generator. When overriding the random number generator to be used, make sure that it exists. When using sandboxing, make sure passgen has access to
-.Pa /dev/urandom
-or the
-.Xr getrandom 2
-system call.
-.It Ar 3
-Error parsing the pattern. Make sure that the pattern is well-formed. The standard output should indicate the position of the error in the pattern.
-.It Ar 4
-There has been an issue allocating memory, make sure your system has enough memory.
-.It Ar 5
-An illegal
-.Ar AMOUNT
-has been specified. Make sure the amount of sequences you have requested is not negative and not zero.
-.It Ar 6
-Illegal markov chain length has been specified. When overriding the markov chain length, make sure that the length you specify is not negative and not zero.
-.It Ar 7
-Unrecognized argument flag. Make sure that you are not using an incorrect flag. If your pattern starts with a dash, use '--' to separate command-line flags from your pattern.
-.It Ar 8
-Preset not found. Make sure that the preset you have specified exists. When it doubt, use the
-.Fl -list
-command to see the full list of all presets that the tool knows about.
+.Bl -tag -width Ds -compact
+.It 1
+More than one pattern was given, or a pattern together with a preset.
+.It 2
+The source of randomness is not valid, or could not be opened.
+.It 3
+The pattern is not valid.
+The message shows where in the pattern the error is.
+.It 4
+Out of memory.
+.It 5
+The amount is not valid.
+.It 6
+The length of the Markov chain is not valid.
+.It 7
+An option was not recognized.
+If the pattern starts with a dash, put
+.Ql --
+before it.
+.It 8
+There is no preset with this name, or the definition of a preset is not
+valid.
+.It 9
+Generating failed, because the pattern uses a wordlist which was not loaded
+or is empty, or because it is nested more deeply than the depth limit.
+.It 10
+A wordlist could not be opened, or its definition is not valid.
+.It 11
+The depth is not valid.
 .El
+.Pp
+If a source of randomness does not supply enough data,
+.Nm
+aborts.
+.Sh EXAMPLES
+Generate a passphrase from a preset:
+.Bd -literal -offset indent
+$ passgen -p apple1
+fnK-Nvo-Ipj-W3M
+.Ed
+.Pp
+Generate a passphrase of 16 random lowercase letters:
+.Bd -literal -offset indent
+$ passgen '[a-z]{16}'
+xqtrisxewuocrbrx
+.Ed
+.Pp
+Generate five passphrases of twelve lowercase letters or digits:
+.Bd -literal -offset indent
+$ passgen -a 5 '[a-z0-9]{12}'
+k8taknzsj324
+lywtyf0dw6r9
+qayn8jveduri
+ddtoolrwmlk3
+541kdz29gfdi
+.Ed
+.Pp
+Generate a passphrase of 16 letters, digits and symbols, and compute its
+entropy:
+.Bd -literal -offset indent
+$ passgen -e '[a-zA-Z0-9@#$()_=+]{16}'
+entropy: 98.07 bits
+9oqosbO@iEqH=nT6
+.Ed
+.Pp
+The same as JSON:
+.Bd -literal -offset indent
+$ passgen -j -e '[a-zA-Z0-9@#$()_=+]{16}'
+[{"output":"R(Jk7w3=yT_oGq#d","entropy":98.068528}]
+.Ed
+.Pp
+Generate a passphrase of five random words, separated by dashes:
+.Bd -literal -offset indent
+$ passgen -w english:/usr/share/dict/words '\ew{english}(-\ew{english}){4}'
+nocturnal-evident-latter-is-five
+.Ed
+.Pp
+Generate a passphrase of five pronounceable words from a Markov chain.
+Compared to words from the wordlist, this has more entropy for the same
+length, while still being memorable.
+.Bd -literal -offset indent
+$ passgen -w english:/usr/share/dict/words '\em{english}(-\em{english}){4}'
+vuvulvers-Bachmer-rebacks-perventercizes-exually
+.Ed
+.Pp
+Define a preset, and use it:
+.Bd -literal -offset indent
+$ passgen -P 'pin:[0-9]{6}' -p pin
+402918
+.Ed
+.Pp
+Derive a passphrase for an account from a master passphrase.
+This always results in the same passphrase:
+.Bd -literal -offset indent
+$ passgen -m mymasterpass -d example.com -t username -p apple2
+6xnSzW-8Ptrv0-dngZFU
+.Ed
 .Sh SEE ALSO
 .Xr apg 1 ,
-.Xr passwd 1 ,
-.Xr passgen.conf 5
+.Xr pwgen 1
 .Sh AUTHORS
-.An "Patrick M. Elsen" Aq pelsen@xfbs.net
+.An Patrick M. Elsen Aq Mt pelsen@xfbs.net
+.Sh CAVEATS
+The master passphrase is given as an argument on the command line.
+While
+.Nm
+is running, other users of the system may be able to see it in the list of
+processes, and it may be saved in the history of the shell.
+.Pp
+What patterns which use Markov chains generate may change between versions of
+.Nm ,
+so they should not be relied on in master passphrase mode.
+.Sh SECURITY CONSIDERATIONS
+Deterministic sources of randomness other than master passphrase mode
+.Po
+.Li xorshift ,
+.Li zero
+and
+.Li chacha20
+with a key that is not secret
+.Pc
+must not be used to generate anything that is meant to be secret.
+.Pp
+The strength of everything derived in master passphrase mode is limited by
+the strength of the master passphrase.
+Someone who gets hold of one derived passphrase can try to guess the master
+passphrase from it, and with it, all of the others.
