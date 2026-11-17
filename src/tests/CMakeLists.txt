@@ -19,6 +19,7 @@ set(TEST_LIST
     "stack.c"
     "token.c"
     "utf8.c"
+    "vectors.c"
     "version.c"
     "wordlist.c"
 )
