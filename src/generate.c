@@ -561,10 +561,17 @@ static int passgen_generate_group(
     passgen_pattern_segment *segment =
         passgen_stack_get(&group->segments, segment_index);
 
-    while(choice >= segment->multiplier) {
+    while(segment && choice >= segment->multiplier) {
         choice -= segment->multiplier;
         segment_index += 1;
         segment = passgen_stack_get(&group->segments, segment_index);
+    }
+
+    // this only happens if the sum of the multipliers is not what the
+    // multipliers of the segments add up to, which would be a bug in the
+    // parser.
+    if(!segment) {
+        return -1;
     }
 
     // keep track of entropy

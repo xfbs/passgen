@@ -308,8 +308,13 @@ int passgen_parse_group(
                     passgen_parser_state_push_repeat(parser, &item->repeat);
                     return 0;
                 } else {
+                    // the multiplier of this segment is about to be replaced,
+                    // so take whatever it is right now out of the sum (it
+                    // is not always one: there may have been a multiplier
+                    // already, as in `{2}{3}a`).
+                    state->data.group.group->multiplier_sum -=
+                        state->data.group.segment->multiplier;
                     state->data.group.segment->multiplier = 0;
-                    state->data.group.group->multiplier_sum -= 1;
                     passgen_parser_state_push_multiplier(
                         parser,
                         &state->data.group.segment->multiplier,
@@ -423,6 +428,11 @@ int passgen_parse_multiplier(
     passgen_token *token,
     passgen_parser_state *state) {
     if(token->codepoint == '}') {
+        // the sum of the multipliers must not overflow.
+        if(*state->data.multiplier.value >
+           SIZE_MAX - *state->data.multiplier.sum) {
+            return -1;
+        }
         *state->data.multiplier.sum += *state->data.multiplier.value;
         passgen_stack_pop(&parser->state, NULL);
         return 0;

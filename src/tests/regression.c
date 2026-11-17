@@ -223,6 +223,32 @@ test_result test_regression_parse_repeat_range(void) {
     return test_ok;
 }
 
+/// Giving a segment more than one multiplier (as in `{4}{1}a`) used to leave
+/// the group with a sum of multipliers which did not match the segments, so
+/// that choosing a segment could run past the last one.
+test_result test_regression_parse_multiplier_twice(void) {
+    passgen_pattern pattern;
+    passgen_error error;
+
+    assert(0 == passgen_parse(&pattern, &error, "{4}{1}a|b"));
+    assert(pattern.group.multiplier_sum == 2);
+    passgen_pattern_free(&pattern);
+
+    assert(0 == passgen_parse(&pattern, &error, "{1}{4}a|{2}b"));
+    assert(pattern.group.multiplier_sum == 6);
+    passgen_pattern_free(&pattern);
+
+    // the sum must not overflow either.
+    assert(
+        0 != passgen_parse(
+                 &pattern,
+                 &error,
+                 "{18446744073709551615}a|{18446744073709551615}b"));
+    passgen_pattern_free(&pattern);
+
+    return test_ok;
+}
+
 static int count_codepoints(void *data, uint32_t codepoint) {
     (void) codepoint;
     *((size_t *) data) += 1;
