@@ -424,6 +424,25 @@ test_result test_regression_parse_set_escapes(void) {
     return test_ok;
 }
 
+/// An empty set used to be accepted, and generated nothing. A set stands for
+/// one of its characters, so there is nothing that it could generate.
+test_result test_regression_parse_set_empty(void) {
+    passgen_pattern pattern;
+    passgen_error error;
+
+    const char *patterns[] = {"[]", "a[]b", "[]{3}", "([])", "[]?", NULL};
+    for(size_t i = 0; patterns[i]; i++) {
+        assert(0 != passgen_parse(&pattern, &error, patterns[i]));
+        passgen_pattern_free(&pattern);
+    }
+
+    // brackets which are escaped are not a set.
+    assert(0 == passgen_parse(&pattern, &error, "\\[\\]"));
+    passgen_pattern_free(&pattern);
+
+    return test_ok;
+}
+
 static int count_codepoints(void *data, uint32_t codepoint) {
     (void) codepoint;
     *((size_t *) data) += 1;

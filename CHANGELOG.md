@@ -5,7 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- `\]` and `\[` to have brackets in a set.
+
 ### Changed
+- Empty sets (`[]`) are rejected.
 - Releases show the commit they were built from in `--version`.
 - Nightly builds are named `passgen-nightly-*`, and their packages have a
   version like `0.2.0+nightly20261117`.
@@ -13,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - `config.h.in` being installed along with the headers.
+- Ranges ending in an escaped character (`[+-\-]`) failing to generate.
 
 ## [0.2.0] - 2026-11-17
 ### Added

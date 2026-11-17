@@ -141,6 +141,7 @@ optional more than a single character.
 They can be nested.
 .It Li [abc] , [a-z] , [a-zA-Z0-9_]
 Set: outputs one of the characters in it, chosen at random.
+It has to have at least one.
 It can list single characters, and ranges of characters, which include every
 character from the first to the last one by Unicode codepoint.
 The last character of a range must not come before the first one.

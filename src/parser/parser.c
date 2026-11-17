@@ -390,6 +390,11 @@ int passgen_parse_set(
 
     // this set's over
     if(token->codepoint == ']') {
+        // a set stands for one of its characters, so it needs at least one.
+        if(set->items.len == 0) {
+            return -1;
+        }
+
         // compute sum of choices and choices list for binary search.
         size_t choices = 0;
         set->choices_list = malloc(sizeof(size_t) * set->items.len);
