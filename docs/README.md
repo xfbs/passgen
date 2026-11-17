@@ -40,7 +40,7 @@ welcome.
 | [passgen.io](https://passgen.io) | The website, with the documentation for users. It has its own [repository](https://gitlab.com/passgen/website). |
 | [API documentation](https://passgen.gitlab.io/passgen/docs/) | Generated from the headers with Doxygen, for the `master` branch. |
 | [Coverage (lcov)](https://passgen.gitlab.io/passgen/coverage/lcov/), [coverage (llvm-cov)](https://passgen.gitlab.io/passgen/coverage/llvm-cov/) | Test coverage reports, for the `master` branch. |
-| [Nightly builds](https://passgen.gitlab.io/passgen/nightly/) | Built from the `master` branch, and signed. |
+| [Nightly builds](https://passgen.io/install/) | Built from the `master` branch, and signed. They are published at `passgen.gitlab.io/passgen/nightly/`, and listed on the website. |
 | [Releases](https://github.com/xfbs/passgen/releases) | Numbered releases. |
 | [Pipelines](https://gitlab.com/passgen/passgen/-/pipelines) | The state of continuous integration. |
 

@@ -7,12 +7,14 @@ as supporting choosing words from a wordlist, building a markov-chain from a
 wordlist to generate high-entropy, but pronounceable sequences, and being able
 to measure the actual entropy of every sequence it generates. 
 
-* Website: [passgen.gitlab.io/passgen](https://passgen.gitlab.io/passgen/)
+* Website: [passgen.io](https://passgen.io)
+* Documentation: [passgen.io/docs](https://passgen.io/docs/)
+* Install: [passgen.io/install](https://passgen.io/install/), with nightly builds
+* Releases: [GitHub](https://github.com/xfbs/passgen/releases)
+* Developer Documentation: [docs/](docs/README.md)
 * Source Documentation: [Doxygen](https://passgen.gitlab.io/passgen/docs/index.html)
 * Code Coverage: [lcov](https://passgen.gitlab.io/passgen/coverage/lcov), [llvm-cov](https://passgen.gitlab.io/passgen/coverage/llvm-cov)
 * Continuous Integration: [Pipelines](https://gitlab.com/passgen/passgen/pipelines)
-* Releases: [GitHub](https://github.com/xfbs/passgen/releases)
-* Nightly Builds: [Nightly](https://passgen.gitlab.io/passgen/nightly/)
 
 ## Features
 
@@ -131,6 +133,8 @@ but it has some additional features. These are the operations that Passgen under
 | `\w{english}` | Word. Picks a random word from the wordlist with the name `english`. You can use the `-w name:/path/to/list` command-line option to load wordlists. You can load multiple wordlists. |
 | `\m{english}` | Markov-Chain. Generates a high-entropy, but pronounceable word by building a Markov-Chain of the wordlist `english`. This allows you to make a tradeoff between memorability and strength: words are easier to remember than completely random sequences. The Markov chain lets you generate random sequences of letters that follow the same probability distribution as the words in the wordlist, meaning that they are pronounceable and thus easier to remember. |
 
+This is only an overview, see the [documentation](https://passgen.io/docs/syntax/) for all of it.
+
 ## Building
 
 In general, if you have all dependencies installed, doing the following should result in a working binary.
@@ -141,7 +145,7 @@ In general, if you have all dependencies installed, doing the following should r
 
 See [Building](docs/building.md) for more information about building the project.
 
-You may also download [signed nightly releases](https://passgen.gitlab.io/passgen/nightly/) from the website.
+You may also download a [release](https://github.com/xfbs/passgen/releases), or a signed nightly build from the [website](https://passgen.io/install/).
 
 ## Prior art
 

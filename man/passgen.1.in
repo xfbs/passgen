@@ -440,6 +440,9 @@ $ passgen -m mymasterpass -d example.com -t username -p apple2
 .Sh SEE ALSO
 .Xr apg 1 ,
 .Xr pwgen 1
+.Pp
+.Lk https://passgen.io "The website of Passgen" ,
+which has more documentation and examples.
 .Sh AUTHORS
 .An Patrick M. Elsen Aq Mt pelsen@xfbs.net
 .Sh CAVEATS
