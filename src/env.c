@@ -4,6 +4,7 @@
 #include "passgen/wordlist.h"
 #include <stdlib.h>
 #include <string.h>
+#include "passgen/util/clear.h"
 
 void passgen_env_init(passgen_env *env, passgen_random *random) {
     env->depth_limit = 1024;

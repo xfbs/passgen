@@ -2,6 +2,7 @@
 #include "passgen/config.h"
 #include "passgen/util/siphash.h"
 #include <stdlib.h>
+#include "passgen/util/clear.h"
 #define UNUSED(x) (void) x
 
 static const size_t hashmap_sizes[] = {

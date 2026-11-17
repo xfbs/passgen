@@ -16,6 +16,7 @@
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
 #include "../try.h"
+#include "passgen/util/clear.h"
 
 int passgen_parse_group(
     struct passgen_parser *parser,

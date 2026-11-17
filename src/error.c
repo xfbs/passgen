@@ -2,6 +2,7 @@
 #include <passgen/error.h>
 #include <stdio.h>
 #include <string.h>
+#include <passgen/util/clear.h>
 
 void passgen_error_init_raw(passgen_error *error, const char *message) {
     memset(&error->source, 0, sizeof(passgen_error_source));

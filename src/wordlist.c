@@ -5,6 +5,7 @@
 #include "try.h"
 #include <stdlib.h>
 #include <string.h>
+#include "passgen/util/clear.h"
 
 #define ALLOC_INITIAL  256
 #define ALLOC_INCREASE 2

@@ -3,6 +3,7 @@
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/special.h"
+#include "passgen/util/clear.h"
 
 void passgen_pattern_item_free(passgen_pattern_item *item) {
     switch(item->kind) {

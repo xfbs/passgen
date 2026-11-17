@@ -1,5 +1,6 @@
 #include "passgen/pattern/preset.h"
 #include "passgen/config.h"
+#include "passgen/util/clear.h"
 
 void passgen_preset_init(passgen_preset *preset, const char *value) {
     preset->value = value;

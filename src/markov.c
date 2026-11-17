@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include "passgen/util/clear.h"
 #define MIN(a, b)            ((a) < (b) ? (a) : (b))
 #define SATURATING_SUB(a, b) ((a) -MIN(a, b))
 

@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "passgen/util/clear.h"
 
 #define PARAMETERS_INITIAL_SIZE 16
 #define PARAMETERS_MULTIPLIER   2

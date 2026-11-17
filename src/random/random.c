@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include "passgen/util/clear.h"
 
 static bool _strprefix(const char *prefix, const char *string) {
     size_t prefix_len = strlen(prefix);

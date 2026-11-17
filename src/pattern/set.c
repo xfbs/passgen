@@ -2,6 +2,7 @@
 #include "passgen/config.h"
 #include "passgen/pattern/range.h"
 #include <stdlib.h>
+#include "passgen/util/clear.h"
 
 void passgen_pattern_set_init(passgen_pattern_set *set) {
     passgen_stack_init(&set->items, sizeof(passgen_pattern_range));

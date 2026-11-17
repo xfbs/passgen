@@ -3,6 +3,7 @@
 #include "passgen/config.h"
 #include <stdlib.h>
 #include <string.h>
+#include "passgen/util/clear.h"
 
 static const size_t passgen_stack_bin_size = 32;
 static const size_t passgen_stack_cap_init = 4;

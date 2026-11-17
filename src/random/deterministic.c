@@ -4,6 +4,7 @@
 #include "passgen/random.h"
 #include <stdlib.h>
 #include <string.h>
+#include "passgen/util/clear.h"
 
 #define CHACHA20_BLOCK_SIZE 64
 #define CHACHA20_KEY_SIZE   32
