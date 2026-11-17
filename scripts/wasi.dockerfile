@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:3.24
 RUN apk add clang binaryen wasi-sdk cmake make lld git llvm ruby
 # the target used to be called wasm32-wasi, which clang has deprecated and
 # which newer versions of wasi-libc no longer ship libraries for.

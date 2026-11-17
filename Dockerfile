@@ -1,4 +1,4 @@
-FROM alpine AS builder
+FROM alpine:3.24 AS builder
 
 RUN apk add gcc musl-dev cmake ninja git ruby bash grep
 ADD . /code
@@ -8,7 +8,7 @@ RUN ninja -C /build
 RUN ctest --test-dir /build --output-on-failure
 RUN ninja -C /build install
 
-FROM alpine
+FROM alpine:3.24
 
 COPY --from=builder /usr/bin/passgen /usr/bin/passgen
 COPY --from=builder /usr/lib/libpassgen.so /usr/lib/

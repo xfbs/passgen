@@ -199,7 +199,7 @@ test:nix:
 
 # fetch wordlists
 wordlists:
-    image: alpine
+    image: alpine:3.24
     stage: pre
     before_script:
         - apk add curl
@@ -387,7 +387,7 @@ website:coverage:
         expire_in: 30 days
 
 pages:
-    image: alpine
+    image: alpine:3.24
     stage: deploy
     dependencies:
         - website:mkdocs
