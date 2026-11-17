@@ -8,6 +8,8 @@ void passgen_preset_init(passgen_preset *preset, const char *value) {
 }
 
 int passgen_preset_parse(passgen_preset *preset) {
+    // TODO: implement
+    (void) preset;
     return 0;
 }
 

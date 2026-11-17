@@ -31,11 +31,11 @@ void passgen_assert_fail(
     fprintf(stderr, "\nBacktrace:\n");
 
     void *callstack[CALLSTACK_MAX];
-    int frames = backtrace(callstack, sizeof(callstack));
+    int frames = backtrace(callstack, CALLSTACK_MAX);
     char **strs = backtrace_symbols(callstack, frames);
 
     for(int i = 0; i < frames; ++i) {
-        printf("%s\n", strs[i]);
+        fprintf(stderr, "%s\n", strs[i]);
     }
 
     free(strs);

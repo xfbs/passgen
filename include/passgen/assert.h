@@ -22,4 +22,4 @@ void passgen_assert_fail(
     size_t line);
 
 /// Static assertion.
-#define passgen_static_assert(x) _Static_assert(x)
+#define passgen_static_assert(x) _Static_assert(x, #x)
