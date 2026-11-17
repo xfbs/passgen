@@ -17,8 +17,8 @@ bench: $(BUILDDIR)/src/bench/passgen-bench
 	@./$<
 
 # run unit tests
-test: $(BUILDDIR)/src/tests/passgen-test
-	@./$< -v
+test: $(BUILDDIR)
+	@cd build && make -j check
 
 # compute coverage
 coverage:

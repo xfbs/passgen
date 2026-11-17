@@ -95,9 +95,9 @@ The supported build types are:
 
 You may want to run tests after building:
 
-    make test
+    ctest --output-on-failure
 	# or
-	./src/test/passgen-test -v
+	./src/tests/passgen-test -v
 
 If the tests work, you can use the built passgen:
 

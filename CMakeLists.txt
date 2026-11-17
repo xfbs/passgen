@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
 project(
     passgen
@@ -97,9 +97,17 @@ if(BUILD_TOOLS)
     add_subdirectory(src/tools)
 endif()
 
-# unit tests
+# unit tests and CLI tests, run with `ctest` or by building the `check` target.
 if(BUILD_TESTING)
+    enable_testing()
     add_subdirectory(src/tests)
+
+    add_test(NAME passgen-test COMMAND passgen-test)
+    add_test(NAME passgen-cli COMMAND ${CMAKE_SOURCE_DIR}/scripts/test-passgen-cli.sh
+                                      $<TARGET_FILE:passgen-cli>)
+
+    # unlike the builtin `test` target, this makes sure everything is built.
+    add_custom_target(check DEPENDS test-lib test-cli)
 endif()
 
 # setup and install man page

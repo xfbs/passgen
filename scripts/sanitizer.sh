@@ -3,7 +3,7 @@ set -euo pipefail
 
 function run_sanitizer() {
     sanitizer="$1"
-    sanitizer_lower="${sanitizer,,}"
+    sanitizer_lower="$(echo "$sanitizer" | tr "[:upper:]" "[:lower:]")"
     sanitizer_first="${sanitizer_lower:0:1}"
     build_dir="${2:-build-${sanitizer_first}san}"
 
@@ -13,8 +13,7 @@ function run_sanitizer() {
         -DUSE_SANITIZER=$sanitizer \
         -DBUILD_GIT_INFO=NO
 
-    ninja -C "$build_dir" test
-    ninja -C "$build_dir" test-cli
+    ninja -C "$build_dir" check
 }
 
 if test "$#" -lt 1; then

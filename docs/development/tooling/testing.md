@@ -4,9 +4,17 @@ When the `BUILD_TESTING` option is enabled on the CMake build system (which it
 is, by default), a `passgen-test` binary will be built which runs unit tests
 against the codebase.
 
-For convenience, tests can be run using the `test` target of the build system.
+The tests are registered with CTest, so after building, they can be run with
+`ctest` (or the `test` target of the build system). This runs both the unit
+tests and the tests of the command-line interface
+(`scripts/test-passgen-cli.sh`).
 
-    make test
+    ctest --test-dir build --output-on-failure
+
+There is also a `check` target, which makes sure everything is built before
+running the tests.
+
+    cmake --build build --target check
 
 These should be run and pass before committing.
 
