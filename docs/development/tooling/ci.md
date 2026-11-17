@@ -32,7 +32,7 @@ that builds Passgen for amd64:
 
 ```yaml
 build:amd64:
-  image: registry.gitlab.com/xfbs/passgen/amd64
+  image: registry.gitlab.com/passgen/passgen/amd64
   stage: build
   script:
     - mkdir build-amd64 && cd build-amd64
@@ -49,7 +49,7 @@ build:amd64:
 ```
 
 This job defines that it should use the Docker image
-`registry.gitlab.com/xfbs/passgen/adm64`, it is part of the *build* stage, it
+`registry.gitlab.com/passgen/passgen/adm64`, it is part of the *build* stage, it
 defines some commands that should be run in this Docker image and finally it
 exports the `build-amd64` folder as an artifact.
 
@@ -92,7 +92,7 @@ You can see that this job uses the `docker` image. It requires the
 and runs a Docker daemon. Using these two together allows the job to use Docker
 in the CI job. It logs in to the GitLab registry (`registry.gitlab.com`) and
 builds and pushes the `alpine.dockerfile` image. This will end up at
-`registry.gitlab.com/xfbs/passgen/alpine`.
+`registry.gitlab.com/passgen/passgen/alpine`.
 
 What you can also see is the `only` section. This limits the job to only
 running for new code on the `master` branch, and to only running if the
@@ -116,7 +116,7 @@ there is also a [scheduled pipeline][schedule] to rebuild everything weekly.
 This causes these jobs to run regardless, in order to ensure that these images
 do not get stale.
 
-[schedule]: https://gitlab.com/xfbs/passgen/-/pipeline_schedules
+[schedule]: https://gitlab.com/passgen/passgen/-/pipeline_schedules
 
 ## Test
 
@@ -140,4 +140,4 @@ In the *build* stage, Passgen is built in release mode, and it is packaged.
 
 In the *deploy* stage, documentation is built and published on GitLab Pages, along with the releases from the *build* stage.
 
-[gitlabciyml]: https://gitlab.com/xfbs/passgen/-/blob/master/.gitlab-ci.yml
+[gitlabciyml]: https://gitlab.com/passgen/passgen/-/blob/master/.gitlab-ci.yml

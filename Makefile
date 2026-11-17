@@ -4,7 +4,7 @@
 # directly, and for better compilation speed it is recommended to use Ninja
 # (package `ninja-build` in Debian) rather than Make.
 DOCKER=docker
-DOCKER_IMAGE=registry.gitlab.com/xfbs/passgen
+DOCKER_IMAGE=registry.gitlab.com/passgen/passgen
 DOXYGEN=doxygen
 BUILDDIR=build
 BUILD_TYPE=Debug

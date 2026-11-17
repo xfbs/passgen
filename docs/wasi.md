@@ -31,4 +31,4 @@ Running passgen with the WasmTime runtime is easy, but it needs some permissions
 
 ## Issues
 
-If you run into any issues with the WASI build of Passgen, please reach out by creating an issue in the [repository](https://gitlab.com/xfbs/passgen).
+If you run into any issues with the WASI build of Passgen, please reach out by creating an [issue](https://github.com/xfbs/passgen/issues).

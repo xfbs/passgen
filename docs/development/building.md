@@ -35,7 +35,7 @@ On other systems, these packages should also be easily available.
 Before you can set up the build system, you must clone the Passgen repository.
 You can do this using Git. 
 
-    git clone https://gitlab.com/xfbs/passgen
+    git clone https://gitlab.com/passgen/passgen
 
 ## Build System
 

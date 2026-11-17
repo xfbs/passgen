@@ -3,8 +3,8 @@ site_url: https://passgen.gitlab.io/passgen/
 
 copyright: 'Copyright &copy; 2023 Patrick M. Elsen'
 
-repo_name: 'xfbs/passgen'
-repo_url: 'https://gitlab.com/xfbs/passgen'
+repo_name: 'passgen/passgen'
+repo_url: 'https://gitlab.com/passgen/passgen'
 
 theme:
   name: 'material'
@@ -62,7 +62,7 @@ nav:
       - Packaging: development/tooling/packaging.md
       - CI/CD: development/tooling/ci.md
     - Security: development/security.md
-    - Repository: "https://gitlab.com/xfbs/passgen"
+    - Repository: "https://gitlab.com/passgen/passgen"
     - Coverage: "https://passgen.gitlab.io/passgen/coverage/lcov/"
     - Documentation: "https://passgen.gitlab.io/passgen/docs/"
   - Licenses: licenses.md

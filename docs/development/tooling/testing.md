@@ -115,9 +115,9 @@ The filters can be used to only run tests starting with a specific name, which
 is not really necessary as running all tests only takes a fraction of a second
 anyways, but can be useful when certain tests are broken during a refactoring.
 
-[tests-folder]: https://gitlab.com/xfbs/passgen/-/tree/master/src/tests
-[tests.h]: https://gitlab.com/xfbs/passgen/-/blob/master/src/tests/tests.h
-[tests.c]: https://gitlab.com/xfbs/passgen/-/blob/master/src/tests/tests.c
-[cmakelists]: https://gitlab.com/xfbs/passgen/-/blob/master/src/tests/CMakeLists.txt
-[generate-test-list]: https://gitlab.com/xfbs/passgen/-/blob/master/scripts/generate-test-list.rb
+[tests-folder]: https://gitlab.com/passgen/passgen/-/tree/master/src/tests
+[tests.h]: https://gitlab.com/passgen/passgen/-/blob/master/src/tests/tests.h
+[tests.c]: https://gitlab.com/passgen/passgen/-/blob/master/src/tests/tests.c
+[cmakelists]: https://gitlab.com/passgen/passgen/-/blob/master/src/tests/CMakeLists.txt
+[generate-test-list]: https://gitlab.com/passgen/passgen/-/blob/master/scripts/generate_test_list.rb
 [valgrind]: https://valgrind.org/

@@ -47,8 +47,8 @@ command-line utility. For a quick overview of how it works, see
 [grammar]: syntax.md
 [security]: development/security.md
 [presets]: presets.md
-[repo]: https://gitlab.com/xfbs/passgen
-[license]: https://gitlab.com/xfbs/passgen/-/blob/master/LICENSE.md
+[repo]: https://gitlab.com/passgen/passgen
+[license]: https://gitlab.com/passgen/passgen/-/blob/master/LICENSE.md
 
 </div>
 

@@ -76,15 +76,15 @@ somewhat in sync. If you are interested in an explainer of how to build
 Passgen, check out the [Building](building.md) page.
 
 
-[gitlab]: https://gitlab.com/xfbs/passgen
+[gitlab]: https://gitlab.com/passgen/passgen
 [github]: https://github.com/xfbs/passgen
 [doxygen]: https://passgen.gitlab.io/passgen/docs/
-[merge-requests]: https://gitlab.com/xfbs/passgen/-/merge_requests
-[bug-reports]: https://gitlab.com/xfbs/passgen/-/issues
+[merge-requests]: https://gitlab.com/passgen/passgen/-/merge_requests
+[bug-reports]: https://github.com/xfbs/passgen/issues
 [coverage-lcov]: https://passgen.gitlab.io/passgen/coverage/lcov/
 [coverage-llvm-cov]: https://passgen.gitlab.io/passgen/coverage/llvm-cov/
 [cmake]: https://cmake.org/
 [llvm-sanitizer]: https://clang.llvm.org/docs/AddressSanitizer.html
 [valgrind]: https://valgrind.org/
 [qemu]: https://www.qemu.org/
-[ci]: https://gitlab.com/xfbs/passgen/-/pipelines
+[ci]: https://gitlab.com/passgen/passgen/-/pipelines

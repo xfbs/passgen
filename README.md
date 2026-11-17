@@ -1,4 +1,4 @@
-# Passgen [![CI Pipelines](https://gitlab.com/xfbs/passgen/badges/master/pipeline.svg)](https://gitlab.com/xfbs/passgen/-/pipelines) [![Documentation](https://passgen.gitlab.io/passgen/badges/docs.svg)](https://passgen.gitlab.io/passgen/docs/index.html)
+# Passgen [![CI Pipelines](https://gitlab.com/passgen/passgen/badges/master/pipeline.svg)](https://gitlab.com/passgen/passgen/-/pipelines) [![Documentation](https://passgen.gitlab.io/passgen/badges/docs.svg)](https://passgen.gitlab.io/passgen/docs/index.html)
 
 Passgen is a tool to generate random sequences from a [regular
 expression](https://en.wikipedia.org/wiki/Regular_expression).  It has some
@@ -10,7 +10,8 @@ to measure the actual entropy of every sequence it generates.
 * Website: [passgen.gitlab.io/passgen](https://passgen.gitlab.io/passgen/)
 * Source Documentation: [Doxygen](https://passgen.gitlab.io/passgen/docs/index.html)
 * Code Coverage: [lcov](https://passgen.gitlab.io/passgen/coverage/lcov), [llvm-cov](https://passgen.gitlab.io/passgen/coverage/llvm-cov)
-* Continuous Integration: [Pipelines](https://gitlab.com/xfbs/passgen/pipelines)
+* Continuous Integration: [Pipelines](https://gitlab.com/passgen/passgen/pipelines)
+* Releases: [GitHub](https://github.com/xfbs/passgen/releases)
 * Nightly Builds: [Nightly](https://passgen.gitlab.io/passgen/nightly/)
 
 ## Features
