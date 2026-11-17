@@ -35,6 +35,8 @@ typedef enum passgen_status {
     /// Something which should not be possible happened. This is a bug in the
     /// library.
     PASSGEN_ERROR_INTERNAL,
+    /// A file could not be read. The detail of the error is the reason.
+    PASSGEN_ERROR_IO,
 
     /// The pattern is not valid UTF-8.
     PASSGEN_ERROR_UTF8,
@@ -78,7 +80,8 @@ typedef enum passgen_status {
     /// of the error is its name.
     PASSGEN_ERROR_WORDLIST_EMPTY,
     /// The pattern uses a wordlist which could not be read, or which has
-    /// words that are not valid UTF-8. The detail of the error is its name.
+    /// words that are not valid UTF-8. The detail of the error is its name,
+    /// and its cause is why.
     PASSGEN_ERROR_WORDLIST_READ,
     /// All of the segments of a group have a multiplier of zero, such as
     /// `{0}a`, so there is nothing to choose from.

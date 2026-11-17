@@ -2,6 +2,7 @@
 /// @author Patrick M. Elsen <pelsen@xfbs.net>
 /// @brief Environment for generating from patterns.
 #pragma once
+#include <passgen/error.h>
 #include <passgen/export.h>
 
 #include <passgen/random.h>
@@ -74,8 +75,10 @@ PASSGEN_EXPORT void passgen_env_depth_limit_set(passgen_env *env, size_t depth_l
 ///   to be seekable.
 /// @param markov_length Length of the Markov chain to build from the
 ///   wordlist when it is used with one, between 1 and 255
-/// @returns Zero on success, nonzero on failure
-PASSGEN_EXPORT int passgen_env_wordlist_add(
+/// @returns @ref PASSGEN_OK or @ref PASSGEN_ERROR_OUT_OF_MEMORY. A file which
+///   cannot be read is not noticed here, but when generating, which then
+///   fails with @ref PASSGEN_ERROR_WORDLIST_READ.
+PASSGEN_EXPORT passgen_status passgen_env_wordlist_add(
     passgen_env *env,
     const char *name,
     FILE *file,

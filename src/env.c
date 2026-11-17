@@ -49,7 +49,7 @@ void passgen_env_depth_limit_set(passgen_env *env, size_t depth_limit) {
     env->depth_limit = depth_limit;
 }
 
-int passgen_env_wordlist_add(
+passgen_status passgen_env_wordlist_add(
     passgen_env *env,
     const char *name,
     FILE *file,
@@ -62,7 +62,7 @@ int passgen_env_wordlist_add(
         free(name_copy);
         free(wordlist);
         fclose(file);
-        return 1;
+        return PASSGEN_ERROR_OUT_OF_MEMORY;
     }
 
     memcpy(name_copy, name, name_size);
@@ -76,5 +76,5 @@ int passgen_env_wordlist_add(
         wordlist_entry_free(NULL, &old);
     }
 
-    return 0;
+    return PASSGEN_OK;
 }

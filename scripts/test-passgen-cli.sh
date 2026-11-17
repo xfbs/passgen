@@ -231,6 +231,11 @@ function error_of() {
     "$@" 2>&1 >/dev/null | sed $'s/\033\\[[0-9;]*m//g' | head -n 1
 }
 
+# all of what is printed as the error.
+function error_lines() {
+    "$@" 2>&1 >/dev/null | sed $'s/\033\\[[0-9;]*m//g' || true
+}
+
 test "$(error_of $passgen '[]')" = "error in pattern: set is empty"
 test "$(error_of $passgen '(abc')" = "error in pattern: group is not closed"
 test "$(error_of $passgen 'a{5,2}')" = "error in pattern: invalid repetition"
@@ -241,6 +246,14 @@ test "$(error_of $passgen '\m{undefined}')" = "error: wordlist not found: undefi
 test "$(error_of $passgen -w "test:$tmpdir/empty.txt" '\w{test}')" = "error: wordlist is empty: test"
 test "$(error_of $passgen -D 2 '((((a))))')" = "error: nested too deeply"
 test "$(error_of $passgen '{0}a')" = "error: nothing to choose from"
+
+# a wordlist which cannot be read (a pipe cannot be rewound) says why.
+if [ -e /dev/stdin ]; then
+    output="$(echo word | error_lines $passgen -w test:/dev/stdin '\w{test}')"
+    test "$(echo "$output" | sed -n 1p)" = "error: wordlist could not be read: test"
+    echo "$output" | sed -n 2p | grep -q "^caused by: cannot read file: "
+    echo word | fails $passgen -w test:/dev/stdin '\m{test}'
+fi
 
 # a file which runs out is an error, with no output. one which is too short
 # to start with is not opened. 1024 bytes are read at a time.

@@ -12,8 +12,8 @@ void load(passgen_wordlist *wordlist, const char *filename) {
     FILE *file = fopen(filename, "r");
     passgen_assert(file);
 
-    passgen_wordlist_load(wordlist, file, 3);
-    fclose(file);
+    // the file is closed by this.
+    passgen_wordlist_load(wordlist, NULL, file, 3);
 }
 
 void dump(const char **args, size_t args_len) {

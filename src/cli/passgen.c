@@ -314,10 +314,11 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
     name[offset] = 0;
 
     // the name is copied, and the file is closed, whether this works or not.
-    int ret = passgen_env_wordlist_add(opt->env, name, file, opt->markov_length);
+    passgen_status status =
+        passgen_env_wordlist_add(opt->env, name, file, opt->markov_length);
     free(name);
 
-    return ret == 0 ? 0 : PASSGEN_CLI_ERROR_ALLOC;
+    return status == PASSGEN_OK ? 0 : PASSGEN_CLI_ERROR_ALLOC;
 }
 
 int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {

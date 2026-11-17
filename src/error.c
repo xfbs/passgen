@@ -13,6 +13,8 @@ const char *passgen_status_string(passgen_status status) {
             return "out of memory";
         case PASSGEN_ERROR_INTERNAL:
             return "internal error";
+        case PASSGEN_ERROR_IO:
+            return "cannot read file";
         case PASSGEN_ERROR_UTF8:
             return "not valid UTF-8";
         case PASSGEN_ERROR_ESCAPE:

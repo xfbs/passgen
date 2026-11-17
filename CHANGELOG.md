@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   fill in, and return the length through a pointer. Failing to generate says
   why, such as which wordlist is missing.
 - A wordlist without a name (`\w{}`) is not a valid pattern.
+- A wordlist which cannot be read says why. One which could only be read in
+  part is an error, rather than being used with the words that were read.
+- `passgen_env_wordlist_add()` returns a `passgen_status`.
 - A source of randomness which runs out is an error (`PASSGEN_ERROR_RANDOM`,
   `passgen_random_failed()`), rather than aborting.
 - Entropy is in bits in the API, rather than a number of possibilities.

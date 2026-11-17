@@ -3,6 +3,7 @@
 /// Tests for errors: that what is wrong with a pattern is reported as such,
 /// along with where it is, and that errors can be chained.
 #include "passgen/util/error.h"
+#include "passgen/wordlist.h"
 #include "tests.h"
 #include <passgen/env.h>
 #include <passgen/error.h>
@@ -11,6 +12,11 @@
 #include <passgen/passgen.h>
 #include <stdlib.h>
 #include <string.h>
+
+// pipes are used as files which cannot be read.
+#ifndef _WIN32
+#include <unistd.h>
+#endif
 
 /// Every kind of mistake in a pattern results in its own status, with the
 /// position of what is wrong.
@@ -590,6 +596,118 @@ test_result test_error_random_file_short(void) {
     assert(!passgen_random_failed(&random));
     assert(passgen_random_u8(&random) == 0);
     assert(passgen_random_failed(&random));
+    passgen_random_close(&random);
+
+    return test_ok;
+}
+
+static int ignore_callback(void *data, uint32_t codepoint) {
+    (void) data;
+    (void) codepoint;
+    return 0;
+}
+
+#ifndef _WIN32
+/// A wordlist which cannot be read fails generating, with the reason as the
+/// cause of the error. It fails in the same way when tried again.
+test_result test_error_wordlist_read(void) {
+    passgen_random random;
+    assert(passgen_random_open(&random, "zero"));
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+
+    // a pipe cannot be rewound, which is how the size of the file is found.
+    int fds[2];
+    assert(0 == pipe(fds));
+    assert(5 == write(fds[1], "word\n", 5));
+    close(fds[1]);
+    FILE *file = fdopen(fds[0], "r");
+    assert(file);
+    assert(PASSGEN_OK == passgen_env_wordlist_add(env, "piped", file, 2));
+
+    const char *patterns[] = {"\\w{piped}", "\\m{piped}", "\\w{piped}"};
+    for(size_t i = 0; i < 3; i++) {
+        passgen_pattern *pattern;
+        passgen_error error;
+        assert(PASSGEN_OK == passgen_parse(&pattern, NULL, patterns[i]));
+        assert(
+            PASSGEN_ERROR_WORDLIST_READ ==
+            passgen_generate(pattern, env, &error, NULL, NULL, ignore_callback));
+        assert(error.kind == PASSGEN_ERROR_WORDLIST_READ);
+        assert_streq(error.detail, "piped");
+        assert(error.cause);
+        assert(error.cause->kind == PASSGEN_ERROR_IO);
+        assert(error.cause->detail[0] != 0);
+        assert(error.cause->cause == NULL);
+        passgen_error_free(&error);
+
+        // without an error to fill in, the cause is not leaked.
+        assert(
+            PASSGEN_ERROR_WORDLIST_READ ==
+            passgen_generate(pattern, env, NULL, NULL, NULL, ignore_callback));
+        passgen_pattern_free(pattern);
+    }
+
+    passgen_env_free(env);
+    passgen_random_close(&random);
+
+    return test_ok;
+}
+
+/// Loading a wordlist directly reports the same thing, and leaves nothing
+/// behind.
+test_result test_error_wordlist_load(void) {
+    int fds[2];
+    assert(0 == pipe(fds));
+    close(fds[1]);
+    FILE *file = fdopen(fds[0], "r");
+    assert(file);
+
+    passgen_wordlist wordlist;
+    passgen_error error;
+    assert(PASSGEN_ERROR_IO == passgen_wordlist_load(&wordlist, &error, file, 3));
+    assert(error.kind == PASSGEN_ERROR_IO);
+    assert(error.detail[0] != 0);
+    assert(!wordlist.parsed);
+    assert(!wordlist.parsed_markov);
+    assert(wordlist.data == NULL);
+    assert(wordlist.words == NULL);
+    assert(wordlist.count == 0);
+    passgen_error_free(&error);
+
+    // this closes the file.
+    passgen_wordlist_free(&wordlist);
+
+    return test_ok;
+}
+#endif
+
+/// A word which is not valid UTF-8 fails generating when it is picked, and
+/// says that this is why.
+test_result test_error_wordlist_utf8(void) {
+    passgen_random random;
+    assert(passgen_random_open(&random, "zero"));
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+
+    FILE *file = tmpfile();
+    assert(file);
+    fputs("\xff\xfe\n", file);
+    assert(PASSGEN_OK == passgen_env_wordlist_add(env, "broken", file, 2));
+
+    passgen_pattern *pattern;
+    passgen_error error;
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\w{broken}"));
+    assert(
+        PASSGEN_ERROR_WORDLIST_READ ==
+        passgen_generate(pattern, env, &error, NULL, NULL, ignore_callback));
+    assert_streq(error.detail, "broken");
+    assert(error.cause);
+    assert(error.cause->kind == PASSGEN_ERROR_UTF8);
+    passgen_error_free(&error);
+    passgen_pattern_free(pattern);
+
+    passgen_env_free(env);
     passgen_random_close(&random);
 
     return test_ok;

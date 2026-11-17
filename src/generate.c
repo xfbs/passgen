@@ -47,6 +47,48 @@ static inline int fail_wordlist(
     return kind;
 }
 
+// Fail because of something to do with a wordlist, which was caused by
+// another error. The cause is moved into the error.
+static inline int fail_wordlist_cause(
+    passgen_generate_context *context,
+    passgen_status kind,
+    const char *name,
+    passgen_error *cause) {
+    passgen_error_wrap(context->error, kind, cause);
+    passgen_error_detail_set(context->error, name);
+    return kind;
+}
+
+// Wordlists are read when they are first used, which is here. The same goes
+// for the Markov chains made from them.
+static int load_wordlist(
+    passgen_generate_context *context,
+    passgen_wordlist *wordlist,
+    const char *name,
+    bool markov) {
+    passgen_error cause;
+    passgen_error_init(&cause);
+    passgen_status status = PASSGEN_OK;
+
+    if(!wordlist->parsed) {
+        status = passgen_wordlist_parse(wordlist, &cause);
+    }
+
+    if(status == PASSGEN_OK && markov && !wordlist->parsed_markov) {
+        status = passgen_wordlist_parse_markov(wordlist, &cause);
+    }
+
+    if(status != PASSGEN_OK) {
+        return fail_wordlist_cause(
+            context,
+            PASSGEN_ERROR_WORDLIST_READ,
+            name,
+            &cause);
+    }
+
+    return PASSGEN_OK;
+}
+
 // Emit a character
 static inline int emit(passgen_generate_context *context, uint32_t codepoint) {
     // if the source of randomness has failed, this is not what should have
@@ -417,12 +459,7 @@ static int passgen_generate_special_markov(
         return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_NOT_FOUND, name);
     }
     passgen_wordlist *wordlist = entry->value;
-    if(!wordlist->parsed && 0 != passgen_wordlist_parse(wordlist)) {
-        return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_READ, name);
-    }
-    if(!wordlist->parsed_markov) {
-        passgen_wordlist_parse_markov(wordlist);
-    }
+    try(load_wordlist(context, wordlist, name, true));
     passgen_markov *markov = &wordlist->markov;
 
     // an empty markov chain (from an empty wordlist) cannot generate anything.
@@ -463,9 +500,7 @@ static int passgen_generate_special_wordlist(
         return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_NOT_FOUND, name);
     }
     passgen_wordlist *wordlist = entry->value;
-    if(!wordlist->parsed && 0 != passgen_wordlist_parse(wordlist)) {
-        return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_READ, name);
-    }
+    try(load_wordlist(context, wordlist, name, false));
 
     // cannot pick a word from an empty wordlist.
     if(passgen_wordlist_count(wordlist) == 0) {
@@ -491,7 +526,14 @@ static int passgen_generate_special_wordlist(
             word_end - word_pos);
         if(decode_ret < PASSGEN_UTF8_SUCCESS) {
             // the word which was picked is not valid UTF-8.
-            return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_READ, name);
+            passgen_error cause;
+            passgen_error_init(&cause);
+            passgen_error_set(&cause, PASSGEN_ERROR_UTF8);
+            return fail_wordlist_cause(
+                context,
+                PASSGEN_ERROR_WORDLIST_READ,
+                name,
+                &cause);
         }
         for(size_t i = 0; &codepoints[i] < codepoints_pos; i++) {
             try(emit(context, codepoints[i]));

@@ -14,7 +14,7 @@ test_result test_wordlist_load(void) {
     assert(file);
 
     passgen_wordlist wordlist;
-    passgen_wordlist_load(&wordlist, file, 3);
+    assert(PASSGEN_OK == passgen_wordlist_load(&wordlist, NULL, file, 3));
 
     assert(wordlist.count == 3);
     assert(0 == strcmp(wordlist.words[0], "abacus"));
@@ -43,7 +43,7 @@ test_result test_wordlist_load_long(void) {
     assert(file);
 
     passgen_wordlist wordlist;
-    passgen_wordlist_load(&wordlist, file, 3);
+    assert(PASSGEN_OK == passgen_wordlist_load(&wordlist, NULL, file, 3));
 
     assert_eq(wordlist.count, 26 * 26);
     assert_eq(passgen_wordlist_count(&wordlist), 26 * 26);
@@ -68,7 +68,7 @@ test_result test_wordlist_random(void) {
     assert(file);
 
     passgen_wordlist wordlist;
-    passgen_wordlist_load(&wordlist, file, 3);
+    assert(PASSGEN_OK == passgen_wordlist_load(&wordlist, NULL, file, 3));
 
     passgen_random random;
     passgen_random_open(&random, NULL);
