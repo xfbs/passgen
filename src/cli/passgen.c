@@ -55,6 +55,8 @@ int passgen_cli_run(passgen_cli_opts opts) {
     int ret = passgen_parse(&pattern, &error, opts.pattern);
     if(ret != 0) {
         passgen_error_print(&error, opts.pattern);
+        // the pattern is partially built at this point.
+        passgen_pattern_free(&pattern);
         return PASSGEN_ERROR_PATTERN_PARSE;
     }
 
@@ -282,7 +284,12 @@ int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
         return PASSGEN_ERROR_PRESET_NOT_FOUND;
     }
     *colon = 0;
-    passgen_hashmap_insert(&opts->presets, arg_copy, colon + 1);
+
+    // the name and the pattern share a single allocation, which is owned by
+    // the hashmap. if this replaces a previous definition, free that one.
+    passgen_hashmap_entry old =
+        passgen_hashmap_insert(&opts->presets, arg_copy, colon + 1);
+    free((void *) old.key);
     return 0;
 }
 
@@ -300,61 +307,37 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_utf8);
     passgen_env_init(&opts->env, NULL);
 
-    // some defaults
-    passgen_hashmap_insert(
-        &opts->presets,
-        "apple1",
-        "([a-zA-Z0-9]{3}-){3}[a-zA-Z0-9]{3}");
-    passgen_hashmap_insert(
-        &opts->presets,
-        "apple2",
-        "([a-zA-Z0-9]{6}-){2}[a-zA-Z0-9]{6}");
-    passgen_hashmap_insert(
-        &opts->presets,
-        "uuid",
-        "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
-    passgen_hashmap_insert(&opts->presets, "edge", "[A-Za-f0-9:_\\-]{15}");
-    passgen_hashmap_insert(&opts->presets, "firefox", "[a-zA-Z0-9]{15}");
-    passgen_hashmap_insert(
-        &opts->presets,
-        "proquint16",
-        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz]["
-        "aiou]){2}[bdfghjklmnprstvz]){0}");
-    passgen_hashmap_insert(
-        &opts->presets,
-        "proquint32",
-        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz]["
-        "aiou]){2}[bdfghjklmnprstvz]){1}");
-    passgen_hashmap_insert(
-        &opts->presets,
-        "proquint48",
-        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz]["
-        "aiou]){2}[bdfghjklmnprstvz]){2}");
-    passgen_hashmap_insert(
-        &opts->presets,
-        "proquint64",
-        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz]["
-        "aiou]){2}[bdfghjklmnprstvz]){3}");
-    passgen_hashmap_insert(
-        &opts->presets,
-        "proquint80",
-        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz]["
-        "aiou]){2}[bdfghjklmnprstvz]){4}");
-    passgen_hashmap_insert(
-        &opts->presets,
-        "proquint96",
-        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz]["
-        "aiou]){2}[bdfghjklmnprstvz]){5}");
-    passgen_hashmap_insert(
-        &opts->presets,
-        "proquint112",
-        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz]["
-        "aiou]){2}[bdfghjklmnprstvz]){6}");
-    passgen_hashmap_insert(
-        &opts->presets,
-        "proquint128",
-        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz]["
-        "aiou]){2}[bdfghjklmnprstvz]){7}");
+    // some defaults. these are defined the same way as presets from the
+    // command line or configuration, so that every entry in the hashmap owns
+    // its memory.
+    static const char *const defaults[] = {
+        "apple1:([a-zA-Z0-9]{3}-){3}[a-zA-Z0-9]{3}",
+        "apple2:([a-zA-Z0-9]{6}-){2}[a-zA-Z0-9]{6}",
+        "uuid:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-"
+        "f]{12}",
+        "edge:[A-Za-f0-9:_\\-]{15}",
+        "firefox:[a-zA-Z0-9]{15}",
+        "proquint16:([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfg"
+        "hjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){0}",
+        "proquint32:([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfg"
+        "hjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){1}",
+        "proquint48:([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfg"
+        "hjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){2}",
+        "proquint64:([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfg"
+        "hjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){3}",
+        "proquint80:([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfg"
+        "hjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){4}",
+        "proquint96:([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfg"
+        "hjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){5}",
+        "proquint112:([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdf"
+        "ghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){6}",
+        "proquint128:([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdf"
+        "ghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){7}",
+    };
+
+    for(size_t i = 0; i < sizeof(defaults) / sizeof(defaults[0]); i++) {
+        passgen_cli_opts_preset(opts, defaults[i]);
+    }
 }
 
 int passgen_cli_preset_show(void *data, passgen_hashmap_entry *entry) {
@@ -655,7 +638,15 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
     return error;
 }
 
+static int passgen_cli_preset_free(void *data, passgen_hashmap_entry *entry) {
+    (void) data;
+    // this frees the value too, as they share an allocation.
+    free((void *) entry->key);
+    return 0;
+}
+
 void passgen_cli_opts_free(passgen_cli_opts *opts) {
+    passgen_hashmap_foreach(&opts->presets, NULL, passgen_cli_preset_free);
     passgen_hashmap_free(&opts->presets);
     passgen_env_free(&opts->env);
 }
