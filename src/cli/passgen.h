@@ -12,7 +12,7 @@
 #include <passgen/config.h>
 #include <passgen/container/hashmap.h>
 #include "passgen/pattern/pattern.h"
-#include "passgen/pattern/env.h"
+#include "passgen/env.h"
 
 /// The kinds of errors that cause the binary to exit early and with a nonzero
 /// return code.
@@ -63,8 +63,11 @@ typedef struct {
 
     /// Presets to choose from.
     passgen_hashmap presets;
+    /// Source of randomness to generate from. This is what the environment
+    /// uses, but it is owned by the options.
+    passgen_random *random;
     /// Environment for passgen
-    passgen_env env;
+    passgen_env *env;
 } passgen_cli_opts;
 
 /// Initialize passgen_cli_opts to default values.

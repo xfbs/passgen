@@ -55,6 +55,10 @@ int main(int argc, char *argv[]) {
 
     // initialise data structures.
     passgen_cli_opts_init(&opts);
+    if(!opts.env) {
+        passgen_cli_opts_free(&opts);
+        return passgen_cli_bail(PASSGEN_ERROR_ALLOC, NULL);
+    }
 
     // load values from a config file (located at /etc/passgen.conf, or
     // $HOME/.config/passgen.conf).

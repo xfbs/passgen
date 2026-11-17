@@ -13,7 +13,7 @@
 #include <stdint.h>
 
 #include "passgen/passgen.h"
-#include "passgen/pattern/env.h"
+#include "passgen/env.h"
 
 /// Callback for generation. Takes an arbitrary data pointer and the codepoint
 /// that was generated. If it returns anything other than zero, generating

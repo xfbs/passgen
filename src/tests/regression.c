@@ -6,7 +6,8 @@
 #include <math.h>
 #include <passgen/generate.h>
 #include <passgen/passgen.h>
-#include <passgen/pattern/env.h>
+#include <passgen/pattern/pattern.h>
+#include <passgen/env.h>
 #include <passgen/random.h>
 #include <passgen/util/utf8.h>
 #include <stdlib.h>
@@ -281,9 +282,10 @@ test_result test_regression_parse_unicode_escape_range(void) {
 test_result test_regression_parse_unicode_syntax(void) {
     passgen_pattern *pattern;
     passgen_error error;
-    passgen_env env;
-    passgen_env_init(&env, passgen_random_open(NULL, "zero"));
-    assert(env.random);
+    passgen_random *random = passgen_random_open(NULL, "zero");
+    assert(random);
+    passgen_env *env = passgen_env_new(random);
+    assert(env);
 
     // one for each of the characters which have a meaning: ( ) ? [ { | }
     const char *patterns[] = {
@@ -305,7 +307,7 @@ test_result test_regression_parse_unicode_syntax(void) {
         assert(0 == passgen_parse(&pattern, &error, patterns[i]));
         size_t len = passgen_generate_fill_utf8(
             pattern,
-            &env,
+            env,
             NULL,
             output,
             sizeof(output) - 1);
@@ -318,7 +320,8 @@ test_result test_regression_parse_unicode_syntax(void) {
     assert(0 != passgen_parse(&pattern, &error, "a\\\xc5\xbcz"));
     passgen_pattern_free(pattern);
 
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_free(random);
 
     return test_ok;
 }
@@ -328,15 +331,16 @@ test_result test_regression_parse_unicode_syntax(void) {
 test_result test_regression_parse_escaped_question_mark(void) {
     passgen_pattern *pattern;
     passgen_error error;
-    passgen_env env;
-    passgen_env_init(&env, passgen_random_open(NULL, "zero"));
-    assert(env.random);
+    passgen_random *random = passgen_random_open(NULL, "zero");
+    assert(random);
+    passgen_env *env = passgen_env_new(random);
+    assert(env);
 
     uint8_t output[32] = {0};
     assert(0 == passgen_parse(&pattern, &error, "why\\?\\?{2}(\\?)"));
     size_t len = passgen_generate_fill_utf8(
         pattern,
-        &env,
+        env,
         NULL,
         output,
         sizeof(output) - 1);
@@ -348,7 +352,7 @@ test_result test_regression_parse_escaped_question_mark(void) {
     assert(0 == passgen_parse(&pattern, &error, "[?]"));
     len = passgen_generate_fill_utf8(
         pattern,
-        &env,
+        env,
         NULL,
         output,
         sizeof(output) - 1);
@@ -360,7 +364,8 @@ test_result test_regression_parse_escaped_question_mark(void) {
     assert(0 != passgen_parse(&pattern, &error, "a\\.b"));
     passgen_pattern_free(pattern);
 
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_free(random);
 
     return test_ok;
 }
@@ -371,9 +376,10 @@ test_result test_regression_parse_escaped_question_mark(void) {
 test_result test_regression_parse_set_escapes(void) {
     passgen_pattern *pattern;
     passgen_error error;
-    passgen_env env;
-    passgen_env_init(&env, passgen_random_open(NULL, "xorshift:1234"));
-    assert(env.random);
+    passgen_random *random = passgen_random_open(NULL, "xorshift:1234");
+    assert(random);
+    passgen_env *env = passgen_env_new(random);
+    assert(env);
 
     // each of these sets has exactly the characters listed.
     const char *sets[][2] = {
@@ -395,7 +401,7 @@ test_result test_regression_parse_set_escapes(void) {
             uint8_t output[8] = {0};
             size_t len = passgen_generate_fill_utf8(
                 pattern,
-                &env,
+                env,
                 NULL,
                 output,
                 sizeof(output) - 1);
@@ -419,7 +425,8 @@ test_result test_regression_parse_set_escapes(void) {
     assert(0 != passgen_parse(&pattern, &error, "[a-\\-]"));
     passgen_pattern_free(pattern);
 
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_free(random);
 
     return test_ok;
 }
@@ -454,26 +461,28 @@ static int count_codepoints(void *data, uint32_t codepoint) {
 test_result test_regression_entropy_maybe(void) {
     passgen_pattern *pattern;
     passgen_error error;
-    passgen_env env;
-    passgen_env_init(&env, passgen_random_open(NULL, "zero"));
-    assert(env.random);
+    passgen_random *random = passgen_random_open(NULL, "zero");
+    assert(random);
+    passgen_env *env = passgen_env_new(random);
+    assert(env);
 
     double entropy = 0;
     size_t count = 0;
 
     assert(0 == passgen_parse(&pattern, &error, "a?"));
-    assert(0 == passgen_generate(pattern, &env, &entropy, &count, count_codepoints));
+    assert(0 == passgen_generate(pattern, env, &entropy, &count, count_codepoints));
     assert(fabs(entropy - 2.0) < 0.0001);
     passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "a?[ab]?(c|d)?"));
-    assert(0 == passgen_generate(pattern, &env, &entropy, &count, count_codepoints));
+    assert(0 == passgen_generate(pattern, env, &entropy, &count, count_codepoints));
     // with the zero randomness source, every optional item is emitted, so
     // this is 2 * (2 * 2) * (2 * 2).
     assert(fabs(entropy - 32.0) < 0.0001);
     passgen_pattern_free(pattern);
 
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_free(random);
 
     return test_ok;
 }
@@ -482,9 +491,10 @@ test_result test_regression_entropy_maybe(void) {
 test_result test_regression_json_control_chars(void) {
     passgen_pattern *pattern;
     passgen_error error;
-    passgen_env env;
-    passgen_env_init(&env, passgen_random_open(NULL, "zero"));
-    assert(env.random);
+    passgen_random *random = passgen_random_open(NULL, "zero");
+    assert(random);
+    passgen_env *env = passgen_env_new(random);
+    assert(env);
 
     // literal control character U+0001 and a tab, a quote and a backslash
     assert(0 == passgen_parse(&pattern, &error, "\x01\t\"[\\\\]"));
@@ -492,7 +502,7 @@ test_result test_regression_json_control_chars(void) {
     uint8_t buffer[64] = {0};
     size_t len = passgen_generate_fill_json_utf8(
         pattern,
-        &env,
+        env,
         NULL,
         buffer,
         sizeof(buffer) - 1);
@@ -500,23 +510,20 @@ test_result test_regression_json_control_chars(void) {
     assert_streq((const char *) buffer, "\\u0001\\t\\\"\\\\");
 
     passgen_pattern_free(pattern);
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_free(random);
 
     return test_ok;
 }
 
 #ifndef _WIN32 // fmemopen does not exist on windows
 
-static char *copy_string(const char *str) {
-    char *copy = malloc(strlen(str) + 1);
-    strcpy(copy, str);
-    return copy;
-}
-
-/// Sets up an environment with a single wordlist named `list`.
-static bool wordlist_env(
-    passgen_env *env,
-    const char *random,
+/// Sets up an environment with a single wordlist named `list`. The source of
+/// randomness is not owned by the environment, so it is returned as well, for
+/// the caller to free.
+static passgen_env *wordlist_env(
+    passgen_random **random,
+    const char *random_desc,
     char *data,
     size_t len,
     size_t level) {
@@ -524,15 +531,27 @@ static bool wordlist_env(
     // in that case.
     FILE *file = len ? fmemopen(data, len, "r") : tmpfile();
     if(!file) {
-        return false;
+        return NULL;
     }
 
-    passgen_env_init(env, passgen_random_open(NULL, random));
-    if(!env->random) {
-        return false;
+    *random = passgen_random_open(NULL, random_desc);
+    passgen_env *env = *random ? passgen_env_new(*random) : NULL;
+    if(!env) {
+        fclose(file);
+        if(*random) {
+            passgen_random_free(*random);
+        }
+        return NULL;
     }
 
-    return 0 == passgen_env_wordlist_add(env, copy_string("list"), file, level);
+    // this closes the file if it fails.
+    if(0 != passgen_env_wordlist_add(env, "list", file, level)) {
+        passgen_env_free(env);
+        passgen_random_free(*random);
+        return NULL;
+    }
+
+    return env;
 }
 
 /// Picking from an empty wordlist used to hang (release builds) or trip an
@@ -540,25 +559,32 @@ static bool wordlist_env(
 test_result test_regression_wordlist_empty(void) {
     passgen_pattern *pattern;
     passgen_error error;
-    passgen_env env;
+    passgen_random *random;
+    passgen_env *env;
     size_t count = 0;
 
-    assert(wordlist_env(&env, "zero", NULL, 0, 3));
+    env = wordlist_env(&random, "zero", NULL, 0, 3);
+    assert(env);
     assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
-    assert(0 != passgen_generate(pattern, &env, NULL, &count, count_codepoints));
+    assert(0 != passgen_generate(pattern, env, NULL, &count, count_codepoints));
     passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "\\m{list}"));
-    assert(0 != passgen_generate(pattern, &env, NULL, &count, count_codepoints));
+    assert(0 != passgen_generate(pattern, env, NULL, &count, count_codepoints));
     passgen_pattern_free(pattern);
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_free(random);
 
     // wordlist that does not exist at all
-    passgen_env_init(&env, passgen_random_open(NULL, "zero"));
+    random = passgen_random_open(NULL, "zero");
+    assert(random);
+    env = passgen_env_new(random);
+    assert(env);
     assert(0 == passgen_parse(&pattern, &error, "\\w{nope}\\m{nope}"));
-    assert(0 != passgen_generate(pattern, &env, NULL, &count, count_codepoints));
+    assert(0 != passgen_generate(pattern, env, NULL, &count, count_codepoints));
     passgen_pattern_free(pattern);
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_free(random);
 
     return test_ok;
 }
@@ -568,21 +594,24 @@ test_result test_regression_wordlist_empty(void) {
 test_result test_regression_wordlist_no_name(void) {
     passgen_pattern *pattern;
     passgen_error error;
-    passgen_env env;
+    passgen_random *random;
+    passgen_env *env;
     char data[] = "alpha\nbravo\n";
     size_t count = 0;
 
-    assert(wordlist_env(&env, "zero", data, strlen(data), 2));
+    env = wordlist_env(&random, "zero", data, strlen(data), 2);
+    assert(env);
 
     assert(0 == passgen_parse(&pattern, &error, "\\w{}"));
-    assert(0 != passgen_generate(pattern, &env, NULL, &count, count_codepoints));
+    assert(0 != passgen_generate(pattern, env, NULL, &count, count_codepoints));
     passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "\\m{}"));
-    assert(0 != passgen_generate(pattern, &env, NULL, &count, count_codepoints));
+    assert(0 != passgen_generate(pattern, env, NULL, &count, count_codepoints));
     passgen_pattern_free(pattern);
 
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_free(random);
 
     return test_ok;
 }
@@ -592,7 +621,8 @@ test_result test_regression_wordlist_no_name(void) {
 test_result test_regression_wordlist_long_words(void) {
     passgen_pattern *pattern;
     passgen_error error;
-    passgen_env env;
+    passgen_random *random;
+    passgen_env *env;
 
     // a single word consisting of 600 times the letter a.
     size_t word_len = 600;
@@ -600,11 +630,12 @@ test_result test_regression_wordlist_long_words(void) {
     memset(data, 'a', word_len);
     data[word_len] = '\n';
 
-    assert(wordlist_env(&env, "xorshift:1234", data, word_len + 1, 1));
+    env = wordlist_env(&random, "xorshift:1234", data, word_len + 1, 1);
+    assert(env);
 
     size_t count = 0;
     assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
-    assert(0 == passgen_generate(pattern, &env, NULL, &count, count_codepoints));
+    assert(0 == passgen_generate(pattern, env, NULL, &count, count_codepoints));
     assert_eq(count, word_len);
     passgen_pattern_free(pattern);
 
@@ -615,12 +646,13 @@ test_result test_regression_wordlist_long_words(void) {
     assert(0 == passgen_parse(&pattern, &error, "\\m{list}{100}"));
     assert(
         0 ==
-        passgen_generate(pattern, &env, &entropy, &count, count_codepoints));
+        passgen_generate(pattern, env, &entropy, &count, count_codepoints));
     assert(count > 128 * 100);
     assert(entropy > 1.0);
     passgen_pattern_free(pattern);
 
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_free(random);
     free(data);
 
     return test_ok;
@@ -630,21 +662,23 @@ test_result test_regression_wordlist_long_words(void) {
 test_result test_regression_wordlist_redefine(void) {
     passgen_pattern *pattern;
     passgen_error error;
-    passgen_env env;
+    passgen_random *random;
+    passgen_env *env;
     char first[] = "first\n";
     char second[] = "second\n";
 
-    assert(wordlist_env(&env, "zero", first, strlen(first), 3));
+    env = wordlist_env(&random, "zero", first, strlen(first), 3);
+    assert(env);
 
     FILE *file = fmemopen(second, strlen(second), "r");
     assert(file);
-    assert(0 == passgen_env_wordlist_add(&env, copy_string("list"), file, 3));
+    assert(0 == passgen_env_wordlist_add(env, "list", file, 3));
 
     uint8_t buffer[32] = {0};
     assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
     size_t len = passgen_generate_fill_utf8(
         pattern,
-        &env,
+        env,
         NULL,
         buffer,
         sizeof(buffer) - 1);
@@ -652,7 +686,8 @@ test_result test_regression_wordlist_redefine(void) {
     assert_streq((const char *) buffer, "second");
 
     passgen_pattern_free(pattern);
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_free(random);
 
     return test_ok;
 }

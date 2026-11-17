@@ -13,12 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `passgen_random_chacha20_argon2_open()` takes `passgen_argon2_params`.
 - `passgen_pattern` is opaque. `passgen_parse()` allocates it, and
   `passgen_pattern_free()` frees it.
+- `passgen_env` is opaque, and created with `passgen_env_new()`. Its header is
+  `passgen/env.h`.
+- The environment no longer frees the source of randomness, and copies the
+  names of wordlists.
 - Releases show the commit they were built from in `--version`.
 - Nightly builds are named `passgen-nightly-*`, and their packages have a
   version like `0.2.0+nightly20261117`.
 - The documentation for users is on passgen.io, and no longer in `docs/`.
 
 ### Removed
+- `passgen_env_init()` and `passgen_env_config()`.
 - Nightly builds for macOS and Windows. Releases have a build for macOS.
 
 ### Fixed

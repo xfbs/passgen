@@ -31,14 +31,14 @@
 #define strprefix(prefix, str) strncmp(prefix, str, strlen(prefix))
 
 int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
-    if(opts->env.random) {
-        passgen_random_free(opts->env.random);
-        opts->env.random = NULL;
+    if(opts->random) {
+        passgen_random_free(opts->random);
+        opts->random = NULL;
     }
 
-    opts->env.random = passgen_random_open(NULL, random);
+    opts->random = passgen_random_open(NULL, random);
 
-    if(!opts->env.random) {
+    if(!opts->random) {
         fprintf(
             stderr,
             "\033[1;31merror\033[0m: invalid randomness source '%s'\n",
@@ -149,7 +149,7 @@ int passgen_cli_generate_normal(
         buffer.len = 0;
         int ret = passgen_generate(
             pattern,
-            &opts.env,
+            opts.env,
             opts.entropy ? &entropy : NULL,
             &buffer,
             passgen_cli_buffer_emit);
@@ -191,7 +191,7 @@ int passgen_cli_generate_json(passgen_cli_opts opts, passgen_pattern *pattern) {
 
         ret = passgen_generate(
             pattern,
-            &opts.env,
+            opts.env,
             opts.entropy ? &entropy : NULL,
             &buffer,
             passgen_cli_buffer_emit);
@@ -263,7 +263,11 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
     memcpy(name, input, offset);
     name[offset] = 0;
 
-    return passgen_env_wordlist_add(&opt->env, name, file, opt->markov_length);
+    // the name is copied, and the file is closed, whether this works or not.
+    int ret = passgen_env_wordlist_add(opt->env, name, file, opt->markov_length);
+    free(name);
+
+    return ret == 0 ? 0 : PASSGEN_ERROR_ALLOC;
 }
 
 int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
@@ -305,7 +309,8 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->master_domain = NULL;
     opts->master_token = NULL;
     passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_utf8);
-    passgen_env_init(&opts->env, NULL);
+    opts->random = NULL;
+    opts->env = passgen_env_new(NULL);
 
     // some defaults. these are defined the same way as presets from the
     // command line or configuration, so that every entry in the hashmap owns
@@ -417,7 +422,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                     return passgen_cli_bail(PASSGEN_ERROR_ILLEGAL_DEPTH, &opt);
                 }
                 opts->depth = opt;
-                opts->env.depth_limit = opt;
+                passgen_env_depth_limit_set(opts->env, opt);
                 break;
             case 'z':
                 opts->null = true;
@@ -513,30 +518,32 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     if(opts->master_passphrase) {
         // this takes precedence over a randomness source which was set in
         // the configuration.
-        if(opts->env.random) {
-            passgen_random_free(opts->env.random);
+        if(opts->random) {
+            passgen_random_free(opts->random);
         }
 
-        opts->env.random = passgen_random_chacha20_argon2_open(
+        opts->random = passgen_random_chacha20_argon2_open(
             NULL,
             opts->master_passphrase,
             opts->master_domain,
             opts->master_token,
             NULL);
-        if(!opts->env.random) {
+        if(!opts->random) {
             return passgen_cli_bail(PASSGEN_ERROR_RANDOM_ALLOC, NULL);
         }
     }
 #endif
 
     // fallback to system randomness if nothing else is defined
-
-    if(!opts->env.random) {
-        opts->env.random = passgen_random_open(NULL, NULL);
-        if(!opts->env.random) {
+    if(!opts->random) {
+        opts->random = passgen_random_open(NULL, NULL);
+        if(!opts->random) {
             return passgen_cli_bail(PASSGEN_ERROR_RANDOM_ALLOC, NULL);
         }
     }
+
+    // this is what the environment generates from.
+    passgen_env_random_set(opts->env, opts->random);
 
     return 0;
 }
@@ -690,7 +697,12 @@ static int passgen_cli_preset_free(void *data, passgen_hashmap_entry *entry) {
 void passgen_cli_opts_free(passgen_cli_opts *opts) {
     passgen_hashmap_foreach(&opts->presets, NULL, passgen_cli_preset_free);
     passgen_hashmap_free(&opts->presets);
-    passgen_env_free(&opts->env);
+    passgen_env_free(opts->env);
+
+    // the environment only borrows the source of randomness.
+    if(opts->random) {
+        passgen_random_free(opts->random);
+    }
 }
 
 int passgen_cli_opts_config_load(passgen_cli_opts *opts, FILE *file) {

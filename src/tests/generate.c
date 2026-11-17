@@ -21,12 +21,13 @@
     passgen_parser parser;                               \
     passgen_token_parser token_parser = {0};             \
     passgen_token token = {0};                           \
-    passgen_env env;                                     \
+    passgen_env *env;                                    \
     passgen_pattern parsed_pattern;                      \
     const char *pattern;                                 \
     passgen_random random;                               \
     assert(passgen_random_xorshift_open(&random, SEED)); \
-    passgen_env_init(&env, &random);
+    env = passgen_env_new(&random);                      \
+    assert(env);
 
 #define GENERATE(output, pattern)                                          \
     do {                                                                   \
@@ -46,7 +47,7 @@
         assert(0 == passgen_parse_finish(&parser));                        \
         size_t len = passgen_generate_fill_unicode(                        \
             parser.pattern,                                                \
-            &env,                                                          \
+            env,                                                           \
             NULL,                                                          \
             output,                                                        \
             sizeof(output));                                               \
@@ -56,7 +57,9 @@
         passgen_pattern_deinit(&parsed_pattern);                             \
     } while(0)
 
-#define POSTAMBLE() passgen_random_close(&random)
+#define POSTAMBLE()        \
+    passgen_env_free(env); \
+    passgen_random_close(&random)
 
 test_result test_generate_empty(void) {
     PREAMBLE();
@@ -128,8 +131,12 @@ generates_exactly(const char *pattern_string, const char *const *expected) {
         return false;
     }
 
-    passgen_env env;
-    passgen_env_init(&env, &random);
+    passgen_env *env = passgen_env_new(&random);
+    if(!env) {
+        passgen_random_close(&random);
+        passgen_pattern_free(pattern);
+        return false;
+    }
 
     bool seen[64] = {false};
     size_t seen_count = 0;
@@ -142,7 +149,7 @@ generates_exactly(const char *pattern_string, const char *const *expected) {
         uint8_t output[64];
         size_t len = passgen_generate_fill_utf8(
             pattern,
-            &env,
+            env,
             NULL,
             output,
             sizeof(output) - 1);
@@ -161,6 +168,7 @@ generates_exactly(const char *pattern_string, const char *const *expected) {
         }
     }
 
+    passgen_env_free(env);
     passgen_random_close(&random);
     passgen_pattern_free(pattern);
 
@@ -271,19 +279,18 @@ test_result test_generate_depth_limit_zero(void) {
     passgen_random random;
     passgen_random_open(&random, NULL);
 
-    passgen_env env;
-    passgen_env_init(&env, &random);
-    env.depth_limit = 0;
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+    passgen_env_depth_limit_set(env, 0);
 
-    int ret = passgen_generate(pattern, &env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, env, NULL, NULL, dummy_callback);
 
     // can't generate
     assert(ret != 0);
 
     passgen_pattern_free(pattern);
-    // FIXME: don't free random in env_free
-    env.random = NULL;
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_close(&random);
 
     return test_ok;
 }
@@ -296,17 +303,16 @@ test_result test_generate_depth_limit_one(void) {
     passgen_random random;
     passgen_random_open(&random, NULL);
 
-    passgen_env env;
-    passgen_env_init(&env, &random);
-    env.depth_limit = 1;
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+    passgen_env_depth_limit_set(env, 1);
 
-    int ret = passgen_generate(pattern, &env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, env, NULL, NULL, dummy_callback);
     assert_eq(ret, 0);
 
     passgen_pattern_free(pattern);
-    // FIXME: don't free random in env_free
-    env.random = NULL;
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_close(&random);
 
     return test_ok;
 }
@@ -319,17 +325,16 @@ test_result test_generate_depth_limit_one_over(void) {
     passgen_random random;
     passgen_random_open(&random, NULL);
 
-    passgen_env env;
-    passgen_env_init(&env, &random);
-    env.depth_limit = 1;
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+    passgen_env_depth_limit_set(env, 1);
 
-    int ret = passgen_generate(pattern, &env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, env, NULL, NULL, dummy_callback);
     assert(ret != 0);
 
     passgen_pattern_free(pattern);
-    // FIXME: don't free random in env_free
-    env.random = NULL;
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_close(&random);
 
     return test_ok;
 }
@@ -342,17 +347,16 @@ test_result test_generate_depth_limit_two(void) {
     passgen_random random;
     passgen_random_open(&random, NULL);
 
-    passgen_env env;
-    passgen_env_init(&env, &random);
-    env.depth_limit = 2;
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+    passgen_env_depth_limit_set(env, 2);
 
-    int ret = passgen_generate(pattern, &env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, env, NULL, NULL, dummy_callback);
     assert(ret == 0);
 
     passgen_pattern_free(pattern);
-    // FIXME: don't free random in env_free
-    env.random = NULL;
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_close(&random);
 
     return test_ok;
 }
@@ -365,17 +369,16 @@ test_result test_generate_depth_limit_two_over(void) {
     passgen_random random;
     passgen_random_open(&random, NULL);
 
-    passgen_env env;
-    passgen_env_init(&env, &random);
-    env.depth_limit = 2;
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+    passgen_env_depth_limit_set(env, 2);
 
-    int ret = passgen_generate(pattern, &env, NULL, NULL, dummy_callback);
+    int ret = passgen_generate(pattern, env, NULL, NULL, dummy_callback);
     assert(ret != 0);
 
     passgen_pattern_free(pattern);
-    // FIXME: don't free random in env_free
-    env.random = NULL;
-    passgen_env_free(&env);
+    passgen_env_free(env);
+    passgen_random_close(&random);
 
     return test_ok;
 }

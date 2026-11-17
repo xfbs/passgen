@@ -4,6 +4,7 @@
 #include "passgen/container/hashmap.h"
 #include "passgen/container/stack.h"
 #include "passgen/markov.h"
+#include "passgen/pattern/env.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/literal.h"
 #include "passgen/pattern/pattern.h"

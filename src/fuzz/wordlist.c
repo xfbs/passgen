@@ -5,7 +5,7 @@
 #include "common.h"
 #include <passgen/generate.h>
 #include <passgen/passgen.h>
-#include <passgen/pattern/env.h>
+#include <passgen/env.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -26,37 +26,30 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         abort();
     }
 
-    passgen_env *volatile env_ptr = NULL;
+    passgen_env *volatile env = NULL;
     passgen_random random;
     fuzz_random_context context;
-    passgen_env env;
 
     if(0 == setjmp(context.exhausted)) {
         fuzz_random_open(&random, &context);
-        passgen_env_init(&env, &random);
-        env_ptr = &env;
+        env = passgen_env_new(&random);
 
         FILE *file = fmemopen((void *) data, size, "r");
-        char *name = malloc(2);
-        if(file && name) {
-            name[0] = 'w';
-            name[1] = 0;
-            passgen_env_wordlist_add(&env, name, file, markov_length);
+        if(env && file) {
+            // this closes the file, also if it fails.
+            passgen_env_wordlist_add(env, "w", file, markov_length);
 
             double entropy;
             size_t budget = FUZZ_OUTPUT_BUDGET;
-            passgen_generate(pattern, &env, &entropy, &budget, fuzz_output);
-        } else {
-            if(file) fclose(file);
-            free(name);
+            passgen_generate(pattern, env, &entropy, &budget, fuzz_output);
+        } else if(file) {
+            fclose(file);
         }
     }
 
-    if(env_ptr) {
-        // the randomness source is on the stack.
-        env_ptr->random = NULL;
-        passgen_env_free(env_ptr);
-    }
+    // the randomness source is on the stack, and not owned by the
+    // environment.
+    passgen_env_free(env);
 
     passgen_pattern_free(pattern);
 

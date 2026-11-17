@@ -10,7 +10,7 @@
 #include <passgen/config.h>
 #include <passgen/generate.h>
 #include <passgen/passgen.h>
-#include <passgen/pattern/env.h>
+#include <passgen/env.h>
 #include <passgen/random.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,16 +47,15 @@ static bool vector_check(const vector *vector, passgen_random *random) {
     }
     fwrite(wordlist, 1, strlen(wordlist), file);
 
-    char *name = malloc(sizeof("words"));
-    if(!name) {
+    // the randomness source is not owned by the environment, so that it can
+    // be used again.
+    passgen_env *env = passgen_env_new(random);
+    if(!env) {
         fclose(file);
         return false;
     }
-    strcpy(name, "words");
 
-    passgen_env env;
-    passgen_env_init(&env, random);
-    bool okay = (0 == passgen_env_wordlist_add(&env, name, file, 3));
+    bool okay = (0 == passgen_env_wordlist_add(env, "words", file, 3));
 
     passgen_pattern *pattern = NULL;
     passgen_error error;
@@ -67,7 +66,7 @@ static bool vector_check(const vector *vector, passgen_random *random) {
         static uint8_t output[2048];
         size_t length = passgen_generate_fill_utf8(
             pattern,
-            &env,
+            env,
             NULL,
             output,
             sizeof(output) - 1);
@@ -89,9 +88,7 @@ static bool vector_check(const vector *vector, passgen_random *random) {
 
     passgen_pattern_free(pattern);
 
-    // the randomness source is not ours to free.
-    env.random = NULL;
-    passgen_env_free(&env);
+    passgen_env_free(env);
 
     return okay;
 }

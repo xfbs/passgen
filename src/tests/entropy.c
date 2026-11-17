@@ -16,16 +16,19 @@ double entropy(const char *p) {
     buffer[0] = 0;
     passgen_random random;
     passgen_random_open(&random, NULL);
-    passgen_env env;
-    passgen_env_init(&env, &random);
-    double entropy;
-    int length = passgen_generate_fill_utf8(
-        pattern,
-        &env,
-        &entropy,
-        &buffer[0],
-        buffer_len);
-    buffer[length] = 0;
+    passgen_env *env = passgen_env_new(&random);
+    double entropy = NAN;
+    if(env) {
+        int length = passgen_generate_fill_utf8(
+            pattern,
+            env,
+            &entropy,
+            &buffer[0],
+            buffer_len);
+        buffer[length] = 0;
+    }
+    passgen_env_free(env);
+    passgen_random_close(&random);
     passgen_pattern_free(pattern);
 
     return entropy;
