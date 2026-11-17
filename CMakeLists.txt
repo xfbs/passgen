@@ -53,8 +53,14 @@ include(CodeCoverage)
 include(IWYU)
 
 clangformat_setup()
-cmakeformat_setup(CMakeLists.txt libpassgen/CMakeLists.txt tests/CMakeLists.txt
-                  tools/CMakeLists.txt bin/CMakeLists.txt)
+cmakeformat_setup(
+    CMakeLists.txt
+    data/CMakeLists.txt
+    src/CMakeLists.txt
+    src/bench/CMakeLists.txt
+    src/cli/CMakeLists.txt
+    src/tests/CMakeLists.txt
+    src/tools/CMakeLists.txt)
 passgen_check_symbols_setup()
 iwyu_setup()
 passgen_metrics_setup()

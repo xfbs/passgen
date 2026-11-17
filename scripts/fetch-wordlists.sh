@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Fetch Wordlists
 set -euxo pipefail
 
