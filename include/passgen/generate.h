@@ -8,6 +8,7 @@
 /// of the system-specific randomness source, or read from a file, or use a
 /// custom randomness generator. 
 #pragma once
+#include <passgen/export.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -30,7 +31,7 @@ typedef int passgen_generate_cb(void *data, uint32_t codepoint);
 /// @returns The number of codepoints written, or zero if generating failed
 ///   (which includes the output not fitting into the buffer). Note that zero
 ///   is also what is returned for a pattern which generates nothing.
-size_t passgen_generate_fill_unicode(
+PASSGEN_EXPORT size_t passgen_generate_fill_unicode(
     const passgen_pattern *pattern,
     passgen_env *env,
     double *entropy,
@@ -47,7 +48,7 @@ size_t passgen_generate_fill_unicode(
 /// @returns The number of bytes written, or zero if generating failed (which
 ///   includes the output not fitting into the buffer). Note that zero is also
 ///   what is returned for a pattern which generates nothing.
-size_t passgen_generate_fill_utf8(
+PASSGEN_EXPORT size_t passgen_generate_fill_utf8(
     const passgen_pattern *pattern,
     passgen_env *env,
     double *entropy,
@@ -65,7 +66,7 @@ size_t passgen_generate_fill_utf8(
 /// @returns The number of bytes written, or zero if generating failed (which
 ///   includes the output not fitting into the buffer). Note that zero is also
 ///   what is returned for a pattern which generates nothing.
-size_t passgen_generate_fill_json_utf8(
+PASSGEN_EXPORT size_t passgen_generate_fill_json_utf8(
     const passgen_pattern *pattern,
     passgen_env *env,
     double *entropy,
@@ -88,7 +89,7 @@ size_t passgen_generate_fill_json_utf8(
 ///   pattern uses a wordlist which is not in the environment or which is empty,
 ///   if groups are nested more deeply than the depth limit of the environment,
 ///   or if the callback returns nonzero.
-int passgen_generate(
+PASSGEN_EXPORT int passgen_generate(
     const passgen_pattern *pattern,
     passgen_env *env,
     double *entropy,

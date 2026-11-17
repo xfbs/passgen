@@ -42,3 +42,13 @@ passgen_target_defaults(passgen-test)
 
 add_custom_target(test-lib passgen-test -v
     DEPENDS passgen-test USES_TERMINAL)
+
+# a test which uses the library like something outside of this repository
+# would: with only the public headers, and the shared library. this does not
+# use passgen_target_defaults(), as that adds the headers for the internals.
+if(LIBPASSGEN_SHARED)
+    add_executable(passgen-test-public "public.c")
+    target_link_libraries(passgen-test-public PRIVATE passgen-shared)
+    target_compile_options(passgen-test-public PRIVATE -Wall -Wextra -g)
+    target_compile_features(passgen-test-public PRIVATE c_std_99)
+endif()

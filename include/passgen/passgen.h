@@ -2,6 +2,7 @@
 /// @author Patrick M. Elsen <pelsen@xfbs.net>
 /// @brief Passgen main interface
 #pragma once
+#include <passgen/export.h>
 #include <stddef.h>
 #include <passgen/error.h>
 
@@ -24,7 +25,7 @@ typedef struct passgen_pattern passgen_pattern;
 /// @param string The pattern to parse, as a NUL-terminated, UTF-8 encoded
 ///   string
 /// @returns Zero on success, nonzero otherwise.
-int passgen_parse(
+PASSGEN_EXPORT int passgen_parse(
     passgen_pattern **pattern,
     passgen_error *error,
     const char *string);
@@ -34,4 +35,4 @@ int passgen_parse(
 /// @memberof passgen_pattern
 /// @param pattern Pattern to free. May be NULL, in which case this does
 ///   nothing.
-void passgen_pattern_free(passgen_pattern *pattern);
+PASSGEN_EXPORT void passgen_pattern_free(passgen_pattern *pattern);

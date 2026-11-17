@@ -1,4 +1,5 @@
 #pragma once
+#include <passgen/export.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -22,15 +23,15 @@ typedef struct {
     passgen_error_source source;
 } passgen_error;
 
-void passgen_error_init_raw(passgen_error *error, const char *message);
+PASSGEN_EXPORT void passgen_error_init_raw(passgen_error *error, const char *message);
 
-void passgen_error_free(passgen_error *error);
+PASSGEN_EXPORT void passgen_error_free(passgen_error *error);
 
-void passgen_error_print(passgen_error *error, const char *pattern);
+PASSGEN_EXPORT void passgen_error_print(passgen_error *error, const char *pattern);
 
-void passgen_error_source_set(passgen_error *error, const char *file, size_t line);
+PASSGEN_EXPORT void passgen_error_source_set(passgen_error *error, const char *file, size_t line);
 
-void passgen_error_offset_set(passgen_error *error, size_t codepoint, size_t byte);
+PASSGEN_EXPORT void passgen_error_offset_set(passgen_error *error, size_t codepoint, size_t byte);
 
 #define passgen_error_init(error, message) \
     do { \

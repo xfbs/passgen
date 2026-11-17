@@ -15,7 +15,7 @@ option(BUILD_DATA "Build data" ON)
 
 option(LIBPASSGEN_STATIC "Build Passgen static library (libpassgen.a)" ON)
 option(LIBPASSGEN_SHARED "Build Passgen dynamic library (libpassgen.so)" ON)
-option(PASSGEN_STATIC "Link Passgen CLI statically" OFF)
+option(PASSGEN_STATIC "Link Passgen CLI fully statically, including the C library" OFF)
 
 option(USE_BACKTRACE "Enable backtrace() for debug builds (not always available)." ON)
 option(USE_LIBEXECINFO
@@ -36,12 +36,11 @@ else()
     option(PASSGEN_DEBUG "Include debugging features for passgen" OFF)
 endif()
 
-# against what do we link tools?
-if(PASSGEN_STATIC OR NOT LIBPASSGEN_SHARED)
-    set(PASSGEN_LIB passgen-static)
-else()
-    set(PASSGEN_LIB passgen-shared)
-endif()
+# everything which is built here (the command-line interface, the tests, the
+# benchmarks and the tools) uses the internals of the library, which the
+# shared library does not export. so all of it is linked against the static
+# library.
+set(PASSGEN_LIB passgen-static)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
@@ -122,6 +121,9 @@ if(BUILD_TESTING)
     add_subdirectory(src/tests)
 
     add_test(NAME passgen-test COMMAND passgen-test)
+    if(LIBPASSGEN_SHARED)
+        add_test(NAME passgen-test-public COMMAND passgen-test-public)
+    endif()
     add_test(NAME passgen-cli COMMAND ${CMAKE_SOURCE_DIR}/scripts/test-passgen-cli.sh
                                       $<TARGET_FILE:passgen-cli>)
 

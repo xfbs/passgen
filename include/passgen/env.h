@@ -2,6 +2,7 @@
 /// @author Patrick M. Elsen <pelsen@xfbs.net>
 /// @brief Environment for generating from patterns.
 #pragma once
+#include <passgen/export.h>
 
 #include <passgen/random.h>
 #include <stddef.h>
@@ -28,7 +29,7 @@ typedef struct passgen_env passgen_env;
 /// @param random Source of randomness to generate from. May be NULL if it is
 ///   set later, with @ref passgen_env_random_set.
 /// @returns The environment, or NULL if it could not be allocated.
-passgen_env *passgen_env_new(passgen_random *random);
+PASSGEN_EXPORT passgen_env *passgen_env_new(passgen_random *random);
 
 /// Free an environment, along with its wordlists. This does not close the
 /// source of randomness.
@@ -36,7 +37,7 @@ passgen_env *passgen_env_new(passgen_random *random);
 /// @memberof passgen_env
 /// @param env Environment to free. May be NULL, in which case this does
 ///   nothing.
-void passgen_env_free(passgen_env *env);
+PASSGEN_EXPORT void passgen_env_free(passgen_env *env);
 
 /// Set the source of randomness to generate from.
 ///
@@ -45,7 +46,7 @@ void passgen_env_free(passgen_env *env);
 /// @memberof passgen_env
 /// @param env Environment to change
 /// @param random Source of randomness to generate from
-void passgen_env_random_set(passgen_env *env, passgen_random *random);
+PASSGEN_EXPORT void passgen_env_random_set(passgen_env *env, passgen_random *random);
 
 /// Set how deeply the groups in a pattern may be nested when generating.
 /// Generating fails for patterns which are nested more deeply. The default is
@@ -55,7 +56,7 @@ void passgen_env_random_set(passgen_env *env, passgen_random *random);
 /// @param env Environment to change
 /// @param depth_limit How deeply groups may be nested. The pattern itself
 ///   counts as a group, so with zero, nothing can be generated.
-void passgen_env_depth_limit_set(passgen_env *env, size_t depth_limit);
+PASSGEN_EXPORT void passgen_env_depth_limit_set(passgen_env *env, size_t depth_limit);
 
 /// Adds a wordlist, which patterns can then refer to by its name. If there is
 /// a wordlist with this name already, it is replaced.
@@ -74,7 +75,7 @@ void passgen_env_depth_limit_set(passgen_env *env, size_t depth_limit);
 /// @param markov_length Length of the Markov chain to build from the
 ///   wordlist when it is used with one, between 1 and 255
 /// @returns Zero on success, nonzero on failure
-int passgen_env_wordlist_add(
+PASSGEN_EXPORT int passgen_env_wordlist_add(
     passgen_env *env,
     const char *name,
     FILE *file,

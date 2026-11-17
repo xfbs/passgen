@@ -64,14 +64,19 @@ passgen_target_defaults(passgen-shared)
 passgen_check_symbols(passgen-shared)
 passgen_metrics(passgen-shared)
 
-# limit API to only those functions that are exported.
-#set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-#set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
-#set_target_properties(passgen-shared PROPERTIES C_VISIBILITY_PRESET hidden)
 include(GenerateExportHeader)
+# functions and variables which are part of the public interface are marked
+# with PASSGEN_EXPORT, which comes from this generated header. it is part of
+# the public interface itself, and installed along with the other headers.
 generate_export_header(passgen-shared
-    BASE_NAME passgen)
+    BASE_NAME passgen
+    EXPORT_FILE_NAME passgen/export.h)
 target_compile_definitions(passgen-static PUBLIC -DPASSGEN_STATIC_DEFINE)
+
+# only what is marked that way is visible from outside of the shared library.
+# everything else is internal, and can only be used when linking against the
+# static library, which is what the tests do.
+set_target_properties(passgen-shared PROPERTIES C_VISIBILITY_PRESET hidden)
 
 install(
     TARGETS passgen-static passgen-shared
@@ -97,6 +102,7 @@ install(
 
 install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/passgen/config.h"
+          "${CMAKE_CURRENT_BINARY_DIR}/passgen/export.h"
     DESTINATION include/passgen
     COMPONENT development)
 
