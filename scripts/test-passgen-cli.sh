@@ -144,6 +144,18 @@ if $passgen -r chacha20:key "a" > /dev/null 2>&1; then
     # everyone's passwords).
     test "$a" = "JuIHep-ZdR5yQ-Nq7cO2"
 
+    # a randomness source from the configuration does not get in the way
+    echo "random zero" > "$XDG_CONFIG_HOME/passgen.conf"
+    test "$a" = "$($passgen -m master -d example.com -t user -p apple2)"
+    rm "$XDG_CONFIG_HOME/passgen.conf"
+
+    # but giving one on the command line is a mistake, as are a domain or a
+    # token without a master passphrase
+    fails $passgen -m master -r zero "a"
+    fails $passgen -r zero -m master "a"
+    fails $passgen -d example.com "a"
+    fails $passgen -t user "a"
+
     # deriving the key needs more memory than may commonly be locked
     if (ulimit -l 8192) 2> /dev/null; then
         test "$a" = "$(ulimit -l 8192; $passgen -m master -d example.com -t user -p apple2)"

@@ -277,10 +277,17 @@ token and the pattern.
 When the pattern uses a wordlist, it also depends on the contents of the
 wordlist.
 .Pp
-If
-.Fl -random
-is given as well, it takes precedence, and the options for master passphrase
-mode are ignored.
+Master passphrase mode cannot be used together with
+.Fl -random ,
+as it is a source of randomness itself.
+It takes precedence over a source of randomness which is set in the
+configuration.
+.Pp
+Before version 1.0.0, what is generated for the same inputs may change from
+one version of
+.Nm
+to the next.
+Changes to it are listed in the changelog.
 .Sh CONFIGURATION
 On startup,
 .Nm
@@ -358,6 +365,10 @@ or is empty, or because it is nested more deeply than the depth limit.
 A wordlist could not be opened, or its definition is not valid.
 .It 11
 The depth is not valid.
+.It 12
+The options for master passphrase mode cannot be used this way: together with
+.Fl -random ,
+or a domain or token without a master passphrase.
 .El
 .Pp
 If a source of randomness does not supply enough data,
@@ -432,6 +443,11 @@ $ passgen -m mymasterpass -d example.com -t username -p apple2
 .Sh AUTHORS
 .An Patrick M. Elsen Aq Mt pelsen@xfbs.net
 .Sh CAVEATS
+Master passphrase mode is not stable before version 1.0.0: another version of
+.Nm
+may generate something else for the same inputs.
+Keep a copy of the passphrases, or of the version which generated them.
+.Pp
 The master passphrase is given as an argument on the command line.
 While
 .Nm

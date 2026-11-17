@@ -359,6 +359,9 @@ void passgen_cli_presets_list(const passgen_cli_opts *opts) {
 int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     const char *short_opts = "a:p:P:d:w:r:m:D:M:t:ezhvjl";
     const char *preset = NULL;
+    // whether the randomness source was set on the command line, rather than
+    // in the configuration.
+    bool random_given = false;
 
     static struct option long_opts[] = {
         {"amount", required_argument, NULL, 'a'},
@@ -442,6 +445,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 break;
             case 'r':
                 try(passgen_cli_opts_random(opts, optarg));
+                random_given = true;
                 break;
             case 'P':
                 try(passgen_cli_opts_preset(opts, optarg));
@@ -488,17 +492,44 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
         return PASSGEN_SHOW_HELP;
     }
 
-    // fallback to system randomness if nothing else is defined
 #ifdef PASSGEN_MONOCYPHER
-    if(!opts->env.random && opts->master_passphrase) {
+    // master passphrase mode is a source of randomness, so it cannot be
+    // combined with another one. silently preferring either of them would
+    // result in something other than what was asked for.
+    if(opts->master_passphrase && random_given) {
+        return passgen_cli_bail(
+            PASSGEN_ERROR_MASTER_CONFLICT,
+            "--master and --random cannot be used together");
+    }
+
+    // these don't do anything on their own. most likely, the master
+    // passphrase was forgotten.
+    if(!opts->master_passphrase && (opts->master_domain || opts->master_token)) {
+        return passgen_cli_bail(
+            PASSGEN_ERROR_MASTER_CONFLICT,
+            "--domain and --token need --master");
+    }
+
+    if(opts->master_passphrase) {
+        // this takes precedence over a randomness source which was set in
+        // the configuration.
+        if(opts->env.random) {
+            passgen_random_free(opts->env.random);
+        }
+
         opts->env.random = passgen_random_chacha20_argon2_open(
             NULL,
             opts->master_passphrase,
             opts->master_domain,
             opts->master_token,
             NULL);
+        if(!opts->env.random) {
+            return passgen_cli_bail(PASSGEN_ERROR_RANDOM_ALLOC, NULL);
+        }
     }
 #endif
+
+    // fallback to system randomness if nothing else is defined
 
     if(!opts->env.random) {
         opts->env.random = passgen_random_open(NULL, NULL);
@@ -606,6 +637,12 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
                 *((const int *) data));
             break;
         case PASSGEN_ERROR_UNRECOGNIZED:
+            break;
+        case PASSGEN_ERROR_MASTER_CONFLICT:
+            fprintf(
+                stderr,
+                "\033[1;31merror\033[0m: %s\n",
+                (const char *) data);
             break;
         case PASSGEN_ERROR_ILLEGAL_DEPTH:
             fprintf(
