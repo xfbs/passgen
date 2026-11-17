@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   implementation to generate them.
 - Fuzzing harnesses, with a script and `fuzz` target to run them.
 - Version macros in `passgen/config.h`.
+- `\?` to have a question mark in the output.
 
 ### Changed
 - Master passphrase mode uses stronger Argon2 parameters and a longer salt.
@@ -30,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `passgen_random_chacha20_argon2_open()` takes strings.
 - The shared library is versioned (`libpassgen.so.0.2`).
 - `passgen_version_compatible()` requires the same minor version before 1.0.0.
+- The man page is up to date.
 - Requires CMake 3.16.
 
 ### Fixed
@@ -43,6 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Crash for wordlists without a name (`\w{}`).
 - Crash when a segment has more than one multiplier (`{4}{1}a`).
 - Out of bounds write for invalid unicode escapes in wordlist names.
+- Characters such as `ż` being mistaken for pattern syntax.
+- Configuration examples using the wrong syntax.
 - Buffer overflows loading the configuration.
 - `--depth` having no effect.
 - Unescaped control characters in JSON output.
