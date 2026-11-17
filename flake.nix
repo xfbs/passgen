@@ -48,6 +48,9 @@
         checks = {
           inherit passgen passgen-asan passgen-ubsan passgen-msan passgen-lsan;
         };
-        devShell = with pkgs; mkShell { buildInputs = [ passgen ]; };
+        devShells.default = pkgs.mkShell {
+          inputsFrom = [ passgen ];
+          packages = [ pkgs.ninja pkgs.ruby pkgs.clang-tools ];
+        };
       });
 }
