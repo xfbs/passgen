@@ -63,6 +63,8 @@ pattern_matches "[a-zA-Z0-9#]{1,2}"
 
 # characters with a meaning in patterns can be escaped
 test "$($passgen 'a\(b\)\[c\]\{d\}e\|f\?')" = "a(b)[c]{d}e|f?"
+$passgen '[\]\[\-]{8}' | matches '[][-]{8}'
+$passgen '[+-\-]{8}' | matches '[+,-]{8}'
 
 # test presets
 $passgen -p apple1

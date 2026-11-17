@@ -144,8 +144,10 @@ Set: outputs one of the characters in it, chosen at random.
 It can list single characters, and ranges of characters, which include every
 character from the first to the last one by Unicode codepoint.
 The last character of a range must not come before the first one.
-To have a dash in a set, write it as
-.Ql \e- .
+To have a dash or a closing bracket in a set, write them as
+.Ql \e-
+and
+.Ql \e] .
 A character which is listed more than once (also as part of a range) is more
 likely to be chosen, and counted more than once for the entropy.
 .It Li a{8} , [a-z]{8,12} , (ab){3}
@@ -173,8 +175,7 @@ The following escape sequences can be used:
 .Bl -tag -width Ds
 .It Li \e( , \e) , \e[ , \e] , \e{ , \e} , \e| , \e\&?
 The character itself, without its meaning in a pattern.
-These cannot be used inside of a set, where only the dash and the closing
-bracket have a meaning.
+These cannot be used inside of a set, except for the brackets.
 .It Li \ea , \eb , \ee , \ef , \en , \er , \et , \ev
 The control characters bell, backspace, escape, form feed, newline, carriage
 return, tab and vertical tab.

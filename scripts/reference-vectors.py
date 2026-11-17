@@ -198,16 +198,20 @@ def parse_group(pattern, pos, toplevel):
     return segments, pos
 
 
+def parse_set_char(pattern, pos):
+    """A character in a set, which may be escaped."""
+    if pattern[pos] == "\\":
+        pos += 1
+    return pattern[pos], pos + 1
+
+
 def parse_set(pattern, pos):
     ranges = []
     while pattern[pos] != "]":
-        if pattern[pos] == "\\":
-            pos += 1
-        start = pattern[pos]
-        pos += 1
+        start, pos = parse_set_char(pattern, pos)
         if pattern[pos] == "-":
-            ranges.append((ord(start), ord(pattern[pos + 1])))
-            pos += 2
+            end, pos = parse_set_char(pattern, pos + 1)
+            ranges.append((ord(start), ord(end)))
         else:
             ranges.append((ord(start), ord(start)))
     return ranges, pos + 1
@@ -305,6 +309,8 @@ PATTERNS = [
     "[a-z]{4,12}",
     "(ab?c?){6}",
     "(why|how|what)\\?{1,3}",
+    # escaped characters in sets, also as the end of a range
+    "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
     "([a-z]{2,4}-){3}[0-9]{2}",
     # characters whose codepoints end in the same byte as characters which
     # have a meaning in patterns

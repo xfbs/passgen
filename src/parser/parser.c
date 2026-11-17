@@ -15,6 +15,7 @@
 #include "passgen/pattern/segment.h"
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
+#include "../try.h"
 
 int passgen_parse_group(
     struct passgen_parser *parser,
@@ -359,6 +360,28 @@ int passgen_parse_group(
     return 0;
 }
 
+/// Gets the character that a token stands for inside of a set. The characters
+/// which have a meaning in a set can be escaped to get the character itself,
+/// and the opening bracket can be for symmetry. Returns nonzero for any other
+/// escaped character.
+static int passgen_parse_set_codepoint(passgen_token *token, uint32_t *codepoint) {
+    *codepoint = token->codepoint;
+
+    if(*codepoint & PASSGEN_TOKEN_ESCAPED_BIT) {
+        *codepoint &= ~PASSGEN_TOKEN_ESCAPED_BIT;
+        switch(*codepoint) {
+            case '-':
+            case ']':
+            case '[':
+                break;
+            default:
+                return -1;
+        }
+    }
+
+    return 0;
+}
+
 int passgen_parse_set(
     passgen_parser *parser,
     passgen_token *token,
@@ -386,17 +409,8 @@ int passgen_parse_set(
         return 0;
     }
 
-    uint32_t codepoint = token->codepoint;
-    if(codepoint & PASSGEN_TOKEN_ESCAPED_BIT) {
-        // no reason to expect an escaped token here unless it's a dash.
-        switch(codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT) {
-            case '-':
-                codepoint &= ~PASSGEN_TOKEN_ESCAPED_BIT;
-                break;
-            default:
-                return -1;
-        }
-    }
+    uint32_t codepoint;
+    try(passgen_parse_set_codepoint(token, &codepoint));
 
     passgen_pattern_range *range = passgen_pattern_set_range_append(set);
 
@@ -417,11 +431,17 @@ int passgen_parse_set_range(
         return -1;
     }
 
-    if(token->codepoint < state->data.set.range->start) {
+    // the end of the range can be escaped as well. this used to keep the
+    // marker for escaped characters as part of the codepoint, resulting in a
+    // range which is far too large.
+    uint32_t codepoint;
+    try(passgen_parse_set_codepoint(token, &codepoint));
+
+    if(codepoint < state->data.set.range->start) {
         return -1;
     }
 
-    state->data.set.range->end = token->codepoint;
+    state->data.set.range->end = codepoint;
     state->type = PASSGEN_PARSER_SET;
 
     return 0;

@@ -365,6 +365,65 @@ test_result test_regression_parse_escaped_question_mark(void) {
     return test_ok;
 }
 
+/// There was no way to have a closing bracket in a set. A range which ended in
+/// an escaped character also kept the marker for escaped characters as part
+/// of the codepoint, so it was far too large, and generating from it failed.
+test_result test_regression_parse_set_escapes(void) {
+    passgen_pattern pattern;
+    passgen_error error;
+    passgen_env env;
+    passgen_env_init(&env, passgen_random_open(NULL, "xorshift:1234"));
+    assert(env.random);
+
+    // each of these sets has exactly the characters listed.
+    const char *sets[][2] = {
+        {"[\\]]", "]"},
+        {"[\\[\\]]", "[]"},
+        {"[a\\]\\-]", "a]-"},
+        {"[+-\\-]", "+,-"},
+        {"[Z-\\]]", "Z[\\]"},
+        {"[\\[-\\]]", "[\\]"},
+        {NULL, NULL},
+    };
+
+    for(size_t i = 0; sets[i][0]; i++) {
+        assert(0 == passgen_parse(&pattern, &error, sets[i][0]));
+
+        bool seen[8] = {false};
+        size_t expected_len = strlen(sets[i][1]);
+        for(size_t n = 0; n < 200; n++) {
+            uint8_t output[8] = {0};
+            size_t len = passgen_generate_fill_utf8(
+                &pattern,
+                &env,
+                NULL,
+                output,
+                sizeof(output) - 1);
+            assert(len == 1);
+            const char *found = strchr(sets[i][1], output[0]);
+            assert(found);
+            seen[found - sets[i][1]] = true;
+        }
+
+        for(size_t c = 0; c < expected_len; c++) {
+            assert(seen[c]);
+        }
+
+        passgen_pattern_free(&pattern);
+    }
+
+    // other characters cannot be escaped in a set, and a range still cannot
+    // end before it starts.
+    assert(0 != passgen_parse(&pattern, &error, "[\\q]"));
+    passgen_pattern_free(&pattern);
+    assert(0 != passgen_parse(&pattern, &error, "[a-\\-]"));
+    passgen_pattern_free(&pattern);
+
+    passgen_env_free(&env);
+
+    return test_ok;
+}
+
 static int count_codepoints(void *data, uint32_t codepoint) {
     (void) codepoint;
     *((size_t *) data) += 1;
