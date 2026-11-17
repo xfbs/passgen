@@ -32,7 +32,7 @@ markdown_extensions:
 plugins:
   - search
   - kroki:
-      HttpMethod: POST
+      http_method: POST
 
 nav:
   - Home: index.md
