@@ -66,10 +66,16 @@ passgen_check_symbols_setup()
 iwyu_setup()
 passgen_metrics_setup()
 
-# get commit info, if git is available.
-if(BUILD_GIT_INFO)
+# information about the build, which is shown along with the version. this is
+# what git describes the commit as, unless it is set to something else (which
+# is useful when building from something that is not a git repository).
+set(PASSGEN_BUILD_INFO
+    ""
+    CACHE STRING "Information about the build to show along with the version.")
+if(NOT PASSGEN_BUILD_INFO AND BUILD_GIT_INFO)
     include(GitInfo)
     git_info()
+    set(PASSGEN_BUILD_INFO "${PROJECT_GIT_DESCRIBE}")
 endif()
 
 # dependency (only on alpine): libexecinfo-dev

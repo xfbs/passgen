@@ -597,11 +597,16 @@ void passgen_cli_show_version(void) {
     passgen_version version = passgen_version_get();
     fprintf(
         stderr,
-        "passgen version v%hu.%hu.%hu (build %s)\n",
+        "passgen version v%hu.%hu.%hu",
         version.major,
         version.minor,
-        version.patch,
-        version.build);
+        version.patch);
+
+    // not every build knows what it was built from.
+    if(version.build && version.build[0]) {
+        fprintf(stderr, " (build %s)", version.build);
+    }
+    fprintf(stderr, "\n");
 
     if(passgen_is_debug()) {
         fprintf(stderr, "debug build\n");

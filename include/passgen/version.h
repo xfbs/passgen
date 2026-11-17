@@ -13,7 +13,8 @@ typedef struct passgen_version {
     uint8_t minor;
     /// Patch version
     uint8_t patch;
-    /// Build information
+    /// Build information, such as the commit it was built from. This is an
+    /// empty string if there is none.
     const char *build;
     /// Prerelease information
     const char *prerelease;

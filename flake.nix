@@ -18,7 +18,10 @@
           inherit version;
           src = self;
           nativeBuildInputs = [ pkgs.cmake pkgs.git pkgs.clang ];
-          cmakeFlags = [ "-DBUILD_GIT_INFO=OFF" ];
+          cmakeFlags = [
+            "-DBUILD_GIT_INFO=OFF"
+            "-DPASSGEN_BUILD_INFO=${self.rev or self.dirtyRev or "unknown"}"
+          ];
         };
         passgen-with-sanitizer = name:
           pkgs.clangStdenv.mkDerivation {

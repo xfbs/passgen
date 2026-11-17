@@ -67,7 +67,7 @@ jobs:
       # JavaScript actions don't work in Alpine containers on ARM runners.
       - name: Build, test and package
         run: |
-          docker run --rm -v "$PWD:/src" -w /src -e PACKAGE alpine:3.22 sh -euxc '
+          docker run --rm -v "$PWD:/src" -w /src -e PACKAGE -e GITHUB_SHA alpine:3.22 sh -euxc '
             apk add --no-cache build-base cmake ninja ruby bash git
             cmake -S . -B build -G Ninja \
               -DCMAKE_BUILD_TYPE=Release \
@@ -75,7 +75,8 @@ jobs:
               -DLIBPASSGEN_SHARED=OFF \
               -DUSE_BACKTRACE=OFF \
               -DBUILD_BENCH=OFF \
-              -DBUILD_GIT_INFO=OFF
+              -DBUILD_GIT_INFO=OFF \
+              -DPASSGEN_BUILD_INFO="$GITHUB_SHA"
             cmake --build build
             ctest --test-dir build --output-on-failure
             cd build
@@ -116,7 +117,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=/usr \
             -DBUILD_BENCH=OFF \
-            -DBUILD_GIT_INFO=OFF
+            -DBUILD_GIT_INFO=OFF \
+            -DPASSGEN_BUILD_INFO="$GITHUB_SHA"
           cmake --build build
 
       - name: Test
@@ -155,7 +157,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DLIBPASSGEN_SHARED=OFF \
             -DBUILD_BENCH=OFF \
-            -DBUILD_GIT_INFO=OFF
+            -DBUILD_GIT_INFO=OFF \
+            -DPASSGEN_BUILD_INFO="$GITHUB_SHA"
           cmake --build build
 
       - name: Test
