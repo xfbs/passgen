@@ -131,23 +131,6 @@ int passgen_token_parse(
     uint8_t width,
     uint32_t codepoint);
 
-/// Parse a bunch of codepoints from an array. The variable size should contain
-/// the number of codepoints and the number of slots in the token array (should
-/// be the same).
-///
-/// It reads `size` amount of codepoints from the codepoints array, and writes
-/// up to `size` amount of tokens into the tokens array.
-///
-/// If the return value is zero or positive, it was a success, and `size` is
-/// filled with the amount of tokens in the tokens array.
-///
-/// @memberof passgen_token_parser
-int passgen_token_parse_str(
-    struct passgen_token_parser *parser,
-    size_t *size,
-    struct passgen_token *token,
-    uint32_t *codepoints);
-
 /// Get error string for parse error
 ///
 /// @memberof passgen_token_parser

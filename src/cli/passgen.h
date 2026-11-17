@@ -71,7 +71,7 @@ typedef struct {
 void passgen_cli_opts_init(passgen_cli_opts *opts);
 
 /// Define a preset, with an argument like `name:value`.
-int passgen_cli_opts_define_preset(passgen_cli_opts *opt, const char *arg);
+int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg);
 
 /// Define a wordlist, with an argument like `name:path`.
 int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input);

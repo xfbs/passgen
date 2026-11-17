@@ -2,20 +2,33 @@
 /// @author Patrick M. Elsen
 /// @brief Pattern syntax parser.
 ///
-/// Parsing API. Needs a `passgen_parser` struct instance, which is defined in @ref data/parser.h.
+/// The parser turns a sequence of Unicode codepoints into a @ref
+/// passgen_pattern. To parse a pattern from a string, use @ref passgen_parse
+/// instead, which decodes the string and runs the parser.
 ///
 /// # Example
 ///
 /// ```c
-/// #include <passgen/pattern/parser.h>
 /// #include <passgen/parser/parser.h>
 ///
-/// struct passgen_parser parser = {0};
-/// passgen_parser_init(&parser);
-/// passgen_parser_utf8(&parser, "[a-z]{9}", 0);
-/// assert(0 == passgen_parser_finish(&parser));
-/// // ...
+/// uint32_t input[] = {'[', 'a', '-', 'z', ']', '{', '9', '}'};
+///
+/// passgen_pattern pattern;
+/// passgen_parser parser;
+/// passgen_parser_init(&parser, &pattern);
+///
+/// int ret = passgen_parser_unicode(&parser, input, 8);
+/// if(ret == 0) {
+///     ret = passgen_parse_finish(&parser);
+/// }
 /// passgen_parser_free(&parser);
+///
+/// if(ret == 0) {
+///     // use the pattern
+/// }
+///
+/// // the pattern has to be freed even if parsing it failed
+/// passgen_pattern_free(&pattern);
 /// ```
 #pragma once
 #include <stdint.h>
@@ -108,7 +121,8 @@ typedef struct passgen_parser {
     /// Current state stack of the parser.
     /// Contains #passgen_parser_state items.
     passgen_stack state;
-    /// Limit of parsing depth.
+    /// Limit of parsing depth, which can be set after initializing the
+    /// parser. Parsing fails when groups are nested more deeply than this.
     /// If set to zero, depth limiting is disabled.
     size_t limit;
     /// The current, possibly incomplete parsed pattern.
@@ -172,13 +186,6 @@ passgen_parser_state *passgen_parser_state_push_special(
 /// @memberof passgen_parser
 void passgen_parser_init(passgen_parser *parser, passgen_pattern *pattern);
 
-/// Set parsing depth limit for this parser.
-///
-/// This will prevent the parser from parsing recursive structures more than
-/// @ref limit deep. Setting it to zero disables it.
-/// @memberof passgen_parser
-void passgen_parser_limit(passgen_parser *parser, size_t limit);
-
 /// Release memory used by the parser.
 ///
 /// @return The parsed pattern
@@ -190,13 +197,6 @@ passgen_pattern *passgen_parser_free(passgen_parser *parser);
 /// @return 0 on success, nonzero on failure.
 /// @memberof passgen_parser
 int passgen_parse_finish(passgen_parser *parser);
-
-/// Parse a UTF-8 string.
-/// @memberof passgen_parser
-int passgen_parser_utf8(
-    passgen_parser *parser,
-    uint8_t *data,
-    size_t length);
 
 /// Parse a sequence of unicode codepoints.
 /// @memberof passgen_parser
