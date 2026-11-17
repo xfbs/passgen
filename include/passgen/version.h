@@ -23,7 +23,7 @@ typedef struct passgen_version {
 /// Returns the version of libpassgen.
 ///
 /// @related passgen_version
-passgen_version passgen_version_get();
+passgen_version passgen_version_get(void);
 
 /// Test if the version of passgen is compatible with the one passed, which
 /// is typically the one that the caller was built against (see

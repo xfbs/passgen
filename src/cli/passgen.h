@@ -120,5 +120,5 @@ void passgen_cli_opts_free(passgen_cli_opts *opts);
 
 #ifdef PASSGEN_SECCOMP
 /// Initialize seccomp filters
-void passgen_cli_seccomp_init();
+void passgen_cli_seccomp_init(void);
 #endif

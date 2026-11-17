@@ -2,7 +2,7 @@
 #include <passgen/version.h>
 #include <stddef.h>
 
-passgen_version passgen_version_get() {
+passgen_version passgen_version_get(void) {
     return (passgen_version) {
         .major = @PROJECT_VERSION_MAJOR@,
         .minor = @PROJECT_VERSION_MINOR@,

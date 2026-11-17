@@ -830,7 +830,7 @@ int passgen_cli_opts_config_user(passgen_cli_opts *opts) {
 #define O_LARGEFILE 0
 #endif
 
-void passgen_cli_seccomp_init() {
+void passgen_cli_seccomp_init(void) {
     scmp_filter_ctx ctx;
     ctx = seccomp_init(SCMP_ACT_KILL);
 
