@@ -156,8 +156,8 @@ passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
         return -1;
     }
 
-    unsigned char buffer[4] = {'\\', 0};
-    size_t bytes = 2;
+    unsigned char buffer[6] = {'\\', 0};
+    int bytes = 2;
     switch(codepoint) {
         case '"':
             buffer[1] = '"';
@@ -181,18 +181,29 @@ passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
             buffer[1] = 't';
             break;
         default:
-            bytes = passgen_utf8_encode_codepoint(
-                (uint8_t *) &buffer[0],
-                codepoint);
+            if(codepoint < 0x20) {
+                // remaining control characters must be escaped in JSON.
+                static const char hex[] = "0123456789abcdef";
+                buffer[1] = 'u';
+                buffer[2] = '0';
+                buffer[3] = '0';
+                buffer[4] = hex[codepoint >> 4];
+                buffer[5] = hex[codepoint & 15];
+                bytes = 6;
+            } else {
+                bytes = passgen_utf8_encode_codepoint(
+                    (uint8_t *) &buffer[0],
+                    codepoint);
+            }
     }
 
     // check that no error happened.
-    if(!bytes) {
+    if(bytes <= 0) {
         return -1;
     }
 
     // make sure it fits.
-    if(bytes <= (fillpos->len - fillpos->cur)) {
+    if((size_t) bytes <= (fillpos->len - fillpos->cur)) {
         memcpy(&fillpos->buffer[fillpos->cur], &buffer[0], bytes);
         fillpos->cur += bytes;
     } else {

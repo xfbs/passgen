@@ -152,6 +152,33 @@ test_result test_regression_entropy_maybe(void) {
     return test_ok;
 }
 
+/// The JSON output must escape all control characters.
+test_result test_regression_json_control_chars(void) {
+    passgen_pattern pattern;
+    passgen_error error;
+    passgen_env env;
+    passgen_env_init(&env, passgen_random_open(NULL, "zero"));
+    assert(env.random);
+
+    // literal control character U+0001 and a tab, a quote and a backslash
+    assert(0 == passgen_parse(&pattern, &error, "\x01\t\"[\\\\]"));
+
+    uint8_t buffer[64] = {0};
+    size_t len = passgen_generate_fill_json_utf8(
+        &pattern,
+        &env,
+        NULL,
+        buffer,
+        sizeof(buffer) - 1);
+    buffer[len] = 0;
+    assert_streq((const char *) buffer, "\\u0001\\t\\\"\\\\");
+
+    passgen_pattern_free(&pattern);
+    passgen_env_free(&env);
+
+    return test_ok;
+}
+
 #ifndef _WIN32 // fmemopen does not exist on windows
 
 static char *copy_string(const char *str) {
