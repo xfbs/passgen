@@ -343,6 +343,30 @@ test_result test_regression_wordlist_empty(void) {
     return test_ok;
 }
 
+/// A wordlist without a name (as in `\w{}`) used to be looked up using a null
+/// pointer, which crashed as soon as any wordlist was defined.
+test_result test_regression_wordlist_no_name(void) {
+    passgen_pattern pattern;
+    passgen_error error;
+    passgen_env env;
+    char data[] = "alpha\nbravo\n";
+    size_t count = 0;
+
+    assert(wordlist_env(&env, "zero", data, strlen(data), 2));
+
+    assert(0 == passgen_parse(&pattern, &error, "\\w{}"));
+    assert(0 != passgen_generate(&pattern, &env, NULL, &count, count_codepoints));
+    passgen_pattern_free(&pattern);
+
+    assert(0 == passgen_parse(&pattern, &error, "\\m{}"));
+    assert(0 != passgen_generate(&pattern, &env, NULL, &count, count_codepoints));
+    passgen_pattern_free(&pattern);
+
+    passgen_env_free(&env);
+
+    return test_ok;
+}
+
 /// Words longer than 128 codepoints used to fail (wordlist) or overflow a
 /// stack buffer (markov chain).
 test_result test_regression_wordlist_long_words(void) {

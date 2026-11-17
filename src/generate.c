@@ -472,6 +472,11 @@ static int passgen_generate_special_preset(
 static int passgen_generate_special(
     passgen_generate_context *context,
     const passgen_pattern_special *special) {
+    // without a name (as in `\w{}`), there is nothing to look up.
+    if(!special->parameters) {
+        return -1;
+    }
+
     switch(special->kind) {
         case PASSGEN_PATTERN_SPECIAL_MARKOV:
             return passgen_generate_special_markov(context, special);
