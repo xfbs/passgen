@@ -115,7 +115,7 @@ as a pseudorandom number generate using the derived key.
 
 ```
 $ passgen -m mymasterpass -d example.com -t username -p apple2
-joCRgX-ISiyaU-dc7VrC
+56joCR-Xh7lVv-L5pfdZ
 ```
 
 ## Syntax

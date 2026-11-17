@@ -47,6 +47,46 @@ test_result test_regression_random_read_boundary(void) {
     return test_ok;
 }
 
+/// When the maximum is a power of two, no value ever has to be rejected, so
+/// exactly one value is read from the randomness source per call. The mask
+/// used to be one bit too wide in this case, which rejected half of them.
+test_result test_regression_random_max_power_of_two(void) {
+    passgen_random limited, plain;
+    assert(passgen_random_xorshift_open(&limited, 1234));
+    assert(passgen_random_xorshift_open(&plain, 1234));
+
+    // if a value was rejected, the two sources would no longer be in sync.
+    for(size_t i = 0; i < 1000; i++) {
+        assert(passgen_random_u8_max(&limited, 1) == 0);
+        passgen_random_u8(&plain);
+
+        assert(
+            passgen_random_u8_max(&limited, 16) ==
+            (passgen_random_u8(&plain) & 15));
+        assert(
+            passgen_random_u16_max(&limited, 1024) ==
+            (passgen_random_u16(&plain) & 1023));
+        assert(
+            passgen_random_u32_max(&limited, UINT32_C(1) << 20) ==
+            (passgen_random_u32(&plain) & ((UINT32_C(1) << 20) - 1)));
+        assert(
+            passgen_random_u64_max(&limited, UINT64_C(1) << 40) ==
+            (passgen_random_u64(&plain) & ((UINT64_C(1) << 40) - 1)));
+    }
+
+    // other maximums still only return values below the maximum.
+    for(size_t i = 0; i < 1000; i++) {
+        assert(passgen_random_u8_max(&limited, 3) < 3);
+        assert(passgen_random_u8_max(&limited, 255) < 255);
+        assert(passgen_random_u64_max(&limited, 62) < 62);
+    }
+
+    passgen_random_close(&limited);
+    passgen_random_close(&plain);
+
+    return test_ok;
+}
+
 #ifdef PASSGEN_MONOCYPHER
 /// Overlong keys and passphrases in randomness descriptions used to overflow
 /// fixed-size stack buffers.

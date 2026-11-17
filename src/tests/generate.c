@@ -12,6 +12,7 @@
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
 #include "tests.h"
+#include <string.h>
 
 // don't change this seed - that will break tests!
 #define SEED 320843200
@@ -103,190 +104,156 @@ test_result test_generate_chars(void) {
     return test_ok;
 }
 
+/// Checks what a pattern generates: every output has to be one of the expected
+/// ones (the list is terminated by NULL), and every expected output has to
+/// come up at some point. This does not depend on the exact sequence of random
+/// numbers, unlike comparing against the output for a specific seed.
+static bool
+generates_exactly(const char *pattern_string, const char *const *expected) {
+    passgen_pattern pattern;
+    passgen_error error;
+    if(0 != passgen_parse(&pattern, &error, pattern_string)) {
+        passgen_pattern_free(&pattern);
+        return false;
+    }
+
+    size_t expected_len = 0;
+    while(expected[expected_len]) {
+        expected_len++;
+    }
+
+    passgen_random random;
+    if(!passgen_random_xorshift_open(&random, SEED)) {
+        passgen_pattern_free(&pattern);
+        return false;
+    }
+
+    passgen_env env;
+    passgen_env_init(&env, &random);
+
+    bool seen[64] = {false};
+    size_t seen_count = 0;
+    bool okay = expected_len <= 64;
+
+    // with the most outputs we test for (27 of them), the chance of not
+    // seeing all of them in this many tries is negligible. and as the seed is
+    // fixed, this is deterministic anyways.
+    for(size_t i = 0; okay && seen_count < expected_len && i < 10000; i++) {
+        uint8_t output[64];
+        size_t len = passgen_generate_fill_utf8(
+            &pattern,
+            &env,
+            NULL,
+            output,
+            sizeof(output) - 1);
+        output[len] = 0;
+
+        okay = false;
+        for(size_t e = 0; e < expected_len; e++) {
+            if(0 == strcmp((const char *) output, expected[e])) {
+                okay = true;
+                if(!seen[e]) {
+                    seen[e] = true;
+                    seen_count++;
+                }
+                break;
+            }
+        }
+    }
+
+    passgen_random_close(&random);
+    passgen_pattern_free(&pattern);
+
+    return okay && seen_count == expected_len;
+}
+
+#define EXPECTED(...) ((const char *const[]){__VA_ARGS__, NULL})
+
 test_result test_generate_segments(void) {
-    PREAMBLE();
-    uint32_t output[10];
-
     // either a or b
-    pattern = "a|b";
-    GENERATE(output, pattern);
-    assert(output[0] == 'b');
-    assert(output[1] == '\0');
+    assert(generates_exactly("a|b", EXPECTED("a", "b")));
+    assert(generates_exactly("a|b|c", EXPECTED("a", "b", "c")));
+    assert(generates_exactly("ab|cd", EXPECTED("ab", "cd")));
 
-    GENERATE(output, pattern);
-    assert(output[0] == 'b');
-    assert(output[1] == '\0');
+    // the helper notices unexpected and missing outputs
+    assert(!generates_exactly("a|b", EXPECTED("a")));
+    assert(!generates_exactly("a|b", EXPECTED("a", "b", "c")));
 
-    GENERATE(output, pattern);
-    assert(output[0] == 'a');
-    assert(output[1] == '\0');
-
-    POSTAMBLE();
     return test_ok;
 }
 
 test_result test_generate_group(void) {
-    PREAMBLE();
-    uint32_t output[10];
+    assert(generates_exactly("(abc)", EXPECTED("abc")));
+    assert(generates_exactly("(a|b)", EXPECTED("a", "b")));
+    assert(generates_exactly("(a|b)c", EXPECTED("ac", "bc")));
+    assert(generates_exactly("((a|b)|c)", EXPECTED("a", "b", "c")));
 
-    // "abc"
-    pattern = "(abc)";
-    GENERATE(output, pattern);
-    assert(output[0] == 'a');
-    assert(output[1] == 'b');
-    assert(output[2] == 'c');
-    assert(output[3] == '\0');
-
-    // either "a" or "b"
-    pattern = "(a|b)";
-    GENERATE(output, pattern);
-    assert(output[0] == 'a');
-    assert(output[1] == '\0');
-
-    passgen_random_u64(&random);
-    passgen_random_u64(&random);
-    passgen_random_u64(&random);
-    passgen_random_u64(&random);
-
-    GENERATE(output, pattern);
-    assert(output[0] == 'b');
-    assert(output[1] == '\0');
-
-    POSTAMBLE();
     return test_ok;
 }
 
 test_result test_generate_set(void) {
-    PREAMBLE();
-    uint32_t output[10];
+    assert(generates_exactly("[a]", EXPECTED("a")));
+    assert(generates_exactly("[abc]", EXPECTED("a", "b", "c")));
+    assert(generates_exactly("[a-c]", EXPECTED("a", "b", "c")));
+    assert(generates_exactly("[a-cx]", EXPECTED("a", "b", "c", "x")));
 
-    // "abc"
-    pattern = "[a]";
-    GENERATE(output, pattern);
-    assert(output[0] == 'a');
-    assert(output[1] == '\0');
+    // sets with a number of choices that is a power of two
+    assert(generates_exactly("[ab]", EXPECTED("a", "b")));
+    assert(generates_exactly("[a-d]", EXPECTED("a", "b", "c", "d")));
 
-    // "a" or "b" or "c"
-    pattern = "[abc]";
-    GENERATE(output, pattern);
-    assert(output[0] == 'a');
-    assert(output[1] == '\0');
-
-    passgen_random_u64(&random);
-    GENERATE(output, pattern);
-    assert(output[0] == 'c');
-    assert(output[1] == '\0');
-
-    GENERATE(output, pattern);
-    assert(output[0] == 'a');
-    assert(output[1] == '\0');
-
-    pattern = "[a-c]";
-    GENERATE(output, pattern);
-    assert(output[0] == 'c');
-    assert(output[1] == '\0');
-
-    GENERATE(output, pattern);
-    assert(output[0] == 'c');
-    assert(output[1] == '\0');
-
-    passgen_random_u64(&random);
-    passgen_random_u64(&random);
-    passgen_random_u64(&random);
-    passgen_random_u64(&random);
-    GENERATE(output, pattern);
-    assert(output[0] == 'b');
-    assert(output[1] == '\0');
-
-    POSTAMBLE();
     return test_ok;
 }
 
 test_result test_generate_maybe(void) {
-    PREAMBLE();
-    uint32_t output[10];
-
     // char or not?
-    pattern = "a?";
-    GENERATE(output, pattern);
-    assert(output[0] == 'a');
-    assert(output[1] == '\0');
-
-    passgen_random_u64(&random);
-    passgen_random_u64(&random);
-    passgen_random_u64(&random);
-
-    GENERATE(output, pattern);
-    assert(output[0] == '\0');
+    assert(generates_exactly("a?", EXPECTED("a", "")));
 
     // group or not?
-    pattern = "(b)?";
-    GENERATE(output, pattern);
-    assert(output[0] == 'b');
-    assert(output[1] == '\0');
-
-    GENERATE(output, pattern);
-    assert(output[0] == 'b');
-    assert(output[1] == '\0');
+    assert(generates_exactly("(b)?", EXPECTED("b", "")));
 
     // set or not?
-    pattern = "[c]?";
-    GENERATE(output, pattern);
-    assert(output[0] == 'c');
-    assert(output[1] == '\0');
+    assert(generates_exactly("[c]?", EXPECTED("c", "")));
 
-    passgen_random_u64(&random);
+    assert(generates_exactly("a?b", EXPECTED("ab", "b")));
 
-    GENERATE(output, pattern);
-    assert(output[0] == 'c');
-    assert(output[1] == '\0');
-
-    POSTAMBLE();
     return test_ok;
 }
 
 test_result test_generate_repeat(void) {
-    PREAMBLE();
-    uint32_t output[10];
+    assert(generates_exactly("a{5}", EXPECTED("aaaaa")));
+    assert(generates_exactly("a{0}", EXPECTED("")));
+    assert(generates_exactly("b{2,3}", EXPECTED("bb", "bbb")));
+    assert(generates_exactly("b{0,2}", EXPECTED("", "b", "bb")));
 
-    // char or not?
-    pattern = "a{5}";
-    GENERATE(output, pattern);
-    assert(output[0] == 'a');
-    assert(output[1] == 'a');
-    assert(output[2] == 'a');
-    assert(output[3] == 'a');
-    assert(output[4] == 'a');
-    assert(output[5] == '\0');
+    assert(generates_exactly(
+        "[ab]{3}",
+        EXPECTED("aaa", "aab", "aba", "abb", "baa", "bab", "bba", "bbb")));
 
-    pattern = "b{2,3}";
-    GENERATE(output, pattern);
-    assert(output[0] == 'b');
-    assert(output[1] == 'b');
-    assert(output[2] == '\0');
+    assert(generates_exactly(
+        "(ab|x){3}",
+        EXPECTED(
+            "ababab",
+            "ababx",
+            "abxab",
+            "abxx",
+            "xabab",
+            "xabx",
+            "xxab",
+            "xxx")));
 
-    passgen_random_u64(&random);
-    GENERATE(output, pattern);
-    assert(output[0] == 'b');
-    assert(output[1] == 'b');
-    assert(output[2] == '\0');
+    // all 27 combinations
+    char combinations[27][4];
+    const char *expected[28];
+    for(size_t i = 0; i < 27; i++) {
+        combinations[i][0] = 'a' + (i / 9) % 3;
+        combinations[i][1] = 'a' + (i / 3) % 3;
+        combinations[i][2] = 'a' + i % 3;
+        combinations[i][3] = 0;
+        expected[i] = combinations[i];
+    }
+    expected[27] = NULL;
+    assert(generates_exactly("[abc]{3}", expected));
 
-    pattern = "[abc]{3}";
-    GENERATE(output, pattern);
-    assert(output[0] == 'c');
-    assert(output[1] == 'c');
-    assert(output[2] == 'c');
-    assert(output[3] == '\0');
-
-    pattern = "(ab|x){3}";
-    GENERATE(output, pattern);
-    assert(output[0] == 'x');
-    assert(output[1] == 'x');
-    assert(output[2] == 'a');
-    assert(output[3] == 'b');
-    assert(output[4] == '\0');
-
-    POSTAMBLE();
     return test_ok;
 }
 
