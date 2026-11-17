@@ -9,19 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflows for CI and automated releases.
 - CTest integration and `check` target.
 - Regression tests and more CLI tests.
+- Test vectors for the deterministic randomness sources, with a reference
+  implementation to generate them.
 
 ### Changed
+- Master passphrase mode uses stronger Argon2 parameters and a longer salt.
+- Output of the deterministic randomness sources has changed. This includes
+  every passphrase derived from a master passphrase.
 - Output is no longer limited to 256 bytes.
 - Failing to generate is an error instead of an empty line.
 - Errors are printed to standard error.
 - User configuration is read from `$XDG_CONFIG_HOME`.
 - Optional items (`a?`) count towards entropy.
 - Repetitions like `a{5,2}` are rejected.
+- Locking memory is best-effort, and no longer makes large allocations fail.
+- `passgen_random_chacha20_argon2_open()` takes strings.
 - Requires CMake 3.16.
 
 ### Fixed
-- Random bytes reused at the buffer boundary. This changes deterministic
-  output (including master passphrase mode) past 1024 bytes of randomness.
+- Random bytes reused at the buffer boundary.
+- Half of the randomness wasted for choices that are a power of two.
+- Large `xorshift:` seeds all resulting in the same output.
 - Stack overflows parsing `chacha20:` and `chacha20-argon2:` descriptions.
 - Stack overflow generating long words from a Markov chain.
 - Exhausted randomness sources going unnoticed in release builds.
@@ -29,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Buffer overflows loading the configuration.
 - `--depth` having no effect.
 - Unescaped control characters in JSON output.
+- Memory leaks in the CLI.
 - Stray files installed into `share/passgen`.
 
 ## [0.1.2] - 2019-08-18
