@@ -42,12 +42,15 @@ void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
         } else {
             // if we don't have enough, copy over whatever we have and
             // reload.
-            memcpy(data, random->buffer, left);
+            memcpy(data, &random->buffer[random->pos], left);
             passgen_random_reload(random);
 
             // if there's more to be read, recurse.
             if(bytes != left) {
-                passgen_random_read(random, data + left, bytes - left);
+                passgen_random_read(
+                    random,
+                    (uint8_t *) data + left,
+                    bytes - left);
             }
         }
     } else {
