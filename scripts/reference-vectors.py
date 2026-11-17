@@ -305,6 +305,9 @@ PATTERNS = [
     "[a-z]{4,12}",
     "(ab?c?){6}",
     "([a-z]{2,4}-){3}[0-9]{2}",
+    # characters whose codepoints end in the same byte as characters which
+    # have a meaning in patterns
+    "(zażółć|gęślą|jaźń){3}[żśŻ]{4}",
     # wordlists
     "\\w{words}(-\\w{words}){3}",
     "\\w{words}{1,3}[0-9]",

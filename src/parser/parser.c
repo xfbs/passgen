@@ -237,7 +237,10 @@ int passgen_parse_group(
 
     if(codepoint & PASSGEN_TOKEN_ESCAPED_BIT) {
         codepoint &= ~PASSGEN_TOKEN_ESCAPED_BIT;
-        switch((char) codepoint) {
+        // note that this must compare the whole codepoint: truncating it to
+        // a char would mistake any character whose codepoint ends in the
+        // same byte (such as U+017C for the pipe, which is U+007C).
+        switch(codepoint) {
             case '|':
             case '(':
             case ')':
@@ -254,7 +257,7 @@ int passgen_parse_group(
                 // special token
                 special = passgen_pattern_segment_new_special(
                     state->data.group.segment);
-                passgen_pattern_special_init(special, (char) codepoint);
+                passgen_pattern_special_init(special, codepoint);
                 passgen_parser_state_push_special(parser, special);
                 return 0;
             default:
@@ -262,7 +265,7 @@ int passgen_parse_group(
                 return -1;
         }
     } else {
-        switch((char) codepoint) {
+        switch(codepoint) {
             case '|':
                 if(state->data.group.segment->multiplier > 0) {
                     // create new segment and parser state

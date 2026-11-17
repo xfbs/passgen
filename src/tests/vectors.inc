@@ -39,6 +39,9 @@ VECTOR("chacha20-argon2:master",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "pas-xhba-dgcl-31")
 VECTOR("chacha20-argon2:master",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207\305\273\305\273\305\273\305\233")
+VECTOR("chacha20-argon2:master",
        "\\w{words}(-\\w{words}){3}",
        "echo-alpha-charlie-bravo")
 VECTOR("chacha20-argon2:master",
@@ -77,6 +80,9 @@ VECTOR("chacha20-argon2:master:example.com",
 VECTOR("chacha20-argon2:master:example.com",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "stv-arp-sur-28")
+VECTOR("chacha20-argon2:master:example.com",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "g\304\231\305\233l\304\205ja\305\272\305\204ja\305\272\305\204\305\233\305\233\305\233\305\274")
 VECTOR("chacha20-argon2:master:example.com",
        "\\w{words}(-\\w{words}){3}",
        "bravo-delta-foxtrot-bravo")
@@ -117,6 +123,9 @@ VECTOR("chacha20-argon2:master:example.com:user",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "cb-ykh-iwyg-80")
 VECTOR("chacha20-argon2:master:example.com:user",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207ja\305\272\305\204g\304\231\305\233l\304\205\305\274\305\233\305\274\305\273")
+VECTOR("chacha20-argon2:master:example.com:user",
        "\\w{words}(-\\w{words}){3}",
        "delta-echo-bravo-delta")
 VECTOR("chacha20-argon2:master:example.com:user",
@@ -155,6 +164,9 @@ VECTOR("chacha20-argon2:other:example.com:user",
 VECTOR("chacha20-argon2:other:example.com:user",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "niv-ntfg-xken-91")
+VECTOR("chacha20-argon2:other:example.com:user",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207g\304\231\305\233l\304\205g\304\231\305\233l\304\205\305\274\305\233\305\273\305\233")
 VECTOR("chacha20-argon2:other:example.com:user",
        "\\w{words}(-\\w{words}){3}",
        "echo-foxtrot-foxtrot-gr\303\266\303\237e")
@@ -195,6 +207,9 @@ VECTOR("chacha20-argon2:master:example.org:user",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "npa-rvl-ep-51")
 VECTOR("chacha20-argon2:master:example.org:user",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207g\304\231\305\233l\304\205g\304\231\305\233l\304\205\305\274\305\233\305\233\305\233")
+VECTOR("chacha20-argon2:master:example.org:user",
        "\\w{words}(-\\w{words}){3}",
        "echo-foxtrot-alpha-foxtrot")
 VECTOR("chacha20-argon2:master:example.org:user",
@@ -233,6 +248,9 @@ VECTOR("chacha20-argon2:master:example.com:admin",
 VECTOR("chacha20-argon2:master:example.com:admin",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "pfoz-rptj-qih-79")
+VECTOR("chacha20-argon2:master:example.com:admin",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207ja\305\272\305\204g\304\231\305\233l\304\205\305\273\305\233\305\233\305\273")
 VECTOR("chacha20-argon2:master:example.com:admin",
        "\\w{words}(-\\w{words}){3}",
        "alpha-foxtrot-bravo-charlie")
@@ -273,6 +291,9 @@ VECTOR("chacha20-argon2:master::user",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "tyx-xcq-sv-48")
 VECTOR("chacha20-argon2:master::user",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "ja\305\272\305\204g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207\305\273\305\233\305\233\305\273")
+VECTOR("chacha20-argon2:master::user",
        "\\w{words}(-\\w{words}){3}",
        "charlie-delta-charlie-bravo")
 VECTOR("chacha20-argon2:master::user",
@@ -311,6 +332,9 @@ VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
 VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "zyzy-rz-bgqf-50")
+VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "ja\305\272\305\204g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207\305\233\305\274\305\233\305\274")
 VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
        "\\w{words}(-\\w{words}){3}",
        "delta-bravo-bravo-alpha")
@@ -351,6 +375,9 @@ VECTOR("chacha20-argon2:correct horse battery staple:example.com",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "ekw-smja-iz-12")
 VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207ja\305\272\305\204\305\273\305\273\305\273\305\273")
+VECTOR("chacha20-argon2:correct horse battery staple:example.com",
        "\\w{words}(-\\w{words}){3}",
        "bravo-charlie-gr\303\266\303\237e-charlie")
 VECTOR("chacha20-argon2:correct horse battery staple:example.com",
@@ -389,6 +416,9 @@ VECTOR("chacha20:key",
 VECTOR("chacha20:key",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "sglb-zhdl-rdy-68")
+VECTOR("chacha20:key",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "ja\305\272\305\204ja\305\272\305\204ja\305\272\305\204\305\273\305\233\305\273\305\233")
 VECTOR("chacha20:key",
        "\\w{words}(-\\w{words}){3}",
        "delta-charlie-charlie-bravo")
@@ -429,6 +459,9 @@ VECTOR("chacha20:key:iv",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "izqx-lbte-xvq-65")
 VECTOR("chacha20:key:iv",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207ja\305\272\305\204za\305\274\303\263\305\202\304\207\305\233\305\274\305\273\305\273")
+VECTOR("chacha20:key:iv",
        "\\w{words}(-\\w{words}){3}",
        "echo-charlie-bravo-gr\303\266\303\237e")
 VECTOR("chacha20:key:iv",
@@ -467,6 +500,9 @@ VECTOR("chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
 VECTOR("chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "kr-oaf-zk-49")
+VECTOR("chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207ja\305\272\305\204za\305\274\303\263\305\202\304\207\305\233\305\233\305\273\305\274")
 VECTOR("chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
        "\\w{words}(-\\w{words}){3}",
        "alpha-echo-delta-gr\303\266\303\237e")
@@ -507,6 +543,9 @@ VECTOR("xorshift:1",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "ffb-oej-fr-09")
 VECTOR("xorshift:1",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "g\304\231\305\233l\304\205g\304\231\305\233l\304\205g\304\231\305\233l\304\205\305\233\305\233\305\233\305\233")
+VECTOR("xorshift:1",
        "\\w{words}(-\\w{words}){3}",
        "bravo-foxtrot-bravo-foxtrot")
 VECTOR("xorshift:1",
@@ -546,6 +585,9 @@ VECTOR("xorshift:1234",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "nw-cwsm-qv-60")
 VECTOR("xorshift:1234",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207ja\305\272\305\204g\304\231\305\233l\304\205\305\273\305\274\305\273\305\273")
+VECTOR("xorshift:1234",
        "\\w{words}(-\\w{words}){3}",
        "delta-alpha-foxtrot-alpha")
 VECTOR("xorshift:1234",
@@ -584,6 +626,9 @@ VECTOR("xorshift:18446744073709551615",
 VECTOR("xorshift:18446744073709551615",
        "([a-z]{2,4}-){3}[0-9]{2}",
        "ee-eqpa-geq-48")
+VECTOR("xorshift:18446744073709551615",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207za\305\274\303\263\305\202\304\207za\305\274\303\263\305\202\304\207\305\233\305\273\305\274\305\274")
 VECTOR("xorshift:18446744073709551615",
        "\\w{words}(-\\w{words}){3}",
        "alpha-echo-bravo-echo")

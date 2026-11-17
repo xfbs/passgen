@@ -274,6 +274,55 @@ test_result test_regression_parse_unicode_escape_range(void) {
     return test_ok;
 }
 
+/// When checking if a character has a meaning in a pattern, only the lowest
+/// byte of its codepoint was looked at. Characters such as U+017C (a z with a
+/// dot above), which ends in the same byte as the pipe (U+007C), were taken
+/// for syntax.
+test_result test_regression_parse_unicode_syntax(void) {
+    passgen_pattern pattern;
+    passgen_error error;
+    passgen_env env;
+    passgen_env_init(&env, passgen_random_open(NULL, "zero"));
+    assert(env.random);
+
+    // one for each of the characters which have a meaning: ( ) ? [ { | }
+    const char *patterns[] = {
+        "a\xc4\xa8z",
+        "a\xc4\xa9z",
+        "a\xc4\xbfz",
+        "a\xc5\x9bz",
+        "a\xc5\xbbz",
+        "a\xc5\xbcz",
+        "a\xc5\xbdz",
+        // and the same in another plane
+        "a\xf0\x9f\x81\xbcz",
+        NULL,
+    };
+
+    for(size_t i = 0; patterns[i]; i++) {
+        // they are literals, so the pattern generates itself.
+        uint8_t output[32] = {0};
+        assert(0 == passgen_parse(&pattern, &error, patterns[i]));
+        size_t len = passgen_generate_fill_utf8(
+            &pattern,
+            &env,
+            NULL,
+            output,
+            sizeof(output) - 1);
+        output[len] = 0;
+        assert_streq((const char *) output, patterns[i]);
+        passgen_pattern_free(&pattern);
+    }
+
+    // escaping them does not give them a meaning either.
+    assert(0 != passgen_parse(&pattern, &error, "a\\\xc5\xbcz"));
+    passgen_pattern_free(&pattern);
+
+    passgen_env_free(&env);
+
+    return test_ok;
+}
+
 static int count_codepoints(void *data, uint32_t codepoint) {
     (void) codepoint;
     *((size_t *) data) += 1;
