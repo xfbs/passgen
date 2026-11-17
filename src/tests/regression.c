@@ -87,6 +87,35 @@ test_result test_regression_random_max_power_of_two(void) {
     return test_ok;
 }
 
+/// The seed of the xorshift source is an unsigned 64 bit number, but it was
+/// parsed as a signed one, so the upper half of the range did not work. It
+/// also accepted anything that started with a number.
+test_result test_regression_random_xorshift_seed(void) {
+    passgen_random parsed, direct;
+
+    assert(passgen_random_open(&parsed, "xorshift:18446744073709551615"));
+    assert(passgen_random_xorshift_open(&direct, UINT64_MAX));
+    assert(passgen_random_u64(&parsed) == passgen_random_u64(&direct));
+    passgen_random_close(&parsed);
+    passgen_random_close(&direct);
+
+    assert(passgen_random_open(&parsed, "xorshift:9223372036854775808"));
+    assert(passgen_random_xorshift_open(&direct, UINT64_C(9223372036854775808)));
+    assert(passgen_random_u64(&parsed) == passgen_random_u64(&direct));
+    passgen_random_close(&parsed);
+    passgen_random_close(&direct);
+
+    assert(!passgen_random_open(&parsed, "xorshift:"));
+    assert(!passgen_random_open(&parsed, "xorshift:0"));
+    assert(!passgen_random_open(&parsed, "xorshift:-1"));
+    assert(!passgen_random_open(&parsed, "xorshift: 1"));
+    assert(!passgen_random_open(&parsed, "xorshift:abc"));
+    assert(!passgen_random_open(&parsed, "xorshift:12abc"));
+    assert(!passgen_random_open(&parsed, "xorshift:18446744073709551616"));
+
+    return test_ok;
+}
+
 #ifdef PASSGEN_MONOCYPHER
 /// Overlong keys and passphrases in randomness descriptions used to overflow
 /// fixed-size stack buffers.

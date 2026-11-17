@@ -2,6 +2,7 @@
 #include "passgen/assert.h"
 #include "passgen/config.h"
 #include "passgen/util/endian.h"
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -94,8 +95,17 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
             return NULL;
         }
 
-        uint64_t seed = atoll(seed_str);
-        if(seed == 0) {
+        // the seed is any nonzero 64 bit number, so this needs to parse the
+        // full unsigned range, and only accept digits (strtoull() would
+        // accept a sign and leading whitespace as well).
+        if(*seed_str < '0' || *seed_str > '9') {
+            return NULL;
+        }
+
+        char *seed_end = NULL;
+        errno = 0;
+        unsigned long long seed = strtoull(seed_str, &seed_end, 10);
+        if(errno != 0 || *seed_end != 0 || seed == 0 || seed > UINT64_MAX) {
             return NULL;
         }
 
