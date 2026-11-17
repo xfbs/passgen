@@ -142,13 +142,25 @@ install(
     DESTINATION share/man/man1
     COMPONENT runtime)
 
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Passgen")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Generates random sequences from a regex-like pattern")
 set(CPACK_PACKAGE_VENDOR "xfbs")
-set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+# this ends up in the package metadata (for example `apt show passgen`), so it
+# has to be plain text.
+set(CPACK_PACKAGE_DESCRIPTION
+"Passgen generates random sequences from a pattern written in a dialect of
+regular expressions. It is built for generating secure passphrases: it can
+pick words from wordlists, make up pronounceable words using a Markov chain,
+and measure the entropy of every sequence it generates.")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://passgen.io")
 set(CPACK_PACKAGE_CONTACT "Patrick Elsen <pelsen@xfbs.net>")
 set(CPACK_PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
 
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md")
+
+# all targets are compiled with debug information, strip it from the binaries
+# and libraries that end up in packages.
+set(CPACK_STRIP_FILES ON)
+
 set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
 set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON)
 set(CPACK_DEB_COMPONENT_INSTALL OFF)
