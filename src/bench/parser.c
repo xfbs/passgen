@@ -28,7 +28,7 @@ static void *bench_parser_prepare(const passgen_hashmap *opts) {
     char *input = malloc(input_len);
     size_t pos = 0;
     for(size_t i = 0; i < data->repeat; i++) {
-        pos += sprintf(&input[pos], "%s", pattern_fragment);
+        pos += snprintf(&input[pos], input_len - pos, "%s", pattern_fragment);
     }
     input[input_len - 1] = 0;
     assert(strlen(input) <= input_len);
@@ -41,6 +41,7 @@ static void *bench_parser_iterate(void *raw_data) {
     passgen_error error;
     int ret = passgen_parse(&data->pattern, &error, data->input);
     assert(ret == 0);
+    (void) ret;
     return data;
 }
 

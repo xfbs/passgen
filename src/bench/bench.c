@@ -1,6 +1,7 @@
 #include "bench.h"
 #include "passgen/config.h"
 #include <getopt.h>
+#include <inttypes.h>
 #include <locale.h>
 #include <math.h>
 #include <stdint.h>
@@ -236,8 +237,13 @@ int passgen_bench_list(const options *options) {
         size_t desc_len = strlen(bench->desc);
 
         size_t pos = 0;
-        pos += sprintf(line, "%s", bench->name);
-        pos += sprintf(line + pos, "%*c", (int) (name_col + 2 - pos), ' ');
+        pos += snprintf(line, sizeof(line), "%s", bench->name);
+        pos += snprintf(
+            line + pos,
+            sizeof(line) - pos,
+            "%*c",
+            (int) (name_col + 2 - pos),
+            ' ');
 
         if(desc_len > (line_len - pos)) {
             while((desc_len - desc_offset) > (line_len - pos)) {
@@ -250,12 +256,13 @@ int passgen_bench_list(const options *options) {
                 line[pos + break_pos] = 0;
                 printf("%s\n", line);
                 desc_offset += break_pos;
-                pos = sprintf(line, "%*c", name_col + 1, ' ');
+                pos = snprintf(line, sizeof(line), "%*c", name_col + 1, ' ');
             }
 
             if(desc_offset != desc_len) {
-                sprintf(
+                snprintf(
                     line,
+                    sizeof(line),
                     "%*c%s",
                     name_col + 1,
                     ' ',
@@ -528,13 +535,13 @@ int main(int argc, char *argv[]) {
         if(options.mode == MODE_BENCH) {
             fprintf(
                 stderr,
-                "Mode: Benchmark (%zu it, %lfs\n",
+                "Mode: Benchmark (%" PRIu64 " it, %lfs\n",
                 options.iter,
                 options.time);
         }
 
         if(options.mode == MODE_ONESHOT) {
-            fprintf(stderr, "Mode: Oneshot (%zu it)\n", options.iter);
+            fprintf(stderr, "Mode: Oneshot (%" PRIu64 " it)\n", options.iter);
         }
     }
 

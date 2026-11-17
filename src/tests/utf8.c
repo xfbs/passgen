@@ -4,7 +4,7 @@
 // test that we can decode an empty string.
 test_result test_utf8_can_decode_empty(void) {
     size_t input_len = 0;
-    const uint8_t input[input_len + 1];
+    const uint8_t input[1] = {0};
     size_t output_len = 0;
     uint32_t output[output_len + 1];
     const uint8_t *input_pos = &input[0];

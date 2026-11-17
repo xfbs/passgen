@@ -123,6 +123,7 @@ static void *bench_token_iterate(void *raw_data) {
     }
 
     assert(ret == PASSGEN_TOKEN_INIT);
+    (void) ret;
 
     return NULL;
 }

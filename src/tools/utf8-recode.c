@@ -10,15 +10,11 @@ int main(int argc, char *argv[]) {
     size_t input_len = 128;
     uint8_t input[input_len];
 
-    size_t input_start = 0;
     size_t input_end = 0;
 
     size_t decoded_len = 128;
     uint32_t decoded[decoded_len];
     size_t decoded_total = 0;
-
-    size_t output_len = 128;
-    uint8_t output[output_len];
 
     int ret;
 
@@ -60,8 +56,6 @@ int main(int argc, char *argv[]) {
 
         printf("read %zu codepoints\n", decoded_total);
 
-        decoded_pos = 0;
-        input_start = 0;
         input_end = 0;
     }
 

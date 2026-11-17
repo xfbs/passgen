@@ -4353,6 +4353,7 @@ typedef struct {
 } bench_utf8_data;
 
 static double bench_utf8_mult(void *raw_data) {
+    (void) raw_data;
     return utf8_txt_len;
 }
 
@@ -4394,6 +4395,11 @@ static void *bench_utf8_iter(void *raw_data) {
 
     assert(ret == 0);
     assert(output_total == utf8_decoded_len);
+
+    // these are only used by the assertions, which are compiled out in
+    // release builds.
+    (void) output_total;
+    (void) utf8_decoded_len;
 
     return NULL;
 }

@@ -438,8 +438,8 @@ test_result test_random_chacha20_seek(void) {
     assert(
         passgen_random_chacha20_open(
             &random,
-            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "passgen") != NULL);
+            (const uint8_t *) "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            (const uint8_t *) "passgen") != NULL);
     CHECK_BEGINNING(&random);
     CHECK_REST(&random);
 
@@ -466,8 +466,8 @@ test_result test_random_chacha20(void) {
     assert(
         passgen_random_chacha20_open(
             &random,
-            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "passgen") != NULL);
+            (const uint8_t *) "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            (const uint8_t *) "passgen") != NULL);
     assert(passgen_random_u8(&random) == 180);
     assert(passgen_random_u16(&random) == 43073);
     assert(passgen_random_u32(&random) == 1604870485);
@@ -477,8 +477,8 @@ test_result test_random_chacha20(void) {
     assert(
         passgen_random_chacha20_open(
             &random,
-            "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-            "passgen") != NULL);
+            (const uint8_t *) "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            (const uint8_t *) "passgen") != NULL);
     assert(passgen_random_u8(&random) == 14);
     assert(passgen_random_u16(&random) == 19281);
     assert(passgen_random_u32(&random) == 2608689089);
@@ -494,9 +494,9 @@ test_result test_random_chacha20_argon2(void) {
     assert(
         passgen_random_chacha20_argon2_open(
             &random,
-            "mypassword",
-            "google.com",
-            "",
+            (const uint8_t *) "mypassword",
+            (const uint8_t *) "google.com",
+            (const uint8_t *) "",
             NULL) != NULL);
     assert(passgen_random_u8(&random) == 53);
     assert(passgen_random_u16(&random) == 45909);

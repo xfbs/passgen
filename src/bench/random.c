@@ -70,8 +70,8 @@ static void *bench_data_prepare_chacha20(const passgen_hashmap *opts) {
     struct bench_data *data = bench_data_prepare(opts);
     passgen_random_chacha20_open(
         &data->random,
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        "passgen");
+        (const uint8_t *) "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        (const uint8_t *) "passgen");
     return data;
 }
 

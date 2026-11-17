@@ -24,7 +24,7 @@ test_result test_siphash64(void) {
          .output = {0xce, 0x87, 0x56, 0x58, 0xbb, 0x3c, 0x80, 0xe1}},
         {.input = "longjohn",
          .output = {0xbc, 0xfd, 0x5a, 0xf7, 0x43, 0xaf, 0x4a, 0x55}},
-        {NULL}};
+        {.input = NULL}};
 
     for(size_t i = 0; testcases[i].input; i++) {
         uint8_t output[8];
@@ -191,7 +191,7 @@ test_result test_siphash128(void) {
               0xda,
               0x3f,
               0xde}},
-        {NULL}};
+        {.input = NULL}};
 
     for(size_t i = 0; testcases[i].input; i++) {
         uint8_t output[16];

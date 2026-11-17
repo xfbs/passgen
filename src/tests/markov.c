@@ -349,7 +349,7 @@ test_result test_markov_generate_random(void) {
     // generate word_count words
     for(size_t count = 0; count < word_count; count++) {
         // clear word
-        for(int i = 0; i < length; i++) {
+        for(size_t i = 0; i < length; i++) {
             word[i] = 0;
         }
 
@@ -359,7 +359,7 @@ test_result test_markov_generate_random(void) {
             next = passgen_markov_generate(&markov, &word[0], &rand, NULL);
 
             // shift characters
-            for(int i = 1; i < length; i++) {
+            for(size_t i = 1; i < length; i++) {
                 word[i - 1] = word[i];
             }
 

@@ -101,7 +101,7 @@ test_result test_token_unicode(void) {
 
     char buffer[8];
     for(uint32_t codepoint = 0; codepoint < CODEPOINT_MAX; codepoint++) {
-        sprintf(buffer, "%x", codepoint);
+        snprintf(buffer, sizeof(buffer), "%x", codepoint);
         int ret = passgen_token_parse(&parser, &token, 1, '\\');
         assert_eq(ret, PASSGEN_TOKEN_ESCAPED);
 

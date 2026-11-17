@@ -23,7 +23,7 @@ static void *hashmap_prepare(const passgen_hashmap *opts) {
     data->data = calloc(sizeof(const char *), data->count);
     for(size_t i = 0; i < data->count; i++) {
         data->data[i] = malloc(16);
-        sprintf(data->data[i], "item-%zu", i);
+        snprintf(data->data[i], 16, "item-%zu", i);
     }
     passgen_hashmap_init(&data->map, &passgen_hashmap_context_utf8);
     return data;
