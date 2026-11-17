@@ -104,8 +104,6 @@ These are the jobs in the *setup* stage and what they do:
 | --- | --- |
 | `docker:alpine` | Builds `alpine.dockerfile`. Used to build static MUSL releases of Passgen. |
 | `docker:deploy` | Builds `deploy.dockerfile`. Used to build the API documentation and deploy to GitLab Pages. |
-| `docker:mingw64` | Builds `mingw64.dockerfile`. Used to cross-compile Passgen for Windows. |
-| `docker:macos` | Builds `macos.dockerfile`. Used to cross-compile Passgen for macOS. |
 | `docker:riscv64` | Builds `riscv64.dockerfile`. Used for cross-compile RISC-V releases of Passgen. |
 | `docker:amd64` | Builds `amdm64.dockerfile`. Used to build AMD64 releases of Passgen. |
 | `docker:aarch64` | Builds `aarch64.dockerfile`. Used to cross-compile ARM releases of Passgen. |

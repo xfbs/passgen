@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   version like `0.2.0+nightly20261117`.
 - The documentation for users is on passgen.io, and no longer in `docs/`.
 
+### Removed
+- Nightly builds for macOS and Windows. Releases have a build for macOS.
+
 ### Fixed
 - `config.h.in` being installed along with the headers.
 - Ranges ending in an escaped character (`[+-\-]`) failing to generate.

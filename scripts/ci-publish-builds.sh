@@ -20,10 +20,6 @@ cp build-aarch64/passgen_*_arm64.deb "$out/passgen-nightly-linux-arm64.deb"
 cp build-riscv64/passgen-*-Linux.tar.xz "$out/passgen-nightly-linux-riscv64.tar.xz"
 cp build-riscv64/passgen_*_riscv64.deb "$out/passgen-nightly-linux-riscv64.deb"
 
-cp build-macos/passgen-*-Darwin.tar.xz "$out/passgen-nightly-macos-amd64.tar.xz"
-
-cp build-mingw64/passgen-*-win64.zip "$out/passgen-nightly-win64-amd64.zip"
-
 cp build-wasi/src/cli/passgen "$out/passgen-nightly-wasi.wasm"
 
 # sign every one of them, which adds a `.sig` file next to it.

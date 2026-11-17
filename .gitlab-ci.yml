@@ -52,21 +52,6 @@ docker:deploy:
         changes:
             - scripts/deploy.dockerfile
 
-docker:mingw64:
-    image: docker
-    stage: images
-    services:
-        - docker:dind
-    script:
-        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-        - docker build . -f scripts/mingw64.dockerfile -t "$CI_REGISTRY_IMAGE/mingw64"
-        - docker push "$CI_REGISTRY_IMAGE/mingw64"
-    only:
-        refs:
-            - master
-        changes:
-            - scripts/mingw64.dockerfile
-
 docker:riscv64:
     image: docker
     stage: images
@@ -81,21 +66,6 @@ docker:riscv64:
             - master
         changes:
             - scripts/riscv64.dockerfile
-
-docker:macos:
-    image: docker
-    stage: images
-    services:
-        - docker:dind
-    script:
-        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-        - docker build . -f scripts/macos.dockerfile -t "$CI_REGISTRY_IMAGE/macos"
-        - docker push "$CI_REGISTRY_IMAGE/macos"
-    only:
-        refs:
-            - master
-        changes:
-            - scripts/macos.dockerfile
 
 docker:amd64:
     image: docker
@@ -210,37 +180,6 @@ wordlists:
             - data/
         expire_in: 1 week
 
-build:mingw64:
-    image: "$CI_REGISTRY_IMAGE/mingw64"
-    stage: build
-    dependencies:
-        - wordlists
-    before_script:
-        - git config --global --add safe.directory '*'
-    script:
-        - cmake -S . -B build-mingw64 -DCMAKE_TOOLCHAIN_FILE=cmake/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y -DPASSGEN_MLOCK=OFF -DPASSGEN_PACKAGE_VERSION="$(./scripts/nightly-version.sh)"
-        - cd build-mingw64
-        - make -j
-        - cpack -G ZIP
-    artifacts:
-        paths:
-            - build-mingw64
-        expire_in: 1 week
-
-build:macos:
-    image: "$CI_REGISTRY_IMAGE/macos"
-    stage: build
-    dependencies:
-        - wordlists
-    script:
-        - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_TOOLCHAIN_FILE=cmake/macos-toolchain.cmake -DPASSGEN_PACKAGE_VERSION="$(./scripts/nightly-version.sh)"
-        - cmake --build build-macos
-        - cd build-macos && cpack -G TXZ
-    artifacts:
-        paths:
-            - build-macos
-        expire_in: 1 week
-
 build:aarch64:
     image: "$CI_REGISTRY_IMAGE/aarch64"
     stage: build
@@ -341,9 +280,7 @@ website:builds:
         - build:alpine
         - build:amd64
         - build:aarch64
-        - build:macos
         - build:riscv64
-        - build:mingw64
         - build:wasi
     script:
         - bash scripts/ci-publish-builds.sh
