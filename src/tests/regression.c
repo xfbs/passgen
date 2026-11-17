@@ -41,3 +41,43 @@ test_result test_regression_random_read_boundary(void) {
 
     return test_ok;
 }
+
+#ifdef PASSGEN_MONOCYPHER
+/// Overlong keys and passphrases in randomness descriptions used to overflow
+/// fixed-size stack buffers.
+test_result test_regression_random_open_overlong(void) {
+    char desc[1024];
+    passgen_random random;
+
+    // 32 bytes of key is fine, 33 is not.
+    strcpy(desc, "chacha20:");
+    memset(desc + strlen(desc), 'A', 32);
+    desc[9 + 32] = 0;
+    assert(passgen_random_open(&random, desc));
+    passgen_random_close(&random);
+
+    desc[9 + 32] = 'A';
+    desc[9 + 33] = 0;
+    assert(!passgen_random_open(&random, desc));
+
+    memset(desc, 'A', sizeof(desc) - 1);
+    desc[sizeof(desc) - 1] = 0;
+    memcpy(desc, "chacha20:", 9);
+    assert(!passgen_random_open(&random, desc));
+
+    // same for the fields of chacha20-argon2.
+    memset(desc, 'A', sizeof(desc) - 1);
+    memcpy(desc, "chacha20-argon2:", 16);
+    assert(!passgen_random_open(&random, desc));
+
+    strcpy(desc, "chacha20-argon2:pass:");
+    memset(desc + strlen(desc), 'B', 500);
+    desc[21 + 500] = 0;
+    assert(!passgen_random_open(&random, desc));
+
+    assert(passgen_random_open(&random, "chacha20-argon2:pass:domain:token"));
+    passgen_random_close(&random);
+
+    return test_ok;
+}
+#endif

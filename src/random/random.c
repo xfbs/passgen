@@ -106,10 +106,14 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
         if(!key_end) {
             key_end = key_ptr + strlen(key_ptr);
         }
-        char key[32] = {0};
-        memcpy(key, key_ptr, key_end - key_ptr);
+        uint8_t key[32] = {0};
+        size_t key_len = key_end - key_ptr;
+        if(key_len > sizeof(key)) {
+            return NULL;
+        }
+        memcpy(key, key_ptr, key_len);
 
-        char iv[] = "passgen";
+        uint8_t iv[8] = "passgen";
 
         if(*key_end == ':') {
             const char *iv_ptr = key_end + 1;
@@ -124,9 +128,10 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
 
     // use chacha20 with raw key and IV
     if(_strprefix("chacha20-argon2:", desc)) {
-        char master_pass[128] = {0};
-        char domain[128] = {0};
-        char token[128] = {0};
+        // one extra byte so that these are always NUL-terminated.
+        char master_pass[129] = {0};
+        char domain[129] = {0};
+        char token[129] = {0};
 
         const char *start = &desc[16];
         const char *end = &desc[16];
@@ -139,14 +144,23 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
             if(!end) { \
                 end = start + strlen(start); \
             } \
+            if((size_t) (end - start) >= sizeof(name)) { \
+                return NULL; \
+            } \
             memcpy(name, start, end - start); \
         }
 
         PARSE_STRING(master_pass)
         PARSE_STRING(domain)
         PARSE_STRING(token)
+#undef PARSE_STRING
 
-        return passgen_random_chacha20_argon2_open(random, master_pass, domain, token, NULL);
+        return passgen_random_chacha20_argon2_open(
+            random,
+            (const uint8_t *) master_pass,
+            (const uint8_t *) domain,
+            (const uint8_t *) token,
+            NULL);
     }
 #endif
 
