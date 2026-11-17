@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.2.0] - 2026-11-17
 ### Added
 - GitHub Actions workflows for CI and automated releases.
 - CTest integration and `check` target.
@@ -25,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - User configuration is read from `$XDG_CONFIG_HOME`.
 - Optional items (`a?`) count towards entropy.
 - Repetitions like `a{5,2}` are rejected.
+- `--master` cannot be combined with `--random`, and `--domain` and `--token`
+  need `--master`.
 - Unicode escapes above `\u{10ffff}` are rejected.
 - UTF-8 which ends in the middle of a sequence is rejected.
 - Locking memory is best-effort, and no longer makes large allocations fail.
@@ -53,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Memory leaks in the CLI.
 - Stray files installed into `share/passgen`.
 
-## [0.1.2] - 2019-08-18
+## 0.1.2 - 2019-08-18
 ### Added
 - Benchmarking tool.
 
@@ -71,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release of project.
 
-[Unreleased]: https://github.com/xfbs/passgen/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/xfbs/passgen/releases/tag/v0.1.0
+[Unreleased]: https://github.com/xfbs/passgen/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/xfbs/passgen/releases/tag/v0.2.0
 [0.1.1]: https://github.com/xfbs/passgen/releases/tag/v0.1.1
+[0.1.0]: https://github.com/xfbs/passgen/releases/tag/v0.1.0
