@@ -9,6 +9,5 @@
 #define PASSGEN_VERSION_STRING "@PROJECT_VERSION@"
 
 #cmakedefine PASSGEN_DEBUG
-#cmakedefine PASSGEN_MEMORY
 #cmakedefine PASSGEN_MLOCK
 #cmakedefine PASSGEN_MONOCYPHER

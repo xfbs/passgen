@@ -24,7 +24,6 @@ option(USE_LIBEXECINFO
 # TODO: disable when not building for linux
 option(PASSGEN_MLOCK "Use mlock() to lock memory on startup, preventing leaks through swapping" ON)
 
-option(PASSGEN_MEMORY "Build with option to override memory management" ON)
 option(PASSGEN_SECCOMP "Build with seccomp filters" OFF)
 
 option(PASSGEN_MONOCYPHER "Build with monocypher" ON)

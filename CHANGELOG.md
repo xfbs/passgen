@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - `\]` and `\[` to have brackets in a set.
+- `passgen_allocator_set()` replaces the allocator which the library uses.
 
 ### Changed
 - Errors in patterns say what is wrong, rather than "invalid token", and mark
@@ -32,7 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The environment no longer frees the source of randomness, and copies the
   names of wordlists.
 - Only the public headers are installed: `passgen.h`, `generate.h`, `env.h`,
-  `random.h`, `error.h`, `version.h`, `config.h` and `export.h`.
+  `random.h`, `error.h`, `allocator.h`, `version.h`, `config.h` and
+  `export.h`.
 - The shared library only exports the public interface.
 - The command-line tool is linked against the static library.
 - Releases show the commit they were built from in `--version`.
@@ -42,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - `passgen_env_init()` and `passgen_env_config()`.
+- The `PASSGEN_MEMORY` build option, which did nothing.
 - Nightly builds for macOS and Windows. Releases have a build for macOS.
 
 ### Fixed

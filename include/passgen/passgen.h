@@ -4,6 +4,7 @@
 #pragma once
 #include <passgen/export.h>
 #include <stddef.h>
+#include <passgen/allocator.h>
 #include <passgen/error.h>
 
 /// A parsed pattern, such as `abc(def|ghi)[a-z]{5}`.

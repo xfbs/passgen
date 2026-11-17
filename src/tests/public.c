@@ -40,6 +40,9 @@ int main(void) {
     // a pattern which is not valid results in an error, and no pattern.
     passgen_pattern *pattern;
     passgen_error error;
+    // the default allocator can be put back, which it already is.
+    passgen_allocator_set(NULL);
+
     check(PASSGEN_ERROR_SET_UNCLOSED == passgen_parse(&pattern, &error, "[a-z"));
     check(pattern == NULL);
     check(error.kind == PASSGEN_ERROR_SET_UNCLOSED);
