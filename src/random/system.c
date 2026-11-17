@@ -54,8 +54,27 @@ static void passgen_random_system_close(void *context) {
     (void) context;
 }
 
+// Fills the buffer for the first time. If that does not work, the source is
+// closed (and released, if it was allocated here).
+static passgen_random *
+passgen_random_start(passgen_random *random, bool allocated) {
+    random->failed = false;
+    passgen_random_reload(random);
+
+    if(random->failed) {
+        random->close(random->context);
+        if(allocated) {
+            free(random);
+        }
+        return NULL;
+    }
+
+    return random;
+}
+
 passgen_random *passgen_random_system_open(passgen_random *random) {
 #ifdef PASSGEN_RANDOM_HAVE_SYSTEM
+    bool allocated = !random;
     if(!random) {
         random = malloc(sizeof(passgen_random));
         if(!random) return NULL;
@@ -64,8 +83,7 @@ passgen_random *passgen_random_system_open(passgen_random *random) {
     random->context = NULL;
     random->read = passgen_random_system_read;
     random->close = passgen_random_system_close;
-    passgen_random_reload(random);
-    return random;
+    return passgen_random_start(random, allocated);
 #else
     static const char *device = "/dev/urandom";
     random = passgen_random_path_open(random, device);
@@ -86,26 +104,21 @@ passgen_random_path_open(passgen_random *random, const char *path) {
         return NULL;
     }
 
-    if(!random) {
-        random = malloc(sizeof(passgen_random));
-        if(!random) {
-            fclose(device);
-            return NULL;
-        }
-    }
-
     return passgen_random_file_open(random, device);
 }
 
 passgen_random *passgen_random_file_open(passgen_random *random, FILE *file) {
+    bool allocated = !random;
     if(!random) {
         random = malloc(sizeof(passgen_random));
-        if(!random) return NULL;
+        if(!random) {
+            fclose(file);
+            return NULL;
+        }
     }
 
     random->context = file;
     random->read = passgen_random_read_file;
     random->close = passgen_random_close_file;
-    passgen_random_reload(random);
-    return random;
+    return passgen_random_start(random, allocated);
 }

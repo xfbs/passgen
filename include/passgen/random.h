@@ -26,6 +26,8 @@
 /// @param context Context pointer of the randomness source.
 /// @param dest Destination to write data to.
 /// @param size Amount of bytes of data to write.
+/// @returns The amount of bytes written. Anything other than `size` means
+///   that the source has failed, and it is not asked again.
 typedef size_t passgen_random_read_func(void *context, void *dest, size_t size);
 
 /// Function used to close the randomness source.
@@ -75,6 +77,10 @@ typedef struct {
 
     /// Function used to close randomness source.
     passgen_random_close_func *close;
+
+    /// Set once the source did not have as much data as was asked for. See
+    /// ::passgen_random_failed.
+    bool failed;
 } passgen_random;
 
 /// Opens a new random object. If given a NULL pointer, allocates memory for it.
@@ -136,13 +142,18 @@ PASSGEN_EXPORT passgen_random *passgen_random_system_open(passgen_random *random
 /// Opens a new, existing random object using @p path as random device.
 ///
 /// @param path Path of file to use as randomness source.
+/// @returns The random object, or NULL if the file cannot be opened, or has
+///   less than ::PASSGEN_RANDOM_BUFFER_LENGTH bytes in it.
 /// @memberof passgen_random
 PASSGEN_EXPORT passgen_random *
 passgen_random_path_open(passgen_random *random, const char *path);
 
 /// Opens a new random object with @p file as randomness source.
 ///
-/// @param file File object to use as randomness source.
+/// @param file File object to use as randomness source. It is closed when
+///   the random object is closed, and also when opening it fails.
+/// @returns The random object, or NULL if the file has less than
+///   ::PASSGEN_RANDOM_BUFFER_LENGTH bytes in it.
 /// @memberof passgen_random
 PASSGEN_EXPORT passgen_random *
 passgen_random_file_open(passgen_random *random, FILE *file);
@@ -260,6 +271,9 @@ PASSGEN_EXPORT void passgen_random_free(passgen_random *random);
 
 /// Read random data from @a random.
 ///
+/// If the source does not have as much data as is asked for, this writes
+/// zeroes, and the source has failed: see ::passgen_random_failed.
+///
 /// @param dest destination to write to, must be large enough and not NULL.
 /// @param bytes how many bytes to write.
 ///
@@ -321,6 +335,16 @@ PASSGEN_EXPORT uint64_t passgen_random_u64_max(passgen_random *random, uint64_t 
 ///
 /// @memberof passgen_random
 PASSGEN_EXPORT void passgen_random_reload(passgen_random *random);
+
+/// Whether the randomness source has failed, which is when it did not have as
+/// much data as was asked for (a file which has been read to the end, for
+/// example).
+///
+/// A source which has failed stays that way, and gives out nothing but zeroes.
+/// Anything which was made using it has to be thrown away. ::passgen_generate
+/// checks this, and fails with ::PASSGEN_ERROR_RANDOM. If you read from a
+/// source yourself, you have to check it once you are done.
+PASSGEN_EXPORT bool passgen_random_failed(const passgen_random *random);
 
 /// Seeks to a specified position in the ChaCha20 stream.
 ///

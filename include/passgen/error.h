@@ -83,6 +83,8 @@ typedef enum passgen_status {
     /// All of the segments of a group have a multiplier of zero, such as
     /// `{0}a`, so there is nothing to choose from.
     PASSGEN_ERROR_GROUP_EMPTY,
+    /// The source of randomness did not have as much data as was needed.
+    PASSGEN_ERROR_RANDOM,
     /// What was generated does not fit into the buffer for it.
     PASSGEN_ERROR_BUFFER_TOO_SMALL,
     /// The callback which is given what is generated asked to stop.

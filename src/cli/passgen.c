@@ -41,7 +41,7 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
     if(!opts->random) {
         fprintf(
             stderr,
-            "\033[1;31merror\033[0m: invalid randomness source '%s'\n",
+            "\033[1;31merror\033[0m: cannot use randomness source '%s'\n",
             random);
         return PASSGEN_CLI_ERROR_RANDOM_ALLOC;
     }

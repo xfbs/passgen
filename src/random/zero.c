@@ -24,6 +24,7 @@ passgen_random *passgen_random_zero_open(passgen_random *random) {
     random->context = NULL;
     random->read = passgen_random_zero_read;
     random->close = passgen_random_zero_close;
+    random->failed = false;
     passgen_random_reload(random);
     return random;
 }

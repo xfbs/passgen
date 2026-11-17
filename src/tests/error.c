@@ -7,6 +7,7 @@
 #include <passgen/env.h>
 #include <passgen/error.h>
 #include <passgen/generate.h>
+#include <passgen/random.h>
 #include <passgen/passgen.h>
 #include <stdlib.h>
 #include <string.h>
@@ -443,6 +444,152 @@ test_result test_error_generate(void) {
     passgen_pattern_free(pattern);
 
     passgen_env_free(env);
+    passgen_random_close(&random);
+
+    return test_ok;
+}
+
+/// Counts down, and fails once it has given out all it has.
+static size_t limited_read(void *context, void *dest, size_t size) {
+    size_t *remaining = context;
+    size_t count = size < *remaining ? size : *remaining;
+    memset(dest, 0xaa, count);
+    *remaining -= count;
+    return count;
+}
+
+static void limited_close(void *context) {
+    (void) context;
+}
+
+/// A source of randomness which runs out fails generating, rather than
+/// aborting or generating something from what is left in the buffer.
+test_result test_error_generate_random(void) {
+    // enough for the first buffer and one more.
+    size_t remaining = 2 * PASSGEN_RANDOM_BUFFER_LENGTH;
+    passgen_random random = {
+        .context = &remaining,
+        .read = limited_read,
+        .close = limited_close,
+    };
+    passgen_random_reload(&random);
+    assert(!passgen_random_failed(&random));
+
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+
+    passgen_pattern *pattern;
+    passgen_error error;
+    uint8_t output[512];
+    size_t written = 99;
+
+    // every character takes eight bytes, so this is fine.
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "[a-z]{100}"));
+    assert(
+        PASSGEN_OK ==
+        passgen_generate_fill_utf8(pattern, env, &error, NULL, output, 512, &written));
+    assert(written == 100);
+    assert(!passgen_random_failed(&random));
+    passgen_pattern_free(pattern);
+
+    // this needs more than there is.
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "[a-z]{300}"));
+    assert(
+        PASSGEN_ERROR_RANDOM ==
+        passgen_generate_fill_utf8(pattern, env, &error, NULL, output, 512, &written));
+    assert(error.kind == PASSGEN_ERROR_RANDOM);
+    assert(written == 0);
+    assert(passgen_random_failed(&random));
+    assert(remaining == 0);
+    passgen_error_free(&error);
+    passgen_pattern_free(pattern);
+
+    // it stays that way, even for choices which do not result in output, and
+    // only gives out zeroes.
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "(a?){0,3}"));
+    assert(
+        PASSGEN_ERROR_RANDOM ==
+        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 512, &written));
+    passgen_pattern_free(pattern);
+
+    assert(passgen_random_u64(&random) == 0);
+    uint8_t large[2 * PASSGEN_RANDOM_BUFFER_LENGTH];
+    memset(large, 1, sizeof(large));
+    passgen_random_read(&random, large, sizeof(large));
+    for(size_t i = 0; i < sizeof(large); i++) {
+        assert(large[i] == 0);
+    }
+
+    // a pattern which does not need any randomness fails as well: the source
+    // is not to be trusted.
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "abc"));
+    assert(
+        PASSGEN_ERROR_RANDOM ==
+        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 512, &written));
+    passgen_pattern_free(pattern);
+
+    passgen_env_free(env);
+    passgen_random_close(&random);
+
+    return test_ok;
+}
+
+/// Reading more than fits into the buffer goes straight to the source, and
+/// fails in the same way.
+test_result test_error_random_large(void) {
+    size_t remaining = PASSGEN_RANDOM_BUFFER_LENGTH + 100;
+    passgen_random random = {
+        .context = &remaining,
+        .read = limited_read,
+        .close = limited_close,
+    };
+    passgen_random_reload(&random);
+    assert(!passgen_random_failed(&random));
+
+    uint8_t large[2 * PASSGEN_RANDOM_BUFFER_LENGTH];
+    memset(large, 1, sizeof(large));
+    passgen_random_read(&random, large, sizeof(large));
+    assert(passgen_random_failed(&random));
+    for(size_t i = 0; i < sizeof(large); i++) {
+        assert(large[i] == 0);
+    }
+
+    passgen_random_close(&random);
+
+    return test_ok;
+}
+
+/// Files which do not have enough in them to fill the buffer once are not
+/// opened, rather than aborting.
+test_result test_error_random_file_short(void) {
+    passgen_random random;
+
+    FILE *file = tmpfile();
+    assert(file);
+    assert(!passgen_random_file_open(&random, file));
+
+    file = tmpfile();
+    assert(file);
+    for(size_t i = 0; i < PASSGEN_RANDOM_BUFFER_LENGTH - 1; i++) {
+        fputc('a', file);
+    }
+    rewind(file);
+    assert(!passgen_random_file_open(NULL, file));
+
+    // just enough for the buffer, after which it fails.
+    file = tmpfile();
+    assert(file);
+    for(size_t i = 0; i < PASSGEN_RANDOM_BUFFER_LENGTH; i++) {
+        fputc('a', file);
+    }
+    rewind(file);
+    assert(passgen_random_file_open(&random, file));
+    for(size_t i = 0; i < PASSGEN_RANDOM_BUFFER_LENGTH - 1; i++) {
+        assert(passgen_random_u8(&random) == 'a');
+    }
+    assert(!passgen_random_failed(&random));
+    assert(passgen_random_u8(&random) == 0);
+    assert(passgen_random_failed(&random));
     passgen_random_close(&random);
 
     return test_ok;

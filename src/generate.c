@@ -49,6 +49,12 @@ static inline int fail_wordlist(
 
 // Emit a character
 static inline int emit(passgen_generate_context *context, uint32_t codepoint) {
+    // if the source of randomness has failed, this is not what should have
+    // been generated.
+    if(passgen_random_failed(context->env->random)) {
+        return fail(context, PASSGEN_ERROR_RANDOM);
+    }
+
     if(0 != context->func(context->data, codepoint)) {
         return fail(context, PASSGEN_ERROR_ABORTED);
     }
@@ -651,5 +657,14 @@ passgen_status passgen_generate(
         .error = error,
     };
 
-    return (passgen_status) passgen_generate_group(&context, &pattern->group);
+    passgen_status status =
+        (passgen_status) passgen_generate_group(&context, &pattern->group);
+
+    // choices which did not result in output (such as leaving something
+    // out) may have been made with a source which has failed, too.
+    if(status == PASSGEN_OK && passgen_random_failed(env->random)) {
+        status = fail(&context, PASSGEN_ERROR_RANDOM);
+    }
+
+    return status;
 }

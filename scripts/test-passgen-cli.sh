@@ -242,5 +242,17 @@ test "$(error_of $passgen -w "test:$tmpdir/empty.txt" '\w{test}')" = "error: wor
 test "$(error_of $passgen -D 2 '((((a))))')" = "error: nested too deeply"
 test "$(error_of $passgen '{0}a')" = "error: nothing to choose from"
 
+# a file which runs out is an error, with no output. one which is too short
+# to start with is not opened. 1024 bytes are read at a time.
+head -c 1500 /dev/zero > "$tmpdir/short.bin"
+head -c 100 /dev/zero > "$tmpdir/tiny.bin"
+test "$($passgen -r "file:$tmpdir/short.bin" '[a-z]{8}')" = "aaaaaaaa"
+test "$(error_of $passgen -r "file:$tmpdir/short.bin" '[a-z]{200}')" = "error: source of randomness ran out"
+test -z "$($passgen -r "file:$tmpdir/short.bin" '[a-z]{200}' 2>/dev/null || true)"
+test -z "$($passgen -j -r "file:$tmpdir/short.bin" '[a-z]{200}' 2>/dev/null || true)"
+fails $passgen -r "file:$tmpdir/short.bin" '[a-z]{200}'
+fails $passgen -r "file:$tmpdir/tiny.bin" 'a'
+fails $passgen -r "file:$tmpdir/empty.txt" 'a'
+
 set +x
 echo "All CLI tests passed."

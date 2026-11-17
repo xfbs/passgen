@@ -17,24 +17,37 @@ static bool _strprefix(const char *prefix, const char *string) {
     return true;
 }
 
+// Called when the source did not have as much data as was asked for. From
+// here on, the source only gives out zeroes, and says that it has failed.
+static void passgen_random_fail(passgen_random *random) {
+    random->failed = true;
+    memset(random->buffer, 0, sizeof(random->buffer));
+    random->pos = 0;
+}
+
+bool passgen_random_failed(const passgen_random *random) {
+    return random->failed;
+}
+
 void passgen_random_reload(passgen_random *random) {
     passgen_assert(random != NULL);
+
+    // once it has failed, it is not asked again.
+    if(random->failed) {
+        random->pos = 0;
+        return;
+    }
 
     // read random data.
     size_t bytes =
         random->read(random->context, &random->buffer, sizeof(random->buffer));
 
-    // make sure we've read enough. this must be a hard failure even in
-    // release builds: continuing with a partially filled buffer would mean
-    // generating output from stale or uninitialized data.
+    // make sure we've read enough. what was read is not used: continuing
+    // with a partially filled buffer would mean generating output from stale
+    // or uninitialized data.
     if(bytes != sizeof(random->buffer)) {
-        fprintf(
-            stderr,
-            "Error reading from randomness source: trying to read %zu "
-            "bytes but got %zu\n",
-            sizeof(random->buffer),
-            bytes);
-        abort();
+        passgen_random_fail(random);
+        return;
     }
 
     // reset position in ring buffer.
@@ -42,6 +55,11 @@ void passgen_random_reload(passgen_random *random) {
 }
 
 void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
+    if(random->failed) {
+        memset(data, 0, bytes);
+        return;
+    }
+
     if(bytes <= sizeof(random->buffer)) {
         // maximum bytes we can have right now
         size_t left = sizeof(random->buffer) - random->pos;
@@ -63,17 +81,17 @@ void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
                     (uint8_t *) data + left,
                     bytes - left);
             }
+
+            // if reloading failed, none of this is to be used.
+            if(random->failed) {
+                memset(data, 0, bytes);
+            }
         }
     } else {
         size_t ret = random->read(random->context, data, bytes);
         if(ret != bytes) {
-            fprintf(
-                stderr,
-                "Error reading from randomness source: trying to read %zu "
-                "bytes but got %zu\n",
-                bytes,
-                ret);
-            abort();
+            passgen_random_fail(random);
+            memset(data, 0, bytes);
         }
     }
 }

@@ -93,6 +93,7 @@ passgen_random *passgen_random_chacha20_open(
     random->close = passgen_random_chacha20_close;
     random->read = passgen_random_chacha20_read;
 
+    random->failed = false;
     passgen_random_reload(random);
 
     return random;

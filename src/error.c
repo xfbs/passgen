@@ -49,6 +49,8 @@ const char *passgen_status_string(passgen_status status) {
             return "wordlist could not be read";
         case PASSGEN_ERROR_GROUP_EMPTY:
             return "nothing to choose from";
+        case PASSGEN_ERROR_RANDOM:
+            return "source of randomness ran out";
         case PASSGEN_ERROR_BUFFER_TOO_SMALL:
             return "output does not fit into the buffer";
         case PASSGEN_ERROR_ABORTED:
