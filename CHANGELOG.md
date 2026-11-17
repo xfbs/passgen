@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Empty sets (`[]`) are rejected.
+- `passgen_random_chacha20_argon2_open()` takes `passgen_argon2_params`.
 - Releases show the commit they were built from in `--version`.
 - Nightly builds are named `passgen-nightly-*`, and their packages have a
   version like `0.2.0+nightly20261117`.

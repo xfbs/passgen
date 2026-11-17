@@ -113,26 +113,25 @@ void passgen_random_chacha20_seek(passgen_random *random, size_t position) {
 
 // these must never change, as that would change every passphrase derived
 // from a master passphrase. to use other parameters, add a new version.
-#define PASSGEN_ARGON2_CONFIG_V1_INIT  \
-    {                                  \
-        .algorithm = CRYPTO_ARGON2_ID, \
-        .nb_blocks = 19 * 1024,        \
-        .nb_passes = 2,                \
-        .nb_lanes = 1,                 \
+#define PASSGEN_ARGON2_PARAMS_V1_INIT \
+    {                                 \
+        .memory = 19 * 1024,          \
+        .passes = 2,                  \
+        .lanes = 1,                   \
     }
 
-const passgen_argon2_config PASSGEN_ARGON2_CONFIG_V1 =
-    PASSGEN_ARGON2_CONFIG_V1_INIT;
+const passgen_argon2_params PASSGEN_ARGON2_PARAMS_V1 =
+    PASSGEN_ARGON2_PARAMS_V1_INIT;
 
-const passgen_argon2_config PASSGEN_ARGON2_CONFIG_DEFAULT =
-    PASSGEN_ARGON2_CONFIG_V1_INIT;
+const passgen_argon2_params PASSGEN_ARGON2_PARAMS_DEFAULT =
+    PASSGEN_ARGON2_PARAMS_V1_INIT;
 
 passgen_random *passgen_random_chacha20_argon2_open(
     passgen_random *random,
     const char *passphrase,
     const char *domain,
     const char *token,
-    passgen_argon2_config *config_ptr) {
+    const passgen_argon2_params *params) {
     // the salt is fixed, as there is nowhere to store one. it is 16 bytes long,
     // which is what is recommended, and other implementations of Argon2 don't
     // accept salts of less than 8 bytes.
@@ -151,10 +150,23 @@ passgen_random *passgen_random_chacha20_argon2_open(
         .ad_size = token ? strlen(token) : 0,
     };
 
-    passgen_argon2_config config = PASSGEN_ARGON2_CONFIG_DEFAULT;
-    if(config_ptr) {
-        config = *config_ptr;
+    if(!params) {
+        params = &PASSGEN_ARGON2_PARAMS_DEFAULT;
     }
+
+    // Monocypher does not check these, and what it does for parameters
+    // which are not valid is undefined.
+    if(params->lanes < 1 || params->passes < 1 ||
+       params->memory / 8 < params->lanes) {
+        return NULL;
+    }
+
+    passgen_argon2_config config = {
+        .algorithm = CRYPTO_ARGON2_ID,
+        .nb_blocks = params->memory,
+        .nb_passes = params->passes,
+        .nb_lanes = params->lanes,
+    };
 
     uint8_t hash[CHACHA20_KEY_SIZE];
     void *work_area = malloc((size_t) 1024 * config.nb_blocks);

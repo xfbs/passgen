@@ -508,7 +508,7 @@ test_result test_random_chacha20_argon2(void) {
 
     // passing the parameters explicitly is the same as the default, and
     // other parameters result in a different key.
-    passgen_argon2_config config = PASSGEN_ARGON2_CONFIG_V1;
+    passgen_argon2_params config = PASSGEN_ARGON2_PARAMS_V1;
     assert(
         passgen_random_chacha20_argon2_open(
             &random,
@@ -520,7 +520,7 @@ test_result test_random_chacha20_argon2(void) {
     assert(passgen_random_u16(&random) == 54107);
     passgen_random_close(&random);
 
-    config.nb_passes += 1;
+    config.passes += 1;
     assert(
         passgen_random_chacha20_argon2_open(
             &random,
@@ -529,6 +529,25 @@ test_result test_random_chacha20_argon2(void) {
             "",
             &config) != NULL);
     assert(passgen_random_u64(&random) != 11525863459809967624ULL);
+    passgen_random_close(&random);
+
+    // parameters which are not valid are rejected.
+    config = PASSGEN_ARGON2_PARAMS_V1;
+    config.passes = 0;
+    assert(!passgen_random_chacha20_argon2_open(&random, "a", NULL, NULL, &config));
+
+    config = PASSGEN_ARGON2_PARAMS_V1;
+    config.lanes = 0;
+    assert(!passgen_random_chacha20_argon2_open(&random, "a", NULL, NULL, &config));
+
+    config = PASSGEN_ARGON2_PARAMS_V1;
+    config.memory = 7;
+    assert(!passgen_random_chacha20_argon2_open(&random, "a", NULL, NULL, &config));
+
+    // the least that is valid.
+    config.memory = 8;
+    config.passes = 1;
+    assert(passgen_random_chacha20_argon2_open(&random, "a", NULL, NULL, &config));
     passgen_random_close(&random);
 
     return test_ok;
