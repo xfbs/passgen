@@ -57,7 +57,11 @@ void passgen_pattern_special_push(
         (uint8_t *) &special->parameters[special->parameters_len],
         codepoint);
 
-    passgen_assert(bytes > 0);
+    // codepoints which cannot be encoded are left out. adding the (negative)
+    // error to the length would corrupt it.
+    if(bytes <= 0) {
+        return;
+    }
     special->parameters_len += bytes;
 
     assert(special->parameters_len < special->parameters_cap);

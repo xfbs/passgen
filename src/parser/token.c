@@ -1,3 +1,4 @@
+#include "passgen/util/utf8.h"
 #include "passgen/parser/token.h"
 
 void passgen_token_parser_init(struct passgen_token_parser *token_parser) {
@@ -22,6 +23,8 @@ const char *passgen_token_state_string(enum passgen_token_state state) {
             return "unexpected character while parsing unicode literal";
         case PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN:
             return "unicode literal payload too long";
+        case PASSGEN_TOKEN_ERROR_UNICODE_RANGE:
+            return "unicode literal is not a valid codepoint";
         default:
             return NULL;
     }
@@ -114,6 +117,13 @@ static inline void token_parse_unicode_payload(
     // once we read the closing brace, the payload is over and we can emit the
     // token.
     if(codepoint == '}') {
+        // six hex digits can encode more than what is a valid codepoint.
+        if(parser->data.unicode_payload.codepoint > PASSGEN_UNICODE_MAX) {
+            parser->state = PASSGEN_TOKEN_ERROR_UNICODE_RANGE;
+
+            return;
+        }
+
         token->codepoint = parser->data.unicode_payload.codepoint;
         parser->state = PASSGEN_TOKEN_INIT;
 

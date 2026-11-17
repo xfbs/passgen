@@ -249,6 +249,31 @@ test_result test_regression_parse_multiplier_twice(void) {
     return test_ok;
 }
 
+/// Unicode escapes can be up to six hex digits long, which is more than what
+/// is a valid codepoint. Those used to be accepted, and corrupted memory when
+/// used in the name of a wordlist.
+test_result test_regression_parse_unicode_escape_range(void) {
+    passgen_pattern pattern;
+    passgen_error error;
+
+    assert(0 == passgen_parse(&pattern, &error, "\\u{10ffff}"));
+    passgen_pattern_free(&pattern);
+
+    assert(0 != passgen_parse(&pattern, &error, "\\u{110000}"));
+    passgen_pattern_free(&pattern);
+
+    assert(0 != passgen_parse(&pattern, &error, "\\u{ffffff}"));
+    passgen_pattern_free(&pattern);
+
+    assert(0 != passgen_parse(&pattern, &error, "\\w{a\\u{fc1f30}b}"));
+    passgen_pattern_free(&pattern);
+
+    assert(0 == passgen_parse(&pattern, &error, "\\w{a\\u{fc}b}"));
+    passgen_pattern_free(&pattern);
+
+    return test_ok;
+}
+
 static int count_codepoints(void *data, uint32_t codepoint) {
     (void) codepoint;
     *((size_t *) data) += 1;

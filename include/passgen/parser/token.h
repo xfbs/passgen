@@ -21,7 +21,7 @@
 
 /// Bitmask for extracting only the Unicode codepoint from the parsed @ref
 /// passgen_token.
-#define PASSGEN_TOKEN_UNICODE_MASK (1 << 21 - 1)
+#define PASSGEN_TOKEN_UNICODE_MASK ((1 << 21) - 1)
 
 /// State of the @ref passgen_token_parser.
 ///
@@ -44,7 +44,9 @@ enum passgen_token_state {
     /// Error while parsing unicode escape sequence payload.
     PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD = -2,
     /// While parsing a unicode escape sequence, encountered a payload that was too large.
-    PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN = -3
+    PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN = -3,
+    /// Error state, the unicode literal is not a valid codepoint
+    PASSGEN_TOKEN_ERROR_UNICODE_RANGE = -4
 };
 
 /// Parser state for tokenizer.
