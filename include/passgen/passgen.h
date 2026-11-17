@@ -19,13 +19,14 @@ typedef struct passgen_pattern passgen_pattern;
 ///   to a newly allocated pattern, which has to be freed with @ref
 ///   passgen_pattern_free when it is no longer needed. If parsing fails, it is
 ///   set to NULL, and there is nothing to free.
-/// @param error Pointer to a @ref passgen_error struct. If parsing fails, this
-///   has a message describing what is wrong, and where in the string. It is
-///   only set in that case, and does not need to be freed.
+/// @param error If parsing fails, this is set to what is wrong, and where in
+///   the string. It then has to be released with @ref passgen_error_free. May
+///   be NULL.
 /// @param string The pattern to parse, as a NUL-terminated, UTF-8 encoded
 ///   string
-/// @returns Zero on success, nonzero otherwise.
-PASSGEN_EXPORT int passgen_parse(
+/// @returns @ref PASSGEN_OK on success, and what is wrong with the pattern
+///   otherwise.
+PASSGEN_EXPORT passgen_status passgen_parse(
     passgen_pattern **pattern,
     passgen_error *error,
     const char *string);

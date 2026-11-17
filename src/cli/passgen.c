@@ -49,18 +49,44 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
     return 0;
 }
 
+/// Prints what is wrong with a pattern, and marks where in the pattern it is.
+static void
+passgen_cli_pattern_error(const passgen_error *error, const char *pattern) {
+    fprintf(stderr, "\033[1;31merror\033[0m in pattern: ");
+    passgen_error_print(error, stderr);
+
+    if(error->has_position) {
+        const char *prefix = "pattern: ";
+        fprintf(stderr, "\033[1;33m%s\033[0m%s\n", prefix, pattern);
+
+        // this lines up as long as every character is as wide as the others,
+        // which is not the case for all of them. it is good enough to find
+        // the place.
+        for(size_t i = 0; i < strlen(prefix) + error->start.codepoint; i++) {
+            fputc(' ', stderr);
+        }
+
+        // errors at the end of the pattern, where something is missing,
+        // don't have a length.
+        size_t length = error->end.codepoint - error->start.codepoint;
+        fprintf(stderr, "\033[1;31m");
+        for(size_t i = 0; i < (length ? length : 1); i++) {
+            fputc('^', stderr);
+        }
+        fprintf(stderr, "\033[0m\n");
+    }
+}
+
 int passgen_cli_run(passgen_cli_opts opts) {
     passgen_pattern *pattern;
     passgen_error error;
-    int ret = passgen_parse(&pattern, &error, opts.pattern);
-    if(ret != 0) {
-        passgen_error_print(&error, opts.pattern);
-        // the pattern is partially built at this point.
-        passgen_pattern_free(pattern);
+    if(PASSGEN_OK != passgen_parse(&pattern, &error, opts.pattern)) {
+        passgen_cli_pattern_error(&error, opts.pattern);
+        passgen_error_free(&error);
         return PASSGEN_CLI_ERROR_PATTERN_PARSE;
     }
 
-    ret = passgen_cli_generate(opts, pattern);
+    int ret = passgen_cli_generate(opts, pattern);
     passgen_pattern_free(pattern);
     return ret;
 }

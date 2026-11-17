@@ -40,10 +40,17 @@ int main(void) {
     // a pattern which is not valid results in an error, and no pattern.
     passgen_pattern *pattern;
     passgen_error error;
-    check(0 != passgen_parse(&pattern, &error, "[a-z"));
+    check(PASSGEN_ERROR_SET_UNCLOSED == passgen_parse(&pattern, &error, "[a-z"));
     check(pattern == NULL);
-    check(error.message != NULL);
+    check(error.kind == PASSGEN_ERROR_SET_UNCLOSED);
+    check(error.has_position);
+    check(error.start.codepoint == 4);
+    check(0 == strcmp(passgen_status_string(error.kind), "set is not closed"));
+    passgen_error_free(&error);
     passgen_pattern_free(pattern);
+
+    // the error is not needed to find out whether it worked.
+    check(PASSGEN_OK != passgen_parse(&pattern, NULL, "(a"));
 
     check(0 == passgen_parse(&pattern, &error, "\\w{words}-[a-z]{4}"));
     check(pattern != NULL);

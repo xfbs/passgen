@@ -2,33 +2,46 @@
 #include "passgen/parser/token.h"
 #include "passgen/pattern/pattern.h"
 #include "passgen/random.h"
+#include "passgen/util/error.h"
 #include "passgen/util/utf8.h"
-#include <assert.h>
 #include <passgen/passgen.h>
 #include <stdlib.h>
 #include <string.h>
 
-int passgen_parse(
+passgen_status passgen_parse(
     passgen_pattern **pattern,
     passgen_error *error,
     const char *string) {
     *pattern = malloc(sizeof(passgen_pattern));
     if(!*pattern) {
-        passgen_error_init(error, "out of memory");
-        return -1;
+        return passgen_error_set(error, PASSGEN_ERROR_OUT_OF_MEMORY);
     }
 
-    int ret = passgen_pattern_parse(*pattern, error, string);
-    if(ret != 0) {
+    passgen_status status = passgen_pattern_parse(*pattern, error, string);
+    if(status != PASSGEN_OK) {
         // whatever was parsed up to the error is of no use to anyone.
         passgen_pattern_free(*pattern);
         *pattern = NULL;
     }
 
-    return ret;
+    return status;
 }
 
-int passgen_pattern_parse(
+/// Turns an error state of the tokenizer into a status.
+static passgen_status token_error_status(int state) {
+    switch(state) {
+        case PASSGEN_TOKEN_ERROR_UNICODE_RANGE:
+            return PASSGEN_ERROR_UNICODE_RANGE;
+        case PASSGEN_TOKEN_ERROR_UNICODE_START:
+        case PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD:
+        case PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN:
+            return PASSGEN_ERROR_UNICODE_ESCAPE;
+        default:
+            return PASSGEN_ERROR_INTERNAL;
+    }
+}
+
+passgen_status passgen_pattern_parse(
     passgen_pattern *output,
     passgen_error *error,
     const char *string) {
@@ -42,15 +55,16 @@ int passgen_pattern_parse(
     uint32_t pattern[pattern_len];
     uint8_t pattern_widths[pattern_len];
     size_t pattern_pos = 0;
-    size_t pattern_pos_total = 0;
-    size_t pattern_raw_pos = 0;
     size_t pattern_raw_len = strlen(string);
+
+    // how much of the input was decoded so far.
+    passgen_error_offset decoded = {0, 0};
 
     int decode_ret = 0;
 
     do {
         uint32_t *pattern_cur = &pattern[0];
-        const uint8_t *pattern_raw_cur = &pattern_raw[pattern_raw_pos];
+        const uint8_t *pattern_raw_cur = &pattern_raw[decoded.byte];
 
         // decode input utf8 into unicode codepoints
         decode_ret = passgen_utf8_decode(
@@ -58,76 +72,97 @@ int passgen_pattern_parse(
             pattern_len,
             pattern_widths,
             &pattern_raw_cur,
-            pattern_raw_len - pattern_raw_pos);
+            pattern_raw_len - decoded.byte);
 
-        pattern_raw_pos += pattern_raw_cur - &pattern_raw[pattern_raw_pos];
+        // where this batch of codepoints starts.
+        passgen_error_offset batch = decoded;
+
         pattern_pos = pattern_cur - &pattern[0];
-        pattern_pos_total += pattern_pos;
+        decoded.byte += pattern_raw_cur - &pattern_raw[decoded.byte];
+        decoded.codepoint += pattern_pos;
 
-        // make sure utf8 decoding was successful
-        if(decode_ret < PASSGEN_UTF8_SUCCESS) {
-            passgen_error_init(error, passgen_utf8_error(decode_ret));
-            passgen_error_offset_set(error, pattern_pos_total, pattern_raw_pos);
-            passgen_parser_free(&parser);
-            return -1;
-        }
-
-        // parse tokens and pattern
+        // parse tokens and pattern. this is done before looking at whether
+        // decoding failed, so that errors come up in the order in which they
+        // are in the pattern.
+        passgen_error_offset position = batch;
         for(size_t i = 0; i < pattern_pos; i++) {
+            // the codepoint following this one
+            passgen_error_offset next = {
+                position.codepoint + 1,
+                position.byte + pattern_widths[i],
+            };
+
             int ret = passgen_token_parse(
                 &token_parser,
                 &token,
                 pattern_widths[i],
                 pattern[i]);
 
+            // a token can be more than one codepoint (for escape sequences),
+            // and starts where the tokenizer says it does.
+            passgen_error_offset token_start = {
+                token.offset,
+                token.byte_offset,
+            };
+
             // make sure parsing the token was successful
             if(ret < 0) {
-                passgen_error_init(error, passgen_token_parse_error_str(ret));
-                passgen_error_offset_set(
-                    error,
-                    token.offset,
-                    token.byte_offset);
                 passgen_parser_free(&parser);
-                return -1;
+                return passgen_error_set_at(
+                    error,
+                    token_error_status(ret),
+                    token_start,
+                    next);
             }
 
             // if we have a token, feed it to the parser
             if(ret == PASSGEN_TOKEN_INIT) {
-                ret = passgen_parse_token(&parser, &token);
+                passgen_status status = passgen_parse_token(&parser, &token);
                 // make sure that the parser accepts the token
-                if(ret != 0) {
-                    passgen_error_init(error, "invalid token");
-                    passgen_error_offset_set(
-                        error,
-                        token.offset,
-                        token.byte_offset);
+                if(status != PASSGEN_OK) {
                     passgen_parser_free(&parser);
-                    return -1;
+                    return passgen_error_set_at(
+                        error,
+                        status,
+                        token_start,
+                        next);
                 }
-                assert(ret == 0);
             }
+
+            position = next;
+        }
+
+        // make sure utf8 decoding was successful. the error is at what
+        // follows the last codepoint which could be decoded.
+        if(decode_ret < PASSGEN_UTF8_SUCCESS) {
+            passgen_error_offset end = {decoded.codepoint + 1, decoded.byte + 1};
+            passgen_parser_free(&parser);
+            return passgen_error_set_at(
+                error,
+                PASSGEN_ERROR_UTF8,
+                decoded,
+                end);
         }
     } while(decode_ret > PASSGEN_UTF8_SUCCESS);
 
+    // from here on, the error is that something is missing at the end.
+
     // make sure we aren't still parsing tokens
     if(token_parser.state != PASSGEN_TOKEN_INIT) {
-        passgen_error_init(
-            error,
-            passgen_token_parse_error_str(token_parser.state));
-        passgen_error_offset_set(error, pattern_pos_total, pattern_raw_pos);
         passgen_parser_free(&parser);
-        return -1;
+        return passgen_error_set_at(
+            error,
+            PASSGEN_ERROR_ESCAPE_UNFINISHED,
+            decoded,
+            decoded);
     }
 
     // make sure we are done parsing
-    if(0 != passgen_parse_finish(&parser)) {
-        passgen_error_init(error, "parsing not finished");
-        passgen_error_offset_set(error, pattern_pos_total, pattern_raw_pos);
-        passgen_parser_free(&parser);
-        return -1;
+    passgen_status status = passgen_parse_finish(&parser);
+    passgen_parser_free(&parser);
+    if(status != PASSGEN_OK) {
+        return passgen_error_set_at(error, status, decoded, decoded);
     }
 
-    passgen_parser_free(&parser);
-
-    return 0;
+    return PASSGEN_OK;
 }

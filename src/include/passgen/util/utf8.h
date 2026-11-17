@@ -41,7 +41,9 @@
 ///   input array. The value of this variable should initially be set to zero. After
 ///   returning, it will indicate the number of processed bytes from the input.
 /// @return 0 on success, a positive integer when the output is too small to fit the
-///   decoded codepoints, and a negative integer on error.
+///   decoded codepoints, and a negative integer on error. On error, `output`
+///   and `input` are advanced past what could be decoded, so `input` points
+///   at the sequence which is not valid.
 int passgen_utf8_decode(
     uint32_t **output,
     size_t output_len,

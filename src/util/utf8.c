@@ -55,6 +55,10 @@ int passgen_utf8_decode(
             utf8_decode(&state, &codepoint, (*input)[input_offset]);
 
         if(status == UTF8_REJECT) {
+            // what came before the sequence which is not valid was decoded,
+            // so report that, to be able to tell where the error is.
+            *output += output_offset;
+            *input += input_offset - codepoint_width;
             return PASSGEN_UTF8_INVALID_CHAR;
         }
 

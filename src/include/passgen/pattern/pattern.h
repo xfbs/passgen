@@ -44,8 +44,8 @@ void passgen_pattern_deinit(passgen_pattern *pattern);
 /// @param error Set if parsing fails, see @ref passgen_parse
 /// @param string The pattern to parse, as a NUL-terminated, UTF-8 encoded
 ///   string
-/// @returns Zero on success, nonzero otherwise.
-int passgen_pattern_parse(
+/// @returns @ref PASSGEN_OK on success, and what is wrong otherwise.
+passgen_status passgen_pattern_parse(
     passgen_pattern *pattern,
     passgen_error *error,
     const char *string);

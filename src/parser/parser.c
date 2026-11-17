@@ -188,7 +188,7 @@ int passgen_parse_token(passgen_parser *parser, passgen_token *token) {
     passgen_parser_state *state = passgen_parser_state_last(parser);
 
     if(parser->limit && parser->state.len >= parser->limit) {
-        return -1;
+        return PASSGEN_ERROR_DEPTH_LIMIT;
     }
 
     switch(state->type) {
@@ -209,7 +209,7 @@ int passgen_parse_token(passgen_parser *parser, passgen_token *token) {
         case PASSGEN_PARSER_SPECIAL_NAME:
             return passgen_parse_special_name(parser, token, state);
         default:
-            return -1;
+            return PASSGEN_ERROR_INTERNAL;
     }
 }
 
@@ -265,7 +265,7 @@ int passgen_parse_group(
                 return 0;
             default:
                 // error
-                return -1;
+                return PASSGEN_ERROR_ESCAPE;
         }
     } else {
         switch(codepoint) {
@@ -287,7 +287,7 @@ int passgen_parse_group(
                     passgen_stack_pop(&state->data.group.group->segments, NULL);
                 }
                 if(parser->state.len <= 1) {
-                    return -1;
+                    return PASSGEN_ERROR_GROUP_UNOPENED;
                 }
                 passgen_pattern_group_finish(state->data.group.group);
                 passgen_stack_pop(&parser->state, NULL);
@@ -334,7 +334,7 @@ int passgen_parse_group(
                     return 0;
                 } else {
                     // error: maybe without a previous item
-                    return -1;
+                    return PASSGEN_ERROR_OPTIONAL;
                 }
             default:
                 break;
@@ -376,7 +376,7 @@ static int passgen_parse_set_codepoint(passgen_token *token, uint32_t *codepoint
             case '[':
                 break;
             default:
-                return -1;
+                return PASSGEN_ERROR_ESCAPE;
         }
     }
 
@@ -393,7 +393,7 @@ int passgen_parse_set(
     if(token->codepoint == ']') {
         // a set stands for one of its characters, so it needs at least one.
         if(set->items.len == 0) {
-            return -1;
+            return PASSGEN_ERROR_SET_EMPTY;
         }
 
         // compute sum of choices and choices list for binary search.
@@ -434,7 +434,7 @@ int passgen_parse_set_range(
     passgen_parser_state *state) {
     (void) parser;
     if(token->codepoint == ']') {
-        return -1;
+        return PASSGEN_ERROR_SET_RANGE;
     }
 
     // the end of the range can be escaped as well. this used to keep the
@@ -444,7 +444,7 @@ int passgen_parse_set_range(
     try(passgen_parse_set_codepoint(token, &codepoint));
 
     if(codepoint < state->data.set.range->start) {
-        return -1;
+        return PASSGEN_ERROR_SET_RANGE;
     }
 
     state->data.set.range->end = codepoint;
@@ -461,7 +461,7 @@ int passgen_parse_multiplier(
         // the sum of the multipliers must not overflow.
         if(*state->data.multiplier.value >
            SIZE_MAX - *state->data.multiplier.sum) {
-            return -1;
+            return PASSGEN_ERROR_REPEAT;
         }
         *state->data.multiplier.sum += *state->data.multiplier.value;
         passgen_stack_pop(&parser->state, NULL);
@@ -472,7 +472,7 @@ int passgen_parse_multiplier(
         uint8_t digit = token->codepoint - '0';
 
         if(*state->data.multiplier.value > (SIZE_MAX - digit) / 10) {
-            return -1;
+            return PASSGEN_ERROR_REPEAT;
         }
         *state->data.multiplier.value *= 10;
         *state->data.multiplier.value += digit;
@@ -480,7 +480,7 @@ int passgen_parse_multiplier(
         return 0;
     }
 
-    return -1;
+    return PASSGEN_ERROR_REPEAT;
 }
 
 int passgen_parse_repeat(
@@ -504,7 +504,7 @@ int passgen_parse_repeat(
         uint8_t digit = token->codepoint - '0';
 
         if(state->data.repeat.repeat->min > (SIZE_MAX - digit) / 10) {
-            return -1;
+            return PASSGEN_ERROR_REPEAT;
         }
         state->data.repeat.repeat->min *= 10;
         state->data.repeat.repeat->min += digit;
@@ -512,7 +512,7 @@ int passgen_parse_repeat(
         return 0;
     }
 
-    return -1;
+    return PASSGEN_ERROR_REPEAT;
 }
 
 int passgen_parse_repeat_range(
@@ -522,7 +522,7 @@ int passgen_parse_repeat_range(
     if(token->codepoint == '}') {
         // a range like {5,2} makes no sense.
         if(state->data.repeat.repeat->max < state->data.repeat.repeat->min) {
-            return -1;
+            return PASSGEN_ERROR_REPEAT;
         }
         passgen_stack_pop(&parser->state, NULL);
         return 0;
@@ -532,7 +532,7 @@ int passgen_parse_repeat_range(
         uint8_t digit = token->codepoint - '0';
 
         if(state->data.repeat.repeat->max > (SIZE_MAX - digit) / 10) {
-            return -1;
+            return PASSGEN_ERROR_REPEAT;
         }
         state->data.repeat.repeat->max *= 10;
         state->data.repeat.repeat->max += digit;
@@ -540,7 +540,7 @@ int passgen_parse_repeat_range(
         return 0;
     }
 
-    return -1;
+    return PASSGEN_ERROR_REPEAT;
 }
 
 int passgen_parse_special(
@@ -554,7 +554,7 @@ int passgen_parse_special(
         return 0;
     }
 
-    return -1;
+    return PASSGEN_ERROR_SPECIAL;
 }
 
 int passgen_parse_special_name(
@@ -575,15 +575,26 @@ int passgen_parse_special_name(
 }
 
 int passgen_parse_finish(passgen_parser *parser) {
-    // make sure we just have one state on the stack, the initial one.
-    if(parser->state.len != 1) {
-        return -1;
-    }
-
-    // make sure last state is a group
+    // make sure we just have one state on the stack, the initial one, which
+    // is a group. otherwise, whatever is on top of the stack was not closed.
     passgen_parser_state *state = passgen_parser_state_last(parser);
-    if(state->type != PASSGEN_PARSER_GROUP) {
-        return -1;
+    if(parser->state.len != 1 || state->type != PASSGEN_PARSER_GROUP) {
+        switch(state->type) {
+            case PASSGEN_PARSER_GROUP:
+                return PASSGEN_ERROR_GROUP_UNCLOSED;
+            case PASSGEN_PARSER_SET:
+            case PASSGEN_PARSER_SET_RANGE:
+                return PASSGEN_ERROR_SET_UNCLOSED;
+            case PASSGEN_PARSER_REPEAT:
+            case PASSGEN_PARSER_REPEAT_RANGE:
+            case PASSGEN_PARSER_MULTIPLIER:
+                return PASSGEN_ERROR_REPEAT;
+            case PASSGEN_PARSER_SPECIAL:
+            case PASSGEN_PARSER_SPECIAL_NAME:
+                return PASSGEN_ERROR_SPECIAL;
+            default:
+                return PASSGEN_ERROR_INTERNAL;
+        }
     }
 
     // clean last state

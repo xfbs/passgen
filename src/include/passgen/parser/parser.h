@@ -195,7 +195,8 @@ passgen_pattern *passgen_parser_free(passgen_parser *parser);
 
 /// Finalize parsing.
 ///
-/// @return 0 on success, nonzero on failure.
+/// @return @ref PASSGEN_OK (which is zero) on success, and a @ref
+///   passgen_status saying what is not closed otherwise.
 /// @memberof passgen_parser
 int passgen_parse_finish(passgen_parser *parser);
 
@@ -207,6 +208,9 @@ int passgen_parser_unicode(
     size_t length);
 
 /// Parse a single token.
+///
+/// @return @ref PASSGEN_OK (which is zero) on success, and a @ref
+///   passgen_status saying what is wrong with the token otherwise.
 /// @memberof passgen_parser
 int passgen_parse_token(
     passgen_parser *parser,
