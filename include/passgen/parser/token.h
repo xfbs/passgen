@@ -5,7 +5,7 @@
 /// The input to Passgen at this point is a sequence of unicode codepoints.
 /// These are converted into tokens. For most codepoints, every codepoint maps
 /// one-to-one to a token, but there are some special cases such as unicode
-/// escape sequences (for example `\u{0a}` will get you a space).
+/// escape sequences (for example `\u{20}` will get you a space).
 ///
 /// Tokens also handle escaping characters. For example, to write a closing
 /// bracket in a character range, you can escape it with a backslash (such as
@@ -58,7 +58,7 @@ enum passgen_token_state {
 /// exact location in the input that caused the error.  The parser also keeps
 /// some state (@ref unicode_payload) for parsing unicode literals. These allow
 /// writing Unicode characters in ASCII by specifying them in hexadecimal
-/// notation. For example, a space could be written as `\x{0a}`. To make this
+/// notation. For example, a space could be written as `\u{20}`. To make this
 /// possible, the parser needs to keep track of the length of the payload (the
 /// hexadecimal data), since that has an upper bound, and the current parsed
 /// codepoint value.

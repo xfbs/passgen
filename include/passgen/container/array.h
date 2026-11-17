@@ -2,8 +2,8 @@
 /// @author Patrick M. Elsen <pelsen@xfbs.net>
 /// @brief Array data structure.
 ///
-/// Defines an array with cheap insertion. Array elements may not be larger
-/// than 1024 bytes. All elements must have the same size.
+/// Defines an array of pointers which grows as needed. It does not own what
+/// the pointers point to.
 
 #pragma once
 #include <passgen/config.h>

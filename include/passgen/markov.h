@@ -5,7 +5,7 @@
 /// The data structures and functions in this file are used to generate
 /// pronounceable phrases by loading in a word list, generating a Markov chain
 /// from it, and then using the Markov chain to generate sequences that are
-/// pronounceable in English but not real words.
+/// pronounceable (in the language of the word list) but mostly not real words.
 #pragma once
 #include "passgen/random.h"
 #include <stddef.h>
@@ -62,7 +62,9 @@ typedef struct passgen_markov_node {
 /// characters, using #passgen_markov_generate you can generate a new
 /// character at random.
 ///
-/// The @ref length of a Markov chain is the length of tuples that it looks at.
+/// The @ref level of a Markov chain is how many of the previous codepoints
+/// it takes into account when generating the next one. The command-line tool
+/// calls this the length of the Markov chain.
 typedef struct {
     /// Length of codepoint tuples that this Markov chains stores.
     size_t level;
@@ -158,14 +160,16 @@ void passgen_markov_add(
 /// @param current Must contain markov->level amount of previous chars
 /// @param markov Must be a parsed markov chain
 /// @param random Must be a valid randomness instance
-/// @param complexity Will be multiplied with the complexity of the choice if it not NULL.
+/// @param entropy If not NULL, this is multiplied with the number of choices
+///   there were, divided by how many of them result in the codepoint which is
+///   returned. This is how the entropy is computed, see @ref passgen_generate.
 /// @return The generated next character
 /// @memberof passgen_markov
 uint32_t passgen_markov_generate(
     passgen_markov *markov,
     const uint32_t *current,
     passgen_random *random,
-    double *complexity);
+    double *entropy);
 
 /// Free a markov chain
 ///

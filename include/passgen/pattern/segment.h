@@ -24,12 +24,12 @@ typedef struct passgen_pattern_segment {
     size_t multiplier;
 } passgen_pattern_segment;
 
-/// Allocate new segment
+/// Initialize a segment
 ///
 /// @memberof passgen_pattern_segment
 void passgen_pattern_segment_init(passgen_pattern_segment *segment);
 
-/// Release segment memory
+/// Release the memory of the items of a segment
 ///
 /// @memberof passgen_pattern_segment
 void passgen_pattern_segment_free(passgen_pattern_segment *segment);

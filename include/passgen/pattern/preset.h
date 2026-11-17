@@ -22,7 +22,8 @@ typedef struct passgen_preset {
 /// @param value Value of preset
 void passgen_preset_init(passgen_preset *preset, const char *value);
 
-/// Parse this preset, if it has not been already
+/// Parse this preset, if it has not been already. This is not implemented,
+/// and does not do anything.
 ///
 /// @memberof passgen_preset
 /// @param preset Preset to parse

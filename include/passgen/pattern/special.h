@@ -32,7 +32,7 @@ typedef struct {
 
 /// Initialise a pattern special with the given char.
 ///
-/// Char can be 'p' for pronounceable, 'w' for word list or 'p' for preset.
+/// Char can be 'm' for Markov chain, 'w' for word list or 'p' for preset.
 ///
 /// Possible types:
 ///

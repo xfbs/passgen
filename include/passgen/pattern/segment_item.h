@@ -49,7 +49,7 @@ typedef struct passgen_pattern_item {
     bool maybe;
 } passgen_pattern_item;
 
-/// Allocate a new segment item
+/// Initialize a segment item
 ///
 /// @memberof passgen_pattern_item
 /// @param item Item to initialize
@@ -57,6 +57,6 @@ void passgen_pattern_item_init(passgen_pattern_item *item);
 
 /// Release segment item memory
 ///
-/// @memberof passgen_pattern_iterm
+/// @memberof passgen_pattern_item
 /// @param item Item to free
 void passgen_pattern_item_free(passgen_pattern_item *item);

@@ -108,8 +108,9 @@ void passgen_hashmap_init(passgen_hashmap *map, const passgen_hashmap_context *c
 /// @memberof passgen_hashmap
 /// @param map HashMap to free
 ///
-/// Beware: this will not free any of the items. Use `passgen_hashmap_foreach_key`
-/// or `passgen_hashmap_foreach_value` to free the items.
+/// Beware: this will not free any of the keys or values. To free those, use
+/// #passgen_hashmap_foreach before freeing the hashmap, for example with
+/// #passgen_hashmap_entry_free.
 void passgen_hashmap_free(passgen_hashmap *map);
 
 /// Insert new item into the hashmap. If there was a previous entry with the
@@ -117,19 +118,21 @@ void passgen_hashmap_free(passgen_hashmap *map);
 /// both key and value.
 ///
 /// @memberof passgen_hashmap
-/// @param map Hashamp to insert into
+/// @param map Hashmap to insert into
 /// @param key Key to insert at
-/// @param valye Value to insert
-/// @returns Previous entry for the same key if one existed, else NULL.
+/// @param value Value to insert
+/// @returns Previous entry for the same key if one existed, else an empty
+///   entry (where `key` is NULL).
 passgen_hashmap_entry passgen_hashmap_insert(passgen_hashmap *map, const void *key, void *value);
 
 /// Remove an entry from the hashmap. Returns the entry if found, else returns
 /// an empty entry (where `key` == NULL).
 ///
 /// @memberof passgen_hashmap
-/// @param map Hashamp to remove from into
+/// @param map Hashmap to remove from
 /// @param key Key to remove
-/// @returns Entry for the key if one existed, else NULL.
+/// @returns Entry for the key if one existed, else an empty entry (where
+///   `key` is NULL).
 passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, const void *key);
 
 /// Lookup an entry in the hashmap. Returns NULL if not found.
@@ -139,7 +142,7 @@ passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, const void *k
 /// Do not change the key via this pointer.
 ///
 /// @memberof passgen_hashmap
-/// @param map Hashamp to lookup in
+/// @param map Hashmap to lookup in
 /// @param key Key to lookup
 /// @returns Entry for the key if one exists, else NULL.
 passgen_hashmap_entry *passgen_hashmap_lookup(const passgen_hashmap *map, const void *key);
@@ -147,7 +150,7 @@ passgen_hashmap_entry *passgen_hashmap_lookup(const passgen_hashmap *map, const 
 /// Run the passed function for every value.
 ///
 /// @memberof passgen_hashmap
-/// @param map Hashamp loop over
+/// @param map Hashmap to loop over
 /// @param user Arbitrary user data that is passed to the function
 /// @param func Function that is called for every #passgen_hashmap_entry in the
 ///   hashmap. If the function returns non-zero, the iteration is aborted and the

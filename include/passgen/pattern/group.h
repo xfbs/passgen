@@ -25,8 +25,8 @@ typedef struct passgen_pattern_segment passgen_pattern_segment;
 /// ratio. If no multipliers are specified, then every segment is chosen at the
 /// same probability. Their documentation explains this in more detail. To make
 /// generation work correctly, the group keeps track of the #multiplier_sum,
-/// which is the sum of all of the multipliers of all segments. This needs to
-/// be computed using the #passgen_pattern_group_finish method.
+/// which is the sum of all of the multipliers of all segments. Whoever changes
+/// the multiplier of a segment has to keep it up to date, as the parser does.
 typedef struct {
     /// [Segments][#passgen_pattern_segment] that make up this group
     passgen_stack segments;
@@ -43,8 +43,9 @@ void passgen_pattern_group_init(passgen_pattern_group *group);
 
 /// Finishes a pattern group.
 ///
-/// This will compute the #multiplier_sum from the segments inside the group.
-/// Must be called after parsing the group is done to ensure accurate generation.
+/// If none of the segments in the group have any items, this sets the
+/// #multiplier_sum to zero, which marks the group as empty, so that it can be
+/// removed. Otherwise, it leaves the #multiplier_sum as it is.
 ///
 /// @memberof passgen_pattern_group
 /// @param group Pattern group to finish
