@@ -1,4 +1,4 @@
-# Passgen [![CI Pipelines](https://gitlab.com/xfbs/passgen/badges/master/pipeline.svg)](https://gitlab.com/xfbs/passgen/-/pipelines) [![Documentation](https://xfbs.gitlab.io/passgen/badges/docs.svg)](https://passgen.it/docs/index.html)
+# Passgen [![CI Pipelines](https://gitlab.com/xfbs/passgen/badges/master/pipeline.svg)](https://gitlab.com/xfbs/passgen/-/pipelines) [![Documentation](https://passgen.gitlab.io/passgen/badges/docs.svg)](https://passgen.gitlab.io/passgen/docs/index.html)
 
 Passgen is a tool to generate random sequences from a [regular
 expression](https://en.wikipedia.org/wiki/Regular_expression).  It has some
@@ -7,11 +7,11 @@ as supporting choosing words from a wordlist, building a markov-chain from a
 wordlist to generate high-entropy, but pronounceable sequences, and being able
 to measure the actual entropy of every sequence it generates. 
 
-* Website: [passgen.it](https://passgen.it)
-* Source Documentation: [Doxygen](https://passgen.it/docs/index.html)
-* Code Coverage: [lcov](https://passgen.it/coverage/lcov), [llvm-cov](https://passgen.it/coverage/llvm-cov)
+* Website: [passgen.gitlab.io/passgen](https://passgen.gitlab.io/passgen/)
+* Source Documentation: [Doxygen](https://passgen.gitlab.io/passgen/docs/index.html)
+* Code Coverage: [lcov](https://passgen.gitlab.io/passgen/coverage/lcov), [llvm-cov](https://passgen.gitlab.io/passgen/coverage/llvm-cov)
 * Continuous Integration: [Pipelines](https://gitlab.com/xfbs/passgen/pipelines)
-* Releases: [Releases](https://passgen.it/releases)
+* Nightly Builds: [Nightly](https://passgen.gitlab.io/passgen/nightly/)
 
 ## Features
 
@@ -138,9 +138,9 @@ In general, if you have all dependencies installed, doing the following should r
     $ cmake --build build
     $ cmake --install build
 
-See [Building](https://passgen.it/development/building) for more information about building the project.
+See [Building](https://passgen.gitlab.io/passgen/development/building) for more information about building the project.
 
-You may also download [signed nightly releases](https://passgen.it/nightly/) from the website.
+You may also download [signed nightly releases](https://passgen.gitlab.io/passgen/nightly/) from the website.
 
 ## Prior art
 

@@ -78,11 +78,11 @@ Passgen, check out the [Building](building.md) page.
 
 [gitlab]: https://gitlab.com/xfbs/passgen
 [github]: https://github.com/xfbs/passgen
-[doxygen]: https://passgen.it/docs/
+[doxygen]: https://passgen.gitlab.io/passgen/docs/
 [merge-requests]: https://gitlab.com/xfbs/passgen/-/merge_requests
 [bug-reports]: https://gitlab.com/xfbs/passgen/-/issues
-[coverage-lcov]: https://passgen.it/coverage/lcov/
-[coverage-llvm-cov]: https://passgen.it/coverage/llvm-cov/
+[coverage-lcov]: https://passgen.gitlab.io/passgen/coverage/lcov/
+[coverage-llvm-cov]: https://passgen.gitlab.io/passgen/coverage/llvm-cov/
 [cmake]: https://cmake.org/
 [llvm-sanitizer]: https://clang.llvm.org/docs/AddressSanitizer.html
 [valgrind]: https://valgrind.org/

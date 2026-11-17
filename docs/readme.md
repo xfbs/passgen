@@ -19,7 +19,7 @@ This is an overview of how the Passgen project is laid out on the filesystem:
 | --- | --- |
 | `cmake/` | [CMake][] configuration. |
 | `data/` | Static data for Passgen, such as default configuration. |
-| `docs/` | Documentation for the Passgen project, hosted on [passgen.it][]. |
+| `docs/` | Documentation for the Passgen project, hosted on [passgen.gitlab.io/passgen][]. |
 | `include/` | Public header files. |
 | `include/passgen/` | Header files of `libpassgen`. |
 | `include/passgen/container/` | Data structure header files. |
@@ -38,7 +38,7 @@ This is an overview of how the Passgen project is laid out on the filesystem:
 | `src/tools/` | Various tools for passgen. |
 | `src/util/` | Utility source files for `libpassgen`. |
 
-[passgen.it]: https://passgen.it
+[passgen.gitlab.io/passgen]: https://passgen.gitlab.io/passgen/
 [CMake]: https://cmake.org/
 
 For information on the grammar that passgen accepts, see [Syntax](syntax.md).

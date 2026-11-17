@@ -1,5 +1,5 @@
 site_name: Passgen
-site_url: https://passgen.it
+site_url: https://passgen.gitlab.io/passgen/
 
 copyright: 'Copyright &copy; 2023 Patrick M. Elsen'
 
@@ -63,8 +63,8 @@ nav:
       - CI/CD: development/tooling/ci.md
     - Security: development/security.md
     - Repository: "https://gitlab.com/xfbs/passgen"
-    - Coverage: "https://passgen.it/coverage/lcov/"
-    - Documentation: "https://passgen.it/docs/"
+    - Coverage: "https://passgen.gitlab.io/passgen/coverage/lcov/"
+    - Documentation: "https://passgen.gitlab.io/passgen/docs/"
   - Licenses: licenses.md
   - About: about.md
 

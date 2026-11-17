@@ -24,33 +24,33 @@ As of right now, there are no real releases for passgen, but there are nightly b
 Every release comes with a signature file. This can be used to verify the authenticity and integrity of the releases. To do so, you need `ssh-keygen` and the passgen developer public key.
 
 ```bash
-wget https://passgen.it/passgen.pub
+wget https://passgen.gitlab.io/passgen/passgen.pub
 ssh-keygen -Y verify -f passgen.pub -s passgen-linux-amd64.deb.sig -n file -I nightly@passgen.it < passgen-linux-amd64.deb
 Good "file" signature for nightly@passgen.it with ED25519 key SHA256:k7BsqKVzJMDEmgomupIE4VE9Xe4V4ffP506BLkz4JGQ
 ```
 
 If the verification fails, please do not trust the build and contact the developers immediately!
 
-[passgen-linux-amd64.tar.xz]: https://passgen.it/nightly/passgen-linux-amd64.tar.xz
-[passgen-linux-amd64.deb]: https://passgen.it/nightly/passgen-linux-amd64.deb
-[passgen-linux-amd64-musl.tar.xz]: https://passgen.it/nightly/passgen-linux-amd64-musl.tar.xz
-[passgen-linux-amd64-musl.bin]: https://passgen.it/nightly/passgen-linux-amd64-musl.bin
-[passgen-linux-aarch64.tar.xz]: https://passgen.it/nightly/passgen-linux-aarch64.tar.xz
-[passgen-linux-arm64.deb]: https://passgen.it/nightly/passgen-linux-arm64.deb
-[passgen-linux-riscv64.tar.xz]: https://passgen.it/nightly/passgen-linux-riscv64.tar.xz
-[passgen-linux-riscv64.deb]: https://passgen.it/nightly/passgen-linux-riscv64.deb
-[passgen-macos-amd64.tar.xz]: https://passgen.it/nightly/passgen-macos-amd64.tar.xz
-[passgen-win64-amd64.zip]: https://passgen.it/nightly/passgen-win64-amd64.zip
-[passgen-wasi.wasm]: https://passgen.it/nightly/passgen-wasi.wasm
+[passgen-linux-amd64.tar.xz]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-amd64.tar.xz
+[passgen-linux-amd64.deb]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-amd64.deb
+[passgen-linux-amd64-musl.tar.xz]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-amd64-musl.tar.xz
+[passgen-linux-amd64-musl.bin]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-amd64-musl.bin
+[passgen-linux-aarch64.tar.xz]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-aarch64.tar.xz
+[passgen-linux-arm64.deb]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-arm64.deb
+[passgen-linux-riscv64.tar.xz]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-riscv64.tar.xz
+[passgen-linux-riscv64.deb]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-riscv64.deb
+[passgen-macos-amd64.tar.xz]: https://passgen.gitlab.io/passgen/nightly/passgen-macos-amd64.tar.xz
+[passgen-win64-amd64.zip]: https://passgen.gitlab.io/passgen/nightly/passgen-win64-amd64.zip
+[passgen-wasi.wasm]: https://passgen.gitlab.io/passgen/nightly/passgen-wasi.wasm
 
-[passgen-linux-amd64.tar.xz.sig]: https://passgen.it/nightly/passgen-linux-amd64.tar.xz.sig
-[passgen-linux-amd64.deb.sig]: https://passgen.it/nightly/passgen-linux-amd64.deb.sig
-[passgen-linux-amd64-musl.tar.xz.sig]: https://passgen.it/nightly/passgen-linux-amd64-musl.tar.xz.sig
-[passgen-linux-amd64-musl.bin.sig]: https://passgen.it/nightly/passgen-linux-amd64-musl.bin.sig
-[passgen-linux-aarch64.tar.xz.sig]: https://passgen.it/nightly/passgen-linux-aarch64.tar.xz.sig
-[passgen-linux-arm64.deb.sig]: https://passgen.it/nightly/passgen-linux-arm64.deb.sig
-[passgen-linux-riscv64.tar.xz.sig]: https://passgen.it/nightly/passgen-linux-riscv64.tar.xz.sig
-[passgen-linux-riscv64.deb.sig]: https://passgen.it/nightly/passgen-linux-riscv64.deb.sig
-[passgen-macos-amd64.tar.xz.sig]: https://passgen.it/nightly/passgen-macos-amd64.tar.xz.sig
-[passgen-win64-amd64.zip.sig]: https://passgen.it/nightly/passgen-win64-amd64.zip.sig
-[passgen-wasi.wasm.sig]: https://passgen.it/nightly/passgen-wasi.wasm.sig
+[passgen-linux-amd64.tar.xz.sig]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-amd64.tar.xz.sig
+[passgen-linux-amd64.deb.sig]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-amd64.deb.sig
+[passgen-linux-amd64-musl.tar.xz.sig]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-amd64-musl.tar.xz.sig
+[passgen-linux-amd64-musl.bin.sig]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-amd64-musl.bin.sig
+[passgen-linux-aarch64.tar.xz.sig]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-aarch64.tar.xz.sig
+[passgen-linux-arm64.deb.sig]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-arm64.deb.sig
+[passgen-linux-riscv64.tar.xz.sig]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-riscv64.tar.xz.sig
+[passgen-linux-riscv64.deb.sig]: https://passgen.gitlab.io/passgen/nightly/passgen-linux-riscv64.deb.sig
+[passgen-macos-amd64.tar.xz.sig]: https://passgen.gitlab.io/passgen/nightly/passgen-macos-amd64.tar.xz.sig
+[passgen-win64-amd64.zip.sig]: https://passgen.gitlab.io/passgen/nightly/passgen-win64-amd64.zip.sig
+[passgen-wasi.wasm.sig]: https://passgen.gitlab.io/passgen/nightly/passgen-wasi.wasm.sig
