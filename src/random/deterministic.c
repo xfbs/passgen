@@ -110,12 +110,21 @@ void passgen_random_chacha20_seek(passgen_random *random, size_t position) {
     passgen_random_reload(random);
 }
 
-const passgen_argon2_config PASSGEN_ARGON2_CONFIG_DEFAULT = {
-    .algorithm = CRYPTO_ARGON2_ID,
-    .nb_blocks = 8,
-    .nb_passes = 8,
-    .nb_lanes = 1,
-};
+// these must never change, as that would change every passphrase derived
+// from a master passphrase. to use other parameters, add a new version.
+#define PASSGEN_ARGON2_CONFIG_V1_INIT  \
+    {                                  \
+        .algorithm = CRYPTO_ARGON2_ID, \
+        .nb_blocks = 19 * 1024,        \
+        .nb_passes = 2,                \
+        .nb_lanes = 1,                 \
+    }
+
+const passgen_argon2_config PASSGEN_ARGON2_CONFIG_V1 =
+    PASSGEN_ARGON2_CONFIG_V1_INIT;
+
+const passgen_argon2_config PASSGEN_ARGON2_CONFIG_DEFAULT =
+    PASSGEN_ARGON2_CONFIG_V1_INIT;
 
 passgen_random *passgen_random_chacha20_argon2_open(
     passgen_random *random,
@@ -123,7 +132,10 @@ passgen_random *passgen_random_chacha20_argon2_open(
     const char *domain,
     const char *token,
     passgen_argon2_config *config_ptr) {
-    static const uint8_t salt[] = "passgen";
+    // the salt is fixed, as there is nowhere to store one. it is 16 bytes long,
+    // which is what is recommended, and other implementations of Argon2 don't
+    // accept salts of less than 8 bytes.
+    static const uint8_t salt[] = "passgen/argon2id";
     passgen_argon2_inputs inputs = {
         .pass = (const uint8_t *) passphrase,
         .pass_size = strlen(passphrase),

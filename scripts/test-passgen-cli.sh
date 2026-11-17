@@ -118,7 +118,12 @@ if $passgen -r chacha20:key "a" > /dev/null 2>&1; then
 
     # known answer, to notice when the derivation changes (which would change
     # everyone's passwords).
-    test "$a" = "e4oVYM-7nPEEt-xRJXQG"
+    test "$a" = "JuIHep-ZdR5yQ-Nq7cO2"
+
+    # deriving the key needs more memory than may commonly be locked
+    if (ulimit -l 8192) 2> /dev/null; then
+        test "$a" = "$(ulimit -l 8192; $passgen -m master -d example.com -t user -p apple2)"
+    fi
 
     # overlong keys are rejected
     long="$(printf 'A%.0s' $(seq 1 300))"

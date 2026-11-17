@@ -498,10 +498,37 @@ test_result test_random_chacha20_argon2(void) {
             "google.com",
             "",
             NULL) != NULL);
-    assert(passgen_random_u8(&random) == 53);
-    assert(passgen_random_u16(&random) == 45909);
-    assert(passgen_random_u32(&random) == 1750958599);
-    assert(passgen_random_u64(&random) == 13270789079271667756ULL);
+    // these values were computed using other implementations of Argon2 and
+    // ChaCha20. they must never change.
+    assert(passgen_random_u8(&random) == 42);
+    assert(passgen_random_u16(&random) == 54107);
+    assert(passgen_random_u32(&random) == 2702625740);
+    assert(passgen_random_u64(&random) == 11525863459809967624ULL);
+    passgen_random_close(&random);
+
+    // passing the parameters explicitly is the same as the default, and
+    // other parameters result in a different key.
+    passgen_argon2_config config = PASSGEN_ARGON2_CONFIG_V1;
+    assert(
+        passgen_random_chacha20_argon2_open(
+            &random,
+            "mypassword",
+            "google.com",
+            "",
+            &config) != NULL);
+    assert(passgen_random_u8(&random) == 42);
+    assert(passgen_random_u16(&random) == 54107);
+    passgen_random_close(&random);
+
+    config.nb_passes += 1;
+    assert(
+        passgen_random_chacha20_argon2_open(
+            &random,
+            "mypassword",
+            "google.com",
+            "",
+            &config) != NULL);
+    assert(passgen_random_u64(&random) != 11525863459809967624ULL);
     passgen_random_close(&random);
 
     return test_ok;
