@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "passgen/container/array.h"
 #include "passgen/markov.h"
 #include "passgen/parser/parser.h"
 #include "passgen/pattern/group.h"

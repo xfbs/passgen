@@ -3,7 +3,6 @@ file(GLOB_RECURSE HEADER_LIST "../../include")
 set(SOURCE_LIST
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
     "assert.c"
-    "container/array.c"
     "container/hashmap.c"
     "container/stack.c"
     "context.c"

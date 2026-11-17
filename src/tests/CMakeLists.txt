@@ -5,7 +5,6 @@ passgen_target_defaults(passgen-test-lib)
 
 # list of test sources.
 set(TEST_LIST
-    "array.c"
     "entropy.c"
     "generate.c"
     "hashmap.c"

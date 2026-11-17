@@ -1,5 +1,6 @@
 #pragma once
-#include <passgen/container/array.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 typedef struct {
     const char *file;
@@ -19,7 +20,6 @@ typedef struct {
     // TODO: rename end
     passgen_error_offset end;
     passgen_error_source source;
-    passgen_array causes;
 } passgen_error;
 
 void passgen_error_init_raw(passgen_error *error, const char *message);
@@ -27,8 +27,6 @@ void passgen_error_init_raw(passgen_error *error, const char *message);
 void passgen_error_free(passgen_error *error);
 
 void passgen_error_print(passgen_error *error, const char *pattern);
-
-void passgen_error_cause_add(passgen_error *error, const passgen_error *cause);
 
 void passgen_error_source_set(passgen_error *error, const char *file, size_t line);
 

@@ -4,7 +4,6 @@
 #include <string.h>
 
 void passgen_error_init_raw(passgen_error *error, const char *message) {
-    passgen_array_init(&error->causes, 0);
     memset(&error->source, 0, sizeof(passgen_error_source));
     memset(&error->offset, 0, sizeof(passgen_error_offset));
     memset(&error->end, 0, sizeof(passgen_error_offset));
@@ -12,7 +11,6 @@ void passgen_error_init_raw(passgen_error *error, const char *message) {
 }
 
 void passgen_error_free(passgen_error *error) {
-    passgen_array_free(&error->causes);
     PASSGEN_CLEAR(error);
 }
 
@@ -34,10 +32,6 @@ void passgen_error_print(passgen_error *error, const char *pattern) {
         fprintf(stderr, " ");
     }
     fprintf(stderr, "\033[1;31m^\033[0m\n");
-}
-
-void passgen_error_cause_add(passgen_error *error, const passgen_error *cause) {
-    passgen_array_push(&error->causes, (void *) cause);
 }
 
 void passgen_error_offset_set(

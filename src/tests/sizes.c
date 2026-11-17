@@ -1,4 +1,3 @@
-#include "passgen/container/array.h"
 #include "passgen/container/hashmap.h"
 #include "passgen/container/stack.h"
 #include "passgen/markov.h"
@@ -61,6 +60,5 @@ test_result test_sizes_util(void) {
     assert_eq(sizeof(passgen_hashmap_entry), 16);
     assert_eq(sizeof(passgen_stack), 32);
     assert_eq(sizeof(passgen_random), 1024 + 4 * 8);
-    assert_eq(sizeof(passgen_array), 24);
     return test_ok;
 }

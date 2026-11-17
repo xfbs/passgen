@@ -5,7 +5,6 @@
 #include <stddef.h>
 
 #include "passgen/container/stack.h"
-#include "passgen/container/array.h"
 #include "passgen/pattern/range.h"
 
 /// Pattern set, such as `[a-zA-Z0-9]`.
