@@ -5,16 +5,29 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char *passgen_random_default_device = "/dev/urandom";
-
 #ifdef __linux__
 #define PASSGEN_RANDOM_HAVE_SYSTEM
+#include <errno.h>
 #include <sys/random.h>
+#include <sys/types.h>
 
 static size_t
 passgen_random_system_read(void *context, void *dest, size_t size) {
     (void) context;
-    return getrandom(dest, size, 0);
+    // getrandom() may return fewer bytes than requested (for requests larger
+    // than 256 bytes) or fail with EINTR, so keep going until we have it all.
+    size_t done = 0;
+    while(done < size) {
+        ssize_t ret = getrandom((uint8_t *) dest + done, size - done, 0);
+        if(ret < 0) {
+            if(errno == EINTR) {
+                continue;
+            }
+            break;
+        }
+        done += (size_t) ret;
+    }
+    return done;
 }
 #endif
 
@@ -52,17 +65,18 @@ passgen_random *passgen_random_system_open(passgen_random *random) {
     random->read = passgen_random_system_read;
     random->close = passgen_random_system_close;
     passgen_random_reload(random);
+    return random;
 #else
-    passgen_random *rand =
-        passgen_random_path_open(random, passgen_random_default_device);
-    if(!rand) {
+    static const char *device = "/dev/urandom";
+    random = passgen_random_path_open(random, device);
+    if(!random) {
         fprintf(
             stderr,
             "error: cannot open system randomness device '%s'\n",
-            passgen_random_default_device);
+            device);
     }
-#endif
     return random;
+#endif
 }
 
 passgen_random *
@@ -74,14 +88,13 @@ passgen_random_path_open(passgen_random *random, const char *path) {
 
     if(!random) {
         random = malloc(sizeof(passgen_random));
-        if(!random) return NULL;
+        if(!random) {
+            fclose(device);
+            return NULL;
+        }
     }
 
     return passgen_random_file_open(random, device);
-
-    passgen_random_reload(random);
-
-    return random;
 }
 
 passgen_random *passgen_random_file_open(passgen_random *random, FILE *file) {

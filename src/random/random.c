@@ -21,10 +21,19 @@ void passgen_random_reload(passgen_random *random) {
     // read random data.
     size_t bytes =
         random->read(random->context, &random->buffer, sizeof(random->buffer));
-    (void) bytes;
 
-    // make sure we've read enough.
-    passgen_assert(bytes == sizeof(random->buffer));
+    // make sure we've read enough. this must be a hard failure even in
+    // release builds: continuing with a partially filled buffer would mean
+    // generating output from stale or uninitialized data.
+    if(bytes != sizeof(random->buffer)) {
+        fprintf(
+            stderr,
+            "Error reading from randomness source: trying to read %zu "
+            "bytes but got %zu\n",
+            sizeof(random->buffer),
+            bytes);
+        abort();
+    }
 
     // reset position in ring buffer.
     random->pos = 0;
@@ -59,7 +68,7 @@ void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
             fprintf(
                 stderr,
                 "Error reading from randomness source: trying to read %zu "
-                "bytes but got %zu",
+                "bytes but got %zu\n",
                 bytes,
                 ret);
             abort();

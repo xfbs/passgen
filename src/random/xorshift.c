@@ -19,14 +19,14 @@ passgen_random_xorshift_read(void *context, void *dest, size_t size) {
     // fill all whole uint64 blocks
     while((size - written) >= sizeof(result)) {
         result = xorshift64(context);
-        memcpy(dest + written, &result, sizeof(result));
+        memcpy((uint8_t *) dest + written, &result, sizeof(result));
         written += sizeof(result);
     }
 
     // maybe fill the last incomplete block
     if(size != written) {
         result = xorshift64(context);
-        memcpy(dest + written, &result, size - written);
+        memcpy((uint8_t *) dest + written, &result, size - written);
         written += size - written;
     }
 
@@ -39,14 +39,17 @@ static void passgen_random_xorshift_close(void *context) {
 
 passgen_random *
 passgen_random_xorshift_open(passgen_random *random, uint64_t seed) {
-    if(!random) {
-        random = malloc(sizeof(passgen_random));
-        if(!random) return NULL;
-    }
-
     // create state
     uint64_t *state = malloc(sizeof(uint64_t));
     if(!state) return NULL;
+
+    if(!random) {
+        random = malloc(sizeof(passgen_random));
+        if(!random) {
+            free(state);
+            return NULL;
+        }
+    }
 
     // initialise state
     *state = seed;
