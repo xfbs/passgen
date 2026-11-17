@@ -43,7 +43,7 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
             stderr,
             "\033[1;31merror\033[0m: invalid randomness source '%s'\n",
             random);
-        return PASSGEN_ERROR_RANDOM_ALLOC;
+        return PASSGEN_CLI_ERROR_RANDOM_ALLOC;
     }
 
     return 0;
@@ -57,7 +57,7 @@ int passgen_cli_run(passgen_cli_opts opts) {
         passgen_error_print(&error, opts.pattern);
         // the pattern is partially built at this point.
         passgen_pattern_free(pattern);
-        return PASSGEN_ERROR_PATTERN_PARSE;
+        return PASSGEN_CLI_ERROR_PATTERN_PARSE;
     }
 
     ret = passgen_cli_generate(opts, pattern);
@@ -155,7 +155,7 @@ int passgen_cli_generate_normal(
             passgen_cli_buffer_emit);
         if(ret != 0) {
             free(buffer.data);
-            return passgen_cli_bail(PASSGEN_ERROR_GENERATE, NULL);
+            return passgen_cli_bail(PASSGEN_CLI_ERROR_GENERATE, NULL);
         }
 
         if(opts.entropy) {
@@ -218,7 +218,7 @@ int passgen_cli_generate_json(passgen_cli_opts opts, passgen_pattern *pattern) {
 
     if(ret != 0) {
         free(buffer.data);
-        return passgen_cli_bail(PASSGEN_ERROR_GENERATE, NULL);
+        return passgen_cli_bail(PASSGEN_CLI_ERROR_GENERATE, NULL);
     }
 
     fwrite(buffer.data, 1, buffer.len, stdout);
@@ -242,7 +242,7 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
             "\033[1;31merror\033[0m: expected NAME:PATH for wordlist "
             "definition `%s`\n",
             input);
-        return PASSGEN_ERROR_WORDLIST;
+        return PASSGEN_CLI_ERROR_WORDLIST;
     }
     size_t offset = colon - input;
 
@@ -252,13 +252,13 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
             stderr,
             "\033[1;31merror\033[0m: cannot open wordlist `%s`\n",
             colon + 1);
-        return PASSGEN_ERROR_WORDLIST;
+        return PASSGEN_CLI_ERROR_WORDLIST;
     }
 
     char *name = malloc(offset + 1);
     if(!name) {
         fclose(file);
-        return PASSGEN_ERROR_ALLOC;
+        return PASSGEN_CLI_ERROR_ALLOC;
     }
     memcpy(name, input, offset);
     name[offset] = 0;
@@ -267,14 +267,14 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
     int ret = passgen_env_wordlist_add(opt->env, name, file, opt->markov_length);
     free(name);
 
-    return ret == 0 ? 0 : PASSGEN_ERROR_ALLOC;
+    return ret == 0 ? 0 : PASSGEN_CLI_ERROR_ALLOC;
 }
 
 int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
     size_t arg_len = strlen(arg);
     char *arg_copy = malloc(arg_len + 1);
     if(!arg_copy) {
-        return PASSGEN_ERROR_ALLOC;
+        return PASSGEN_CLI_ERROR_ALLOC;
     }
     memcpy(arg_copy, arg, arg_len + 1);
     char *colon = strstr(arg_copy, ":");
@@ -285,7 +285,7 @@ int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
             "definition `%s`\n",
             arg);
         free(arg_copy);
-        return PASSGEN_ERROR_PRESET_NOT_FOUND;
+        return PASSGEN_CLI_ERROR_PRESET_NOT_FOUND;
     }
     *colon = 0;
 
@@ -396,11 +396,11 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             case 0:
                 break;
             case 'h':
-                return PASSGEN_SHOW_HELP;
+                return PASSGEN_CLI_SHOW_HELP;
             case 'a':
                 opt = atoi(optarg);
                 if(opt < 1) {
-                    return passgen_cli_bail(PASSGEN_ERROR_ILLEGAL_AMOUNT, &opt);
+                    return passgen_cli_bail(PASSGEN_CLI_ERROR_ILLEGAL_AMOUNT, &opt);
                 }
                 opts->amount = opt;
                 break;
@@ -419,7 +419,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             case 'D':
                 opt = atoi(optarg);
                 if(opt < 1) {
-                    return passgen_cli_bail(PASSGEN_ERROR_ILLEGAL_DEPTH, &opt);
+                    return passgen_cli_bail(PASSGEN_CLI_ERROR_ILLEGAL_DEPTH, &opt);
                 }
                 opts->depth = opt;
                 passgen_env_depth_limit_set(opts->env, opt);
@@ -431,7 +431,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 opts->entropy = true;
                 break;
             case 'v':
-                return PASSGEN_SHOW_VERSION;
+                return PASSGEN_CLI_SHOW_VERSION;
             case 'l':
                 passgen_cli_presets_list(opts);
                 exit(0);
@@ -443,7 +443,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 // the markov chain stores its level in a single byte.
                 if(opt < 1 || opt > UINT8_MAX) {
                     return passgen_cli_bail(
-                        PASSGEN_ERROR_ILLEGAL_MARKOV_LENGTH,
+                        PASSGEN_CLI_ERROR_ILLEGAL_MARKOV_LENGTH,
                         &opt);
                 }
                 opts->markov_length = opt;
@@ -461,14 +461,14 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             case '?':
             default:
                 return passgen_cli_bail(
-                    PASSGEN_ERROR_UNRECOGNIZED,
+                    PASSGEN_CLI_ERROR_UNRECOGNIZED,
                     argv[optind]);
         }
     }
 
     // can't have both a preset and a format at the same time.
     if(preset && opts->pattern) {
-        return passgen_cli_bail(PASSGEN_ERROR_MULTIPLE_FORMATS, opts->pattern);
+        return passgen_cli_bail(PASSGEN_CLI_ERROR_MULTIPLE_FORMATS, opts->pattern);
     }
 
     // if a preset was given, parse it.
@@ -476,7 +476,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
         passgen_hashmap_entry *entry =
             passgen_hashmap_lookup(&opts->presets, preset);
         if(!entry) {
-            return passgen_cli_bail(PASSGEN_ERROR_PRESET_NOT_FOUND, preset);
+            return passgen_cli_bail(PASSGEN_CLI_ERROR_PRESET_NOT_FOUND, preset);
         }
         opts->pattern = entry->value;
     }
@@ -485,7 +485,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     if(optind < argc) {
         if(opts->pattern || (argc - optind) > 1) {
             return passgen_cli_bail(
-                PASSGEN_ERROR_MULTIPLE_FORMATS,
+                PASSGEN_CLI_ERROR_MULTIPLE_FORMATS,
                 argv[optind]);
         } else {
             opts->pattern = argv[optind];
@@ -494,7 +494,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 
     // if no format or preset was given, show help.
     if(!opts->pattern) {
-        return PASSGEN_SHOW_HELP;
+        return PASSGEN_CLI_SHOW_HELP;
     }
 
 #ifdef PASSGEN_MONOCYPHER
@@ -503,7 +503,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     // result in something other than what was asked for.
     if(opts->master_passphrase && random_given) {
         return passgen_cli_bail(
-            PASSGEN_ERROR_MASTER_CONFLICT,
+            PASSGEN_CLI_ERROR_MASTER_CONFLICT,
             "--master and --random cannot be used together");
     }
 
@@ -511,7 +511,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     // passphrase was forgotten.
     if(!opts->master_passphrase && (opts->master_domain || opts->master_token)) {
         return passgen_cli_bail(
-            PASSGEN_ERROR_MASTER_CONFLICT,
+            PASSGEN_CLI_ERROR_MASTER_CONFLICT,
             "--domain and --token need --master");
     }
 
@@ -529,7 +529,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             opts->master_token,
             NULL);
         if(!opts->random) {
-            return passgen_cli_bail(PASSGEN_ERROR_RANDOM_ALLOC, NULL);
+            return passgen_cli_bail(PASSGEN_CLI_ERROR_RANDOM_ALLOC, NULL);
         }
     }
 #endif
@@ -538,7 +538,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     if(!opts->random) {
         opts->random = passgen_random_open(NULL, NULL);
         if(!opts->random) {
-            return passgen_cli_bail(PASSGEN_ERROR_RANDOM_ALLOC, NULL);
+            return passgen_cli_bail(PASSGEN_CLI_ERROR_RANDOM_ALLOC, NULL);
         }
     }
 
@@ -624,56 +624,56 @@ void passgen_cli_show_version(void) {
 
 int passgen_cli_bail(passgen_cli_error error, const void *data) {
     switch(error) {
-        case PASSGEN_ERROR_MULTIPLE_FORMATS:
+        case PASSGEN_CLI_ERROR_MULTIPLE_FORMATS:
             fprintf(
                 stderr,
                 "error: multiple patterns specified (%s).\n",
                 (const char *) data);
             break;
-        case PASSGEN_ERROR_RANDOM_ALLOC:
+        case PASSGEN_CLI_ERROR_RANDOM_ALLOC:
             fprintf(stderr, "error: couldn't open random object.\n");
             break;
-        case PASSGEN_ERROR_PATTERN_PARSE:
+        case PASSGEN_CLI_ERROR_PATTERN_PARSE:
             break;
-        case PASSGEN_ERROR_ILLEGAL_AMOUNT:
+        case PASSGEN_CLI_ERROR_ILLEGAL_AMOUNT:
             fprintf(
                 stderr,
                 "\033[1;31merror\033[0m: illegal amount entered (%i)\n",
                 *((const int *) data));
             break;
-        case PASSGEN_ERROR_ILLEGAL_MARKOV_LENGTH:
+        case PASSGEN_CLI_ERROR_ILLEGAL_MARKOV_LENGTH:
             fprintf(
                 stderr,
                 "\033[1;31merror\033[0m: illegal markov chain length entered "
                 "(%i)\n",
                 *((const int *) data));
             break;
-        case PASSGEN_ERROR_UNRECOGNIZED:
+        case PASSGEN_CLI_ERROR_UNRECOGNIZED:
             break;
-        case PASSGEN_ERROR_MASTER_CONFLICT:
+        case PASSGEN_CLI_ERROR_MASTER_CONFLICT:
             fprintf(
                 stderr,
                 "\033[1;31merror\033[0m: %s\n",
                 (const char *) data);
             break;
-        case PASSGEN_ERROR_ILLEGAL_DEPTH:
+        case PASSGEN_CLI_ERROR_ILLEGAL_DEPTH:
             fprintf(
                 stderr,
                 "\033[1;31merror\033[0m: illegal depth entered (%i)\n",
                 *((const int *) data));
             break;
-        case PASSGEN_ERROR_GENERATE:
+        case PASSGEN_CLI_ERROR_GENERATE:
             fprintf(
                 stderr,
                 "\033[1;31merror\033[0m: failed to generate output (unknown "
                 "or empty wordlist, or depth limit exceeded)\n");
             break;
-        case PASSGEN_ERROR_ALLOC:
+        case PASSGEN_CLI_ERROR_ALLOC:
             fprintf(stderr, "\033[1;31merror\033[0m: out of memory\n");
             break;
-        case PASSGEN_ERROR_WORDLIST:
+        case PASSGEN_CLI_ERROR_WORDLIST:
             break;
-        case PASSGEN_ERROR_PRESET_NOT_FOUND:
+        case PASSGEN_CLI_ERROR_PRESET_NOT_FOUND:
             fprintf(
                 stderr,
                 "\033[1;31merror\033[0m: preset `%s` not found\n",
@@ -711,7 +711,7 @@ int passgen_cli_opts_config_load(passgen_cli_opts *opts, FILE *file) {
     size_t length = 0;
     char *config = malloc(capacity);
     if(!config) {
-        return PASSGEN_ERROR_ALLOC;
+        return PASSGEN_CLI_ERROR_ALLOC;
     }
 
     while(true) {
@@ -725,7 +725,7 @@ int passgen_cli_opts_config_load(passgen_cli_opts *opts, FILE *file) {
         char *new_config = realloc(config, capacity);
         if(!new_config) {
             free(config);
-            return PASSGEN_ERROR_ALLOC;
+            return PASSGEN_CLI_ERROR_ALLOC;
         }
         config = new_config;
     }
@@ -820,7 +820,7 @@ int passgen_cli_opts_config_user(passgen_cli_opts *opts) {
     size_t config_path_len = strlen(dir) + strlen(suffix) + 1;
     char *config_path = malloc(config_path_len);
     if(!config_path) {
-        return PASSGEN_ERROR_ALLOC;
+        return PASSGEN_CLI_ERROR_ALLOC;
     }
     snprintf(config_path, config_path_len, "%s%s", dir, suffix);
     FILE *file = fopen(config_path, "r");
