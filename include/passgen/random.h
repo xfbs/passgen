@@ -194,15 +194,16 @@ passgen_random *passgen_random_chacha20_open(
 /// distinct passphrases for multiple logins to the same domain, for example. Or you
 /// may use it as a counter to rotate your passphrases periodically.
 ///
-/// @param passphrase Master passphrase
-/// @param domain Domain name
-/// @param token Token, used as additional input
+/// @param passphrase Master passphrase, as a NUL-terminated string
+/// @param domain Domain name, as a NUL-terminated string (may be NULL)
+/// @param token Token, used as additional input, as a NUL-terminated string
+///   (may be NULL)
 /// @memberof passgen_random
 passgen_random *passgen_random_chacha20_argon2_open(
     passgen_random *random,
-    const uint8_t *passphrase,
-    const uint8_t *domain,
-    const uint8_t *token,
+    const char *passphrase,
+    const char *domain,
+    const char *token,
     passgen_argon2_config *config);
 #endif
 

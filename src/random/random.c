@@ -166,9 +166,9 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
 
         return passgen_random_chacha20_argon2_open(
             random,
-            (const uint8_t *) master_pass,
-            (const uint8_t *) domain,
-            (const uint8_t *) token,
+            master_pass,
+            domain,
+            token,
             NULL);
     }
 #endif

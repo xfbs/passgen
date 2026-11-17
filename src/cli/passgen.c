@@ -493,9 +493,9 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     if(!opts->env.random && opts->master_passphrase) {
         opts->env.random = passgen_random_chacha20_argon2_open(
             NULL,
-            (const uint8_t *) opts->master_passphrase,
-            (const uint8_t *) opts->master_domain,
-            (const uint8_t *) opts->master_token,
+            opts->master_passphrase,
+            opts->master_domain,
+            opts->master_token,
             NULL);
     }
 #endif

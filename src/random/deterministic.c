@@ -119,23 +119,23 @@ const passgen_argon2_config PASSGEN_ARGON2_CONFIG_DEFAULT = {
 
 passgen_random *passgen_random_chacha20_argon2_open(
     passgen_random *random,
-    const uint8_t *passphrase,
-    const uint8_t *domain,
-    const uint8_t *token,
+    const char *passphrase,
+    const char *domain,
+    const char *token,
     passgen_argon2_config *config_ptr) {
     static const uint8_t salt[] = "passgen";
     passgen_argon2_inputs inputs = {
-        .pass = passphrase,
-        .pass_size = strlen((const char *) passphrase),
+        .pass = (const uint8_t *) passphrase,
+        .pass_size = strlen(passphrase),
         .salt = salt,
         .salt_size = sizeof(salt) - 1,
     };
 
     passgen_argon2_extras extras = {
-        .key = domain,
-        .key_size = domain ? strlen((const char *) domain) : 0,
-        .ad = token,
-        .ad_size = token ? strlen((const char *) token) : 0,
+        .key = (const uint8_t *) domain,
+        .key_size = domain ? strlen(domain) : 0,
+        .ad = (const uint8_t *) token,
+        .ad_size = token ? strlen(token) : 0,
     };
 
     passgen_argon2_config config = PASSGEN_ARGON2_CONFIG_DEFAULT;

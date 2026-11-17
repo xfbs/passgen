@@ -494,9 +494,9 @@ test_result test_random_chacha20_argon2(void) {
     assert(
         passgen_random_chacha20_argon2_open(
             &random,
-            (const uint8_t *) "mypassword",
-            (const uint8_t *) "google.com",
-            (const uint8_t *) "",
+            "mypassword",
+            "google.com",
+            "",
             NULL) != NULL);
     assert(passgen_random_u8(&random) == 53);
     assert(passgen_random_u16(&random) == 45909);
