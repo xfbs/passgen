@@ -79,10 +79,12 @@ PASSGEN_EXPORT size_t passgen_generate_fill_json_utf8(
 /// @param pattern A pattern which was parsed successfully
 /// @param env The environment, which has the source of randomness and the
 ///   wordlists
-/// @param entropy If not NULL, this is set to the number of equally likely
-///   outputs that the one which was generated was chosen from. This is a
-///   product, not a number of bits: take the logarithm to base two of it to get
-///   the entropy in bits. It is infinite for more than about 1024 bits.
+/// @param entropy If not NULL, this is set to the entropy of what was
+///   generated, in bits. This is the logarithm to base two of the number of
+///   equally likely choices that were made to generate it: with 64 bits,
+///   someone who knows the pattern needs up to 2^64 guesses to find it. For a
+///   pattern which can generate the same output in more than one way (such as
+///   `[aa]`), this is more than the entropy of the output.
 /// @param data Passed to the callback as it is
 /// @param func Called for every codepoint which is generated
 /// @returns Zero on success, nonzero on failure. Generating fails if the

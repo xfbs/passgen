@@ -18,6 +18,7 @@
 #include "passgen/wordlist.h"
 #include "try.h"
 
+#include <math.h>
 #include <string.h>
 
 typedef struct {
@@ -308,7 +309,7 @@ static size_t passgen_generate_repeat(
 
     // keep track of entropy
     if(context->entropy) {
-        *context->entropy *= difference + 1;
+        *context->entropy += log2((double) difference + 1);
     }
 
     return repeat->min + choice;
@@ -329,7 +330,7 @@ static int passgen_generate_set(
 
     // keep track of entropy
     if(context->entropy) {
-        *context->entropy *= possible;
+        *context->entropy += log2((double) possible);
     }
 
     // locate choice in list of choices.
@@ -455,7 +456,7 @@ static int passgen_generate_special_wordlist(
     } while(decode_ret > PASSGEN_UTF8_SUCCESS);
 
     if(context->entropy) {
-        *context->entropy *= passgen_wordlist_count(wordlist);
+        *context->entropy += log2((double) passgen_wordlist_count(wordlist));
     }
 
     return 0;
@@ -499,7 +500,7 @@ static int passgen_generate_item(
     if(item->maybe) {
         // either way, this is a choice between two options.
         if(context->entropy) {
-            *context->entropy *= 2;
+            *context->entropy += 1;
         }
 
         if(!passgen_random_bool(context->env->random)) {
@@ -576,9 +577,11 @@ static int passgen_generate_group(
     }
 
     // keep track of entropy
+    // the segment was one of multiplier_sum equally likely choices, of which
+    // multiplier many result in this segment.
     if(context->entropy) {
-        *context->entropy *= group->multiplier_sum;
-        *context->entropy /= segment->multiplier;
+        *context->entropy += log2((double) group->multiplier_sum) -
+                             log2((double) segment->multiplier);
     }
 
     try(passgen_generate_segment(context, segment));
@@ -597,7 +600,7 @@ int passgen_generate(
     // when entropy collection is request (by passing a non-NULL pointer),
     // initialize it.
     if(entropy) {
-        *entropy = 1.0;
+        *entropy = 0.0;
     }
 
     passgen_generate_context context = {

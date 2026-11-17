@@ -471,14 +471,55 @@ test_result test_regression_entropy_maybe(void) {
 
     assert(0 == passgen_parse(&pattern, &error, "a?"));
     assert(0 == passgen_generate(pattern, env, &entropy, &count, count_codepoints));
-    assert(fabs(entropy - 2.0) < 0.0001);
+    assert(fabs(entropy - 1.0) < 0.0001);
     passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "a?[ab]?(c|d)?"));
     assert(0 == passgen_generate(pattern, env, &entropy, &count, count_codepoints));
     // with the zero randomness source, every optional item is emitted, so
-    // this is 2 * (2 * 2) * (2 * 2).
-    assert(fabs(entropy - 32.0) < 0.0001);
+    // this is one bit for each of them, and one each for the set and the
+    // group.
+    assert(fabs(entropy - 5.0) < 0.0001);
+    passgen_pattern_free(pattern);
+
+    passgen_env_free(env);
+    passgen_random_free(random);
+
+    return test_ok;
+}
+
+/// The entropy used to be computed as the number of possible outputs, which
+/// is too large for a double above 1024 bits: it was reported as infinite. It
+/// is computed in bits now.
+test_result test_regression_entropy_large(void) {
+    passgen_pattern *pattern;
+    passgen_error error;
+    passgen_random *random = passgen_random_open(NULL, "zero");
+    assert(random);
+    passgen_env *env = passgen_env_new(random);
+    assert(env);
+
+    double entropy = 0;
+    size_t count = 0;
+
+    // 300 lowercase letters have about 1410 bits.
+    assert(0 == passgen_parse(&pattern, &error, "[a-z]{300}"));
+    assert(0 == passgen_generate(pattern, env, &entropy, &count, count_codepoints));
+    assert(isfinite(entropy));
+    assert(fabs(entropy - 300 * log2(26)) < 0.001);
+    passgen_pattern_free(pattern);
+
+    // something which always generates the same has none.
+    assert(0 == passgen_parse(&pattern, &error, "abc(def){3}"));
+    assert(0 == passgen_generate(pattern, env, &entropy, &count, count_codepoints));
+    assert(entropy == 0.0);
+    passgen_pattern_free(pattern);
+
+    // a segment which is more likely to be chosen has less. with the zero
+    // source of randomness, the first one is chosen, which is three of four.
+    assert(0 == passgen_parse(&pattern, &error, "{3}a|b"));
+    assert(0 == passgen_generate(pattern, env, &entropy, &count, count_codepoints));
+    assert(fabs(entropy - (log2(4) - log2(3))) < 0.0001);
     passgen_pattern_free(pattern);
 
     passgen_env_free(env);
@@ -648,7 +689,7 @@ test_result test_regression_wordlist_long_words(void) {
         0 ==
         passgen_generate(pattern, env, &entropy, &count, count_codepoints));
     assert(count > 128 * 100);
-    assert(entropy > 1.0);
+    assert(entropy > 0.0);
     passgen_pattern_free(pattern);
 
     passgen_env_free(env);

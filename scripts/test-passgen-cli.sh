@@ -177,6 +177,10 @@ $passgen --json --entropy "[a-z]{4}" | matches '\[\{"output":"[a-z]{4}","entropy
 # entropy
 test "$($passgen -e "[a-z]{4}" 2>&1 >/dev/null)" = "entropy: 18.80 bits"
 
+# also for more than fits into a double as a number of possibilities
+test "$($passgen -e "[a-z]{300}" 2>&1 >/dev/null)" = "entropy: 1410.13 bits"
+$passgen --json --entropy "[a-z]{300}" | matches '\[\{"output":"[a-z]+","entropy":1410\.13[0-9]*\}\]'
+
 # wordlists
 printf 'alpha\nbravo\ncharlie\n' > "$tmpdir/words.txt"
 : > "$tmpdir/empty.txt"

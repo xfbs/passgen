@@ -2,6 +2,7 @@
 #include "passgen/assert.h"
 #include "passgen/config.h"
 #include <assert.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include "passgen/util/clear.h"
@@ -303,7 +304,7 @@ uint32_t passgen_markov_generate(
 
     // record total choices.
     if(entropy) {
-        *entropy *= (double) leaf->total_count;
+        *entropy += log2((double) leaf->total_count);
     }
 
     size_t choice = passgen_random_u64_max(random, leaf->total_count);
@@ -313,7 +314,7 @@ uint32_t passgen_markov_generate(
             if(choice < count) {
                 // record bucket (reduces total choices).
                 if(entropy) {
-                    *entropy /= (double) count;
+                    *entropy -= log2((double) count);
                 }
 
                 return passgen_markov_leaf_codepoint_raw(leaf, i);

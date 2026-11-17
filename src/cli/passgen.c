@@ -159,7 +159,7 @@ int passgen_cli_generate_normal(
         }
 
         if(opts.entropy) {
-            fprintf(stderr, "entropy: %.2lf bits\n", log(entropy) / log(2));
+            fprintf(stderr, "entropy: %.2lf bits\n", entropy);
         }
 
         if(i != 0) {
@@ -205,7 +205,7 @@ int passgen_cli_generate_json(passgen_cli_opts opts, passgen_pattern *pattern) {
                 number,
                 sizeof(number),
                 "\",\"entropy\":%lf}",
-                log(entropy) / log(2));
+                entropy);
             ret = passgen_cli_buffer_puts(&buffer, number);
         } else {
             ret = passgen_cli_buffer_puts(&buffer, "\"}");

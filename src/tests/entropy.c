@@ -41,55 +41,55 @@ bool equals(double a, double b) {
 
 test_result test_entropy_literal(void) {
     assert(equals(0.0, 0.0));
-    assert(equals(1.0, entropy("")));
-    assert(equals(1.0, entropy("a")));
-    assert(equals(1.0, entropy("ab")));
-    assert(equals(1.0, entropy("abc")));
-    assert(equals(1.0, entropy("abcdefghijklmnopqrstuvwxyz")));
+    assert(equals(log2(1.0), entropy("")));
+    assert(equals(log2(1.0), entropy("a")));
+    assert(equals(log2(1.0), entropy("ab")));
+    assert(equals(log2(1.0), entropy("abc")));
+    assert(equals(log2(1.0), entropy("abcdefghijklmnopqrstuvwxyz")));
 
     return test_ok;
 }
 
 test_result test_entropy_group(void) {
-    assert(equals(1.0, entropy("()")));
-    assert(equals(1.0, entropy("(abc)")));
-    assert(equals(1.0, entropy("(())")));
-    assert(equals(2.0, entropy("(abc|def)")));
-    assert(equals(3.0, entropy("(abc|def|hij)")));
-    assert(equals(4.0, entropy("(abc|def|hij|klm)")));
+    assert(equals(log2(1.0), entropy("()")));
+    assert(equals(log2(1.0), entropy("(abc)")));
+    assert(equals(log2(1.0), entropy("(())")));
+    assert(equals(log2(2.0), entropy("(abc|def)")));
+    assert(equals(log2(3.0), entropy("(abc|def|hij)")));
+    assert(equals(log2(4.0), entropy("(abc|def|hij|klm)")));
 
     return test_ok;
 }
 
 test_result test_entropy_range(void) {
-    assert(equals(1.0, entropy("[a]")));
-    assert(equals(2.0, entropy("[ab]")));
-    assert(equals(3.0, entropy("[abc]")));
-    assert(equals(3.0, entropy("[a-c]")));
-    assert(equals(26.0, entropy("[a-z]")));
-    assert(equals(10.0, entropy("[0-9]")));
-    assert(equals(16.0, entropy("[0-9a-f]")));
-    assert(equals(20.0, entropy("[0-9a-f,.:\\-]")));
+    assert(equals(log2(1.0), entropy("[a]")));
+    assert(equals(log2(2.0), entropy("[ab]")));
+    assert(equals(log2(3.0), entropy("[abc]")));
+    assert(equals(log2(3.0), entropy("[a-c]")));
+    assert(equals(log2(26.0), entropy("[a-z]")));
+    assert(equals(log2(10.0), entropy("[0-9]")));
+    assert(equals(log2(16.0), entropy("[0-9a-f]")));
+    assert(equals(log2(20.0), entropy("[0-9a-f,.:\\-]")));
 
     return test_ok;
 }
 
 test_result test_entropy_repeat(void) {
-    assert(equals(3.0, entropy("[abc]{1}")));
-    assert(equals(3.0 * 3.0, entropy("[abc]{2}")));
-    assert(equals(3.0 * 3.0 * 3.0, entropy("[abc]{3}")));
+    assert(equals(log2(3.0), entropy("[abc]{1}")));
+    assert(equals(log2(3.0 * 3.0), entropy("[abc]{2}")));
+    assert(equals(log2(3.0 * 3.0 * 3.0), entropy("[abc]{3}")));
 
-    assert(equals(3.0, entropy("(this|that|other){1}")));
-    assert(equals(3.0 * 3.0, entropy("(this|that|other){2}")));
-    assert(equals(3.0 * 3.0 * 3.0, entropy("(this|that|other){3}")));
+    assert(equals(log2(3.0), entropy("(this|that|other){1}")));
+    assert(equals(log2(3.0 * 3.0), entropy("(this|that|other){2}")));
+    assert(equals(log2(3.0 * 3.0 * 3.0), entropy("(this|that|other){3}")));
 
-    assert(equals(1.0, entropy("a{1}")));
-    assert(equals(2.0, entropy("a{1,2}")));
-    assert(equals(3.0, entropy("a{1,3}")));
+    assert(equals(log2(1.0), entropy("a{1}")));
+    assert(equals(log2(2.0), entropy("a{1,2}")));
+    assert(equals(log2(3.0), entropy("a{1,3}")));
 
-    assert(equals(1.0, entropy("(a){1}")));
-    assert(equals(2.0, entropy("(a){1,2}")));
-    assert(equals(3.0, entropy("(a){1,3}")));
+    assert(equals(log2(1.0), entropy("(a){1}")));
+    assert(equals(log2(2.0), entropy("(a){1,2}")));
+    assert(equals(log2(3.0), entropy("(a){1,3}")));
 
     return test_ok;
 }

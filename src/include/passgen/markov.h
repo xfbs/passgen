@@ -160,9 +160,9 @@ void passgen_markov_add(
 /// @param current Must contain markov->level amount of previous chars
 /// @param markov Must be a parsed markov chain
 /// @param random Must be a valid randomness instance
-/// @param entropy If not NULL, this is multiplied with the number of choices
-///   there were, divided by how many of them result in the codepoint which is
-///   returned. This is how the entropy is computed, see @ref passgen_generate.
+/// @param entropy If not NULL, the entropy of this choice is added to it, in
+///   bits: the logarithm to base two of the number of choices there were,
+///   divided by how many of them result in the codepoint which is returned.
 /// @return The generated next character
 /// @memberof passgen_markov
 uint32_t passgen_markov_generate(

@@ -70,9 +70,9 @@ int main(void) {
     output[length] = 0;
     check(length >= strlen("alpha-abcd"));
     check(strchr((const char *) output, '-') != NULL);
-    // three words, and four letters
-    check(entropy > 3.0 * 26 * 26 * 26 * 26 - 1);
-    check(entropy < 3.0 * 26 * 26 * 26 * 26 + 1);
+    // in bits: one of three words, and four letters. that is 20.39 bits.
+    check(entropy > 20.38);
+    check(entropy < 20.40);
 
     uint32_t codepoints[64];
     check(0 != passgen_generate_fill_unicode(pattern, env, NULL, codepoints, 64));

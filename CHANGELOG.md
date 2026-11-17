@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `\]` and `\[` to have brackets in a set.
 
 ### Changed
+- Entropy is in bits in the API, rather than a number of possibilities.
 - Empty sets (`[]`) are rejected.
 - `passgen_random_chacha20_argon2_open()` takes `passgen_argon2_params`.
 - `passgen_pattern` is opaque. `passgen_parse()` allocates it, and
@@ -33,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - `config.h.in` being installed along with the headers.
 - Ranges ending in an escaped character (`[+-\-]`) failing to generate.
+- Entropy above 1024 bits being reported as infinite.
 
 ## [0.2.0] - 2026-11-17
 ### Added
