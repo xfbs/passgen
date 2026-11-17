@@ -4,6 +4,7 @@
 #include <getopt.h>
 #include <math.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,81 +62,164 @@ int passgen_cli_run(passgen_cli_opts opts) {
     return ret;
 }
 
+/// Growable output buffer. Generated sequences have no fixed upper bound on
+/// their length, so they are collected in here.
+typedef struct {
+    char *data;
+    size_t len;
+    size_t capacity;
+    bool json;
+} passgen_cli_buffer;
+
+static int
+passgen_cli_buffer_push(passgen_cli_buffer *buffer, const char *data, size_t len) {
+    if(buffer->capacity - buffer->len < len) {
+        size_t capacity = buffer->capacity ? buffer->capacity : 256;
+        while(capacity - buffer->len < len) {
+            capacity *= 2;
+        }
+        char *new_data = realloc(buffer->data, capacity);
+        if(!new_data) {
+            return -1;
+        }
+        buffer->data = new_data;
+        buffer->capacity = capacity;
+    }
+
+    memcpy(&buffer->data[buffer->len], data, len);
+    buffer->len += len;
+    return 0;
+}
+
+static int passgen_cli_buffer_puts(passgen_cli_buffer *buffer, const char *str) {
+    return passgen_cli_buffer_push(buffer, str, strlen(str));
+}
+
+/// Callback for passgen_generate(): appends a codepoint as UTF-8 to the
+/// buffer, escaping it for use in a JSON string if requested.
+static int passgen_cli_buffer_emit(void *data, uint32_t codepoint) {
+    passgen_cli_buffer *buffer = data;
+    char encoded[8];
+
+    if(buffer->json) {
+        switch(codepoint) {
+            case '"':
+                return passgen_cli_buffer_puts(buffer, "\\\"");
+            case '\\':
+                return passgen_cli_buffer_puts(buffer, "\\\\");
+            case '\b':
+                return passgen_cli_buffer_puts(buffer, "\\b");
+            case '\f':
+                return passgen_cli_buffer_puts(buffer, "\\f");
+            case '\n':
+                return passgen_cli_buffer_puts(buffer, "\\n");
+            case '\r':
+                return passgen_cli_buffer_puts(buffer, "\\r");
+            case '\t':
+                return passgen_cli_buffer_puts(buffer, "\\t");
+            default:
+                break;
+        }
+
+        if(codepoint < 0x20) {
+            snprintf(encoded, sizeof(encoded), "\\u%04x", (unsigned) codepoint);
+            return passgen_cli_buffer_puts(buffer, encoded);
+        }
+    }
+
+    int bytes = passgen_utf8_encode_codepoint((uint8_t *) encoded, codepoint);
+    if(bytes <= 0) {
+        return -1;
+    }
+
+    return passgen_cli_buffer_push(buffer, encoded, bytes);
+}
+
 int passgen_cli_generate_normal(
     passgen_cli_opts opts,
     passgen_pattern *pattern) {
-    // allocate some space for pass.
-    // size_t pass_len = pattern_maxlen(pattern);
-    size_t pass_len = 256;
-    uint8_t *pass = malloc(pass_len + 1);
-    if(!pass) {
-        return passgen_cli_bail(PASSGEN_ERROR_ALLOC, NULL);
-    }
-
-    char sep = '\n';
-    if(opts.null) {
-        sep = '\0';
-    }
+    passgen_cli_buffer buffer = {0};
+    char sep = opts.null ? '\0' : '\n';
 
     for(size_t i = 0; i < opts.amount; ++i) {
-        // get a NULL-terminated, random pass.
         double entropy;
-        size_t written = passgen_generate_fill_utf8(
+        buffer.len = 0;
+        int ret = passgen_generate(
             pattern,
             &opts.env,
             opts.entropy ? &entropy : NULL,
-            pass,
-            pass_len);
-        pass[written] = '\0';
+            &buffer,
+            passgen_cli_buffer_emit);
+        if(ret != 0) {
+            free(buffer.data);
+            return passgen_cli_bail(PASSGEN_ERROR_GENERATE, NULL);
+        }
 
         if(opts.entropy) {
             fprintf(stderr, "entropy: %.2lf bits\n", log(entropy) / log(2));
         }
 
-        if(i == 0) {
-            printf("%s", pass);
-        } else {
-            printf("%c%s", sep, pass);
+        if(i != 0) {
+            fputc(sep, stdout);
         }
+        fwrite(buffer.data, 1, buffer.len, stdout);
     }
 
-    printf("\n");
-    free(pass);
+    fputc('\n', stdout);
+    free(buffer.data);
 
     return 0;
 }
 
 int passgen_cli_generate_json(passgen_cli_opts opts, passgen_pattern *pattern) {
-    // allocate some space for pass.
-    // size_t pass_len = pattern_maxlen(pattern);
-    size_t pass_len = 256;
-    uint8_t *pass = malloc(pass_len + 1);
-    if(!pass) {
-        return passgen_cli_bail(PASSGEN_ERROR_ALLOC, NULL);
-    }
+    // the whole document is collected first, so that nothing is printed (rather
+    // than truncated JSON) when generating fails.
+    passgen_cli_buffer buffer = {.json = true};
+    int ret = passgen_cli_buffer_puts(&buffer, "[");
 
-    printf("[");
-    for(size_t i = 0; i < opts.amount; ++i) {
+    for(size_t i = 0; ret == 0 && i < opts.amount; ++i) {
         double entropy;
-        // get a NULL-terminated, random pass.
-        size_t written = passgen_generate_fill_json_utf8(
+        ret = passgen_cli_buffer_puts(
+            &buffer,
+            (i == 0) ? "{\"output\":\"" : ",{\"output\":\"");
+        if(ret != 0) {
+            break;
+        }
+
+        ret = passgen_generate(
             pattern,
             &opts.env,
             opts.entropy ? &entropy : NULL,
-            pass,
-            pass_len);
-        pass[written] = '\0';
-        printf("%s{\"output\":\"%s\"", (i == 0) ? "" : ",", pass);
-
-        if(opts.entropy) {
-            printf(",\"entropy\":%lf", log(entropy) / log(2));
+            &buffer,
+            passgen_cli_buffer_emit);
+        if(ret != 0) {
+            break;
         }
 
-        printf("}");
+        if(opts.entropy) {
+            char number[64];
+            snprintf(
+                number,
+                sizeof(number),
+                "\",\"entropy\":%lf}",
+                log(entropy) / log(2));
+            ret = passgen_cli_buffer_puts(&buffer, number);
+        } else {
+            ret = passgen_cli_buffer_puts(&buffer, "\"}");
+        }
     }
-    printf("]\n");
 
-    free(pass);
+    if(ret == 0) {
+        ret = passgen_cli_buffer_puts(&buffer, "]\n");
+    }
+
+    if(ret != 0) {
+        free(buffer.data);
+        return passgen_cli_bail(PASSGEN_ERROR_GENERATE, NULL);
+    }
+
+    fwrite(buffer.data, 1, buffer.len, stdout);
+    free(buffer.data);
     return 0;
 }
 
@@ -501,6 +585,15 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
                 *((const int *) data));
             break;
         case PASSGEN_ERROR_UNRECOGNIZED:
+            break;
+        case PASSGEN_ERROR_GENERATE:
+            fprintf(
+                stderr,
+                "\033[1;31merror\033[0m: failed to generate output (unknown "
+                "or empty wordlist, or depth limit exceeded)\n");
+            break;
+        case PASSGEN_ERROR_ALLOC:
+            fprintf(stderr, "\033[1;31merror\033[0m: out of memory\n");
             break;
         case PASSGEN_ERROR_PRESET_NOT_FOUND:
             printf(

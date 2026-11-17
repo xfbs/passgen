@@ -5,14 +5,6 @@
 #include <sys/mman.h>
 #endif
 
-#define try(statement)            \
-    do {                          \
-        int ret = statement;      \
-        if(ret != EXIT_SUCCESS) { \
-            return ret;           \
-        }                         \
-    } while(0)
-
 int main(int argc, char *argv[]) {
     int ret;
     passgen_cli_opts opts;
@@ -37,7 +29,11 @@ int main(int argc, char *argv[]) {
 
     // load values from a config file (located at /etc/passgen.conf, or
     // $HOME/.config/passgen.conf).
-    try(passgen_cli_opts_config(&opts));
+    ret = passgen_cli_opts_config(&opts);
+    if(ret != PASSGEN_ERROR_NONE) {
+        passgen_cli_opts_free(&opts);
+        return ret;
+    }
 
     // parse CLI options, which override the previously loaded configuration.
     ret = passgen_cli_opts_parse(&opts, argc, argv);
@@ -50,12 +46,13 @@ int main(int argc, char *argv[]) {
         passgen_cli_opts_free(&opts);
         return 0;
     } else if(ret != PASSGEN_ERROR_NONE) {
+        passgen_cli_opts_free(&opts);
         return ret;
     }
 
     // run the cli commands and free memory.
-    try(passgen_cli_run(opts));
+    ret = passgen_cli_run(opts);
     passgen_cli_opts_free(&opts);
 
-    return EXIT_SUCCESS;
+    return ret;
 }
