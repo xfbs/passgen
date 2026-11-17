@@ -480,6 +480,11 @@ static int passgen_generate_item(
     // if it is a maybe (has a question mark following it), decide first if we
     // want to emit it or not.
     if(item->maybe) {
+        // either way, this is a choice between two options.
+        if(context->entropy) {
+            *context->entropy *= 2;
+        }
+
         if(!passgen_random_bool(context->env->random)) {
             return 0;
         }
@@ -508,7 +513,6 @@ static int passgen_generate_item(
         }
     }
 
-    // unreachable
     return 0;
 }
 

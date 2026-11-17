@@ -3,6 +3,7 @@
 /// Regression tests for bugs that were found and fixed. Most of these are
 /// only really meaningful when run with sanitizers enabled.
 #include "tests.h"
+#include <math.h>
 #include <passgen/generate.h>
 #include <passgen/passgen.h>
 #include <passgen/pattern/env.h>
@@ -120,6 +121,35 @@ static int count_codepoints(void *data, uint32_t codepoint) {
     (void) codepoint;
     *((size_t *) data) += 1;
     return 0;
+}
+
+/// Optional items (`a?`) are a choice between two options, which needs to be
+/// reflected in the entropy.
+test_result test_regression_entropy_maybe(void) {
+    passgen_pattern pattern;
+    passgen_error error;
+    passgen_env env;
+    passgen_env_init(&env, passgen_random_open(NULL, "zero"));
+    assert(env.random);
+
+    double entropy = 0;
+    size_t count = 0;
+
+    assert(0 == passgen_parse(&pattern, &error, "a?"));
+    assert(0 == passgen_generate(&pattern, &env, &entropy, &count, count_codepoints));
+    assert(fabs(entropy - 2.0) < 0.0001);
+    passgen_pattern_free(&pattern);
+
+    assert(0 == passgen_parse(&pattern, &error, "a?[ab]?(c|d)?"));
+    assert(0 == passgen_generate(&pattern, &env, &entropy, &count, count_codepoints));
+    // with the zero randomness source, every optional item is emitted, so
+    // this is 2 * (2 * 2) * (2 * 2).
+    assert(fabs(entropy - 32.0) < 0.0001);
+    passgen_pattern_free(&pattern);
+
+    passgen_env_free(&env);
+
+    return test_ok;
 }
 
 #ifndef _WIN32 // fmemopen does not exist on windows
