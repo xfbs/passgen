@@ -139,7 +139,7 @@ In general, if you have all dependencies installed, doing the following should r
     $ cmake --build build
     $ cmake --install build
 
-See [Building](https://passgen.gitlab.io/passgen/development/building) for more information about building the project.
+See [Building](docs/building.md) for more information about building the project.
 
 You may also download [signed nightly releases](https://passgen.gitlab.io/passgen/nightly/) from the website.
 

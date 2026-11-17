@@ -1,12 +1,8 @@
 # Building
 
-<figure markdown>
-![Building Passgen](../media/building.svg){ width="600px" }
-<figcaption>Building passgen from source</figcaption>
-</figure>
-
-If you want to work on Passgen, you can compile it from source. If you just want to 
-try it, you can download pre-built and signed binaries from the [Releases](../nightly.md) page.
+If you want to work on Passgen, you can compile it from source. If you just want to
+try it, you can download pre-built binaries, see [Install](https://passgen.io/install/)
+on the website.
 
 ## Dependencies
 
@@ -109,4 +105,4 @@ If you want to install the version of Passgen that you have installed locally, i
     cpack -G DEB
     apt install ./passgen_*_amd64.deb
 
-See the [Tooling](tooling.md) section for more tooling options.
+See the [overview](README.md) for the other tools that the build system supports.

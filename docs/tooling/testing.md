@@ -36,7 +36,7 @@ that "all heap blocks were freed".
 
 Another recommendation is using the LLVM sanitizers. To do this, the code needs
 to be compiled specially with them enabled, instructions on how to do that can
-be found at the [Tooling](../tooling.md) page.
+be found in the [overview](../README.md).
 
 ## Implementation
 

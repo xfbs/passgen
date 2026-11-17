@@ -334,16 +334,6 @@ build:wasi:
             - build-wasi
         expire_in: 1 week
 
-website:mkdocs:
-    image: "$CI_REGISTRY_IMAGE/deploy"
-    stage: post
-    script:
-        - bash scripts/ci-publish-website.sh
-    artifacts:
-        paths:
-            - public
-        expire_in: 30 days
-
 website:builds:
     image: "$CI_REGISTRY_IMAGE/deploy"
     stage: post
@@ -390,12 +380,12 @@ pages:
     image: alpine:3.24
     stage: deploy
     dependencies:
-        - website:mkdocs
         - website:builds
         - website:doxygen
         - website:coverage
     script:
-        - "true"
+        # the website is at passgen.io, the front page here points to it.
+        - cp scripts/pages-index.html public/index.html
     artifacts:
         paths:
             - public

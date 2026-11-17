@@ -8,7 +8,7 @@ and deploy them (*deployment*).
 In the case of Passgen, the system is used to run a whole array of checks
 against the code (unit tests, including running them with Valgrind or LLVM
 sanitizers), generate reports (test coverage, source code documentation) and
-deploy those as well as this documentation.
+deploy those, along with the nightly builds.
 
 This project uses GitLab Pipelines as its CI. These are configured by the
 [`.gitlab-ci.yml`][gitlabciyml] file. This file defines that jobs that are run,
@@ -103,7 +103,7 @@ These are the jobs in the *setup* stage and what they do:
 | Name | Description |
 | --- | --- |
 | `docker:alpine` | Builds `alpine.dockerfile`. Used to build static MUSL releases of Passgen. |
-| `docker:deploy` | Builds `deploy.dockerfile`. Used to build documentation and deploy to GitLab Pages. |
+| `docker:deploy` | Builds `deploy.dockerfile`. Used to build the API documentation and deploy to GitLab Pages. |
 | `docker:mingw64` | Builds `mingw64.dockerfile`. Used to cross-compile Passgen for Windows. |
 | `docker:macos` | Builds `macos.dockerfile`. Used to cross-compile Passgen for macOS. |
 | `docker:riscv64` | Builds `riscv64.dockerfile`. Used for cross-compile RISC-V releases of Passgen. |
@@ -138,6 +138,6 @@ In the *build* stage, Passgen is built in release mode, and it is packaged.
 
 ## Deploy
 
-In the *deploy* stage, documentation is built and published on GitLab Pages, along with the releases from the *build* stage.
+In the *deploy* stage, the API documentation and the coverage reports are published on GitLab Pages, along with the nightly builds from the *build* stage. The website itself is not part of this, it is built from its own [repository](https://gitlab.com/passgen/website).
 
 [gitlabciyml]: https://gitlab.com/passgen/passgen/-/blob/master/.gitlab-ci.yml
