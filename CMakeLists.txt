@@ -28,6 +28,7 @@ option(PASSGEN_MEMORY "Build with option to override memory management" ON)
 option(PASSGEN_SECCOMP "Build with seccomp filters" OFF)
 
 option(PASSGEN_MONOCYPHER "Build with monocypher" ON)
+option(PASSGEN_FUZZ "Build fuzzing harnesses with libFuzzer (needs Clang)" OFF)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     option(PASSGEN_DEBUG "Include debugging features for passgen" ON)
@@ -85,6 +86,12 @@ if(PASSGEN_SECCOMP)
     endif()
 endif()
 
+# for fuzzing, everything needs to be instrumented, so that the fuzzing engine
+# can tell which code an input reaches.
+if(PASSGEN_FUZZ)
+    add_compile_options(-fsanitize=fuzzer-no-link)
+endif()
+
 # build libpassgen
 add_subdirectory(src)
 
@@ -111,6 +118,12 @@ if(BUILD_TESTING)
     add_test(NAME passgen-test COMMAND passgen-test)
     add_test(NAME passgen-cli COMMAND ${CMAKE_SOURCE_DIR}/scripts/test-passgen-cli.sh
                                       $<TARGET_FILE:passgen-cli>)
+
+    # fuzzing harnesses, which are run over their corpus as tests. these use
+    # POSIX functions which are not there on Windows.
+    if(NOT WIN32)
+        add_subdirectory(src/fuzz)
+    endif()
 
     # unlike the builtin `test` target, this makes sure everything is built.
     add_custom_target(check DEPENDS test-lib test-cli)

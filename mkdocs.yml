@@ -54,6 +54,7 @@ nav:
       - Testing: development/tooling/testing.md
       - Benchmarks: development/tooling/benchmarks.md
       - Sanitizers: development/tooling/sanitizers.md
+      - Fuzzing: development/tooling/fuzzing.md
       - Formatting: development/tooling/formatting.md
       - Includes: development/tooling/includes.md
       - Symbols: development/tooling/symbols.md

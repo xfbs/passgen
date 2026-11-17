@@ -8,6 +8,7 @@ DOCKER_IMAGE=registry.gitlab.com/passgen/passgen
 DOXYGEN=doxygen
 BUILDDIR=build
 BUILD_TYPE=Debug
+FUZZ_TIME=60
 
 # build passgen
 passgen: $(BUILDDIR)/src/cli/passgen
@@ -35,6 +36,11 @@ msan:
 # run UndefinedSanitizer agains the code
 usan:
 	@./scripts/sanitizer.sh Undefined
+
+# fuzz every harness for a while, needs a clang with libFuzzer. set FUZZ_TIME
+# to the number of seconds to run each of them for.
+fuzz:
+	@./scripts/fuzz.sh $(FUZZ_TIME)
 
 # format source code
 format: $(BUILDDIR)
@@ -72,4 +78,4 @@ docker-build:
 docs:
 	$(DOXYGEN) Doxyfile
 
-.PHONY: docs bench test passgen format asan usan msan
+.PHONY: docs bench test passgen format asan usan msan fuzz

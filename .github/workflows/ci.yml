@@ -92,6 +92,33 @@ jobs:
       - name: Test
         run: ctest --test-dir build --output-on-failure
 
+  # Fuzz every harness for a short while. This is not long enough to find much
+  # that is new, but it notices when a change breaks something badly.
+  fuzz:
+    name: fuzz / ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [pattern, wordlist, random, utf8]
+    env:
+      CC: clang
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y ruby
+
+      - name: Fuzz
+        run: ./scripts/fuzz.sh 120 ${{ matrix.target }}
+
+      - name: Upload crashing inputs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-crashes-${{ matrix.target }}
+          path: build-fuzz/crashes/
+
   # Fully static build against musl, which is what the release binaries are.
   static:
     name: alpine / static

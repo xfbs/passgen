@@ -64,6 +64,7 @@ Note that you usually have to delete and recreate the build folder if you want t
 | `PASSGEN_MLOCK` | Enable the use of [`mlock()`](https://www.man7.org/linux/man-pages/man2/mlock.2.html) on startup, which prevents Passgen memory from being swapped out to disk. |
 | `PASSGEN_MONOCYPHER` | Enable building [Monocypher](https://monocypher.org/manual/), a cryptographic library. This is used to implement the masterpass mode. | 
 | `PASSGEN_DEBUG` | Enable debugging code. Defaults to on unless building in release mode. |
+| `PASSGEN_FUZZ` | Build the [fuzzing](tooling/fuzzing.md) harnesses with libFuzzer, to look for new inputs. Needs Clang. Disabled by default. |
 | `USE_SANITIZER` | Enables use of one of the [LLVM sanitizers][asan]. Disabled by default. |
 | `CODE_COVERAGE` | Enable instrumentation for generating code coverage reports. Disabled by default. |
 
