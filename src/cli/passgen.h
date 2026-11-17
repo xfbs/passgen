@@ -27,6 +27,8 @@ typedef enum {
     PASSGEN_ERROR_UNRECOGNIZED,
     PASSGEN_ERROR_PRESET_NOT_FOUND,
     PASSGEN_ERROR_GENERATE,
+    PASSGEN_ERROR_WORDLIST,
+    PASSGEN_ERROR_ILLEGAL_DEPTH,
 
     PASSGEN_SHOW_HELP,
     PASSGEN_SHOW_VERSION,
@@ -44,7 +46,7 @@ typedef struct {
     bool json;
     /// Collect entropy
     bool entropy;
-    /// Parsing depth.
+    /// Maximum nesting depth of groups when generating.
     size_t depth;
     /// Length of markov chain
     size_t markov_length;

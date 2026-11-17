@@ -39,10 +39,11 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
     opts->env.random = passgen_random_open(NULL, random);
 
     if(!opts->env.random) {
-        printf(
+        fprintf(
+            stderr,
             "\033[1;31merror\033[0m: invalid randomness source '%s'\n",
             random);
-        return 1;
+        return PASSGEN_ERROR_RANDOM_ALLOC;
     }
 
     return 0;
@@ -232,20 +233,33 @@ int passgen_cli_generate(passgen_cli_opts opts, passgen_pattern *pattern) {
 }
 
 int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
-    char *colon = strstr(input, ":");
+    const char *colon = strstr(input, ":");
     if(!colon) {
-        return 1;
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m: expected NAME:PATH for wordlist "
+            "definition `%s`\n",
+            input);
+        return PASSGEN_ERROR_WORDLIST;
     }
     size_t offset = colon - input;
 
-    char *name = malloc(offset + 1);
-    memcpy(name, input, offset);
-    name[offset] = 0;
-
     FILE *file = fopen(colon + 1, "r");
     if(!file) {
-        return 1;
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m: cannot open wordlist `%s`\n",
+            colon + 1);
+        return PASSGEN_ERROR_WORDLIST;
     }
+
+    char *name = malloc(offset + 1);
+    if(!name) {
+        fclose(file);
+        return PASSGEN_ERROR_ALLOC;
+    }
+    memcpy(name, input, offset);
+    name[offset] = 0;
 
     return passgen_env_wordlist_add(&opt->env, name, file, opt->markov_length);
 }
@@ -253,13 +267,19 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
 int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
     size_t arg_len = strlen(arg);
     char *arg_copy = malloc(arg_len + 1);
+    if(!arg_copy) {
+        return PASSGEN_ERROR_ALLOC;
+    }
     memcpy(arg_copy, arg, arg_len + 1);
     char *colon = strstr(arg_copy, ":");
     if(!colon) {
-        printf(
-            "Error: expected preset:value for preset definition `%s`\n",
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m: expected NAME:PATTERN for preset "
+            "definition `%s`\n",
             arg);
-        return 1;
+        free(arg_copy);
+        return PASSGEN_ERROR_PRESET_NOT_FOUND;
     }
     *colon = 0;
     passgen_hashmap_insert(&opts->presets, arg_copy, colon + 1);
@@ -407,7 +427,11 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 break;
             case 'D':
                 opt = atoi(optarg);
+                if(opt < 1) {
+                    return passgen_cli_bail(PASSGEN_ERROR_ILLEGAL_DEPTH, &opt);
+                }
                 opts->depth = opt;
+                opts->env.depth_limit = opt;
                 break;
             case 'z':
                 opts->null = true;
@@ -425,7 +449,8 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 break;
             case 'M':
                 opt = atoi(optarg);
-                if(opt < 1) {
+                // the markov chain stores its level in a single byte.
+                if(opt < 1 || opt > UINT8_MAX) {
                     return passgen_cli_bail(
                         PASSGEN_ERROR_ILLEGAL_MARKOV_LENGTH,
                         &opt);
@@ -483,13 +508,20 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     // fallback to system randomness if nothing else is defined
 #ifdef PASSGEN_MONOCYPHER
     if(!opts->env.random && opts->master_passphrase) {
-        opts->env.random = passgen_random_chacha20_argon2_open(NULL, opts->master_passphrase, opts->master_domain, opts->master_token, NULL);
+        opts->env.random = passgen_random_chacha20_argon2_open(
+            NULL,
+            (const uint8_t *) opts->master_passphrase,
+            (const uint8_t *) opts->master_domain,
+            (const uint8_t *) opts->master_token,
+            NULL);
     }
 #endif
 
     if(!opts->env.random) {
         opts->env.random = passgen_random_open(NULL, NULL);
-        assert(opts->env.random);
+        if(!opts->env.random) {
+            return passgen_cli_bail(PASSGEN_ERROR_RANDOM_ALLOC, NULL);
+        }
     }
 
     return 0;
@@ -518,6 +550,7 @@ void passgen_cli_usage(const char *executable) {
         "OPTIONS\n"
         "    -a, --amount       Amount of passwords to generate\n"
         "    -d, --domain DOMAIN  Domain to use (for master-passphrase mode)\n"
+        "    -D, --depth DEPTH  Maximum nesting depth of groups\n"
         "    -e, --entropy      Compute entropy for each password in bits.\n"
         "    -h, --help         Show this help information\n"
         "    -j, --json         Output as JSON\n"
@@ -526,6 +559,8 @@ void passgen_cli_usage(const char *executable) {
         "    -M, --markov-length LENGTH\n"
         "                       Specify markov chain length for next wordlist\n"
         "    -p, --preset NAME  Use the given preset\n"
+        "    -P, --define-preset NAME:PATTERN\n"
+        "                       Define a preset\n"
         "    -r, --random RAND  Source of randomness to use\n"
         "    -t, --token TOKEN  Token to use (for master-passphrase mode)\n"
         "    -v, --version      Show the version of this build\n"
@@ -564,27 +599,36 @@ void passgen_cli_show_version(void) {
 int passgen_cli_bail(passgen_cli_error error, const void *data) {
     switch(error) {
         case PASSGEN_ERROR_MULTIPLE_FORMATS:
-            printf(
+            fprintf(
+                stderr,
                 "error: multiple patterns specified (%s).\n",
                 (const char *) data);
             break;
         case PASSGEN_ERROR_RANDOM_ALLOC:
-            printf("error: couldn't open random object.\n");
+            fprintf(stderr, "error: couldn't open random object.\n");
             break;
         case PASSGEN_ERROR_PATTERN_PARSE:
             break;
         case PASSGEN_ERROR_ILLEGAL_AMOUNT:
-            printf(
+            fprintf(
+                stderr,
                 "\033[1;31merror\033[0m: illegal amount entered (%i)\n",
                 *((const int *) data));
             break;
         case PASSGEN_ERROR_ILLEGAL_MARKOV_LENGTH:
-            printf(
+            fprintf(
+                stderr,
                 "\033[1;31merror\033[0m: illegal markov chain length entered "
                 "(%i)\n",
                 *((const int *) data));
             break;
         case PASSGEN_ERROR_UNRECOGNIZED:
+            break;
+        case PASSGEN_ERROR_ILLEGAL_DEPTH:
+            fprintf(
+                stderr,
+                "\033[1;31merror\033[0m: illegal depth entered (%i)\n",
+                *((const int *) data));
             break;
         case PASSGEN_ERROR_GENERATE:
             fprintf(
@@ -595,13 +639,16 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
         case PASSGEN_ERROR_ALLOC:
             fprintf(stderr, "\033[1;31merror\033[0m: out of memory\n");
             break;
+        case PASSGEN_ERROR_WORDLIST:
+            break;
         case PASSGEN_ERROR_PRESET_NOT_FOUND:
-            printf(
+            fprintf(
+                stderr,
                 "\033[1;31merror\033[0m: preset `%s` not found\n",
                 (const char *) data);
             break;
         default:
-            printf("error: unknown error.\n");
+            fprintf(stderr, "error: unknown error.\n");
             break;
     }
 
