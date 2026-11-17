@@ -46,6 +46,20 @@ passgen_check_symbols(passgen-static)
 add_library(passgen-shared SHARED ${SOURCE_LIST} ${HEADER_LIST})
 target_link_libraries(passgen-shared PRIVATE m)
 set_target_properties(passgen-shared PROPERTIES OUTPUT_NAME passgen)
+
+# version the shared library, so that programs linked against it don't end up
+# using an incompatible one. before version 1.0.0, minor versions may be
+# incompatible with each other, so the minor version is part of the name
+# which programs are linked against (libpassgen.so.0.2). from 1.0.0 on, this
+# should only be the major version.
+if(PROJECT_VERSION_MAJOR EQUAL 0)
+    set(PASSGEN_SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+else()
+    set(PASSGEN_SOVERSION "${PROJECT_VERSION_MAJOR}")
+endif()
+set_target_properties(
+    passgen-shared PROPERTIES VERSION ${PROJECT_VERSION}
+                              SOVERSION ${PASSGEN_SOVERSION})
 target_include_directories(passgen-shared PUBLIC ../include ${CMAKE_CURRENT_BINARY_DIR})
 passgen_target_defaults(passgen-shared)
 passgen_check_symbols(passgen-shared)
