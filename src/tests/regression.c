@@ -8,6 +8,7 @@
 #include <passgen/passgen.h>
 #include <passgen/pattern/env.h>
 #include <passgen/random.h>
+#include <passgen/util/utf8.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -112,6 +113,42 @@ test_result test_regression_random_xorshift_seed(void) {
     assert(!passgen_random_open(&parsed, "xorshift:abc"));
     assert(!passgen_random_open(&parsed, "xorshift:12abc"));
     assert(!passgen_random_open(&parsed, "xorshift:18446744073709551616"));
+
+    return test_ok;
+}
+
+/// Input which ends in the middle of a UTF-8 sequence used to be accepted,
+/// with the incomplete sequence silently left out.
+test_result test_regression_utf8_truncated(void) {
+    // "ab", followed by the first two bytes of a three byte sequence
+    const uint8_t truncated[] = {'a', 'b', 0xe6, 0x97};
+    uint32_t codepoints[8];
+
+    uint32_t *output = &codepoints[0];
+    const uint8_t *input = &truncated[0];
+    int ret = passgen_utf8_decode(&output, 8, NULL, &input, sizeof(truncated));
+    assert(ret == PASSGEN_UTF8_INVALID_CHAR);
+
+    // what came before the incomplete sequence is still decoded.
+    assert(output == &codepoints[2]);
+    assert(input == &truncated[2]);
+    assert(codepoints[0] == 'a');
+    assert(codepoints[1] == 'b');
+
+    // the complete sequence is fine.
+    const uint8_t complete[] = {'a', 'b', 0xe6, 0x97, 0xa5};
+    output = &codepoints[0];
+    input = &complete[0];
+    ret = passgen_utf8_decode(&output, 8, NULL, &input, sizeof(complete));
+    assert(ret == PASSGEN_UTF8_SUCCESS);
+    assert(output == &codepoints[3]);
+    assert(codepoints[2] == 0x65e5);
+
+    // a pattern which ends this way is not valid.
+    passgen_pattern pattern;
+    passgen_error error;
+    assert(0 != passgen_parse(&pattern, &error, "ab\xe6\x97"));
+    passgen_pattern_free(&pattern);
 
     return test_ok;
 }

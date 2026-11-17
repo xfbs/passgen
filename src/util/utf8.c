@@ -76,6 +76,15 @@ int passgen_utf8_decode(
     }
 
     *output += output_offset;
+
+    // the input ended in the middle of a sequence. the output is only ever
+    // full right after a codepoint was decoded, so this cannot happen when
+    // there is more input to come.
+    if(state != UTF8_ACCEPT) {
+        *input += input_offset - codepoint_width;
+        return PASSGEN_UTF8_INVALID_CHAR;
+    }
+
     *input += input_offset;
 
     if(input_offset != input_len) {
