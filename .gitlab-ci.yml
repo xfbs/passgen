@@ -218,7 +218,7 @@ build:mingw64:
     before_script:
         - git config --global --add safe.directory '*'
     script:
-        - cmake -S . -B build-mingw64 -DCMAKE_TOOLCHAIN_FILE=cmake/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y -DPASSGEN_MLOCK=OFF
+        - cmake -S . -B build-mingw64 -DCMAKE_TOOLCHAIN_FILE=cmake/mingw64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=y -DPASSGEN_MLOCK=OFF -DPASSGEN_PACKAGE_VERSION="$(./scripts/nightly-version.sh)"
         - cd build-mingw64
         - make -j
         - cpack -G ZIP
@@ -233,7 +233,7 @@ build:macos:
     dependencies:
         - wordlists
     script:
-        - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_TOOLCHAIN_FILE=cmake/macos-toolchain.cmake
+        - cmake -S . -B build-macos -DLIBPASSGEN_SHARED=NO -DCMAKE_BUILD_TYPE=Release -DBUILD_BENCH=NO -DCMAKE_TOOLCHAIN_FILE=cmake/macos-toolchain.cmake -DPASSGEN_PACKAGE_VERSION="$(./scripts/nightly-version.sh)"
         - cmake --build build-macos
         - cd build-macos && cpack -G TXZ
     artifacts:
@@ -249,7 +249,7 @@ build:aarch64:
     before_script:
         - git config --global --add safe.directory '*'
     script:
-        - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
+        - cmake -S . -B build-aarch64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/aarch64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_PACKAGE_VERSION="$(./scripts/nightly-version.sh)"
         - cd build-aarch64
         - ninja
         - qemu-aarch64-static -L /usr/aarch64-linux-gnu/ ./src/tests/passgen-test
@@ -269,7 +269,7 @@ build:riscv64:
     before_script:
         - git config --global --add safe.directory '*'
     script:
-        - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Release
+        - cmake -S . -B build-riscv64 -GNinja -DCMAKE_TOOLCHAIN_FILE=cmake/riscv64-gcc.cmake -DCMAKE_BUILD_TYPE=Release -DPASSGEN_PACKAGE_VERSION="$(./scripts/nightly-version.sh)"
         - cd build-riscv64
         - ninja
         - qemu-riscv64-static -L /usr/riscv64-linux-gnu/ ./src/tests/passgen-test
@@ -291,7 +291,7 @@ build:amd64:
         - git config --global --add safe.directory '*'
     script:
         - mkdir build-amd64 && cd build-amd64
-        - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_SECCOMP=YES ..
+        - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_SECCOMP=YES -DPASSGEN_PACKAGE_VERSION="$(../scripts/nightly-version.sh)" ..
         - ninja
         - ./src/tests/passgen-test
         - ../scripts/test-passgen-cli.sh ./src/cli/passgen
@@ -310,7 +310,7 @@ build:alpine:
         - wordlists
     script:
         - mkdir -p build-alpine-release && cd build-alpine-release
-        - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=Yes -DPASSGEN_SECCOMP=No ..
+        - cmake -GNinja -DCMAKE_UNITY_BUILD=YES -DCMAKE_BUILD_TYPE=Release -DPASSGEN_STATIC=Yes -DPASSGEN_SECCOMP=No -DPASSGEN_PACKAGE_VERSION="$(../scripts/nightly-version.sh)" ..
         - ninja
         - ./src/tests/passgen-test
         - ../scripts/test-passgen-cli.sh ./src/cli/passgen

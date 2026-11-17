@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Releases show the commit they were built from in `--version`.
+- Nightly builds are named `passgen-nightly-*`, and their packages have a
+  version like `0.2.0+nightly20261117`.
 
 ### Fixed
 - `config.h.in` being installed along with the headers.

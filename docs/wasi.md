@@ -23,10 +23,10 @@ Once installed, you should be able to run it:
 
 Running passgen with the WasmTime runtime is easy, but it needs some permissions in order to be able to access random data and your home directory (to load your configuration). Here is how:
 
-    wasmtime run --dir /dev --dir ~ --env HOME=$HOME passgen-wasi.wasm -- -p apple1
+    wasmtime run --dir /dev --dir ~ --env HOME=$HOME passgen-nightly-wasi.wasm -- -p apple1
     QZv-Wk9-UOU-IN6
 
-    wasmtime run --dir /dev --dir ~ --env HOME=$HOME passgen-wasi.wasm -- -p uuid
+    wasmtime run --dir /dev --dir ~ --env HOME=$HOME passgen-nightly-wasi.wasm -- -p uuid
     942e6cbf-50b6-4bc6-8675-947f8fe85031
 
 ## Issues

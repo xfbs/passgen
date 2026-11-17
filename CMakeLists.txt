@@ -153,7 +153,18 @@ pick words from wordlists, make up pronounceable words using a Markov chain,
 and measure the entropy of every sequence it generates.")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://passgen.io")
 set(CPACK_PACKAGE_CONTACT "Patrick Elsen <pelsen@xfbs.net>")
-set(CPACK_PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
+
+# the version of the packages is that of the project, unless it is set to
+# something else. nightly builds do that, to tell them apart from releases
+# (see scripts/nightly-version.sh).
+set(PASSGEN_PACKAGE_VERSION
+    ""
+    CACHE STRING "Version of the packages, defaults to the version of passgen.")
+if(PASSGEN_PACKAGE_VERSION)
+    set(CPACK_PACKAGE_VERSION ${PASSGEN_PACKAGE_VERSION})
+else()
+    set(CPACK_PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
+endif()
 
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md")
 

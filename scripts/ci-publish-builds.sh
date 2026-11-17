@@ -1,43 +1,36 @@
 #!/bin/bash
+# Collects the builds from the build jobs, and signs them, to be published as
+# the nightly builds. The names all start with `passgen-nightly-`, so that they
+# cannot be mistaken for releases. They don't have a version in them, so that
+# they can be linked to.
 set -euxo pipefail
 
-mkdir -p public/nightly
+out=public/nightly
+mkdir -p "$out"
 
-cp build-alpine-release/passgen-*-Linux.tar.xz public/nightly/passgen-linux-amd64-musl.tar.xz
-cp build-alpine-release/src/cli/passgen public/nightly/passgen-linux-amd64-musl.bin
+cp build-alpine-release/passgen-*-Linux.tar.xz "$out/passgen-nightly-linux-amd64-musl.tar.xz"
+cp build-alpine-release/src/cli/passgen "$out/passgen-nightly-linux-amd64-musl.bin"
 
-cp build-amd64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-amd64.tar.xz
-cp build-amd64/passgen_*_amd64.deb public/nightly/passgen-linux-amd64.deb
+cp build-amd64/passgen-*-Linux.tar.xz "$out/passgen-nightly-linux-amd64.tar.xz"
+cp build-amd64/passgen_*_amd64.deb "$out/passgen-nightly-linux-amd64.deb"
 
-cp build-aarch64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-aarch64.tar.xz
-cp build-aarch64/passgen_*_arm64.deb public/nightly/passgen-linux-arm64.deb
+cp build-aarch64/passgen-*-Linux.tar.xz "$out/passgen-nightly-linux-aarch64.tar.xz"
+cp build-aarch64/passgen_*_arm64.deb "$out/passgen-nightly-linux-arm64.deb"
 
-cp build-riscv64/passgen-*-Linux.tar.xz public/nightly/passgen-linux-riscv64.tar.xz
-cp build-riscv64/passgen_*_riscv64.deb public/nightly/passgen-linux-riscv64.deb
+cp build-riscv64/passgen-*-Linux.tar.xz "$out/passgen-nightly-linux-riscv64.tar.xz"
+cp build-riscv64/passgen_*_riscv64.deb "$out/passgen-nightly-linux-riscv64.deb"
 
-cp build-macos/passgen-*-Darwin.tar.xz public/nightly/passgen-macos-amd64.tar.xz
+cp build-macos/passgen-*-Darwin.tar.xz "$out/passgen-nightly-macos-amd64.tar.xz"
 
-cp build-mingw64/passgen-*-win64.zip public/nightly/passgen-win64-amd64.zip
+cp build-mingw64/passgen-*-win64.zip "$out/passgen-nightly-win64-amd64.zip"
 
-cp build-wasi/src/cli/passgen public/nightly/passgen-wasi.wasm
+cp build-wasi/src/cli/passgen "$out/passgen-nightly-wasi.wasm"
 
-chmod 0600 $PASSGEN_SIGNING_KEY
-
-function sign() {
-    ssh-keygen -Y sign -f $PASSGEN_SIGNING_KEY -n file $1
-}
-
-sign public/nightly/passgen-linux-amd64-musl.tar.xz
-sign public/nightly/passgen-linux-amd64-musl.bin
-sign public/nightly/passgen-linux-amd64.tar.xz
-sign public/nightly/passgen-linux-amd64.deb
-sign public/nightly/passgen-linux-aarch64.tar.xz
-sign public/nightly/passgen-linux-arm64.deb
-sign public/nightly/passgen-linux-riscv64.tar.xz
-sign public/nightly/passgen-linux-riscv64.deb
-sign public/nightly/passgen-macos-amd64.tar.xz
-sign public/nightly/passgen-win64-amd64.zip
-sign public/nightly/passgen-wasi.wasm
+# sign every one of them, which adds a `.sig` file next to it.
+chmod 0600 "$PASSGEN_SIGNING_KEY"
+for file in "$out"/passgen-nightly-*; do
+    ssh-keygen -Y sign -f "$PASSGEN_SIGNING_KEY" -n file "$file"
+done
 
 # export keys file
 cp data/passgen.pub public/passgen.pub
