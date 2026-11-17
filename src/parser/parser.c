@@ -431,6 +431,9 @@ int passgen_parse_multiplier(
     if(token->codepoint >= '0' && token->codepoint <= '9') {
         uint8_t digit = token->codepoint - '0';
 
+        if(*state->data.multiplier.value > (SIZE_MAX - digit) / 10) {
+            return -1;
+        }
         *state->data.multiplier.value *= 10;
         *state->data.multiplier.value += digit;
 
@@ -460,6 +463,9 @@ int passgen_parse_repeat(
     if(token->codepoint >= '0' && token->codepoint <= '9') {
         uint8_t digit = token->codepoint - '0';
 
+        if(state->data.repeat.repeat->min > (SIZE_MAX - digit) / 10) {
+            return -1;
+        }
         state->data.repeat.repeat->min *= 10;
         state->data.repeat.repeat->min += digit;
 
@@ -474,6 +480,10 @@ int passgen_parse_repeat_range(
     passgen_token *token,
     passgen_parser_state *state) {
     if(token->codepoint == '}') {
+        // a range like {5,2} makes no sense.
+        if(state->data.repeat.repeat->max < state->data.repeat.repeat->min) {
+            return -1;
+        }
         passgen_stack_pop(&parser->state, NULL);
         return 0;
     }
@@ -481,6 +491,9 @@ int passgen_parse_repeat_range(
     if(token->codepoint >= '0' && token->codepoint <= '9') {
         uint8_t digit = token->codepoint - '0';
 
+        if(state->data.repeat.repeat->max > (SIZE_MAX - digit) / 10) {
+            return -1;
+        }
         state->data.repeat.repeat->max *= 10;
         state->data.repeat.repeat->max += digit;
 

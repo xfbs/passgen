@@ -86,6 +86,36 @@ test_result test_regression_random_open_overlong(void) {
 }
 #endif
 
+/// Repetitions where the maximum is smaller than the minimum, or that
+/// overflow, must be rejected by the parser.
+test_result test_regression_parse_repeat_range(void) {
+    passgen_pattern pattern;
+    passgen_error error;
+
+    assert(0 != passgen_parse(&pattern, &error, "a{5,2}"));
+    passgen_pattern_free(&pattern);
+
+    assert(0 != passgen_parse(&pattern, &error, "a{1,0}"));
+    passgen_pattern_free(&pattern);
+
+    assert(
+        0 != passgen_parse(&pattern, &error, "a{99999999999999999999999999}"));
+    passgen_pattern_free(&pattern);
+
+    assert(
+        0 !=
+        passgen_parse(&pattern, &error, "a{1,99999999999999999999999999}"));
+    passgen_pattern_free(&pattern);
+
+    assert(0 == passgen_parse(&pattern, &error, "a{2,5}"));
+    passgen_pattern_free(&pattern);
+
+    assert(0 == passgen_parse(&pattern, &error, "a{2,2}"));
+    passgen_pattern_free(&pattern);
+
+    return test_ok;
+}
+
 static int count_codepoints(void *data, uint32_t codepoint) {
     (void) codepoint;
     *((size_t *) data) += 1;
