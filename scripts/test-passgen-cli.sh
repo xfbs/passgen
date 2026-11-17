@@ -96,6 +96,13 @@ $passgen -l
 test "$($passgen "a{1000}" | tr -d '\n' | wc -c)" -eq 1000
 test "$($passgen -a 3 "[a-z]{500}" | wc -l)" -eq 3
 
+# large outputs work when only little memory may be locked. the subshell keeps
+# the limit from applying to the rest of the tests, and this is skipped where
+# the limit cannot be set to this value.
+if (ulimit -l 8192) 2> /dev/null; then
+    test "$(ulimit -l 8192; $passgen "a{20000000}" | tr -d '\n' | wc -c)" -eq 20000000
+fi
+
 # deterministic randomness sources always produce the same output
 test "$($passgen -r xorshift:1234 "[a-z]{32}")" = "$($passgen -r xorshift:1234 "[a-z]{32}")"
 test "$($passgen -r zero "[a-z]{8}")" = "aaaaaaaa"
