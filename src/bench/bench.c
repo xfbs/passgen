@@ -426,7 +426,7 @@ void add_option(options *options, const char *arg) {
     if(options->verbose) {
         fprintf(stderr, "Parsed option '%s' as '%s'\n", arg, value);
     }
-    passgen_hashmap_insert(&options->options, arg, value);
+    passgen_hashmap_insert(&options->options, arg, value, NULL);
 }
 
 int main(int argc, char *argv[]) {

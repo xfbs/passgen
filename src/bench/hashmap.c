@@ -45,7 +45,7 @@ static void *bench_hashmap_insert(void *raw_data) {
     hashmap_data *data = raw_data;
 
     for(size_t i = 0; i < data->count; i++) {
-        passgen_hashmap_insert(&data->map, data->data[i], NULL);
+        passgen_hashmap_insert(&data->map, data->data[i], NULL, NULL);
     }
 
     return data;

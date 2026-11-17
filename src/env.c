@@ -70,8 +70,15 @@ passgen_status passgen_env_wordlist_add(
 
     // if a wordlist with this name was already defined, the new one replaces
     // it.
-    passgen_hashmap_entry old =
-        passgen_hashmap_insert(&env->wordlists, name_copy, wordlist);
+    passgen_hashmap_entry old;
+    if(PASSGEN_OK !=
+       passgen_hashmap_insert(&env->wordlists, name_copy, wordlist, &old)) {
+        // this closes the file.
+        passgen_wordlist_free(wordlist);
+        free(wordlist);
+        free(name_copy);
+        return PASSGEN_ERROR_OUT_OF_MEMORY;
+    }
     if(old.key) {
         wordlist_entry_free(NULL, &old);
     }

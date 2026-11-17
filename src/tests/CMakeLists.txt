@@ -3,6 +3,10 @@ add_library(passgen-test-lib STATIC "tests.c" "tests.h")
 target_include_directories(passgen-test-lib PUBLIC ".")
 passgen_target_defaults(passgen-test-lib)
 
+# the testing framework puts back the allocator of the library after every
+# test, so it uses the library, and brings it along.
+target_link_libraries(passgen-test-lib PUBLIC ${PASSGEN_LIB})
+
 # list of test sources.
 set(TEST_LIST
     "alloc.c"
@@ -39,7 +43,7 @@ add_custom_command(
 
 add_executable(passgen-test ${CMAKE_CURRENT_BINARY_DIR}/test_list.c
                             ${TEST_LIST})
-target_link_libraries(passgen-test PRIVATE ${PASSGEN_LIB} passgen-test-lib)
+target_link_libraries(passgen-test PRIVATE passgen-test-lib)
 passgen_target_defaults(passgen-test)
 
 add_custom_target(test-lib passgen-test -v

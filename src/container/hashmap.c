@@ -1,7 +1,9 @@
 #include "passgen/container/hashmap.h"
 #include "passgen/config.h"
 #include "passgen/util/siphash.h"
+#include "passgen/util/alloc.h"
 #include <stdlib.h>
+#include <string.h>
 #include "passgen/util/clear.h"
 #define UNUSED(x) (void) x
 
@@ -63,28 +65,10 @@ void passgen_hashmap_free(passgen_hashmap *map) {
     map->context->fini(map);
 
     // deallocate data
-    free(map->data);
+    passgen_free(map->data, map->capacity * sizeof(passgen_hashmap_entry));
 
     // set everything to zero
     PASSGEN_CLEAR(map);
-}
-
-void passgen_hashmap_realloc(passgen_hashmap *map, size_t capacity) {
-    // save previous hashmap
-    passgen_hashmap old = *map;
-
-    map->data = calloc(capacity, sizeof(passgen_hashmap_entry));
-    map->capacity = capacity;
-    map->len = 0;
-
-    // copy data over
-    for(size_t i = 0; i < old.capacity; i++) {
-        if(old.data[i].key) {
-            passgen_hashmap_insert(map, old.data[i].key, old.data[i].value);
-        }
-    }
-
-    free(old.data);
 }
 
 static inline size_t passgen_hashmap_position(
@@ -94,82 +78,117 @@ static inline size_t passgen_hashmap_position(
     return map->context->hash(map, key, first) % map->capacity;
 }
 
+// Moves the entry at the position to the other position for its key, if
+// that is free.
 static inline bool passgen_hashmap_move(passgen_hashmap *map, size_t pos) {
     const void *key = map->data[pos].key;
     bool first = passgen_hashmap_position(map, key, true) == pos;
     size_t other_pos = passgen_hashmap_position(map, key, !first);
     if(!map->data[other_pos].key) {
-        map->data[other_pos].key = map->data[pos].key;
-        map->data[other_pos].value = map->data[pos].value;
+        map->data[other_pos] = map->data[pos];
         return true;
     }
     return false;
 }
 
-static inline size_t next_capacity(passgen_hashmap *map) {
-    size_t i;
-    for(i = 0; hashmap_sizes[i]; i++) {
-        if(hashmap_sizes[i] >= map->capacity) {
-            break;
+// Puts a key which is not in the hashmap into it, if there is room for it.
+static bool
+passgen_hashmap_place(passgen_hashmap *map, const void *key, void *value) {
+    for(int i = 0; i < 2; i++) {
+        size_t pos = passgen_hashmap_position(map, key, i == 0);
+        if(!map->data[pos].key || passgen_hashmap_move(map, pos)) {
+            map->data[pos].key = key;
+            map->data[pos].value = value;
+            map->len += 1;
+            return true;
         }
     }
-    if(hashmap_sizes[i] && hashmap_sizes[i + 1]) {
-        return hashmap_sizes[i + 1];
-    } else {
-        return 2 * map->capacity - 1;
-    }
+
+    return false;
 }
 
-passgen_hashmap_entry
-passgen_hashmap_insert(passgen_hashmap *map, const void *key, void *value) {
+static inline size_t next_capacity(size_t capacity) {
+    for(size_t i = 0; hashmap_sizes[i]; i++) {
+        if(hashmap_sizes[i] > capacity) {
+            return hashmap_sizes[i];
+        }
+    }
+    return 2 * capacity - 1;
+}
+
+// Moves all entries into a larger allocation. If they do not all fit, a
+// larger one is tried, until they do.
+static passgen_status
+passgen_hashmap_grow(passgen_hashmap *map, size_t capacity) {
+    passgen_hashmap old = *map;
+
+    while(true) {
+        passgen_hashmap_entry *data =
+            passgen_alloc_zeroed(capacity * sizeof(passgen_hashmap_entry));
+        if(!data) {
+            *map = old;
+            return PASSGEN_ERROR_OUT_OF_MEMORY;
+        }
+
+        map->data = data;
+        map->capacity = capacity;
+        map->len = 0;
+
+        bool placed = true;
+        for(size_t i = 0; placed && i < old.capacity; i++) {
+            if(old.data[i].key) {
+                placed =
+                    passgen_hashmap_place(map, old.data[i].key, old.data[i].value);
+            }
+        }
+
+        if(placed) {
+            break;
+        }
+
+        passgen_free(data, capacity * sizeof(passgen_hashmap_entry));
+        capacity = next_capacity(capacity);
+    }
+
+    passgen_free(old.data, old.capacity * sizeof(passgen_hashmap_entry));
+    return PASSGEN_OK;
+}
+
+passgen_status passgen_hashmap_insert(
+    passgen_hashmap *map,
+    const void *key,
+    void *value,
+    passgen_hashmap_entry *previous) {
+    if(previous) {
+        *previous = (passgen_hashmap_entry){NULL, NULL};
+    }
+
+    // if the key is there already, it is replaced. this has to be checked in
+    // both places before anything is moved, or it would end up in the
+    // hashmap twice.
+    passgen_hashmap_entry *entry = passgen_hashmap_lookup(map, key);
+    if(entry) {
+        if(previous) {
+            *previous = *entry;
+        }
+        entry->key = key;
+        entry->value = value;
+        return PASSGEN_OK;
+    }
+
     if(map->capacity == 0) {
-        passgen_hashmap_realloc(map, hashmap_sizes[0]);
-    }
-
-    size_t hash;
-
-    hash = passgen_hashmap_position(map, key, true);
-    if(!map->data[hash].key) {
-        map->data[hash].key = key;
-        map->data[hash].value = value;
-        map->len += 1;
-        return (passgen_hashmap_entry){NULL, NULL};
-    } else {
-        if(map->context->equal(map, map->data[hash].key, key)) {
-            passgen_hashmap_entry entry = map->data[hash];
-            map->data[hash].key = key;
-            map->data[hash].value = value;
-            return entry;
-        } else if(passgen_hashmap_move(map, hash)) {
-            map->data[hash].key = key;
-            map->data[hash].value = value;
-            map->len += 1;
-            return (passgen_hashmap_entry){NULL, NULL};
+        if(PASSGEN_OK != passgen_hashmap_grow(map, hashmap_sizes[0])) {
+            return PASSGEN_ERROR_OUT_OF_MEMORY;
         }
     }
 
-    hash = passgen_hashmap_position(map, key, false);
-    if(!map->data[hash].key) {
-        map->data[hash].key = key;
-        map->data[hash].value = value;
-        map->len += 1;
-        return (passgen_hashmap_entry){NULL, NULL};
-    } else {
-        if(map->context->equal(map, map->data[hash].key, key)) {
-            passgen_hashmap_entry entry = map->data[hash];
-            map->data[hash].key = key;
-            map->data[hash].value = value;
-            return entry;
-        } else if(passgen_hashmap_move(map, hash)) {
-            map->data[hash].key = key;
-            map->data[hash].value = value;
-            map->len += 1;
-            return (passgen_hashmap_entry){NULL, NULL};
+    while(!passgen_hashmap_place(map, key, value)) {
+        if(PASSGEN_OK != passgen_hashmap_grow(map, next_capacity(map->capacity))) {
+            return PASSGEN_ERROR_OUT_OF_MEMORY;
         }
     }
 
-    passgen_hashmap_realloc(map, next_capacity(map));
-    return passgen_hashmap_insert(map, key, value);
+    return PASSGEN_OK;
 }
 
 passgen_hashmap_entry

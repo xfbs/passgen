@@ -342,8 +342,12 @@ int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
 
     // the name and the pattern share a single allocation, which is owned by
     // the hashmap. if this replaces a previous definition, free that one.
-    passgen_hashmap_entry old =
-        passgen_hashmap_insert(&opts->presets, arg_copy, colon + 1);
+    passgen_hashmap_entry old;
+    if(PASSGEN_OK !=
+       passgen_hashmap_insert(&opts->presets, arg_copy, colon + 1, &old)) {
+        free(arg_copy);
+        return PASSGEN_CLI_ERROR_ALLOC;
+    }
     free((void *) old.key);
     return 0;
 }

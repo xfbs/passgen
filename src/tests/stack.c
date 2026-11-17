@@ -1,5 +1,7 @@
 #include "passgen/container/stack.h"
+#include "testalloc.h"
 #include "tests.h"
+#include <stdint.h>
 #include <stdlib.h>
 
 test_result test_stack_init(void) {
@@ -304,5 +306,90 @@ test_result test_stack_pop_many(void) {
     assert_eq(stack.len, 0);
 
     passgen_stack_free(&stack);
+    return test_ok;
+}
+
+/// Running out of memory at any point while pushing leaves the stack as it
+/// was, with everything which was allocated accounted for.
+test_result test_stack_out_of_memory(void) {
+    const size_t count = 5 * 32 + 7;
+    bool done = false;
+
+    for(size_t fail_at = 0; !done; fail_at++) {
+        test_allocator allocator;
+        test_allocator_install(&allocator, fail_at);
+
+        passgen_stack stack;
+        passgen_stack_init(&stack, sizeof(size_t));
+
+        size_t pushed = 0;
+        while(pushed < count) {
+            size_t *value = passgen_stack_push(&stack, &pushed);
+            if(!value) {
+                break;
+            }
+            pushed++;
+        }
+
+        done = pushed == count;
+        assert(stack.len == pushed);
+        for(size_t i = 0; i < pushed; i++) {
+            assert(*(size_t *) passgen_stack_get(&stack, i) == i);
+        }
+
+        // what failed once works once there is memory again.
+        if(!done) {
+            allocator.fail_at = TEST_ALLOCATOR_NEVER;
+            assert(passgen_stack_push(&stack, &pushed));
+            assert(stack.len == pushed + 1);
+            passgen_stack_free(&stack);
+            assert(test_allocator_clean(&allocator));
+            test_allocator_remove();
+            continue;
+        }
+
+        // popping down to nothing releases everything.
+        for(size_t i = 0; i < count; i++) {
+            size_t value;
+            assert(passgen_stack_pop(&stack, &value));
+            assert(value == count - 1 - i);
+        }
+        assert(stack.len == 0);
+        assert(test_allocator_clean(&allocator));
+
+        passgen_stack_free(&stack);
+        assert(test_allocator_clean(&allocator));
+        test_allocator_remove();
+    }
+
+    return test_ok;
+}
+
+/// Allocations are released with the size they were made with, whichever way
+/// the stack grew or shrunk.
+test_result test_stack_sizes(void) {
+    test_allocator allocator;
+    test_allocator_install(&allocator, TEST_ALLOCATOR_NEVER);
+
+    passgen_stack stack;
+    passgen_stack_init(&stack, 24);
+    uint8_t value[24] = {0};
+
+    // up and down across bins, several times.
+    for(size_t round = 0; round < 3; round++) {
+        for(size_t i = 0; i < 300; i++) {
+            assert(passgen_stack_push(&stack, value));
+        }
+        for(size_t i = 0; i < 200; i++) {
+            passgen_stack_pop(&stack, NULL);
+        }
+    }
+    assert(stack.len == 300);
+    assert(allocator.mismatches == 0);
+
+    passgen_stack_free(&stack);
+    assert(test_allocator_clean(&allocator));
+    test_allocator_remove();
+
     return test_ok;
 }

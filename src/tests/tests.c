@@ -1,4 +1,5 @@
 #include "tests.h"
+#include <passgen/allocator.h>
 #include <getopt.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -223,6 +224,10 @@ bool run(test_run test, int padding) {
 
     clock_t before = clock();
     test_result ret = test.entry.func();
+
+    // a test which fails part of the way may not have put the allocator back,
+    // which would break the tests after it.
+    passgen_allocator_set(NULL);
     clock_t total = clock() - before;
 
     double time = total / (CLOCKS_PER_SEC * 1.0);

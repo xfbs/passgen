@@ -10,6 +10,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <passgen/error.h>
 
 struct passgen_hashmap_context;
 
@@ -114,16 +115,21 @@ void passgen_hashmap_init(passgen_hashmap *map, const passgen_hashmap_context *c
 void passgen_hashmap_free(passgen_hashmap *map);
 
 /// Insert new item into the hashmap. If there was a previous entry with the
-/// same key, it will return it so that it can be deallocated. Will overwrite
-/// both key and value.
+/// same key, it is replaced, and returned so that it can be deallocated.
 ///
 /// @memberof passgen_hashmap
 /// @param map Hashmap to insert into
 /// @param key Key to insert at
 /// @param value Value to insert
-/// @returns Previous entry for the same key if one existed, else an empty
-///   entry (where `key` is NULL).
-passgen_hashmap_entry passgen_hashmap_insert(passgen_hashmap *map, const void *key, void *value);
+/// @param previous Set to the previous entry for the same key if one existed,
+///   else to an empty entry (where `key` is NULL). May be NULL.
+/// @returns @ref PASSGEN_OK, or @ref PASSGEN_ERROR_OUT_OF_MEMORY if it needed
+///   to grow and could not. The hashmap is unchanged then.
+passgen_status passgen_hashmap_insert(
+    passgen_hashmap *map,
+    const void *key,
+    void *value,
+    passgen_hashmap_entry *previous);
 
 /// Remove an entry from the hashmap. Returns the entry if found, else returns
 /// an empty entry (where `key` == NULL).

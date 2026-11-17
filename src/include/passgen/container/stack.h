@@ -7,8 +7,15 @@
 /// Stack data structure. Implements efficient insertion (push) and removal
 /// (pop). Can hold elements of any size, determined by `element_size`.
 typedef struct {
-    /// Backing data store.
+    /// The bins, which hold the elements.
     void **data;
+
+    /// How many bins there is room for in @ref data.
+    size_t bins_capacity;
+
+    /// How many elements there is room for in the first bin. The others
+    /// always have room for @ref bin_size elements.
+    size_t first_capacity;
 
     /// Size of the individual elements that are stored.
     size_t element_size;
@@ -43,11 +50,15 @@ void passgen_stack_foreach(const passgen_stack *stack, void (*func)(void *elemen
 /// Push a new value onto this stack. If a non-NULL pointer is passed, it is
 /// copied to the new value. A pointer to the value on the stack is returned.
 ///
+/// Elements other than the first @ref passgen_stack::bin_size do not move,
+/// so pointers to them stay valid until they are popped.
+///
 /// @memberof passgen_stack
 /// @param stack Stack to push into
 /// @param value Pointer to value to insert. If NULL, new space is created on the stack but it is not initialized.
-/// @returns Pointer to the new item on the stack.
-void *passgen_stack_push(passgen_stack *stack, void *value);
+/// @returns Pointer to the new item on the stack, or NULL if there is no
+///   memory for it. The stack is unchanged then.
+void *passgen_stack_push(passgen_stack *stack, const void *value);
 
 /// Get the nth element on the stack. If the position is invalid, returns NULL.
 ///
