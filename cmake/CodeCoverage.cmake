@@ -80,8 +80,15 @@ option(
   OFF)
 
 # Programs
-find_program(LLVM_COV_PATH NAMES llvm-cov llvm-cov-11 llvm-cov-10)
-find_program(LLVM_PROFDATA_PATH NAMES llvm-profdata llvm-profdata-11 llvm-profdata-10)
+#
+# Changed for Passgen: llvm-cov and llvm-profdata have to be of the same version
+# as clang, as the format of the profiles changes between versions. Distributions
+# such as Debian install them with the major version as a suffix (llvm-cov-14),
+# and only have them without one if the llvm package is installed, so the
+# versioned names of the version of the compiler are preferred.
+string(REGEX MATCH "^[0-9]+" _ccov_clang_major "${CMAKE_C_COMPILER_VERSION}")
+find_program(LLVM_COV_PATH NAMES llvm-cov-${_ccov_clang_major} llvm-cov)
+find_program(LLVM_PROFDATA_PATH NAMES llvm-profdata-${_ccov_clang_major} llvm-profdata)
 find_program(LCOV_PATH lcov)
 find_program(GENHTML_PATH genhtml)
 # Hide behind the 'advanced' mode flag for GUI/ccmake
