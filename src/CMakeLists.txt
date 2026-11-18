@@ -93,8 +93,8 @@ endif()
 if(passgen_installed_libraries)
     install(
         TARGETS ${passgen_installed_libraries}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT development
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+        ARCHIVE DESTINATION ${PASSGEN_INSTALL_LIBDIR} COMPONENT development
+        LIBRARY DESTINATION ${PASSGEN_INSTALL_LIBDIR} COMPONENT runtime
             NAMELINK_COMPONENT development
         RUNTIME DESTINATION bin COMPONENT runtime)
 endif()
@@ -126,7 +126,7 @@ install(
 configure_file(passgen.pc.in passgen.pc @ONLY)
 install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/passgen.pc"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    DESTINATION ${PASSGEN_INSTALL_LIBDIR}/pkgconfig
     COMPONENT development)
 
 if(USE_LIBEXECINFO)

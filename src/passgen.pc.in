@@ -2,7 +2,7 @@
 # is, so that it works wherever the library is installed or unpacked.
 prefix=${pcfiledir}/@PASSGEN_PKGCONFIG_TO_PREFIX@
 exec_prefix=${prefix}
-libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+libdir=${exec_prefix}/@PASSGEN_INSTALL_LIBDIR@
 includedir=${prefix}/include
 
 Name: passgen

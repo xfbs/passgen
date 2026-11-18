@@ -99,23 +99,34 @@ if(PASSGEN_FUZZ)
     add_compile_options(-fsanitize=fuzzer-no-link)
 endif()
 
-# where libraries are installed, relative to the prefix. this is what
-# GNUInstallDirs calls it, so that packaging for distributions which put them
-# elsewhere (such as lib64) works as usual, but it is lib unless set.
-# (a string rather than a path, as cmake would make a relative path given on
-# the command line absolute.)
+# where libraries are installed. this is what GNUInstallDirs calls it, so that
+# packaging for distributions which put them elsewhere (such as lib64) works
+# as usual, but it is lib unless set. (a string rather than a path, as cmake
+# would make a relative path given on the command line absolute.)
 set(CMAKE_INSTALL_LIBDIR "lib"
     CACHE STRING "Where to install libraries, relative to the prefix")
+
+# like GNUInstallDirs, it may also be absolute, as long as it is in the prefix
+# (nix does that). what is installed only uses it relative to the prefix, so
+# that the prefix can still be changed when installing.
 if(IS_ABSOLUTE "${CMAKE_INSTALL_LIBDIR}")
-    message(FATAL_ERROR "CMAKE_INSTALL_LIBDIR has to be relative to the prefix")
+    file(RELATIVE_PATH PASSGEN_INSTALL_LIBDIR
+        "${CMAKE_INSTALL_PREFIX}" "${CMAKE_INSTALL_LIBDIR}")
+    if(PASSGEN_INSTALL_LIBDIR STREQUAL "" OR PASSGEN_INSTALL_LIBDIR MATCHES "^\\.\\.")
+        message(FATAL_ERROR
+            "CMAKE_INSTALL_LIBDIR (${CMAKE_INSTALL_LIBDIR}) has to be in "
+            "CMAKE_INSTALL_PREFIX (${CMAKE_INSTALL_PREFIX})")
+    endif()
+else()
+    set(PASSGEN_INSTALL_LIBDIR "${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 # the command-line tool and the pkg-config file find the library relative to
 # where they are, so that they work wherever they are installed or unpacked.
 file(RELATIVE_PATH PASSGEN_BIN_TO_LIBDIR
-    "/prefix/bin" "/prefix/${CMAKE_INSTALL_LIBDIR}")
+    "/prefix/bin" "/prefix/${PASSGEN_INSTALL_LIBDIR}")
 file(RELATIVE_PATH PASSGEN_PKGCONFIG_TO_PREFIX
-    "/prefix/${CMAKE_INSTALL_LIBDIR}/pkgconfig" "/prefix")
+    "/prefix/${PASSGEN_INSTALL_LIBDIR}/pkgconfig" "/prefix")
 string(REGEX REPLACE "/$" "" PASSGEN_PKGCONFIG_TO_PREFIX
     "${PASSGEN_PKGCONFIG_TO_PREFIX}")
 
@@ -267,8 +278,8 @@ set(CPACK_RPM_PACKAGE_URL "${CPACK_PACKAGE_HOMEPAGE_URL}")
 set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
     /usr/share/man
     /usr/share/man/man1
-    /usr/${CMAKE_INSTALL_LIBDIR}
-    /usr/${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+    /usr/${PASSGEN_INSTALL_LIBDIR}
+    /usr/${PASSGEN_INSTALL_LIBDIR}/pkgconfig)
 
 include(CPack)
 
