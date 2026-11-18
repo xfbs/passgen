@@ -60,9 +60,45 @@ jobs:
       - name: Build against the installed library with pkg-config
         run: ./scripts/test-pkg-config.sh build "$CC"
 
+      - name: Run the installed command-line tool from elsewhere
+        run: ./scripts/test-relocatable.sh build
+
       - name: Check exported symbols
         if: runner.os == 'Linux'
         run: cmake --build build --target symbols-check
+
+  # The command-line tool linked against the shared library, as in the
+  # archives of releases which have the library. It has to find the library
+  # relative to where it is, wherever it is installed.
+  cli-shared:
+    name: ${{ matrix.os }} / command-line tool linked against the shared library
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build ruby
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DPASSGEN_CLI_SHARED=ON
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Run the installed command-line tool from elsewhere
+        run: ./scripts/test-relocatable.sh build
 
   # Build without Monocypher, which leaves out master passphrase mode, so
   # that this keeps working.

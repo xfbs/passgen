@@ -1,6 +1,30 @@
 add_executable(passgen-cli passgen.c main.c)
-target_link_libraries(passgen-cli PUBLIC ${PASSGEN_LIB} m)
 set_target_properties(passgen-cli PROPERTIES OUTPUT_NAME passgen)
+
+# the command-line interface is linked against the static library by default,
+# so that it is a single binary. it can also be linked against the shared
+# library, like any other program which uses it.
+if(PASSGEN_CLI_SHARED)
+    if(NOT LIBPASSGEN_SHARED OR PASSGEN_STATIC)
+        message(FATAL_ERROR
+            "PASSGEN_CLI_SHARED needs LIBPASSGEN_SHARED, and cannot be "
+            "used with PASSGEN_STATIC")
+    endif()
+    target_link_libraries(passgen-cli PRIVATE passgen-shared m)
+
+    # the library is installed into lib/, next to bin/. the binary looks for
+    # it relative to where it is, so that it can be installed or unpacked
+    # anywhere.
+    if(APPLE)
+        set_target_properties(passgen-cli PROPERTIES
+            INSTALL_RPATH "@loader_path/../lib")
+    else()
+        set_target_properties(passgen-cli PROPERTIES
+            INSTALL_RPATH "$ORIGIN/../lib")
+    endif()
+else()
+    target_link_libraries(passgen-cli PRIVATE ${PASSGEN_LIB} m)
+endif()
 # the command-line interface only uses the public interface of the library.
 passgen_target_defaults(passgen-cli PUBLIC_ONLY)
 

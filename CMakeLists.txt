@@ -18,6 +18,7 @@ option(PASSGEN_TEST_CXX
 option(LIBPASSGEN_STATIC "Build Passgen static library (libpassgen.a)" ON)
 option(LIBPASSGEN_SHARED "Build Passgen dynamic library (libpassgen.so)" ON)
 option(PASSGEN_STATIC "Link Passgen CLI fully statically, including the C library" OFF)
+option(PASSGEN_CLI_SHARED "Link Passgen CLI against the shared library (libpassgen.so)" OFF)
 
 option(USE_BACKTRACE "Enable backtrace() for debug builds (not always available)." ON)
 option(USE_LIBEXECINFO

@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `passgen_allocator_set()` replaces the allocator which the library uses.
 - `passgen/passgen.h` includes all of the public headers.
 - A pkg-config file, `passgen.pc`.
+- `-DPASSGEN_CLI_SHARED=ON` links the command-line tool against the shared
+  library, which it finds relative to where it is installed.
 - `passgen_random_desc_secret()` says whether a description of a source of
   randomness may hold a secret, so that it is not shown.
 - The public headers can be used from C++.
