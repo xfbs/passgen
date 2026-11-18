@@ -8,12 +8,15 @@
 /// time, which is what master passphrase mode is built on (see
 /// @ref passgen_random_chacha20_argon2_open), and what the tests use.
 #pragma once
+#include <passgen/config.h>
 #include <passgen/export.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
-#include <passgen/config.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /// Size of the buffer of a source of randomness, in bytes.
 ///
@@ -412,4 +415,8 @@ PASSGEN_EXPORT bool passgen_random_failed(const passgen_random *random);
 /// @returns Whether it seeked, which is false if the source is not ChaCha20
 PASSGEN_EXPORT bool
 passgen_random_chacha20_seek(passgen_random *random, size_t position);
+#endif
+
+#ifdef __cplusplus
+}
 #endif

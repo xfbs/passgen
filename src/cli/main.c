@@ -1,5 +1,4 @@
 #include "passgen.h"
-#include <passgen/config.h>
 
 #ifdef PASSGEN_MLOCK
 #include <sys/mman.h>

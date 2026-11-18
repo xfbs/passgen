@@ -3,6 +3,11 @@ target_link_libraries(passgen-cli PUBLIC ${PASSGEN_LIB} m)
 set_target_properties(passgen-cli PROPERTIES OUTPUT_NAME passgen)
 passgen_target_defaults(passgen-cli)
 
+# lock memory, if turned on
+if(PASSGEN_MLOCK)
+    target_compile_definitions(passgen-cli PRIVATE PASSGEN_MLOCK)
+endif()
+
 # link with seccomp, if turned on
 if(PASSGEN_SECCOMP)
     target_link_libraries(passgen-cli PUBLIC ${libseccomp})

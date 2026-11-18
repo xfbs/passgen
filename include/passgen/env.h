@@ -9,6 +9,10 @@
 #include <stddef.h>
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// @struct passgen_env
 /// Environment that is needed when generating from patterns.
 ///
@@ -84,3 +88,7 @@ PASSGEN_EXPORT passgen_status passgen_env_wordlist_add(
     const char *name,
     FILE *file,
     size_t markov_length);
+
+#ifdef __cplusplus
+}
+#endif

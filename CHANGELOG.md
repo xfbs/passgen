@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `\]` and `\[` to have brackets in a set.
 - `passgen_allocator_set()` replaces the allocator which the library uses.
+- `passgen/passgen.h` includes all of the public headers.
+- The public headers can be used from C++.
 
 ### Changed
 - Errors in patterns say what is wrong, rather than "invalid token", and mark
@@ -52,6 +54,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - `passgen_env_init()` and `passgen_env_config()`.
+- `PASSGEN_MLOCK` from `passgen/config.h`, as it is only for the
+  command-line tool.
 - The `PASSGEN_MEMORY` build option, which did nothing.
 - Nightly builds for macOS and Windows. Releases have a build for macOS.
 

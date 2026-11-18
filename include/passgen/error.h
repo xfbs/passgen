@@ -23,6 +23,10 @@
 #include <stddef.h>
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// What went wrong, or @ref PASSGEN_OK if nothing did.
 ///
 /// The values may change between versions, so use the names. Use @ref
@@ -166,3 +170,7 @@ PASSGEN_EXPORT void passgen_error_free(passgen_error *error);
 /// @param error Error to print
 /// @param file Where to print it to, such as `stderr`
 PASSGEN_EXPORT void passgen_error_print(const passgen_error *error, FILE *file);
+
+#ifdef __cplusplus
+}
+#endif

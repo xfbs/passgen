@@ -15,8 +15,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "passgen/passgen.h"
-#include "passgen/env.h"
+#include <passgen/env.h>
+#include <passgen/passgen.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /// Callback which is given what is generated, one codepoint at a time.
 ///
@@ -142,3 +146,7 @@ PASSGEN_EXPORT passgen_status passgen_generate(
     double *entropy,
     void *data,
     passgen_generate_cb *func);
+
+#ifdef __cplusplus
+}
+#endif

@@ -12,6 +12,10 @@
 #include <passgen/export.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// An allocator. The sizes of allocations are passed back in when they are
 /// resized or freed, so it does not have to keep track of them.
 ///
@@ -56,3 +60,7 @@ typedef struct passgen_allocator {
 /// @param allocator The allocator to use, which is copied. NULL for the
 ///   default one.
 PASSGEN_EXPORT void passgen_allocator_set(const passgen_allocator *allocator);
+
+#ifdef __cplusplus
+}
+#endif

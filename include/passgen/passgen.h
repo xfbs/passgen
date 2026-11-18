@@ -1,11 +1,17 @@
 /// @file passgen.h
 /// @author Patrick M. Elsen <pelsen@xfbs.net>
-/// @brief Passgen main interface
+/// @brief Parsing patterns, and all of the rest of the interface.
+///
+/// Including this header is enough to use all of libpassgen: it includes the
+/// other public headers.
 #pragma once
+#include <passgen/error.h>
 #include <passgen/export.h>
 #include <stddef.h>
-#include <passgen/allocator.h>
-#include <passgen/error.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /// @struct passgen_pattern
 /// A parsed pattern, such as `abc(def|ghi)[a-z]{5}`.
@@ -39,3 +45,16 @@ PASSGEN_EXPORT passgen_status passgen_parse(
 /// @param pattern Pattern to free. May be NULL, in which case this does
 ///   nothing.
 PASSGEN_EXPORT void passgen_pattern_free(passgen_pattern *pattern);
+
+#ifdef __cplusplus
+}
+#endif
+
+// the rest of the interface. this comes last, as generate.h needs what is
+// declared above.
+#include <passgen/allocator.h>
+#include <passgen/config.h>
+#include <passgen/env.h>
+#include <passgen/generate.h>
+#include <passgen/random.h>
+#include <passgen/version.h>

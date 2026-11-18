@@ -117,11 +117,23 @@ endif()
 # unit tests and CLI tests, run with `ctest` or by building the `check` target.
 if(BUILD_TESTING)
     enable_testing()
+
+    # the public headers are checked from C++ as well, if there is a
+    # compiler for it.
+    include(CheckLanguage)
+    check_language(CXX)
+    if(CMAKE_CXX_COMPILER)
+        enable_language(CXX)
+    endif()
+
     add_subdirectory(src/tests)
 
     add_test(NAME passgen-test COMMAND passgen-test)
     if(LIBPASSGEN_SHARED)
         add_test(NAME passgen-test-public COMMAND passgen-test-public)
+    endif()
+    if(TARGET passgen-test-public-cxx)
+        add_test(NAME passgen-test-public-cxx COMMAND passgen-test-public-cxx)
     endif()
     add_test(NAME passgen-cli COMMAND ${CMAKE_SOURCE_DIR}/scripts/test-passgen-cli.sh
                                       $<TARGET_FILE:passgen-cli>)

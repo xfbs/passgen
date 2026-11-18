@@ -6,6 +6,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// Version information for libpassgen.
 typedef struct passgen_version {
     /// Major version
@@ -46,3 +50,7 @@ PASSGEN_EXPORT bool passgen_version_compatible(passgen_version version);
 /// slower, and stop with a message when something which should not be
 /// possible happens.
 PASSGEN_EXPORT bool passgen_is_debug(void);
+
+#ifdef __cplusplus
+}
+#endif

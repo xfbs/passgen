@@ -1,13 +1,25 @@
+/// @file
+/// @brief How the library was built.
+///
+/// This is generated when the library is built, and installed with it as
+/// `passgen/config.h`.
 #pragma once
 
-/// Version of passgen that these headers belong to. Use
-/// passgen_version_get() to get the version of the library which is used at
-/// runtime, which may be another one.
+/// Major version of the library which these headers belong to. Use
+/// @ref passgen_version_get to get the version of the library which is used
+/// at runtime, which may be another one.
 #define PASSGEN_VERSION_MAJOR  @PROJECT_VERSION_MAJOR@
+/// Minor version of the library which these headers belong to.
 #define PASSGEN_VERSION_MINOR  @PROJECT_VERSION_MINOR@
+/// Patch version of the library which these headers belong to.
 #define PASSGEN_VERSION_PATCH  @PROJECT_VERSION_PATCH@
+/// Version of the library which these headers belong to, such as `0.2.0`.
 #define PASSGEN_VERSION_STRING "@PROJECT_VERSION@"
 
+/// Defined if the library is a debug build (see @ref passgen_is_debug).
 #cmakedefine PASSGEN_DEBUG
-#cmakedefine PASSGEN_MLOCK
+
+/// Defined if the library is built with Monocypher, which the ChaCha20
+/// sources of randomness need, such as master passphrase mode (see
+/// @ref passgen_random_chacha20_argon2_open).
 #cmakedefine PASSGEN_MONOCYPHER
