@@ -82,6 +82,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ranges ending in an escaped character (`[+-\-]`) failing to generate.
 - Entropy above 1024 bits being reported as infinite.
 - The API documentation leaving out the ChaCha20 sources of randomness.
+- The library printing to stderr when `/dev/urandom` cannot be opened, on
+  systems without `getrandom()` or `arc4random()`.
 - An alternative with a multiplier of zero making the group choose wrongly:
   `({0}a|b)` generated nothing, and `({0}a|b|c)` always chose `b`. Passwords
   derived from such a pattern change.

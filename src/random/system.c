@@ -86,15 +86,8 @@ passgen_random *passgen_random_system_open(passgen_random *random) {
     random->close = passgen_random_system_close;
     return passgen_random_start(random, allocated);
 #else
-    static const char *device = "/dev/urandom";
-    random = passgen_random_path_open(random, device);
-    if(!random) {
-        fprintf(
-            stderr,
-            "error: cannot open system randomness device '%s'\n",
-            device);
-    }
-    return random;
+    // whoever opens it says why, if it cannot be opened.
+    return passgen_random_path_open(random, "/dev/urandom");
 #endif
 }
 

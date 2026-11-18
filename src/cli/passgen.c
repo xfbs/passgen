@@ -684,7 +684,7 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
                 (const char *) data);
             break;
         case PASSGEN_CLI_ERROR_RANDOM_ALLOC:
-            fprintf(stderr, "error: couldn't open random object.\n");
+            fprintf(stderr, "error: cannot open the source of randomness.\n");
             break;
         case PASSGEN_CLI_ERROR_PATTERN_PARSE:
             break;
