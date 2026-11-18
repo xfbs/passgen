@@ -22,6 +22,7 @@
 #include "passgen/parser/parser.h"
 #include "passgen/parser/token.h"
 #include "passgen/passgen.h"
+#include "passgen/random_desc.h"
 #include "passgen/pattern/pattern.h"
 #include "passgen/util/utf8.h"
 #include "passgen/version.h"
@@ -29,6 +30,26 @@
 
 #define UNUSED(x)              (void) x
 #define strprefix(prefix, str) strncmp(prefix, str, strlen(prefix))
+
+/// Prints that a randomness source cannot be used. A description which may
+/// hold a secret (see @ref passgen_random_desc_secret) is not printed in full,
+/// so that the secret does not end up in a terminal or a log: only its kind,
+/// which is what comes before the first colon.
+static void passgen_cli_random_error(const char *random) {
+    const char *colon = strchr(random, ':');
+    if(colon && passgen_random_desc_secret(random)) {
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m: cannot use randomness source '%.*s:...'\n",
+            (int) (colon - random),
+            random);
+    } else {
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m: cannot use randomness source '%s'\n",
+            random);
+    }
+}
 
 int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
     if(opts->random) {
@@ -39,10 +60,7 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
     opts->random = passgen_random_open(NULL, random);
 
     if(!opts->random) {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: cannot use randomness source '%s'\n",
-            random);
+        passgen_cli_random_error(random);
         return PASSGEN_CLI_ERROR_RANDOM_ALLOC;
     }
 

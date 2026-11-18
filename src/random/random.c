@@ -143,111 +143,171 @@ static bool hex_decode(const char *string, uint8_t *bytes, size_t size) {
 }
 #endif
 
+/// What every kind of description starts with. The ones without parameters
+/// are the whole description, all others are followed by their parameters.
+static const struct {
+    const char *prefix;
+    bool whole;
+    passgen_random_desc_kind kind;
+} random_desc_kinds[] = {
+    {"zero", true, PASSGEN_RANDOM_DESC_ZERO},
+    {"system", true, PASSGEN_RANDOM_DESC_SYSTEM},
+    {"file:", false, PASSGEN_RANDOM_DESC_FILE},
+    {"xorshift:", false, PASSGEN_RANDOM_DESC_XORSHIFT},
+    {"chacha20:", false, PASSGEN_RANDOM_DESC_CHACHA20},
+    {"chacha20-argon2:", false, PASSGEN_RANDOM_DESC_CHACHA20_ARGON2},
+};
+
+/// Finds out which kind of source a description is for, from how it starts,
+/// whether or not the rest of it is valid. Sets `params` to what follows the
+/// prefix. Returns false if it is not any known kind.
+static bool random_desc_kind(
+    const char *string,
+    passgen_random_desc_kind *kind,
+    const char **params) {
+    size_t count = sizeof(random_desc_kinds) / sizeof(random_desc_kinds[0]);
+    for(size_t i = 0; i < count; i++) {
+        const char *prefix = random_desc_kinds[i].prefix;
+        bool matches = random_desc_kinds[i].whole
+                           ? 0 == strcmp(prefix, string)
+                           : _strprefix(prefix, string);
+        if(matches) {
+            *kind = random_desc_kinds[i].kind;
+            *params = &string[strlen(prefix)];
+            return true;
+        }
+    }
+    return false;
+}
+
+bool passgen_random_desc_secret(const char *string) {
+    passgen_random_desc_kind kind;
+    const char *params;
+    // an unknown kind may be a mistyped one which holds a secret.
+    if(!random_desc_kind(string, &kind, &params)) {
+        return true;
+    }
+
+    // there is no default case, so that a new kind is a warning here until
+    // it is decided whether it holds a secret.
+    switch(kind) {
+        case PASSGEN_RANDOM_DESC_ZERO:
+        case PASSGEN_RANDOM_DESC_SYSTEM:
+        case PASSGEN_RANDOM_DESC_FILE:
+        case PASSGEN_RANDOM_DESC_XORSHIFT:
+            return false;
+        case PASSGEN_RANDOM_DESC_CHACHA20:
+        case PASSGEN_RANDOM_DESC_CHACHA20_ARGON2:
+            return true;
+    }
+    return true;
+}
+
 bool passgen_random_desc_parse(passgen_random_desc *desc, const char *string) {
     memset(desc, 0, sizeof(*desc));
 
-    if(strcmp("zero", string) == 0) {
-        desc->kind = PASSGEN_RANDOM_DESC_ZERO;
-        return true;
+    passgen_random_desc_kind kind;
+    const char *params;
+    if(!random_desc_kind(string, &kind, &params)) {
+        return false;
     }
 
-    // check if we should read randomness from this file
-    if(_strprefix("file:", string)) {
-        desc->kind = PASSGEN_RANDOM_DESC_FILE;
-        desc->data.file.path = &string[5];
-        return true;
-    }
+    switch(kind) {
+        case PASSGEN_RANDOM_DESC_ZERO:
+        case PASSGEN_RANDOM_DESC_SYSTEM:
+            break;
 
-    // check if we should use the xorshift PRNG with the given seed
-    if(_strprefix("xorshift:", string)) {
-        const char *seed_str = &string[9];
+        // read randomness from this file
+        case PASSGEN_RANDOM_DESC_FILE:
+            desc->data.file.path = params;
+            break;
 
-        // the seed is any nonzero 64 bit number, so this needs to parse the
-        // full unsigned range, and only accept digits (strtoull() would
-        // accept a sign and leading whitespace as well).
-        if(*seed_str < '0' || *seed_str > '9') {
-            return false;
+        // use the xorshift PRNG with the given seed
+        case PASSGEN_RANDOM_DESC_XORSHIFT: {
+            // the seed is any nonzero 64 bit number, so this needs to parse
+            // the full unsigned range, and only accept digits (strtoull()
+            // would accept a sign and leading whitespace as well).
+            if(*params < '0' || *params > '9') {
+                return false;
+            }
+
+            char *seed_end = NULL;
+            errno = 0;
+            unsigned long long seed = strtoull(params, &seed_end, 10);
+            if(errno != 0 || *seed_end != 0 || seed == 0 || seed > UINT64_MAX) {
+                return false;
+            }
+            desc->data.xorshift.seed = seed;
+            break;
         }
 
-        char *seed_end = NULL;
-        errno = 0;
-        unsigned long long seed = strtoull(seed_str, &seed_end, 10);
-        if(errno != 0 || *seed_end != 0 || seed == 0 || seed > UINT64_MAX) {
-            return false;
-        }
-
-        desc->kind = PASSGEN_RANDOM_DESC_XORSHIFT;
-        desc->data.xorshift.seed = seed;
-        return true;
-    }
-
-    // check if we should use the system default
-    if(0 == strcmp(string, "system")) {
-        desc->kind = PASSGEN_RANDOM_DESC_SYSTEM;
-        return true;
-    }
-
+        // use chacha20 with a key and an IV in hex: exactly 64 hex digits for
+        // the 32 bytes of the key, and if there is an IV, exactly 16 for its
+        // 8 bytes.
+        case PASSGEN_RANDOM_DESC_CHACHA20: {
 #ifdef PASSGEN_MONOCYPHER
-    // use chacha20 with a key and an IV in hex: exactly 64 hex digits for the
-    // 32 bytes of the key, and if there is an IV, exactly 16 for its 8 bytes.
-    if(_strprefix("chacha20:", string)) {
-        const char *pos = &string[9];
-        uint8_t *key = desc->data.chacha20.key;
-        uint8_t *iv = desc->data.chacha20.iv;
-        if(!hex_decode(pos, key, 32)) {
-            PASSGEN_CLEAR(desc);
-            return false;
-        }
-        pos += 64;
-
-        memcpy(iv, "passgen", 8);
-        if(*pos == ':') {
-            pos++;
-            if(!hex_decode(pos, iv, 8)) {
+            const char *pos = params;
+            uint8_t *key = desc->data.chacha20.key;
+            uint8_t *iv = desc->data.chacha20.iv;
+            if(!hex_decode(pos, key, 32)) {
                 PASSGEN_CLEAR(desc);
                 return false;
             }
-            pos += 16;
-        }
+            pos += 64;
 
-        // nothing may follow, so that a key or IV which is too long is not
-        // silently cut off.
-        if(*pos) {
-            PASSGEN_CLEAR(desc);
+            memcpy(iv, "passgen", 8);
+            if(*pos == ':') {
+                pos++;
+                if(!hex_decode(pos, iv, 8)) {
+                    PASSGEN_CLEAR(desc);
+                    return false;
+                }
+                pos += 16;
+            }
+
+            // nothing may follow, so that a key or IV which is too long is
+            // not silently cut off.
+            if(*pos) {
+                PASSGEN_CLEAR(desc);
+                return false;
+            }
+            break;
+#else
             return false;
-        }
-
-        desc->kind = PASSGEN_RANDOM_DESC_CHACHA20;
-        return true;
-    }
-
-    // use chacha20 with a key derived from a master passphrase
-    if(_strprefix("chacha20-argon2:", string)) {
-        // one colon before the master passphrase is skipped, so that
-        // `chacha20-argon2::x` has the master passphrase `x`. this is how it
-        // always was, and changing it would change what is derived from it.
-        const char *pos = &string[16];
-        if(*pos == ':') {
-            pos++;
-        }
-        char *passphrase = desc->data.chacha20_argon2.passphrase;
-        char *domain = desc->data.chacha20_argon2.domain;
-        char *token = desc->data.chacha20_argon2.token;
-        size_t size = PASSGEN_RANDOM_DESC_STRING_MAX + 1;
-        if(!desc_string(&pos, passphrase, size) ||
-           !desc_string(&pos, domain, size) ||
-           !desc_string(&pos, token, size)) {
-            PASSGEN_CLEAR(desc);
-            return false;
-        }
-
-        desc->kind = PASSGEN_RANDOM_DESC_CHACHA20_ARGON2;
-        desc->data.chacha20_argon2.params = NULL;
-        return true;
-    }
 #endif
+        }
 
-    return false;
+        // use chacha20 with a key derived from a master passphrase
+        case PASSGEN_RANDOM_DESC_CHACHA20_ARGON2: {
+#ifdef PASSGEN_MONOCYPHER
+            // one colon before the master passphrase is skipped, so that
+            // `chacha20-argon2::x` has the master passphrase `x`. this is how
+            // it always was, and changing it would change what is derived
+            // from it.
+            const char *pos = params;
+            if(*pos == ':') {
+                pos++;
+            }
+            char *passphrase = desc->data.chacha20_argon2.passphrase;
+            char *domain = desc->data.chacha20_argon2.domain;
+            char *token = desc->data.chacha20_argon2.token;
+            size_t size = PASSGEN_RANDOM_DESC_STRING_MAX + 1;
+            if(!desc_string(&pos, passphrase, size) ||
+               !desc_string(&pos, domain, size) ||
+               !desc_string(&pos, token, size)) {
+                PASSGEN_CLEAR(desc);
+                return false;
+            }
+            desc->data.chacha20_argon2.params = NULL;
+            break;
+#else
+            return false;
+#endif
+        }
+    }
+
+    desc->kind = kind;
+    return true;
 }
 
 passgen_random *passgen_random_desc_open(

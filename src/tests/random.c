@@ -799,6 +799,42 @@ test_result test_random_desc_parse_chacha20(void) {
     return test_ok;
 }
 
+/// Whether a description may hold a secret only depends on its kind, so it
+/// works for descriptions which are not valid, which is when it is needed (to
+/// not print the secret in an error).
+test_result test_random_desc_secret(void) {
+    const char *secret[] = {
+        "chacha20:" KEY,
+        "chacha20:secretkey",
+        "chacha20-argon2:master:example.com:user",
+        "chacha20-argon2:",
+        // not a known kind, but maybe a mistyped one
+        "chacha:secretkey",
+        "chacha20",
+        "",
+        "zero:",
+        "systemx",
+    };
+    for(size_t i = 0; i < sizeof(secret) / sizeof(secret[0]); i++) {
+        assert(passgen_random_desc_secret(secret[i]));
+    }
+
+    const char *public[] = {
+        "zero",
+        "system",
+        "file:/dev/urandom",
+        "file:",
+        "xorshift:1234",
+        "xorshift:0",
+        "xorshift:abc",
+    };
+    for(size_t i = 0; i < sizeof(public) / sizeof(public[0]); i++) {
+        assert(!passgen_random_desc_secret(public[i]));
+    }
+
+    return test_ok;
+}
+
 /// What is parsed opens the same source as opening the description does.
 test_result test_random_desc_open(void) {
     const char *descs[] = {

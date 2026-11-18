@@ -107,6 +107,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The entropy of a set counting a character which is listed more than once
   (`[aab]`, `[a-zc]`) as a different character every time, which overstated
   it. It now depends on how many times the chosen character was listed.
+- A randomness source which cannot be used printing all of its description in
+  the error, including a key or a master passphrase. Only the kind is printed
+  now, except for sources which cannot hold a secret (`file`, `xorshift`).
 
 ## [0.2.0] - 2026-11-17
 ### Added

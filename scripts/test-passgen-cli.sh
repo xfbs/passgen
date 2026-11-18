@@ -276,6 +276,20 @@ test "$(error_of $passgen '[]')" = "error in pattern: set is empty"
 test "$(error_of $passgen '(abc')" = "error in pattern: group is not closed"
 test "$(error_of $passgen 'a{5,2}')" = "error in pattern: invalid repetition"
 test "$(error_of $passgen 'a\q')" = "error in pattern: unknown escape sequence"
+
+# a randomness source which cannot be used is named, but what may be a secret
+# in it (a key or a master passphrase) is not printed, also for an unknown kind
+# which may be a typo of one with a secret.
+test "$(error_of $passgen -r "chacha20:secretkey" a)" = "error: cannot use randomness source 'chacha20:...'"
+test "$(error_of $passgen -r "chacha20-argon2:$(printf 'x%.0s' $(seq 200))" a)" = "error: cannot use randomness source 'chacha20-argon2:...'"
+test "$(error_of $passgen -r "chacha:secretkey" a)" = "error: cannot use randomness source 'chacha:...'"
+test "$(error_lines $passgen -r "chacha20:secretkey" a | grep -c secretkey)" = 0
+echo "random chacha20:secretkey" > "$XDG_CONFIG_HOME/passgen.conf"
+test "$(error_lines $passgen a | grep -c secretkey)" = 0
+rm "$XDG_CONFIG_HOME/passgen.conf"
+# sources without secrets are printed in full.
+test "$(error_of $passgen -r "file:/nonexistent" a)" = "error: cannot use randomness source 'file:/nonexistent'"
+test "$(error_of $passgen -r "xorshift:0" a)" = "error: cannot use randomness source 'xorshift:0'"
 test "$(error_of $passgen '\w{}')" = "error in pattern: expected a name in braces"
 test "$(error_of $passgen '\w{undefined}')" = "error: wordlist not found: undefined"
 test "$(error_of $passgen '\m{undefined}')" = "error: wordlist not found: undefined"
