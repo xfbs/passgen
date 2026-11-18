@@ -1,7 +1,7 @@
 #include "passgen/pattern/set.h"
 #include "passgen/config.h"
 #include "passgen/pattern/range.h"
-#include <stdlib.h>
+#include "passgen/util/alloc.h"
 #include "passgen/util/clear.h"
 
 void passgen_pattern_set_init(passgen_pattern_set *set) {
@@ -11,8 +11,10 @@ void passgen_pattern_set_init(passgen_pattern_set *set) {
 }
 
 void passgen_pattern_set_free(passgen_pattern_set *set) {
+    // the list of choices has an entry for every range, once the set is
+    // complete.
+    passgen_free(set->choices_list, set->items.len * sizeof(size_t));
     passgen_stack_free(&set->items);
-    free(set->choices_list);
     PASSGEN_CLEAR(set);
 }
 

@@ -2,7 +2,7 @@
 #include "passgen/config.h"
 #include "passgen/pattern/group.h"
 #include "passgen/util/clear.h"
-#include <stdlib.h>
+#include "passgen/util/alloc.h"
 
 void passgen_pattern_init(passgen_pattern *pattern) {
     passgen_pattern_group_init(&pattern->group);
@@ -19,5 +19,5 @@ void passgen_pattern_free(passgen_pattern *pattern) {
     }
 
     passgen_pattern_deinit(pattern);
-    free(pattern);
+    passgen_free(pattern, sizeof(*pattern));
 }

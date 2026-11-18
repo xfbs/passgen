@@ -4,9 +4,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdlib.h>
 
 #include "passgen/container/stack.h"
+#include "passgen/util/alloc.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/literal.h"
 #include "passgen/pattern/pattern.h"
@@ -58,6 +58,8 @@ int passgen_parse_special_name(
     struct passgen_token *token,
     passgen_parser_state *state);
 
+// pushing a state can move the states which are on the stack, so pointers to
+// them are not to be used after.
 inline passgen_parser_state *passgen_parser_state_push(passgen_parser *parser) {
     return passgen_stack_push(&parser->state, NULL);
 }
@@ -67,6 +69,9 @@ passgen_parser_state *passgen_parser_state_push_group(
     passgen_pattern_group *group,
     passgen_pattern_segment *segment) {
     passgen_parser_state *state = passgen_parser_state_push(parser);
+    if(!state) {
+        return NULL;
+    }
     state->type = PASSGEN_PARSER_GROUP;
     state->data.group.group = group;
     state->data.group.segment = segment;
@@ -79,6 +84,9 @@ passgen_parser_state *passgen_parser_state_push_set(
     passgen_pattern_set *set,
     passgen_pattern_range *range) {
     passgen_parser_state *state = passgen_parser_state_push(parser);
+    if(!state) {
+        return NULL;
+    }
     state->type = PASSGEN_PARSER_SET;
     state->data.set.set = set;
     state->data.set.range = range;
@@ -90,6 +98,9 @@ passgen_parser_state *passgen_parser_state_push_repeat(
     passgen_parser *parser,
     passgen_pattern_repeat *repeat) {
     passgen_parser_state *state = passgen_parser_state_push(parser);
+    if(!state) {
+        return NULL;
+    }
     state->type = PASSGEN_PARSER_REPEAT;
     repeat->min = 0;
     repeat->max = 0;
@@ -103,6 +114,9 @@ passgen_parser_state *passgen_parser_state_push_multiplier(
     size_t *multiplier,
     size_t *sum) {
     passgen_parser_state *state = passgen_parser_state_push(parser);
+    if(!state) {
+        return NULL;
+    }
     state->type = PASSGEN_PARSER_MULTIPLIER;
     *multiplier = 0;
     state->data.multiplier.value = multiplier;
@@ -114,23 +128,32 @@ passgen_parser_state *passgen_parser_state_push_special(
     passgen_parser *parser,
     passgen_pattern_special *special) {
     passgen_parser_state *state = passgen_parser_state_push(parser);
+    if(!state) {
+        return NULL;
+    }
     state->type = PASSGEN_PARSER_SPECIAL;
     state->data.special.special = special;
     return state;
 }
 
-void passgen_parser_init(passgen_parser *parser, passgen_pattern *pattern) {
+passgen_status
+passgen_parser_init(passgen_parser *parser, passgen_pattern *pattern) {
     passgen_stack_init(&parser->state, sizeof(passgen_parser_state));
     parser->limit = 0;
     parser->pattern = pattern;
-    if(!pattern) {
-        parser->pattern = malloc(sizeof(passgen_pattern));
+    passgen_pattern_init(pattern);
+
+    passgen_pattern_segment *segment =
+        passgen_pattern_group_segment_append(&pattern->group);
+    if(!segment) {
+        return PASSGEN_ERROR_OUT_OF_MEMORY;
     }
-    passgen_pattern_init(parser->pattern);
-    passgen_parser_state_push_group(
-        parser,
-        &parser->pattern->group,
-        passgen_pattern_group_segment_append(&parser->pattern->group));
+
+    if(!passgen_parser_state_push_group(parser, &pattern->group, segment)) {
+        return PASSGEN_ERROR_OUT_OF_MEMORY;
+    }
+
+    return PASSGEN_OK;
 }
 
 passgen_pattern *passgen_parser_free(passgen_parser *parser) {
@@ -152,13 +175,16 @@ passgen_parser_state *passgen_parser_state_last(passgen_parser *parser) {
 }
 
 // get the last item, making sure that it's only a single character.
-// in case of characters, mark it as tainted.
-static inline passgen_pattern_item *
-last_single_item_taint(passgen_pattern_segment *segment) {
+// in case of characters, mark it as tainted. the item is NULL if there is
+// none.
+static inline passgen_status last_single_item_taint(
+    passgen_pattern_segment *segment,
+    passgen_pattern_item **output) {
     passgen_pattern_item *item = passgen_stack_top(&segment->items);
+    *output = item;
 
     if(!item) {
-        return NULL;
+        return PASSGEN_OK;
     }
 
     if(item->kind == PASSGEN_PATTERN_LITERAL) {
@@ -172,6 +198,10 @@ last_single_item_taint(passgen_pattern_segment *segment) {
 
             // create new item
             item = passgen_pattern_segment_new_item(segment);
+            *output = item;
+            if(!item) {
+                return PASSGEN_ERROR_OUT_OF_MEMORY;
+            }
             item->kind = PASSGEN_PATTERN_LITERAL;
             passgen_pattern_literal_init(&item->data.literal);
             passgen_pattern_literal_append(&item->data.literal, codepoint);
@@ -181,7 +211,7 @@ last_single_item_taint(passgen_pattern_segment *segment) {
         passgen_pattern_literal_taint(&item->data.literal);
     }
 
-    return item;
+    return PASSGEN_OK;
 }
 
 int passgen_parse_token(passgen_parser *parser, passgen_token *token) {
@@ -260,8 +290,13 @@ int passgen_parse_group(
                 // special token
                 special = passgen_pattern_segment_new_special(
                     state->data.group.segment);
+                if(!special) {
+                    return PASSGEN_ERROR_OUT_OF_MEMORY;
+                }
                 passgen_pattern_special_init(special, codepoint);
-                passgen_parser_state_push_special(parser, special);
+                if(!passgen_parser_state_push_special(parser, special)) {
+                    return PASSGEN_ERROR_OUT_OF_MEMORY;
+                }
                 return 0;
             default:
                 // error
@@ -272,9 +307,13 @@ int passgen_parse_group(
             case '|':
                 if(state->data.group.segment->multiplier > 0) {
                     // create new segment and parser state
-                    state->data.group.segment =
+                    passgen_pattern_segment *segment =
                         passgen_pattern_group_segment_append(
                             state->data.group.group);
+                    if(!segment) {
+                        return PASSGEN_ERROR_OUT_OF_MEMORY;
+                    }
+                    state->data.group.segment = segment;
                 } else {
                     // if the previous segment had a zero multiplier, recycle it
                     passgen_pattern_segment_free(state->data.group.segment);
@@ -296,22 +335,36 @@ int passgen_parse_group(
                 // we're supposed to read something in.
                 group = passgen_pattern_segment_new_group(
                     state->data.group.segment);
-                passgen_parser_state_push_group(
-                    parser,
-                    group,
-                    passgen_pattern_group_segment_append(group));
+                if(!group) {
+                    return PASSGEN_ERROR_OUT_OF_MEMORY;
+                }
+                passgen_pattern_segment *segment =
+                    passgen_pattern_group_segment_append(group);
+                if(!segment) {
+                    return PASSGEN_ERROR_OUT_OF_MEMORY;
+                }
+                if(!passgen_parser_state_push_group(parser, group, segment)) {
+                    return PASSGEN_ERROR_OUT_OF_MEMORY;
+                }
                 return 0;
-            case '[':
-                passgen_parser_state_push_set(
-                    parser,
-                    passgen_pattern_segment_new_set(state->data.group.segment),
-                    NULL);
+            case '[': {
+                passgen_pattern_set *set =
+                    passgen_pattern_segment_new_set(state->data.group.segment);
+                if(!set) {
+                    return PASSGEN_ERROR_OUT_OF_MEMORY;
+                }
+                if(!passgen_parser_state_push_set(parser, set, NULL)) {
+                    return PASSGEN_ERROR_OUT_OF_MEMORY;
+                }
                 return 0;
+            }
             case '{':
-                item = last_single_item_taint(state->data.group.segment);
-                // error, there was no item
+                try(last_single_item_taint(state->data.group.segment, &item));
+                // without an item, this is the multiplier of the segment.
                 if(item) {
-                    passgen_parser_state_push_repeat(parser, &item->repeat);
+                    if(!passgen_parser_state_push_repeat(parser, &item->repeat)) {
+                        return PASSGEN_ERROR_OUT_OF_MEMORY;
+                    }
                     return 0;
                 } else {
                     // the multiplier of this segment is about to be replaced,
@@ -321,14 +374,16 @@ int passgen_parse_group(
                     state->data.group.group->multiplier_sum -=
                         state->data.group.segment->multiplier;
                     state->data.group.segment->multiplier = 0;
-                    passgen_parser_state_push_multiplier(
-                        parser,
-                        &state->data.group.segment->multiplier,
-                        &state->data.group.group->multiplier_sum);
+                    if(!passgen_parser_state_push_multiplier(
+                           parser,
+                           &state->data.group.segment->multiplier,
+                           &state->data.group.group->multiplier_sum)) {
+                        return PASSGEN_ERROR_OUT_OF_MEMORY;
+                    }
                     return 0;
                 }
             case '?':
-                item = last_single_item_taint(state->data.group.segment);
+                try(last_single_item_taint(state->data.group.segment, &item));
                 if(item) {
                     item->maybe = true;
                     return 0;
@@ -356,6 +411,9 @@ int passgen_parse_group(
 
     passgen_pattern_literal *literal =
         passgen_pattern_segment_new_char(state->data.group.segment);
+    if(!literal) {
+        return PASSGEN_ERROR_OUT_OF_MEMORY;
+    }
     passgen_pattern_literal_append(literal, codepoint);
 
     return 0;
@@ -398,7 +456,10 @@ int passgen_parse_set(
 
         // compute sum of choices and choices list for binary search.
         size_t choices = 0;
-        set->choices_list = malloc(sizeof(size_t) * set->items.len);
+        set->choices_list = passgen_alloc(sizeof(size_t) * set->items.len);
+        if(!set->choices_list) {
+            return PASSGEN_ERROR_OUT_OF_MEMORY;
+        }
         for(size_t i = 0; i < set->items.len; i++) {
             passgen_pattern_range *range = passgen_stack_get(&set->items, i);
             choices += 1 + range->end - range->start;
@@ -419,6 +480,9 @@ int passgen_parse_set(
     try(passgen_parse_set_codepoint(token, &codepoint));
 
     passgen_pattern_range *range = passgen_pattern_set_range_append(set);
+    if(!range) {
+        return PASSGEN_ERROR_OUT_OF_MEMORY;
+    }
 
     range->start = codepoint;
     range->end = codepoint;
@@ -570,9 +634,9 @@ int passgen_parse_special_name(
         }
         passgen_stack_pop(&parser->state, NULL);
     } else {
-        passgen_pattern_special_push(
+        try(passgen_pattern_special_push(
             state->data.special.special,
-            token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT);
+            token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT));
     }
 
     return 0;

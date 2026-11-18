@@ -46,9 +46,12 @@ void passgen_pattern_group_finish(passgen_pattern_group *group) {
 
 passgen_pattern_segment *
 passgen_pattern_group_segment_append(passgen_pattern_group *group) {
-    group->multiplier_sum += 1;
     passgen_pattern_segment *segment =
         passgen_stack_push(&group->segments, NULL);
+    if(!segment) {
+        return NULL;
+    }
+    group->multiplier_sum += 1;
     passgen_pattern_segment_init(segment);
 
     return segment;

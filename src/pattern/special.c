@@ -2,9 +2,8 @@
 #include "passgen/assert.h"
 #include "passgen/config.h"
 #include "passgen/util/utf8.h"
-#include <assert.h>
 #include <stdbool.h>
-#include <stdlib.h>
+#include "passgen/util/alloc.h"
 #include "passgen/util/clear.h"
 
 #define PARAMETERS_INITIAL_SIZE 16
@@ -34,24 +33,26 @@ void passgen_pattern_special_init(
 }
 
 void passgen_pattern_special_free(passgen_pattern_special *special) {
-    free(special->parameters);
+    passgen_free(special->parameters, special->parameters_cap);
     PASSGEN_CLEAR(special);
 }
 
-void passgen_pattern_special_push(
+passgen_status passgen_pattern_special_push(
     passgen_pattern_special *special,
     int32_t codepoint) {
-    if(special->parameters_cap == 0) {
-        special->parameters_cap = PARAMETERS_INITIAL_SIZE;
-        special->parameters = malloc(special->parameters_cap);
-    }
-
     // always leave enough space for a full UTF8 character (4 bytes) plus a
     // NULL.
     if((special->parameters_len + 5) >= special->parameters_cap) {
-        special->parameters_cap *= PARAMETERS_MULTIPLIER;
-        special->parameters =
-            realloc(special->parameters, special->parameters_cap);
+        int32_t capacity = special->parameters_cap
+                               ? special->parameters_cap * PARAMETERS_MULTIPLIER
+                               : PARAMETERS_INITIAL_SIZE;
+        char *parameters =
+            passgen_resize(special->parameters, special->parameters_cap, capacity);
+        if(!parameters) {
+            return PASSGEN_ERROR_OUT_OF_MEMORY;
+        }
+        special->parameters = parameters;
+        special->parameters_cap = capacity;
     }
 
     int bytes = passgen_utf8_encode_codepoint(
@@ -61,12 +62,14 @@ void passgen_pattern_special_push(
     // codepoints which cannot be encoded are left out. adding the (negative)
     // error to the length would corrupt it.
     if(bytes <= 0) {
-        return;
+        return PASSGEN_OK;
     }
-    special->parameters_len += bytes;
 
-    assert(special->parameters_len < special->parameters_cap);
+    special->parameters_len += bytes;
+    passgen_assert(special->parameters_len < special->parameters_cap);
 
     // always NULL-terminate the string.
     special->parameters[special->parameters_len] = 0;
+
+    return PASSGEN_OK;
 }

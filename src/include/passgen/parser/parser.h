@@ -180,12 +180,14 @@ passgen_parser_state *passgen_parser_state_push_special(
 
 /// Initialize the parsing structure.
 ///
-/// Must be called once before the parser can be used. If @ref pattern is not
-/// supplied, a new pattern will be allocated. This needs to be deallocated
-/// using @ref passgen_pattern_free. A pattern which is supplied has to be
-/// released with @ref passgen_pattern_deinit.
+/// Must be called once before the parser can be used. The pattern is
+/// initialized, and has to be released with @ref passgen_pattern_deinit,
+/// whether this works or not. So does the parser, with
+/// @ref passgen_parser_free.
 /// @memberof passgen_parser
-void passgen_parser_init(passgen_parser *parser, passgen_pattern *pattern);
+/// @returns @ref PASSGEN_OK, or @ref PASSGEN_ERROR_OUT_OF_MEMORY
+passgen_status
+passgen_parser_init(passgen_parser *parser, passgen_pattern *pattern);
 
 /// Release memory used by the parser.
 ///

@@ -2,6 +2,7 @@
 #include "passgen/parser/token.h"
 #include "passgen/pattern/pattern.h"
 #include "passgen/random.h"
+#include "passgen/util/alloc.h"
 #include "passgen/util/error.h"
 #include "passgen/util/utf8.h"
 #include <passgen/passgen.h>
@@ -12,7 +13,7 @@ passgen_status passgen_parse(
     passgen_pattern **pattern,
     passgen_error *error,
     const char *string) {
-    *pattern = malloc(sizeof(passgen_pattern));
+    *pattern = passgen_alloc(sizeof(passgen_pattern));
     if(!*pattern) {
         return passgen_error_set(error, PASSGEN_ERROR_OUT_OF_MEMORY);
     }
@@ -48,7 +49,10 @@ passgen_status passgen_pattern_parse(
     passgen_parser parser;
     passgen_token_parser token_parser = {0};
     passgen_token token = {0};
-    passgen_parser_init(&parser, output);
+    if(PASSGEN_OK != passgen_parser_init(&parser, output)) {
+        passgen_parser_free(&parser);
+        return passgen_error_set(error, PASSGEN_ERROR_OUT_OF_MEMORY);
+    }
 
     const uint8_t *pattern_raw = (const uint8_t *) string;
     size_t pattern_len = 256;
@@ -119,6 +123,10 @@ passgen_status passgen_pattern_parse(
             if(ret == PASSGEN_TOKEN_INIT) {
                 passgen_status status = passgen_parse_token(&parser, &token);
                 // make sure that the parser accepts the token
+                if(status == PASSGEN_ERROR_OUT_OF_MEMORY) {
+                    passgen_parser_free(&parser);
+                    return passgen_error_set(error, status);
+                }
                 if(status != PASSGEN_OK) {
                     passgen_parser_free(&parser);
                     return passgen_error_set_at(

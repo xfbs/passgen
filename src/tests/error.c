@@ -4,6 +4,7 @@
 /// along with where it is, and that errors can be chained.
 #include "passgen/util/error.h"
 #include "passgen/wordlist.h"
+#include "testalloc.h"
 #include "tests.h"
 #include <passgen/env.h>
 #include <passgen/error.h>
@@ -709,6 +710,93 @@ test_result test_error_wordlist_utf8(void) {
 
     passgen_env_free(env);
     passgen_random_close(&random);
+
+    return test_ok;
+}
+
+/// Generates from a pattern into the buffer, with the same randomness every
+/// time. Returns the length, or zero if it failed.
+static size_t generate_fixed(passgen_pattern *pattern, uint8_t *output, size_t size) {
+    passgen_random random;
+    if(!passgen_random_open(&random, "xorshift:1234")) {
+        return 0;
+    }
+    passgen_env *env = passgen_env_new(&random);
+    size_t written = 0;
+    if(env) {
+        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, size, &written);
+        passgen_env_free(env);
+    }
+    passgen_random_close(&random);
+    return written;
+}
+
+/// Running out of memory at any point while parsing fails with
+/// PASSGEN_ERROR_OUT_OF_MEMORY, which has no position, and leaves nothing
+/// allocated. Once there is enough memory, the pattern is the same as it
+/// always is.
+test_result test_error_parse_out_of_memory(void) {
+    const char *patterns[] = {
+        "",
+        "abcdefghijklmnop",
+        "a|b|c|d",
+        "(a|b){2,5}[x-z]?",
+        "[a-z0-9\\-\\]]{3}",
+        "{3}abc|{2}def|ghi",
+        "a?b?(c)?",
+        "((((((nested))))))",
+        "\\w{a-rather-long-wordlist-name}",
+        "\\m{x}-\\w{y}",
+        // more items, segments and ranges than fit into the first bin of a
+        // stack.
+        ("abcdefgh{2}abcdefgh{2}abcdefgh{2}abcdefgh{2}abcdefgh{2}abcdefgh{2}"
+         "abcdefgh{2}abcdefgh{2}abcdefgh{2}abcdefgh{2}abcdefgh{2}abcdefgh{2}"),
+        "a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|0|1|2|3|4|5|6|7",
+        "[aceg-ikmoqsuwy02468ACEGIKMOQSUWY!#%&()*+,./:;<=>?@^_`{|}~]",
+    };
+
+    for(size_t i = 0; i < sizeof(patterns) / sizeof(patterns[0]); i++) {
+        // what it is when nothing fails, for comparing.
+        passgen_pattern *pattern;
+        assert(PASSGEN_OK == passgen_parse(&pattern, NULL, patterns[i]));
+        uint8_t expected[1024];
+        size_t expected_len = 0;
+        if(!strstr(patterns[i], "\\")) {
+            expected_len = generate_fixed(pattern, expected, sizeof(expected));
+        }
+        passgen_pattern_free(pattern);
+
+        bool done = false;
+        for(size_t fail_at = 0; !done; fail_at++) {
+            test_allocator allocator;
+            test_allocator_install(&allocator, fail_at);
+
+            passgen_error error;
+            pattern = (passgen_pattern *) &error;
+            passgen_status status = passgen_parse(&pattern, &error, patterns[i]);
+
+            if(status == PASSGEN_OK) {
+                done = true;
+                if(!strstr(patterns[i], "\\")) {
+                    uint8_t output[1024];
+                    size_t output_len =
+                        generate_fixed(pattern, output, sizeof(output));
+                    assert_eq(output_len, expected_len);
+                    assert(0 == memcmp(output, expected, output_len));
+                }
+                passgen_pattern_free(pattern);
+            } else {
+                assert_eq(status, PASSGEN_ERROR_OUT_OF_MEMORY);
+                assert_eq(error.kind, PASSGEN_ERROR_OUT_OF_MEMORY);
+                assert(!error.has_position);
+                assert(pattern == NULL);
+                passgen_error_free(&error);
+            }
+
+            assert(test_allocator_clean(&allocator));
+            test_allocator_remove();
+        }
+    }
 
     return test_ok;
 }

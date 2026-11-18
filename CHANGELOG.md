@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A wordlist which cannot be read says why. One which could only be read in
   part is an error, rather than being used with the words that were read.
 - `passgen_env_wordlist_add()` returns a `passgen_status`.
+- Running out of memory while parsing a pattern is an error
+  (`PASSGEN_ERROR_OUT_OF_MEMORY`), rather than a crash.
 - A source of randomness which runs out is an error (`PASSGEN_ERROR_RANDOM`,
   `passgen_random_failed()`), rather than aborting.
 - Entropy is in bits in the API, rather than a number of possibilities.

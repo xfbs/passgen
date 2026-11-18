@@ -2,6 +2,7 @@
 /// @author Patrick M. Elsen
 /// @brief Pattern special data structure (such as `\w{english}` or `\p{uuid}`)
 #pragma once
+#include <passgen/error.h>
 #include <stdint.h>
 
 /// Kind of special pattern
@@ -60,6 +61,7 @@ void passgen_pattern_special_free(passgen_pattern_special *special);
 /// @memberof passgen_pattern_special
 /// @param special Special pattern to add codepoint to
 /// @param codepoint Codepoint to add to the pattern
-void passgen_pattern_special_push(
+/// @returns @ref PASSGEN_OK, or @ref PASSGEN_ERROR_OUT_OF_MEMORY
+passgen_status passgen_pattern_special_push(
     passgen_pattern_special *special,
     int32_t codepoint);

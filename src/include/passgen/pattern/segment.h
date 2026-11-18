@@ -36,11 +36,15 @@ void passgen_pattern_segment_free(passgen_pattern_segment *segment);
 
 /// Appends new empty segment item onto this segment
 ///
+/// Returns NULL if there is no memory for it.
+///
 /// @memberof passgen_pattern_segment
 passgen_pattern_item *
 passgen_pattern_segment_new_item(passgen_pattern_segment *segment);
 
 /// Appends new @ref passgen_pattern_literal onto this segment.
+///
+/// Returns NULL if there is no memory for it.
 ///
 /// @memberof passgen_pattern_segment
 passgen_pattern_literal *
@@ -48,17 +52,23 @@ passgen_pattern_segment_new_char(passgen_pattern_segment *segment);
 
 /// Appends new @ref passgen_pattern_set onto this segment.
 ///
+/// Returns NULL if there is no memory for it.
+///
 /// @memberof passgen_pattern_segment
 passgen_pattern_set *
 passgen_pattern_segment_new_set(passgen_pattern_segment *segment);
 
 /// Appends new @ref [passgen_pattern_group] onto this segment.
 ///
+/// Returns NULL if there is no memory for it.
+///
 /// @memberof passgen_pattern_segment
 passgen_pattern_group *
 passgen_pattern_segment_new_group(passgen_pattern_segment *segment);
 
 /// Appends new @ref passgen_pattern_special onto this segment.
+///
+/// Returns NULL if there is no memory for it.
 ///
 /// @memberof passgen_pattern_segment
 passgen_pattern_special *

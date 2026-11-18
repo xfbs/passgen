@@ -64,7 +64,8 @@ void passgen_pattern_group_free(passgen_pattern_group *group);
 ///
 /// @memberof passgen_pattern_group
 /// @param group Group to append segment to
-/// @returns Point to the newly appended segment
+/// @returns Pointer to the newly appended segment, or NULL if there is no
+///   memory for it
 passgen_pattern_segment *
 passgen_pattern_group_segment_append(passgen_pattern_group *group);
 
