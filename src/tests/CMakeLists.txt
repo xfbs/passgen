@@ -60,7 +60,7 @@ if(LIBPASSGEN_SHARED)
 
     # the same from C++, which only links if the headers declare everything
     # as extern "C".
-    if(CMAKE_CXX_COMPILER)
+    if(PASSGEN_TEST_CXX)
         add_executable(passgen-test-public-cxx "public.cpp")
         target_link_libraries(passgen-test-public-cxx PRIVATE passgen-shared)
         target_compile_options(passgen-test-public-cxx PRIVATE -Wall -Wextra -g)

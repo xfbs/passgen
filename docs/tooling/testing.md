@@ -18,6 +18,11 @@ running the tests.
 
 These should be run and pass before committing.
 
+With `-DPASSGEN_TEST_CXX=ON`, the public headers are checked from C++ as well.
+This needs a C++ compiler which goes with the C compiler (such as `CXX=clang++`
+with `CC=clang`), as it gets the same flags, so it is not done by default.
+Continuous integration does it on GitHub.
+
 You can also filter the tests to run only specific tests by calling the test
 binary directly. For example, this will only run tests that start with
 `random`:

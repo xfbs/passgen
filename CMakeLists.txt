@@ -12,6 +12,8 @@ option(BUILD_BENCH "Build benchmark utilities." YES)
 option(BUILD_GIT_INFO "Bake git commit information into the binaries." ON)
 option(BUILD_TESTING "Build unit tests" ON)
 option(BUILD_DATA "Build data" ON)
+option(PASSGEN_TEST_CXX
+       "Check that the public headers work from C++ (needs a C++ compiler, which should be the counterpart of the C compiler)" OFF)
 
 option(LIBPASSGEN_STATIC "Build Passgen static library (libpassgen.a)" ON)
 option(LIBPASSGEN_SHARED "Build Passgen dynamic library (libpassgen.so)" ON)
@@ -118,11 +120,12 @@ endif()
 if(BUILD_TESTING)
     enable_testing()
 
-    # the public headers are checked from C++ as well, if there is a
-    # compiler for it.
-    include(CheckLanguage)
-    check_language(CXX)
-    if(CMAKE_CXX_COMPILER)
+    # the public headers are checked from C++ as well, if asked to. this is
+    # not done by default, as the flags for the C compiler (such as for
+    # sanitizers or coverage) are used for the C++ compiler too, and the C++
+    # compiler which is found may not be the one which goes with it (g++ with
+    # clang, or one for the build machine when cross compiling).
+    if(PASSGEN_TEST_CXX)
         enable_language(CXX)
     endif()
 
