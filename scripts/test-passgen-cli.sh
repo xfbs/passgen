@@ -202,6 +202,15 @@ test "$(XDG_CONFIG_HOME= $passgen -p fromhome)" = "uvw"
 $passgen -D 5 "((((a))))" | matches "a"
 fails $passgen -D 2 "((((a))))"
 
+# the default limit is 1024 (and counts the pattern itself as one level).
+function nested() {
+    printf '(%.0s' $(seq "$1")
+    printf a
+    printf ')%.0s' $(seq "$1")
+}
+$passgen "$(nested 1023)" | matches "a"
+fails $passgen "$(nested 1024)"
+
 fails $passgen "a{5,2}"
 fails $passgen "(abc"
 fails $passgen "[z-a]"

@@ -49,8 +49,6 @@ typedef struct {
     bool json;
     /// Collect entropy
     bool entropy;
-    /// Maximum nesting depth of groups when generating.
-    size_t depth;
     /// Length of markov chain
     size_t markov_length;
 

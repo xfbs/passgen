@@ -355,7 +355,6 @@ int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
 void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->pattern = NULL;
     opts->amount = 1;
-    opts->depth = 100;
     opts->null = false;
     opts->json = false;
     opts->markov_length = 3;
@@ -476,7 +475,6 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 if(opt < 1) {
                     return passgen_cli_bail(PASSGEN_CLI_ERROR_ILLEGAL_DEPTH, &opt);
                 }
-                opts->depth = opt;
                 passgen_env_depth_limit_set(opts->env, opt);
                 break;
             case 'z':
@@ -626,7 +624,7 @@ void passgen_cli_usage(const char *executable) {
         "OPTIONS\n"
         "    -a, --amount       Amount of passwords to generate\n"
         "    -d, --domain DOMAIN  Domain to use (for master-passphrase mode)\n"
-        "    -D, --depth DEPTH  Maximum nesting depth of groups\n"
+        "    -D, --depth DEPTH  Maximum nesting depth of groups (default: 1024)\n"
         "    -e, --entropy      Compute entropy for each password in bits.\n"
         "    -h, --help         Show this help information\n"
         "    -j, --json         Output as JSON\n"
