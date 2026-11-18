@@ -1,4 +1,5 @@
 #include "passgen/random.h"
+#include "passgen/random_desc.h"
 #include "passgen/config.h"
 
 #include <stdbool.h>
@@ -657,3 +658,156 @@ test_result test_random_out_of_memory(void) {
 
     return test_ok;
 }
+
+/// Descriptions are parsed into what they describe, and anything else is not
+/// valid.
+test_result test_random_desc_parse(void) {
+    passgen_random_desc desc;
+
+    assert(passgen_random_desc_parse(&desc, "zero"));
+    assert_eq(desc.kind, PASSGEN_RANDOM_DESC_ZERO);
+    assert(passgen_random_desc_parse(&desc, "system"));
+    assert_eq(desc.kind, PASSGEN_RANDOM_DESC_SYSTEM);
+    assert(!passgen_random_desc_parse(&desc, "systems"));
+    assert(!passgen_random_desc_parse(&desc, "zero:"));
+    assert(!passgen_random_desc_parse(&desc, ""));
+    assert(!passgen_random_desc_parse(&desc, "unknown"));
+
+    // the path is whatever follows, it is only checked when opening it.
+    const char *file = "file:/dev/zero";
+    assert(passgen_random_desc_parse(&desc, file));
+    assert_eq(desc.kind, PASSGEN_RANDOM_DESC_FILE);
+    assert(desc.data.file.path == &file[5]);
+    assert(passgen_random_desc_parse(&desc, "file:"));
+    assert_streq(desc.data.file.path, "");
+
+    // seeds are digits only, and any 64 bit number other than zero.
+    assert(passgen_random_desc_parse(&desc, "xorshift:1"));
+    assert_eq(desc.kind, PASSGEN_RANDOM_DESC_XORSHIFT);
+    assert_eq(desc.data.xorshift.seed, 1);
+    assert(passgen_random_desc_parse(&desc, "xorshift:18446744073709551615"));
+    assert_eq(desc.data.xorshift.seed, UINT64_MAX);
+    assert(!passgen_random_desc_parse(&desc, "xorshift:18446744073709551616"));
+    assert(!passgen_random_desc_parse(&desc, "xorshift:0"));
+    assert(!passgen_random_desc_parse(&desc, "xorshift:"));
+    assert(!passgen_random_desc_parse(&desc, "xorshift:+1"));
+    assert(!passgen_random_desc_parse(&desc, "xorshift: 1"));
+    assert(!passgen_random_desc_parse(&desc, "xorshift:1a"));
+
+    return test_ok;
+}
+
+#ifdef PASSGEN_MONOCYPHER
+/// ChaCha20 keys and IVs are padded with zeroes, and the master passphrase,
+/// domain and token are separated by colons.
+test_result test_random_desc_parse_chacha20(void) {
+    passgen_random_desc desc;
+
+    assert(passgen_random_desc_parse(&desc, "chacha20:key"));
+    assert_eq(desc.kind, PASSGEN_RANDOM_DESC_CHACHA20);
+    uint8_t key[32] = "key";
+    assert(0 == memcmp(desc.data.chacha20.key, key, sizeof(key)));
+    assert(0 == memcmp(desc.data.chacha20.iv, "passgen", 8));
+
+    // an IV which is given replaces the default one, and is cut off.
+    assert(passgen_random_desc_parse(&desc, "chacha20:key:iv"));
+    assert(0 == memcmp(desc.data.chacha20.iv, "iv\0\0\0\0\0\0", 8));
+    assert(passgen_random_desc_parse(&desc, "chacha20:key:ivivivivXX"));
+    assert(0 == memcmp(desc.data.chacha20.iv, "iviviviv", 8));
+    assert(passgen_random_desc_parse(&desc, "chacha20:key:"));
+    assert(0 == memcmp(desc.data.chacha20.iv, "\0\0\0\0\0\0\0\0", 8));
+
+    // keys are at most 32 bytes.
+    assert(passgen_random_desc_parse(
+        &desc,
+        "chacha20:0123456789abcdef0123456789abcdef"));
+    assert(!passgen_random_desc_parse(
+        &desc,
+        "chacha20:0123456789abcdef0123456789abcdefX"));
+
+    assert(passgen_random_desc_parse(&desc, "chacha20-argon2:master:domain:token"));
+    assert_eq(desc.kind, PASSGEN_RANDOM_DESC_CHACHA20_ARGON2);
+    assert_streq(desc.data.chacha20_argon2.passphrase, "master");
+    assert_streq(desc.data.chacha20_argon2.domain, "domain");
+    assert_streq(desc.data.chacha20_argon2.token, "token");
+    assert(desc.data.chacha20_argon2.params == NULL);
+
+    // the domain and the token are optional, and can be empty.
+    assert(passgen_random_desc_parse(&desc, "chacha20-argon2:master"));
+    assert_streq(desc.data.chacha20_argon2.passphrase, "master");
+    assert_streq(desc.data.chacha20_argon2.domain, "");
+    assert_streq(desc.data.chacha20_argon2.token, "");
+    assert(passgen_random_desc_parse(&desc, "chacha20-argon2:master::token"));
+    assert_streq(desc.data.chacha20_argon2.domain, "");
+    assert_streq(desc.data.chacha20_argon2.token, "token");
+
+    // one colon before the master passphrase is skipped, as it always was.
+    assert(passgen_random_desc_parse(&desc, "chacha20-argon2::master:domain"));
+    assert_streq(desc.data.chacha20_argon2.passphrase, "master");
+    assert_streq(desc.data.chacha20_argon2.domain, "domain");
+
+    // anything after the token is ignored.
+    assert(passgen_random_desc_parse(&desc, "chacha20-argon2:a:b:c:d"));
+    assert_streq(desc.data.chacha20_argon2.token, "c");
+
+    // each of them is at most 128 bytes.
+    char string[16 + 129 + 1] = "chacha20-argon2:";
+    memset(&string[16], 'x', 128);
+    string[16 + 128] = 0;
+    assert(passgen_random_desc_parse(&desc, string));
+    assert_eq(strlen(desc.data.chacha20_argon2.passphrase), 128);
+    string[16 + 128] = 'x';
+    string[16 + 129] = 0;
+    assert(!passgen_random_desc_parse(&desc, string));
+
+    return test_ok;
+}
+
+/// What is parsed opens the same source as opening the description does.
+test_result test_random_desc_open(void) {
+    const char *descs[] = {
+        "zero",
+        "xorshift:1234",
+        "chacha20:key:iv",
+    };
+
+    for(size_t i = 0; i < sizeof(descs) / sizeof(descs[0]); i++) {
+        passgen_random_desc desc;
+        assert(passgen_random_desc_parse(&desc, descs[i]));
+        passgen_random *parsed = passgen_random_desc_open(NULL, &desc);
+        assert(parsed);
+        passgen_random *opened = passgen_random_open(NULL, descs[i]);
+        assert(opened);
+
+        uint8_t expected[64], output[64];
+        passgen_random_read(opened, expected, sizeof(expected));
+        passgen_random_read(parsed, output, sizeof(output));
+        assert(0 == memcmp(output, expected, sizeof(output)));
+
+        passgen_random_free(parsed);
+        passgen_random_free(opened);
+    }
+
+    // keys are derived with the parameters which it has. the usual ones
+    // are slow, and checked by the test vectors.
+    passgen_random_desc desc;
+    assert(passgen_random_desc_parse(
+        &desc,
+        "chacha20-argon2:master:example.com:1"));
+    const passgen_argon2_params params = {.memory = 8, .passes = 1, .lanes = 1};
+    desc.data.chacha20_argon2.params = &params;
+    passgen_random *parsed = passgen_random_desc_open(NULL, &desc);
+    passgen_random *opened = passgen_random_chacha20_argon2_open(
+        NULL,
+        "master",
+        "example.com",
+        "1",
+        &params);
+    assert(parsed && opened);
+    assert_eq(passgen_random_u64(parsed), passgen_random_u64(opened));
+    passgen_random_free(parsed);
+    passgen_random_free(opened);
+
+    return test_ok;
+}
+#endif

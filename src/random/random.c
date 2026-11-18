@@ -1,4 +1,5 @@
 #include "passgen/random.h"
+#include "passgen/random_desc.h"
 #include "passgen/util/alloc.h"
 #include "passgen/assert.h"
 #include "passgen/config.h"
@@ -97,63 +98,83 @@ void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
     }
 }
 
-passgen_random *
-passgen_random_open_parse(passgen_random *random, const char *desc) {
-    if(strcmp("zero", desc) == 0) {
-        return passgen_random_zero_open(random);
+// Copies the part of a description up to the next colon (or its end) into a
+// string, and moves past it. Returns false if it does not fit.
+static bool desc_string(const char **pos, char *string, size_t size) {
+    const char *end = strchr(*pos, ':');
+    if(!end) {
+        end = *pos + strlen(*pos);
+    }
+    size_t length = (size_t) (end - *pos);
+    if(length >= size) {
+        return false;
+    }
+    memcpy(string, *pos, length);
+    string[length] = 0;
+    *pos = *end ? end + 1 : end;
+    return true;
+}
+
+bool passgen_random_desc_parse(passgen_random_desc *desc, const char *string) {
+    memset(desc, 0, sizeof(*desc));
+
+    if(strcmp("zero", string) == 0) {
+        desc->kind = PASSGEN_RANDOM_DESC_ZERO;
+        return true;
     }
 
     // check if we should read randomness from this file
-    if(_strprefix("file:", desc)) {
-        return passgen_random_path_open(random, &desc[5]);
+    if(_strprefix("file:", string)) {
+        desc->kind = PASSGEN_RANDOM_DESC_FILE;
+        desc->data.file.path = &string[5];
+        return true;
     }
 
     // check if we should use the xorshift PRNG with the given seed
-    if(_strprefix("xorshift:", desc)) {
-        const char *seed_str = &desc[9];
-        if(*seed_str == 0) {
-            return NULL;
-        }
+    if(_strprefix("xorshift:", string)) {
+        const char *seed_str = &string[9];
 
         // the seed is any nonzero 64 bit number, so this needs to parse the
         // full unsigned range, and only accept digits (strtoull() would
         // accept a sign and leading whitespace as well).
         if(*seed_str < '0' || *seed_str > '9') {
-            return NULL;
+            return false;
         }
 
         char *seed_end = NULL;
         errno = 0;
         unsigned long long seed = strtoull(seed_str, &seed_end, 10);
         if(errno != 0 || *seed_end != 0 || seed == 0 || seed > UINT64_MAX) {
-            return NULL;
+            return false;
         }
 
-        return passgen_random_xorshift_open(random, seed);
+        desc->kind = PASSGEN_RANDOM_DESC_XORSHIFT;
+        desc->data.xorshift.seed = seed;
+        return true;
     }
 
     // check if we should use the system default
-    if(0 == strcmp(desc, "system")) {
-        return passgen_random_system_open(random);
+    if(0 == strcmp(string, "system")) {
+        desc->kind = PASSGEN_RANDOM_DESC_SYSTEM;
+        return true;
     }
 
 #ifdef PASSGEN_MONOCYPHER
     // use chacha20 with raw key and IV
-    if(_strprefix("chacha20:", desc)) {
-        const char *key_ptr = &desc[9];
+    if(_strprefix("chacha20:", string)) {
+        const char *key_ptr = &string[9];
         const char *key_end = strchr(key_ptr, ':');
         if(!key_end) {
             key_end = key_ptr + strlen(key_ptr);
         }
-        uint8_t key[32] = {0};
-        size_t key_len = key_end - key_ptr;
-        if(key_len > sizeof(key)) {
-            return NULL;
+        size_t key_len = (size_t) (key_end - key_ptr);
+        if(key_len > sizeof(desc->data.chacha20.key)) {
+            return false;
         }
-        memcpy(key, key_ptr, key_len);
+        memcpy(desc->data.chacha20.key, key_ptr, key_len);
 
-        uint8_t iv[8] = "passgen";
-
+        uint8_t *iv = desc->data.chacha20.iv;
+        memcpy(iv, "passgen", 8);
         if(*key_end == ':') {
             const char *iv_ptr = key_end + 1;
             size_t iv_len = strlen(iv_ptr);
@@ -162,56 +183,91 @@ passgen_random_open_parse(passgen_random *random, const char *desc) {
             memcpy(iv, iv_ptr, iv_len);
         }
 
-        return passgen_random_chacha20_open(random, key, iv);
+        desc->kind = PASSGEN_RANDOM_DESC_CHACHA20;
+        return true;
     }
 
-    // use chacha20 with raw key and IV
-    if(_strprefix("chacha20-argon2:", desc)) {
-        // one extra byte so that these are always NUL-terminated.
-        char master_pass[129] = {0};
-        char domain[129] = {0};
-        char token[129] = {0};
-
-        const char *start = &desc[16];
-        const char *end = &desc[16];
-
-#define PARSE_STRING(name) \
-        if(*end == ':') end++; \
-        if(*end) { \
-            start = end; \
-            end = strchr(start, ':'); \
-            if(!end) { \
-                end = start + strlen(start); \
-            } \
-            if((size_t) (end - start) >= sizeof(name)) { \
-                return NULL; \
-            } \
-            memcpy(name, start, end - start); \
+    // use chacha20 with a key derived from a master passphrase
+    if(_strprefix("chacha20-argon2:", string)) {
+        // one colon before the master passphrase is skipped, so that
+        // `chacha20-argon2::x` has the master passphrase `x`. this is how it
+        // always was, and changing it would change what is derived from it.
+        const char *pos = &string[16];
+        if(*pos == ':') {
+            pos++;
+        }
+        char *passphrase = desc->data.chacha20_argon2.passphrase;
+        char *domain = desc->data.chacha20_argon2.domain;
+        char *token = desc->data.chacha20_argon2.token;
+        size_t size = PASSGEN_RANDOM_DESC_STRING_MAX + 1;
+        if(!desc_string(&pos, passphrase, size) ||
+           !desc_string(&pos, domain, size) ||
+           !desc_string(&pos, token, size)) {
+            PASSGEN_CLEAR(desc);
+            return false;
         }
 
-        PARSE_STRING(master_pass)
-        PARSE_STRING(domain)
-        PARSE_STRING(token)
-#undef PARSE_STRING
-
-        return passgen_random_chacha20_argon2_open(
-            random,
-            master_pass,
-            domain,
-            token,
-            NULL);
+        desc->kind = PASSGEN_RANDOM_DESC_CHACHA20_ARGON2;
+        desc->data.chacha20_argon2.params = NULL;
+        return true;
     }
 #endif
+
+    return false;
+}
+
+passgen_random *passgen_random_desc_open(
+    passgen_random *random,
+    const passgen_random_desc *desc) {
+    switch(desc->kind) {
+        case PASSGEN_RANDOM_DESC_ZERO:
+            return passgen_random_zero_open(random);
+        case PASSGEN_RANDOM_DESC_SYSTEM:
+            return passgen_random_system_open(random);
+        case PASSGEN_RANDOM_DESC_FILE:
+            return passgen_random_path_open(random, desc->data.file.path);
+        case PASSGEN_RANDOM_DESC_XORSHIFT:
+            return passgen_random_xorshift_open(
+                random,
+                desc->data.xorshift.seed);
+#ifdef PASSGEN_MONOCYPHER
+        case PASSGEN_RANDOM_DESC_CHACHA20:
+            return passgen_random_chacha20_open(
+                random,
+                desc->data.chacha20.key,
+                desc->data.chacha20.iv);
+        case PASSGEN_RANDOM_DESC_CHACHA20_ARGON2:
+            return passgen_random_chacha20_argon2_open(
+                random,
+                desc->data.chacha20_argon2.passphrase,
+                desc->data.chacha20_argon2.domain,
+                desc->data.chacha20_argon2.token,
+                desc->data.chacha20_argon2.params);
+#else
+        case PASSGEN_RANDOM_DESC_CHACHA20:
+        case PASSGEN_RANDOM_DESC_CHACHA20_ARGON2:
+            break;
+#endif
+    }
 
     return NULL;
 }
 
 passgen_random *passgen_random_open(passgen_random *random, const char *desc) {
-    if(desc) {
-        return passgen_random_open_parse(random, desc);
+    if(!desc) {
+        return passgen_random_system_open(random);
     }
 
-    return passgen_random_system_open(random);
+    passgen_random_desc parsed;
+    passgen_random *opened = NULL;
+    if(passgen_random_desc_parse(&parsed, desc)) {
+        opened = passgen_random_desc_open(random, &parsed);
+    }
+
+    // this may have held a master passphrase or a key.
+    PASSGEN_CLEAR(&parsed);
+
+    return opened;
 }
 
 void passgen_random_close(passgen_random *random) {
