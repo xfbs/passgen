@@ -57,7 +57,17 @@ function(passgen_target_defaults target)
       PRIVATE PASSGEN_BACKTRACE)
   endif()
 
-  target_code_coverage(${target})
+  # monocypher (src/monocypher.c and its header) is vendored, and tested
+  # upstream, so it is left out of the coverage reports, where it would only
+  # make the rest harder to see. clang uses llvm-cov, which takes a regular
+  # expression, and gcc uses lcov, which takes a wildcard pattern for the
+  # whole path.
+  if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+    set(coverage_exclude "/monocypher\\.[ch]")
+  else()
+    set(coverage_exclude "*/monocypher.c" "*/monocypher.h")
+  endif()
+  target_code_coverage(${target} EXCLUDE ${coverage_exclude})
 
   target_iwyu_setup(${target})
 endfunction()

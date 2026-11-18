@@ -30,3 +30,13 @@ test coverage report.
 
 The resulting coverage is placed in `ccov/passgen-test/index.html` in the build
 folder.
+
+Monocypher (`src/monocypher.c` and `src/include/passgen/monocypher.h`) is left
+out of the reports. It is vendored and tested upstream, and would otherwise make
+up a large part of the report without saying anything about Passgen. The
+patterns for this are in `passgen_target_defaults()` in `cmake/Passgen.cmake`.
+
+On macOS, `llvm-cov` and `llvm-profdata` come with Xcode, but are not on the
+`PATH`:
+
+    PATH="$(dirname "$(xcrun --find llvm-cov)"):$PATH" CC=clang ./scripts/coverage.sh build-coverage
