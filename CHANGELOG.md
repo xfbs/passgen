@@ -60,6 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   change the end of that range, so that `[a-zA-Z0-9-_]` meant `0` to `_`
   rather than a dash and an underscore. Passwords derived from such a pattern
   are not the same with the fixed pattern.
+- A repetition or a multiplier without a number (`a{}`, `a{,}`, `{}a`) is an
+  error, rather than zero. The minimum can still be left out (`a{,3}`).
 
 ### Removed
 - `passgen_env_init()` and `passgen_env_config()`.

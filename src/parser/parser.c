@@ -105,6 +105,7 @@ passgen_parser_state *passgen_parser_state_push_repeat(
     repeat->min = 0;
     repeat->max = 0;
     state->data.repeat.repeat = repeat;
+    state->data.repeat.digits = false;
 
     return state;
 }
@@ -121,6 +122,7 @@ passgen_parser_state *passgen_parser_state_push_multiplier(
     *multiplier = 0;
     state->data.multiplier.value = multiplier;
     state->data.multiplier.sum = sum;
+    state->data.multiplier.digits = false;
     return state;
 }
 
@@ -538,6 +540,10 @@ int passgen_parse_multiplier(
     passgen_token *token,
     passgen_parser_state *state) {
     if(token->codepoint == '}') {
+        // there has to be a number, as in `{2}a`.
+        if(!state->data.multiplier.digits) {
+            return PASSGEN_ERROR_REPEAT;
+        }
         // the sum of the multipliers must not overflow.
         if(*state->data.multiplier.value >
            SIZE_MAX - *state->data.multiplier.sum) {
@@ -556,6 +562,7 @@ int passgen_parse_multiplier(
         }
         *state->data.multiplier.value *= 10;
         *state->data.multiplier.value += digit;
+        state->data.multiplier.digits = true;
 
         return 0;
     }
@@ -567,8 +574,12 @@ int passgen_parse_repeat(
     passgen_parser *parser,
     passgen_token *token,
     passgen_parser_state *state) {
-    // this set's over
+    // this repetition is over
     if(token->codepoint == '}') {
+        // there has to be a number, as in `a{2}`.
+        if(!state->data.repeat.digits) {
+            return PASSGEN_ERROR_REPEAT;
+        }
         state->data.repeat.repeat->max = state->data.repeat.repeat->min;
         passgen_stack_pop(&parser->state, NULL);
         return 0;
@@ -588,6 +599,7 @@ int passgen_parse_repeat(
         }
         state->data.repeat.repeat->min *= 10;
         state->data.repeat.repeat->min += digit;
+        state->data.repeat.digits = true;
 
         return 0;
     }
@@ -600,6 +612,11 @@ int passgen_parse_repeat_range(
     passgen_token *token,
     passgen_parser_state *state) {
     if(token->codepoint == '}') {
+        // there has to be at least one number. the minimum may be left out,
+        // as in `a{,3}`, but `a{,}` is as empty as `a{}`.
+        if(!state->data.repeat.digits) {
+            return PASSGEN_ERROR_REPEAT;
+        }
         // a range like {5,2} makes no sense.
         if(state->data.repeat.repeat->max < state->data.repeat.repeat->min) {
             return PASSGEN_ERROR_REPEAT;
@@ -616,6 +633,7 @@ int passgen_parse_repeat_range(
         }
         state->data.repeat.repeat->max *= 10;
         state->data.repeat.repeat->max += digit;
+        state->data.repeat.digits = true;
 
         return 0;
     }

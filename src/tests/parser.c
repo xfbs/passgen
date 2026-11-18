@@ -908,6 +908,11 @@ const char *pattern_broken[] = {
     // unclosed groups
     "(",
     "(()",
+    // repetitions and multipliers without a number
+    "a{}",
+    "a{,}",
+    "{}a",
+    "({}a|b)",
     // unfinished escape sequence
     "\\",
     "\\u",
@@ -970,6 +975,7 @@ const char *pattern_working[] = {
     "a{9}",
     "a{12}",
     "a{12,16}",
+    "a{,3}",
     // group
     "()",
     "(a)",

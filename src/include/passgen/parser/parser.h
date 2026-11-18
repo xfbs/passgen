@@ -92,6 +92,8 @@ typedef struct {
         struct {
             /// Current repeat
             passgen_pattern_repeat *repeat;
+            /// Whether any digits were read (`{}` is not a repetition).
+            bool digits;
         } repeat;
         /// Data for #PASSGEN_PARSER_SET and #PASSGEN_PARSER_SET_RANGE types.
         struct {
@@ -111,6 +113,8 @@ typedef struct {
             size_t *value;
             /// Current multiplier sum
             size_t *sum;
+            /// Whether any digits were read (`{}` is not a multiplier).
+            bool digits;
         } multiplier;
     } data;
 } passgen_parser_state;

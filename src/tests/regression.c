@@ -345,6 +345,28 @@ test_result test_regression_parse_set_dash(void) {
     return test_ok;
 }
 
+/// A repetition or a multiplier without any number (as in `a{}`) used to be
+/// read as zero. Leaving out only the minimum (as in `a{,3}`) is fine.
+test_result test_regression_parse_repeat_empty(void) {
+    passgen_pattern *pattern;
+    passgen_error error;
+
+    assert(PASSGEN_ERROR_REPEAT == passgen_parse(&pattern, &error, "a{}"));
+    assert(PASSGEN_ERROR_REPEAT == passgen_parse(&pattern, &error, "a{,}"));
+    assert(PASSGEN_ERROR_REPEAT == passgen_parse(&pattern, &error, "{}a|b"));
+    assert(PASSGEN_ERROR_REPEAT == passgen_parse(&pattern, &error, "(a|{}b)"));
+
+    assert(0 == passgen_parse(&pattern, &error, "a{,3}"));
+    passgen_pattern_segment *segment =
+        passgen_pattern_group_segment_get(&pattern->group, 0);
+    passgen_pattern_item *item = passgen_stack_get(&segment->items, 0);
+    assert(item->repeat.min == 0);
+    assert(item->repeat.max == 3);
+    passgen_pattern_free(pattern);
+
+    return test_ok;
+}
+
 /// Unicode escapes can be up to six hex digits long, which is more than what
 /// is a valid codepoint. Those used to be accepted, and corrupted memory when
 /// used in the name of a wordlist.
