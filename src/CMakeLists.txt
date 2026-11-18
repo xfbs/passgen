@@ -82,13 +82,22 @@ set_target_properties(passgen-shared PROPERTIES C_VISIBILITY_PRESET hidden)
 # against it, so it is part of the runtime. the static library, and the link
 # to the shared one which the linker uses, are only needed to build against
 # the library.
-install(
-    TARGETS passgen-static passgen-shared
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT development
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
-        NAMELINK_COMPONENT development
-    RUNTIME DESTINATION bin COMPONENT runtime
-    OPTIONAL)
+# only the libraries which are built are installed.
+set(passgen_installed_libraries)
+if(LIBPASSGEN_STATIC)
+    list(APPEND passgen_installed_libraries passgen-static)
+endif()
+if(LIBPASSGEN_SHARED)
+    list(APPEND passgen_installed_libraries passgen-shared)
+endif()
+if(passgen_installed_libraries)
+    install(
+        TARGETS ${passgen_installed_libraries}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT development
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+            NAMELINK_COMPONENT development
+        RUNTIME DESTINATION bin COMPONENT runtime)
+endif()
 
 if(NOT LIBPASSGEN_STATIC)
     set_target_properties(passgen-static PROPERTIES EXCLUDE_FROM_ALL TRUE)

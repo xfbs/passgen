@@ -38,10 +38,10 @@ else()
     option(PASSGEN_DEBUG "Include debugging features for passgen" OFF)
 endif()
 
-# everything which is built here (the command-line interface, the tests, the
-# benchmarks and the tools) uses the internals of the library, which the
-# shared library does not export. so all of it is linked against the static
-# library.
+# the tests, the benchmarks and the tools use the internals of the library,
+# which the shared library does not export, so they are linked against the
+# static library. so is the command-line interface by default, although it
+# only uses the public interface (see PASSGEN_CLI_SHARED).
 set(PASSGEN_LIB passgen-static)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")

@@ -198,6 +198,7 @@ jobs:
           cmake -S . -B build -G Ninja
           -DCMAKE_BUILD_TYPE=Release
           -DPASSGEN_STATIC=ON
+          -DLIBPASSGEN_SHARED=OFF
           -DUSE_BACKTRACE=OFF
           -DBUILD_GIT_INFO=OFF
 
@@ -206,3 +207,9 @@ jobs:
 
       - name: Test
         run: ctest --test-dir build --output-on-failure
+
+      # the same as releases do with the static build.
+      - name: Install and package
+        run: |
+          ./scripts/test-relocatable.sh build
+          ./scripts/package-archive.sh build passgen-static runtime
