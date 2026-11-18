@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `\]` and `\[` to have brackets in a set.
 - `passgen_allocator_set()` replaces the allocator which the library uses.
 - `passgen/passgen.h` includes all of the public headers.
+- A pkg-config file, `passgen.pc`.
 - The public headers can be used from C++.
 - The API documentation has a main page with the conventions of the library,
   and an example which is built and run as a test (`examples/`).

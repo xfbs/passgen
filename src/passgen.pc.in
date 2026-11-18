@@ -1,0 +1,14 @@
+# pkg-config file for libpassgen. The prefix is found from where this file
+# is, so that it works wherever the library is installed or unpacked.
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: passgen
+Description: @PROJECT_DESCRIPTION@
+URL: https://passgen.io
+Version: @PROJECT_VERSION@
+Cflags: -I${includedir}
+Libs: -L${libdir} -lpassgen
+Libs.private: -lm

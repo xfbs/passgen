@@ -17,6 +17,12 @@ Include `passgen/passgen.h`, which has all of the interface, and link against
 #include <passgen/passgen.h>
 ```
 
+pkg-config knows about it, as `passgen`:
+
+```sh
+cc -o program program.c $(pkg-config --cflags --libs passgen)
+```
+
 Generating takes three things:
 
 1. **A pattern,** which is parsed from a string with @ref passgen_parse.

@@ -106,6 +106,14 @@ install(
     DESTINATION include/passgen
     COMPONENT development)
 
+# for building against the library with pkg-config, such as with
+# `pkg-config --cflags --libs passgen`.
+configure_file(passgen.pc.in passgen.pc @ONLY)
+install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/passgen.pc"
+    DESTINATION lib/pkgconfig
+    COMPONENT development)
+
 if(USE_LIBEXECINFO)
   target_link_libraries(passgen-static PRIVATE execinfo)
   #target_link_libraries(passgen-shared PRIVATE execinfo)
