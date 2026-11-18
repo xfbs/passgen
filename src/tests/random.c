@@ -10,6 +10,12 @@
 #include "testalloc.h"
 #include "tests.h"
 
+#ifndef _WIN32
+#include <signal.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#endif
+
 /// Tests that a given function covers all possible outputs (0..max, inclusive).
 #define TEST_COVERAGE(max, collate, function)                    \
     do {                                                         \
@@ -447,15 +453,25 @@ test_result test_random_chacha20_seek(void) {
     CHECK_REST(&random);
 
     // seek back to beginning, same values
-    passgen_random_chacha20_seek(&random, 0);
+    assert(passgen_random_chacha20_seek(&random, 0));
     CHECK_BEGINNING(&random);
     CHECK_REST(&random);
 
     // seek to middle of stream, only latter values
-    passgen_random_chacha20_seek(&random, 7);
+    assert(passgen_random_chacha20_seek(&random, 7));
     CHECK_REST(&random);
 
     passgen_random_close(&random);
+
+    // any other source is left as it is.
+    passgen_random other, same;
+    assert(passgen_random_xorshift_open(&other, 1234));
+    assert(passgen_random_xorshift_open(&same, 1234));
+    assert_eq(passgen_random_u64(&other), passgen_random_u64(&same));
+    assert(!passgen_random_chacha20_seek(&other, 0));
+    assert_eq(passgen_random_u64(&other), passgen_random_u64(&same));
+    passgen_random_close(&other);
+    passgen_random_close(&same);
 
     return test_ok;
 }
@@ -807,6 +823,57 @@ test_result test_random_desc_open(void) {
     assert_eq(passgen_random_u64(parsed), passgen_random_u64(opened));
     passgen_random_free(parsed);
     passgen_random_free(opened);
+
+    return test_ok;
+}
+#endif
+
+#ifndef _WIN32
+// Exit code of the child process when it aborted.
+#define ABORTED_EXIT 42
+
+// Turns aborting into exiting, so that it does not go through what the
+// system does for a crash, which is slow, and hangs under the leaks tool.
+static void exit_on_abort(int signal) {
+    (void) signal;
+    _exit(ABORTED_EXIT);
+}
+
+/// Asking for a number smaller than zero is a mistake of the caller, which
+/// would loop forever. It aborts in every build, which is checked in a child
+/// process.
+test_result test_random_max_zero(void) {
+    for(int bits = 8; bits <= 64; bits *= 2) {
+        pid_t child = fork();
+        assert(child >= 0);
+        if(child == 0) {
+            // what it prints is expected.
+            freopen("/dev/null", "w", stderr);
+            signal(SIGABRT, exit_on_abort);
+            passgen_random random;
+            passgen_random_zero_open(&random);
+            switch(bits) {
+                case 8:
+                    passgen_random_u8_max(&random, 0);
+                    break;
+                case 16:
+                    passgen_random_u16_max(&random, 0);
+                    break;
+                case 32:
+                    passgen_random_u32_max(&random, 0);
+                    break;
+                default:
+                    passgen_random_u64_max(&random, 0);
+                    break;
+            }
+            _exit(0);
+        }
+
+        int status = 0;
+        assert(child == waitpid(child, &status, 0));
+        assert(WIFEXITED(status));
+        assert_eq(WEXITSTATUS(status), ABORTED_EXIT);
+    }
 
     return test_ok;
 }

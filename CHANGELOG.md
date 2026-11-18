@@ -30,6 +30,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Entropy is in bits in the API, rather than a number of possibilities.
 - Empty sets (`[]`) are rejected.
 - `passgen_random_chacha20_argon2_open()` takes `passgen_argon2_params`.
+- `passgen_random_chacha20_seek()` returns whether it could seek, and leaves
+  other sources alone, rather than corrupting them in release builds.
+- A `max` of zero for `passgen_random_u*_max()` aborts in every build, rather
+  than looping forever in release builds.
 - `passgen_pattern` is opaque. `passgen_parse()` allocates it, and
   `passgen_pattern_free()` frees it.
 - `passgen_env` is opaque, and created with `passgen_env_new()`. Its header is

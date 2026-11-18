@@ -22,6 +22,20 @@
 #define passgen_assert(cond) (void) (cond)
 #endif
 
+/// Checks an argument which the caller of a public function passed, in every
+/// build. If it is not valid, which is a mistake in the program which calls
+/// the library, this prints what is wrong and aborts. Use this where carrying
+/// on would hang or corrupt memory, and there is no way to return an error.
+#define passgen_require(cond)                                             \
+    do {                                                                  \
+        if(!(cond)) {                                                     \
+            passgen_require_fail(#cond, __func__);                        \
+        }                                                                 \
+    } while(0)
+
+/// Prints which argument is not valid, and aborts.
+void passgen_require_fail(const char *cond, const char *func);
+
 /// Prints assertion failure and optionally backtrace.
 void passgen_assert_fail(
     const char *cond,

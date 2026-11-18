@@ -317,7 +317,8 @@ inline bool passgen_random_bool(passgen_random *random) {
 }
 
 inline uint8_t passgen_random_u8_max(passgen_random *random, uint8_t max) {
-    passgen_assert(max);
+    // with zero, there is nothing to return, and this would loop forever.
+    passgen_require(max);
 
     // smallest mask of the form 2^n - 1 that covers the largest value we may
     // return, which is max - 1.
@@ -335,7 +336,8 @@ inline uint8_t passgen_random_u8_max(passgen_random *random, uint8_t max) {
 }
 
 inline uint16_t passgen_random_u16_max(passgen_random *random, uint16_t max) {
-    passgen_assert(max);
+    // with zero, there is nothing to return, and this would loop forever.
+    passgen_require(max);
 
     // smallest mask of the form 2^n - 1 that covers the largest value we may
     // return, which is max - 1.
@@ -355,7 +357,8 @@ inline uint16_t passgen_random_u16_max(passgen_random *random, uint16_t max) {
 }
 
 inline uint32_t passgen_random_u32_max(passgen_random *random, uint32_t max) {
-    passgen_assert(max);
+    // with zero, there is nothing to return, and this would loop forever.
+    passgen_require(max);
 
     // smallest mask of the form 2^n - 1 that covers the largest value we may
     // return, which is max - 1.
@@ -376,7 +379,8 @@ inline uint32_t passgen_random_u32_max(passgen_random *random, uint32_t max) {
 }
 
 inline uint64_t passgen_random_u64_max(passgen_random *random, uint64_t max) {
-    passgen_assert(max);
+    // with zero, there is nothing to return, and this would loop forever.
+    passgen_require(max);
 
     // smallest mask of the form 2^n - 1 that covers the largest value we may
     // return, which is max - 1.

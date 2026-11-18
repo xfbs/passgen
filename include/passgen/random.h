@@ -307,25 +307,29 @@ PASSGEN_EXPORT bool passgen_random_bool(passgen_random *random);
 
 /// Read a `uint8_t` that is strictly smaller than @p max from @p random.
 ///
-/// @param max must be nonzero.
+/// @param max Must not be zero, as nothing is smaller than that. The library
+///   aborts if it is.
 /// @memberof passgen_random
 PASSGEN_EXPORT uint8_t passgen_random_u8_max(passgen_random *random, uint8_t max);
 
 /// Read a `uint16_t` that is strictly smaller than @p max from @p random.
 ///
-/// @param max must be nonzero.
+/// @param max Must not be zero, as nothing is smaller than that. The library
+///   aborts if it is.
 /// @memberof passgen_random
 PASSGEN_EXPORT uint16_t passgen_random_u16_max(passgen_random *random, uint16_t max);
 
 /// Read a `uint32_t` that is strictly smaller than @p max from @p random.
 ///
-/// @param max must be nonzero.
+/// @param max Must not be zero, as nothing is smaller than that. The library
+///   aborts if it is.
 /// @memberof passgen_random
 PASSGEN_EXPORT uint32_t passgen_random_u32_max(passgen_random *random, uint32_t max);
 
 /// Read a `uint64_t` that is strictly smaller than @p max from @p random.
 ///
-/// @param max must be nonzero.
+/// @param max Must not be zero, as nothing is smaller than that. The library
+///   aborts if it is.
 /// @memberof passgen_random
 PASSGEN_EXPORT uint64_t passgen_random_u64_max(passgen_random *random, uint64_t max);
 
@@ -346,11 +350,17 @@ PASSGEN_EXPORT void passgen_random_reload(passgen_random *random);
 /// source yourself, you have to check it once you are done.
 PASSGEN_EXPORT bool passgen_random_failed(const passgen_random *random);
 
-/// Seeks to a specified position in the ChaCha20 stream.
+#ifdef PASSGEN_MONOCYPHER
+/// Seeks to a position in the ChaCha20 stream, so that what is read next is
+/// what was read at that position. Seeking to zero starts over.
 ///
-/// Only use this with randomness sources from @p passgen_random_chacha20_open
-/// or @p passgen_random_chacha20_argon2_open. If you use it with any other
-/// randomness source, it will panic at runtime.
+/// This only works for sources opened with ::passgen_random_chacha20_open or
+/// ::passgen_random_chacha20_argon2_open. Anything else is left as it is.
 ///
 /// @memberof passgen_random
-PASSGEN_EXPORT void passgen_random_chacha20_seek(passgen_random *random, size_t position);
+/// @param random The source
+/// @param position The position, in bytes from the start of the stream
+/// @returns Whether it seeked, which is false if the source is not ChaCha20
+PASSGEN_EXPORT bool
+passgen_random_chacha20_seek(passgen_random *random, size_t position);
+#endif

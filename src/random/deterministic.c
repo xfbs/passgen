@@ -100,10 +100,12 @@ passgen_random *passgen_random_chacha20_open(
     return random;
 }
 
-void passgen_random_chacha20_seek(passgen_random *random, size_t position) {
-    // make sure this really is a chacha20 randomness source
-    passgen_assert(random->read == passgen_random_chacha20_read);
-    passgen_assert(random->close == passgen_random_chacha20_close);
+bool passgen_random_chacha20_seek(passgen_random *random, size_t position) {
+    // anything else has another context, which this would write into.
+    if(random->read != passgen_random_chacha20_read ||
+       random->close != passgen_random_chacha20_close) {
+        return false;
+    }
 
     // reset offset
     passgen_random_chacha20_context *data = random->context;
@@ -111,6 +113,8 @@ void passgen_random_chacha20_seek(passgen_random *random, size_t position) {
 
     // reload random data buffer
     passgen_random_reload(random);
+
+    return true;
 }
 
 // these must never change, as that would change every passphrase derived

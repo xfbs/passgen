@@ -1,6 +1,12 @@
 #include "passgen/assert.h"
 
+#include <stdio.h>
 #include <stdlib.h>
+
+void passgen_require_fail(const char *cond, const char *func) {
+    fprintf(stderr, "passgen: %s() called with %s not true\n", func, cond);
+    abort();
+}
 
 #ifdef PASSGEN_DEBUG
 
