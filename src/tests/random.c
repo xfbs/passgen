@@ -681,7 +681,7 @@ test_result test_random_out_of_memory(void) {
         "file:/dev/zero",
 #endif
 #ifdef PASSGEN_MONOCYPHER
-        "chacha20:" KEY ":0123456789abcdef",
+        ("chacha20:" KEY ":0123456789abcdef"),
 #endif
     };
 
@@ -839,14 +839,14 @@ test_result test_random_desc_parse_chacha20(void) {
         "chacha20:key:iv",
         // one digit short, one too many, not hex
         "chacha20:000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1",
-        "chacha20:" KEY "0",
+        ("chacha20:" KEY "0"),
         "chacha20:000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1g",
-        "chacha20:" KEY ":",
-        "chacha20:" KEY ":012345678abcdef",
-        "chacha20:" KEY ":0123456789abcdef0",
-        "chacha20:" KEY ":0123456789abcdeg",
-        "chacha20:" KEY ":0123456789abcdef:",
-        "chacha20: " KEY,
+        ("chacha20:" KEY ":"),
+        ("chacha20:" KEY ":012345678abcdef"),
+        ("chacha20:" KEY ":0123456789abcdef0"),
+        ("chacha20:" KEY ":0123456789abcdeg"),
+        ("chacha20:" KEY ":0123456789abcdef:"),
+        ("chacha20: " KEY),
         "chacha20:0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
     };
     for(size_t i = 0; i < sizeof(invalid) / sizeof(invalid[0]); i++) {
@@ -896,7 +896,7 @@ test_result test_random_desc_parse_chacha20(void) {
 /// not print the secret in an error).
 test_result test_random_desc_secret(void) {
     const char *secret[] = {
-        "chacha20:" KEY,
+        ("chacha20:" KEY),
         "chacha20:secretkey",
         "chacha20-argon2:master:example.com:user",
         "chacha20-argon2:",
@@ -933,7 +933,7 @@ test_result test_random_desc_open(void) {
         "zero",
         "xorshift:1234",
 #ifdef PASSGEN_MONOCYPHER
-        "chacha20:" KEY ":0123456789abcdef",
+        ("chacha20:" KEY ":0123456789abcdef"),
 #endif
     };
 
