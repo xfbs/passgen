@@ -291,7 +291,7 @@ test_result test_regression_parse_multiplier_zero_recycled(void) {
 }
 
 /// Parses a pattern which consists of a single set, and checks that it has
-/// exactly the given ranges, as pairs of start and end.
+/// exactly the given ranges, as triples of start, end and multiplier.
 static bool set_ranges_are(const char *input, const uint32_t *ranges, size_t len) {
     passgen_pattern *pattern;
     passgen_error error;
@@ -305,7 +305,8 @@ static bool set_ranges_are(const char *input, const uint32_t *ranges, size_t len
                 item->data.set.items.len == len;
     for(size_t i = 0; same && i < len; i++) {
         passgen_pattern_range *range = passgen_stack_get(&item->data.set.items, i);
-        same = range->start == ranges[2 * i] && range->end == ranges[2 * i + 1];
+        same = range->start == ranges[3 * i] && range->end == ranges[3 * i + 1] &&
+               range->multiplier == ranges[3 * i + 2];
     }
     passgen_pattern_free(pattern);
     return same;
@@ -328,19 +329,99 @@ test_result test_regression_parse_set_dash(void) {
             passgen_parse(&pattern, &error, broken[i]));
     }
 
-    const uint32_t dash[] = {'-', '-'};
+    // (the ranges of a set are sorted by codepoint.)
+    const uint32_t dash[] = {'-', '-', 1};
     assert(set_ranges_are("[\\-]", dash, 1));
 
-    const uint32_t range_dash_e[] = {'a', 'c', '-', '-', 'e', 'e'};
+    const uint32_t range_dash_e[] = {'-', '-', 1, 'a', 'c', 1, 'e', 'e', 1};
     assert(set_ranges_are("[a-c\\-e]", range_dash_e, 3));
 
     const uint32_t url_safe[] = {
-        'a', 'z', 'A', 'Z', '0', '9', '-', '-', '_', '_'};
+        '-', '-', 1, '0', '9', 1, 'A', 'Z', 1, '_', '_', 1, 'a', 'z', 1};
     assert(set_ranges_are("[a-zA-Z0-9\\-_]", url_safe, 5));
 
-    // an escaped dash can start or end a range.
-    const uint32_t dash_range[] = {'-', '/', '+', '-'};
-    assert(set_ranges_are("[\\--/+-\\-]", dash_range, 2));
+    // an escaped dash can start or end a range. here, both contain it.
+    const uint32_t dash_range[] = {'+', ',', 1, '-', '-', 2, '.', '/', 1};
+    assert(set_ranges_are("[\\--/+-\\-]", dash_range, 3));
+
+    return test_ok;
+}
+
+/// The ranges of a set used to be kept in the order of the pattern, so that
+/// sets with the same characters (such as `[ab]` and `[ba]`) generated
+/// differently. A character which was listed more than once (as in `[aab]`)
+/// was more likely, but the entropy counted it as a different character every
+/// time, which overstated it. The ranges are now sorted, split where they
+/// overlap, merged where they are adjacent, and know how many times their
+/// characters were listed.
+test_result test_regression_parse_set_weights(void) {
+    const uint32_t sorted[] = {'a', 'b', 1};
+    assert(set_ranges_are("[ba]", sorted, 1));
+    assert(set_ranges_are("[ab]", sorted, 1));
+    assert(set_ranges_are("[a-b]", sorted, 1));
+
+    const uint32_t twice[] = {'a', 'a', 2, 'b', 'b', 1};
+    assert(set_ranges_are("[aab]", twice, 2));
+    assert(set_ranges_are("[aba]", twice, 2));
+
+    const uint32_t thrice[] = {'a', 'a', 3};
+    assert(set_ranges_are("[aaa]", thrice, 1));
+
+    const uint32_t inside[] = {'a', 'b', 1, 'c', 'c', 2, 'd', 'z', 1};
+    assert(set_ranges_are("[a-zc]", inside, 3));
+
+    const uint32_t overlap[] = {'a', 'm', 2, 'n', 'z', 1};
+    assert(set_ranges_are("[a-ma-z]", overlap, 2));
+    assert(set_ranges_are("[a-za-m]", overlap, 2));
+
+    const uint32_t nested[] = {'a', 'b', 1, 'c', 'd', 2, 'e', 'e', 3, 'f', 'z', 1};
+    assert(set_ranges_are("[a-zc-ee]", nested, 4));
+
+    // the last codepoint, whose range ends right before 0x110000.
+    const uint32_t last[] = {'a', 'a', 1, 0x10ffff, 0x10ffff, 2};
+    assert(set_ranges_are("[\\u{10ffff}a\\u{10ffff}]", last, 2));
+
+    // with the zero source of randomness, the first choice is taken, which is
+    // the smallest character. its entropy depends on how often it is listed.
+    passgen_random *random = passgen_random_open(NULL, "zero");
+    assert(random);
+    passgen_env *env = passgen_env_new(random);
+    assert(env);
+    const struct {
+        const char *pattern;
+        const char *output;
+        double entropy;
+    } cases[] = {
+        {"[ba]", "a", 1.0},
+        {"[aab]", "a", log2(3) - log2(2)},
+        {"[cbb]", "b", log2(3) - log2(2)},
+        {"[a-zc]", "a", log2(27)},
+        {"[aaa]", "a", 0.0},
+        {NULL, NULL, 0.0},
+    };
+    for(size_t i = 0; cases[i].pattern; i++) {
+        passgen_pattern *pattern;
+        passgen_error error;
+        assert(0 == passgen_parse(&pattern, &error, cases[i].pattern));
+        uint8_t buffer[8] = {0};
+        size_t len = 0;
+        double entropy = -1;
+        assert(
+            0 == passgen_generate_fill_utf8(
+                     pattern,
+                     env,
+                     NULL,
+                     &entropy,
+                     buffer,
+                     sizeof(buffer) - 1,
+                     &len));
+        buffer[len] = 0;
+        assert_streq((const char *) buffer, cases[i].output);
+        assert(fabs(entropy - cases[i].entropy) < 0.0001);
+        passgen_pattern_free(pattern);
+    }
+    passgen_env_free(env);
+    passgen_random_free(random);
 
     return test_ok;
 }

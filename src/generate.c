@@ -405,35 +405,41 @@ static int passgen_generate_set(
         return 0;
     }
 
-    // compute number of possible codepoints
+    // compute number of possible choices
     size_t possible = set->choices_list[set->items.len - 1];
     passgen_assert(possible != 0);
     size_t choice = passgen_random_u64_max(context->env->random, possible);
 
-    // keep track of entropy
-    if(context->entropy) {
-        *context->entropy += log2((double) possible);
-    }
-
-    // locate choice in list of choices.
-    // TODO: binary search.
-    size_t num;
-    for(num = 0; num < set->items.len; num++) {
-        if(choice < set->choices_list[num]) {
-            break;
+    // locate the range of the choice: the first one whose cumulative number
+    // of choices is larger than it.
+    size_t low = 0;
+    size_t high = set->items.len - 1;
+    while(low < high) {
+        size_t middle = low + (high - low) / 2;
+        if(choice < set->choices_list[middle]) {
+            high = middle;
+        } else {
+            low = middle + 1;
         }
     }
 
-    passgen_assert(num != set->items.len);
-
-    /* adjust choice to be relative offset */
-    if(num) {
-        choice -= set->choices_list[num - 1];
+    // adjust choice to be relative offset
+    if(low) {
+        choice -= set->choices_list[low - 1];
     }
 
-    passgen_pattern_range *range = passgen_stack_get(&set->items, num);
+    passgen_pattern_range *range = passgen_stack_get(&set->items, low);
+    passgen_assert(range->multiplier > 0);
 
-    return emit(context, range->start + choice);
+    // keep track of entropy: the set had possible equally likely choices, of
+    // which multiplier many result in this character.
+    if(context->entropy) {
+        *context->entropy +=
+            log2((double) possible) - log2((double) range->multiplier);
+    }
+
+    // every character of the range is there multiplier many times.
+    return emit(context, range->start + (uint32_t) (choice / range->multiplier));
 }
 
 static int passgen_generate_literal(

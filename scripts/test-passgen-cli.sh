@@ -117,11 +117,11 @@ test "$($passgen -r zero "[a-z]{8}")" = "aaaaaaaa"
 while read -r preset expected; do
     test "$($passgen -r xorshift:1234 -p "$preset")" = "$expected"
 done << EOF
-apple1 d3i-T2y-cwY-myW
-apple2 d3iAT2-6cwYmy-Wq1gS7
+apple1 3t8-jsO-2Mo-COm
+apple2 3t8Qjs-w2MoCO-mGr6ix
 uuid b378ad68-a262-4c80-856c-b0cc9fe064be
-edge DIaYCWMYQG-Q-MP
-firefox 7d3iAT2y6cwYmyW
+edge 27OM1KAME5fEfAD
+firefox x3t8QjsOw2MoCOm
 proquint16 gupik
 proquint32 gupik-fosab
 proquint48 gupik-fosab-kabas
@@ -144,7 +144,7 @@ if $passgen -r chacha20:key "a" > /dev/null 2>&1; then
 
     # known answer, to notice when the derivation changes (which would change
     # everyone's passwords).
-    test "$a" = "JuIHep-ZdR5yQ-Nq7cO2"
+    test "$a" = "ZKYX4F-p3hvOg-dGx2es"
 
     # a randomness source from the configuration does not get in the way
     echo "random zero" > "$XDG_CONFIG_HOME/passgen.conf"

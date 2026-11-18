@@ -149,8 +149,17 @@ To have a dash or a closing bracket in a set, write them as
 .Ql \e-
 and
 .Ql \e] .
-A character which is listed more than once (also as part of a range) is more
-likely to be chosen, and counted more than once for the entropy.
+A character which is listed more than once (also as part of a range) is as many
+times as likely to be chosen: in
+.Li [aab] ,
+.Ql a
+is twice as likely as
+.Ql b .
+The order does not matter, so
+.Li [ba]
+and
+.Li [ab]
+generate the same.
 .It Li a{8} , [a-z]{8,12} , (ab){3}
 Repetition: outputs what comes before it the given number of times.
 With two numbers, it is a random number of times between the first and the

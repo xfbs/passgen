@@ -783,6 +783,7 @@ test_result test_error_parse_out_of_memory(void) {
         "a|b|c|d",
         "(a|b){2,5}[x-z]?",
         "[a-z0-9\\-\\]]{3}",
+        "[a-ma-zcc\\u{10ffff}]",
         "{3}abc|{2}def|ghi",
         "a?b?(c)?",
         "((((((nested))))))",

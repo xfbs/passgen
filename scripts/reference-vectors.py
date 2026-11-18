@@ -252,12 +252,16 @@ def generate_item(random, item, wordlists):
             words = wordlists[data]
             output += words[random.below(len(words))]
         elif kind == "set":
-            choice = random.below(sum(end - start + 1 for start, end in data))
-            for start, end in data:
-                if choice <= end - start:
-                    output += chr(start + choice)
-                    break
-                choice -= end - start + 1
+            # every character, as many times as it is listed, in the order
+            # of the codepoints. this is what the sorted and merged ranges of
+            # a set in Passgen stand for, so `[ba]` is the same as `[ab]`,
+            # and in `[aab]`, `a` is twice as likely as `b`.
+            characters = sorted(
+                codepoint
+                for start, end in data
+                for codepoint in range(start, end + 1)
+            )
+            output += chr(characters[random.below(len(characters))])
     return output
 
 
@@ -329,6 +333,11 @@ PATTERNS = [
     # escaped characters in sets, also as the end of a range
     "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
     "([a-z]{2,4}-){3}[0-9]{2}",
+    # sets are sorted, and a character listed more than once (also through
+    # ranges which overlap) is that many times as likely
+    "[ba]{16}",
+    "[aab]{24}",
+    "[a-zc0-9a-f]{24}",
     # characters whose codepoints end in the same byte as characters which
     # have a meaning in patterns
     "(zażółć|gęślą|jaźń){3}[żśŻ]{4}",

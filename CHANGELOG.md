@@ -62,6 +62,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are not the same with the fixed pattern.
 - A repetition or a multiplier without a number (`a{}`, `a{,}`, `{}a`) is an
   error, rather than zero. The minimum can still be left out (`a{,3}`).
+- The characters of a set are sorted, so that sets with the same characters
+  generate the same (`[ba]` and `[ab]`, or `[a-zA-Z0-9]` and `[0-9A-Za-z]`).
+  This changes what most patterns with a set generate from a deterministic
+  source of randomness, including every password derived from a master
+  passphrase with such a pattern, and with the presets `apple1`, `apple2`,
+  `edge` and `firefox`.
 
 ### Removed
 - `passgen_env_init()` and `passgen_env_config()`.
@@ -78,6 +84,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - An alternative with a multiplier of zero making the group choose wrongly:
   `({0}a|b)` generated nothing, and `({0}a|b|c)` always chose `b`. Passwords
   derived from such a pattern change.
+- The entropy of a set counting a character which is listed more than once
+  (`[aab]`, `[a-zc]`) as a different character every time, which overstated
+  it. It now depends on how many times the chosen character was listed.
 
 ## [0.2.0] - 2026-11-17
 ### Added

@@ -461,17 +461,8 @@ int passgen_parse_set(
             return PASSGEN_ERROR_SET_EMPTY;
         }
 
-        // compute sum of choices and choices list for binary search.
-        size_t choices = 0;
-        set->choices_list = passgen_alloc(sizeof(size_t) * set->items.len);
-        if(!set->choices_list) {
-            return PASSGEN_ERROR_OUT_OF_MEMORY;
-        }
-        for(size_t i = 0; i < set->items.len; i++) {
-            passgen_pattern_range *range = passgen_stack_get(&set->items, i);
-            choices += 1 + range->end - range->start;
-            set->choices_list[i] = choices;
-        }
+        // sort and merge the ranges, and compute the list of choices.
+        try(passgen_pattern_set_finish(set));
 
         passgen_stack_pop(&parser->state, NULL);
         return 0;

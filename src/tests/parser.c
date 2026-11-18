@@ -382,17 +382,14 @@ test_result test_parser_set_simple(void) {
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_SET);
 
-    assert(item->data.set.items.len == 2);
+    // adjacent characters are merged into one range.
+    assert(item->data.set.items.len == 1);
 
     range = passgen_pattern_set_range_get(&item->data.set, 0);
     assert(range);
     assert(range->start == 'a');
-    assert(range->end == 'a');
-
-    range = passgen_pattern_set_range_get(&item->data.set, 1);
-    assert(range);
-    assert(range->start == 'b');
     assert(range->end == 'b');
+    assert(range->multiplier == 1);
 
     POSTAMBLE();
 
@@ -419,22 +416,20 @@ test_result test_parser_set_simple_escaped(void) {
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_SET);
 
-    assert(item->data.set.items.len == 3);
+    // ranges are sorted, so the dash comes first.
+    assert(item->data.set.items.len == 2);
 
     range = passgen_pattern_set_range_get(&item->data.set, 0);
     assert(range);
-    assert(range->start == 'a');
-    assert(range->end == 'a');
+    assert(range->start == '-');
+    assert(range->end == '-');
+    assert(range->multiplier == 1);
 
     range = passgen_pattern_set_range_get(&item->data.set, 1);
     assert(range);
-    assert(range->start == '-');
-    assert(range->end == '-');
-
-    range = passgen_pattern_set_range_get(&item->data.set, 2);
-    assert(range);
-    assert(range->start == 'b');
+    assert(range->start == 'a');
     assert(range->end == 'b');
+    assert(range->multiplier == 1);
 
     POSTAMBLE();
 
@@ -467,6 +462,7 @@ test_result test_parser_range_simple(void) {
     assert(range);
     assert(range->start == 'a');
     assert(range->end == 'b');
+    assert(range->multiplier == 1);
 
     POSTAMBLE();
 
@@ -496,17 +492,14 @@ test_result test_parser_range_multiple(void) {
     assert(item);
     assert(item->kind == PASSGEN_PATTERN_SET);
 
-    assert(item->data.set.items.len == 2);
+    // adjacent ranges are merged into one.
+    assert(item->data.set.items.len == 1);
 
     range = passgen_pattern_set_range_get(&item->data.set, 0);
     assert(range);
     assert(range->start == 'a');
-    assert(range->end == 'b');
-
-    range = passgen_pattern_set_range_get(&item->data.set, 1);
-    assert(range);
-    assert(range->start == 'c');
     assert(range->end == 'd');
+    assert(range->multiplier == 1);
 
     POSTAMBLE();
 
