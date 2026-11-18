@@ -475,8 +475,13 @@ int passgen_parse_set(
         return 0;
     }
 
-    // part of a range expression
-    if(state->data.set.range && token->codepoint == '-') {
+    // a dash is only ever part of a range, and needs a character before it
+    // which does not already end a range. otherwise, it is an error, as in
+    // `[-a]` or `[a-c-e]` (a literal dash has to be escaped, as in `[a\-]`).
+    if(token->codepoint == '-') {
+        if(!state->data.set.range) {
+            return PASSGEN_ERROR_SET_RANGE;
+        }
         state->type = PASSGEN_PARSER_SET_RANGE;
         return 0;
     }
@@ -502,6 +507,7 @@ int passgen_parse_set_range(
     passgen_token *token,
     passgen_parser_state *state) {
     (void) parser;
+    // a range needs an end, as in `[a-z]` (and not `[a-]`).
     if(token->codepoint == ']') {
         return PASSGEN_ERROR_SET_RANGE;
     }
@@ -518,6 +524,11 @@ int passgen_parse_set_range(
 
     state->data.set.range->end = codepoint;
     state->type = PASSGEN_PARSER_SET;
+
+    // the range is complete, so a dash cannot follow it. this used to extend
+    // the range again, so that `[a-c-e]` became `[a-e]`, `[a-c-b]` silently
+    // became `[a-b]`, and `[a-zA-Z0-9-_]` contained `0` to `_`.
+    state->data.set.range = NULL;
 
     return 0;
 }

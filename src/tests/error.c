@@ -45,6 +45,8 @@ test_result test_error_parse(void) {
         {"a[]b", PASSGEN_ERROR_SET_EMPTY, 2, 3},
         {"[z-a]", PASSGEN_ERROR_SET_RANGE, 3, 4},
         {"[a-]", PASSGEN_ERROR_SET_RANGE, 3, 4},
+        {"[-a]", PASSGEN_ERROR_SET_RANGE, 1, 2},
+        {"[a-c-e]", PASSGEN_ERROR_SET_RANGE, 4, 5},
         {"a{5,2}", PASSGEN_ERROR_REPEAT, 5, 6},
         {"a{x}", PASSGEN_ERROR_REPEAT, 2, 3},
         {"a{2,x}", PASSGEN_ERROR_REPEAT, 4, 5},

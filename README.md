@@ -127,7 +127,7 @@ but it has some additional features. These are the operations that Passgen under
 
 | Syntax | Explanation |
 | --- | --- |
-| `[a-z]`, `[a-zA-Z0-9]`, `[abcdefg]` | Range. Choose a letter at random. You can give it ranges (`a-z`) or individual letters. If you want to use the literal dash as a letter, either place it last or escape it with a backslash. |
+| `[a-z]`, `[a-zA-Z0-9]`, `[abcdefg]` | Range. Choose a letter at random. You can give it ranges (`a-z`) or individual letters. If you want to use the literal dash as a letter, escape it with a backslash (`[a-z\-]`). |
 | `(abc\|def)` | Group. Choose one at random: `abc` or `def`. |
 | `a{7}`, `[a-z]{4,6}` | Repetition. Appending a `{n}` to any syntax repeats the last thing *n* times. Appending a `{n,m}` to any syntax repeats the last thing a random amount between *n* and *m* times. If you want to repeat a whole sequence of things, put them into a group (in parentheses). |
 | `\w{english}` | Word. Picks a random word from the wordlist with the name `english`. You can use the `-w name:/path/to/list` command-line option to load wordlists. You can load multiple wordlists. |

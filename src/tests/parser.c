@@ -899,6 +899,12 @@ const char *pattern_broken[] = {
     "[b-",
     "[b-]",
     "[za-",
+    // a dash which is not part of a range has to be escaped
+    "[-]",
+    "[-a]",
+    "[a-c-]",
+    "[a-c-e]",
+    "[a-zA-Z0-9-_]",
     // unclosed groups
     "(",
     "(()",
@@ -979,6 +985,11 @@ const char *pattern_working[] = {
     "[a-z0-9!@#$%^&*]",
     "[a-z]{2}",
     "[a-z]{2,8}",
+    // an escaped dash is the character itself, also in a range
+    "[\\-]",
+    "[a\\-]",
+    "[a-c\\-e]",
+    "[+-\\-]",
     // unicode literal
     "\\u{0a}",
     "\\u{0A}",

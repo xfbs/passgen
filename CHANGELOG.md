@@ -54,6 +54,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nightly builds are named `passgen-nightly-*`, and their packages have a
   version like `0.2.0+nightly20261117`.
 - The documentation for users is on passgen.io, and no longer in `docs/`.
+- A dash in a set is only ever part of a range. To have a dash itself, escape
+  it (`[a-z\-]`). A dash at the start or the end of a set (`[-a]`, `[a-]`) or
+  after a range (`[a-z0-9-_]`) is an error. A dash after a range used to
+  change the end of that range, so that `[a-zA-Z0-9-_]` meant `0` to `_`
+  rather than a dash and an underscore. Passwords derived from such a pattern
+  are not the same with the fixed pattern.
 
 ### Removed
 - `passgen_env_init()` and `passgen_env_config()`.
@@ -67,6 +73,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ranges ending in an escaped character (`[+-\-]`) failing to generate.
 - Entropy above 1024 bits being reported as infinite.
 - The API documentation leaving out the ChaCha20 sources of randomness.
+- An alternative with a multiplier of zero making the group choose wrongly:
+  `({0}a|b)` generated nothing, and `({0}a|b|c)` always chose `b`. Passwords
+  derived from such a pattern change.
 
 ## [0.2.0] - 2026-11-17
 ### Added

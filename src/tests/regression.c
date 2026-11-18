@@ -8,7 +8,9 @@
 #include <passgen/passgen.h>
 #include <passgen/pattern/pattern.h>
 #include <passgen/pattern/segment.h>
+#include <passgen/pattern/range.h>
 #include <passgen/pattern/segment_item.h>
+#include <passgen/pattern/set.h>
 #include <passgen/env.h>
 #include <passgen/random.h>
 #include <passgen/util/utf8.h>
@@ -284,6 +286,61 @@ test_result test_regression_parse_multiplier_zero_recycled(void) {
     assert(item->data.group.segments.len == 2);
     assert(item->data.group.multiplier_sum == 2);
     passgen_pattern_free(pattern);
+
+    return test_ok;
+}
+
+/// Parses a pattern which consists of a single set, and checks that it has
+/// exactly the given ranges, as pairs of start and end.
+static bool set_ranges_are(const char *input, const uint32_t *ranges, size_t len) {
+    passgen_pattern *pattern;
+    passgen_error error;
+    if(0 != passgen_parse(&pattern, &error, input)) {
+        return false;
+    }
+    passgen_pattern_segment *segment =
+        passgen_pattern_group_segment_get(&pattern->group, 0);
+    passgen_pattern_item *item = passgen_stack_get(&segment->items, 0);
+    bool same = segment->items.len == 1 && item->kind == PASSGEN_PATTERN_SET &&
+                item->data.set.items.len == len;
+    for(size_t i = 0; same && i < len; i++) {
+        passgen_pattern_range *range = passgen_stack_get(&item->data.set.items, i);
+        same = range->start == ranges[2 * i] && range->end == ranges[2 * i + 1];
+    }
+    passgen_pattern_free(pattern);
+    return same;
+}
+
+/// A dash after a range (as in `[a-c-e]`) used to change the end of that
+/// range, so that `[a-zA-Z0-9-_]` silently contained `0` to `_`, and `[a-c-b]`
+/// shrank to `[a-b]`. A dash is now only ever part of a range, and has to be
+/// escaped to be the character itself.
+test_result test_regression_parse_set_dash(void) {
+    passgen_pattern *pattern;
+    passgen_error error;
+
+    const char *broken[] = {
+        "[-]", "[-a]", "[a-]", "[a-c-]", "[a-c-e]", "[a-c-b]", "[a-zA-Z0-9-_]",
+        NULL};
+    for(size_t i = 0; broken[i]; i++) {
+        assert(
+            PASSGEN_ERROR_SET_RANGE ==
+            passgen_parse(&pattern, &error, broken[i]));
+    }
+
+    const uint32_t dash[] = {'-', '-'};
+    assert(set_ranges_are("[\\-]", dash, 1));
+
+    const uint32_t range_dash_e[] = {'a', 'c', '-', '-', 'e', 'e'};
+    assert(set_ranges_are("[a-c\\-e]", range_dash_e, 3));
+
+    const uint32_t url_safe[] = {
+        'a', 'z', 'A', 'Z', '0', '9', '-', '-', '_', '_'};
+    assert(set_ranges_are("[a-zA-Z0-9\\-_]", url_safe, 5));
+
+    // an escaped dash can start or end a range.
+    const uint32_t dash_range[] = {'-', '/', '+', '-'};
+    assert(set_ranges_are("[\\--/+-\\-]", dash_range, 2));
 
     return test_ok;
 }
