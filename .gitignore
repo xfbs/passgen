@@ -3,3 +3,5 @@ build*/
 docs/html
 docs/xml
 /result
+**/__pycache__
+**/*.pyc
