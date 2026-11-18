@@ -113,12 +113,24 @@ def open_source(description):
     if kind == "xorshift":
         return Xorshift(int(rest))
     if kind == "chacha20":
-        key, _, iv = rest.partition(":")
-        key = key.encode().ljust(32, b"\0")
-        iv = iv.encode().ljust(8, b"\0") if iv else CHACHA20_DEFAULT_IV
+        key, colon, iv = rest.partition(":")
+        key = key.encode()
+        if len(key) > 32:
+            raise ValueError(description)
+        key = key.ljust(32, b"\0")
+        # an IV which is given replaces the default one, even an empty one,
+        # and is cut off after eight bytes.
+        iv = iv.encode()[:8].ljust(8, b"\0") if colon else CHACHA20_DEFAULT_IV
         return ChaCha20(key, iv)
     if kind == "chacha20-argon2":
+        # one colon before the master passphrase is skipped, so that
+        # `chacha20-argon2::x` has the master passphrase `x`.
+        if rest.startswith(":"):
+            rest = rest[1:]
+        # anything after the token is ignored.
         parts = [part.encode() for part in rest.split(":")] + [b"", b""]
+        if any(len(part) > 128 for part in parts[:3]):
+            raise ValueError(description)
         key = argon2id(parts[0], parts[1], parts[2])
         return ChaCha20(key, CHACHA20_DEFAULT_IV)
     raise ValueError(description)
@@ -285,12 +297,17 @@ SOURCES = [
     MASTER + "master:example.com:admin",
     # token without a domain
     MASTER + "master::user",
+    # one colon before the master passphrase is skipped, so this is the same
+    # as "master:example.com"
+    MASTER + ":master:example.com",
     # not only ASCII
     MASTER + "pässwörd:exämple.com:üser",
     MASTER + "correct horse battery staple:example.com",
     # the other deterministic sources
     "chacha20:key",
     "chacha20:key:iv",
+    # an empty IV is all zeroes, rather than the default one
+    "chacha20:key:",
     "chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
     "xorshift:1",
     "xorshift:1234",
