@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `passgen_allocator_set()` replaces the allocator which the library uses.
 - `passgen/passgen.h` includes all of the public headers.
 - The public headers can be used from C++.
+- The API documentation has a main page with the conventions of the library,
+  and an example which is built and run as a test (`examples/`).
 
 ### Changed
 - Errors in patterns say what is wrong, rather than "invalid token", and mark

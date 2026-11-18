@@ -50,7 +50,8 @@ welcome.
 | --- | --- |
 | `cmake/` | CMake modules. |
 | `data/` | The example configuration, the public key which nightly builds are signed with, and the wordlists (once downloaded with `scripts/fetch-wordlists.sh`). |
-| `docs/` | This documentation. |
+| `docs/` | This documentation, and the main page of the API documentation (`api.md`). |
+| `examples/` | Programs which use `libpassgen`, shown in the API documentation and run as tests. |
 | `include/passgen/` | The public headers of `libpassgen`. These are what is installed, and what the API documentation is generated from. |
 | `src/include/passgen/` | The headers for the internals of `libpassgen`. They are not installed, and can only be used by what is built as part of this repository, such as the tests. |
 | `src/include/passgen/container/` | Data structures. |

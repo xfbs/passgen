@@ -135,6 +135,22 @@ if(BUILD_TESTING)
     if(TARGET passgen-test-public-cxx)
         add_test(NAME passgen-test-public-cxx COMMAND passgen-test-public-cxx)
     endif()
+
+    # the examples, which have to keep working: with the default pattern,
+    # with a wordlist, and with a pattern which is not valid.
+    if(LIBPASSGEN_SHARED)
+        add_subdirectory(examples)
+        add_test(NAME passgen-example-generate
+                 COMMAND passgen-example-generate)
+        add_test(NAME passgen-example-generate-wordlist
+                 COMMAND passgen-example-generate "\\w{words}-\\m{words}"
+                         ${CMAKE_SOURCE_DIR}/examples/words.txt)
+        add_test(NAME passgen-example-generate-invalid
+                 COMMAND passgen-example-generate "[a-z")
+        set_tests_properties(passgen-example-generate-invalid
+                             PROPERTIES PASS_REGULAR_EXPRESSION
+                             "error: set is not closed")
+    endif()
     add_test(NAME passgen-cli COMMAND ${CMAKE_SOURCE_DIR}/scripts/test-passgen-cli.sh
                                       $<TARGET_FILE:passgen-cli>)
 

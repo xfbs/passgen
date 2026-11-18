@@ -8,7 +8,8 @@ The documentation is in three places:
 - The documentation for developers is what you are reading. It is plain
   Markdown in the `docs/` folder, meant to be read on GitLab or GitHub.
 - The documentation of the API of `libpassgen` is in the headers, as comments,
-  and is turned into HTML with [Doxygen][].
+  and is turned into HTML with [Doxygen][]. Its main page is `docs/api.md`,
+  which includes the examples in `examples/`.
 
 ## Man page
 
@@ -26,8 +27,16 @@ documentation, run Doxygen in the root of the repository:
 
     doxygen Doxyfile
 
-The result is placed in `docs/html`. Continuous integration does this for
-every commit to the `master` branch, and publishes it at
+The result is placed in `docs/html`. There should not be any warnings about
+the headers or the pages.
+
+The examples in `examples/` are built against the shared library, with only
+the public headers, and run as tests, so that what the documentation shows
+keeps working. Comments in them use `//`, as Doxygen leaves out `///`
+comments in code which it includes.
+
+Continuous integration generates the documentation for every commit to the
+`master` branch, and publishes it at
 [passgen.gitlab.io/passgen/docs][api].
 
 It also measures how much of the API is documented, with
