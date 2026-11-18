@@ -11,15 +11,16 @@
 
 static const char wordlist[] = "alpha\nbravo\ncharlie\ndelta\necho\nfoxtrot\n";
 
-int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-    if(fuzz_has_long_number(data, size)) {
-        return 0;
-    }
+// What parsing returned, for the run as it is, and the one where an
+// allocation fails.
+static int parsed_runs[2];
+static size_t run_index;
 
+static void run(const uint8_t *data, size_t size) {
     // patterns are strings, so anything after a NUL byte is ignored.
     char *string = malloc(size + 1);
     if(!string) {
-        return 0;
+        return;
     }
     memcpy(string, data, size);
     string[size] = 0;
@@ -27,6 +28,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     passgen_pattern *pattern;
     passgen_error error;
     int parsed = passgen_parse(&pattern, &error, string);
+    parsed_runs[run_index++] = parsed;
 
     if(parsed == 0) {
         // these are volatile as they are used after the longjmp().
@@ -64,6 +66,23 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     passgen_pattern_free(pattern);
     free(string);
+}
+
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    if(fuzz_has_long_number(data, size)) {
+        return 0;
+    }
+
+    run_index = 0;
+    fuzz_run(run, data, size);
+
+    // when an allocation fails, parsing either fails because of that, or
+    // works out the same as it does otherwise (as when it was one which is
+    // not needed for parsing).
+    if(run_index == 2 && parsed_runs[1] != parsed_runs[0] &&
+       parsed_runs[1] != PASSGEN_ERROR_OUT_OF_MEMORY) {
+        abort();
+    }
 
     return 0;
 }

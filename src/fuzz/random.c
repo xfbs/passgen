@@ -2,6 +2,7 @@
 ///
 /// Fuzzing harness for descriptions of randomness sources, as passed to the
 /// `--random` option. The input is the description.
+#include "common.h"
 #include <passgen/random.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -11,10 +12,10 @@ static int has_prefix(const char *string, const char *prefix) {
     return 0 == strncmp(string, prefix, strlen(prefix));
 }
 
-int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+static void run(const uint8_t *data, size_t size) {
     char *description = malloc(size + 1);
     if(!description) {
-        return 0;
+        return;
     }
     memcpy(description, data, size);
     description[size] = 0;
@@ -39,6 +40,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     }
 
     free(description);
+}
+
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    fuzz_run(run, data, size);
 
     return 0;
 }

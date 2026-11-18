@@ -9,11 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-    if(size < 2) {
-        return 0;
-    }
-
+static void run(const uint8_t *data, size_t size) {
     // the length of the chain is kept small, as the memory needed grows with
     // it.
     size_t markov_length = 1 + data[0] % 4;
@@ -22,8 +18,13 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     passgen_pattern *pattern;
     passgen_error error;
-    if(0 != passgen_parse(&pattern, &error, "\\w{w}-\\m{w}{3}")) {
-        abort();
+    int parsed = passgen_parse(&pattern, &error, "\\w{w}-\\m{w}{3}");
+    if(parsed != 0) {
+        // this only fails when an allocation does.
+        if(parsed != PASSGEN_ERROR_OUT_OF_MEMORY) {
+            abort();
+        }
+        return;
     }
 
     passgen_env *volatile env = NULL;
@@ -52,6 +53,14 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     passgen_env_free(env);
 
     passgen_pattern_free(pattern);
+}
+
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    if(size < 2) {
+        return 0;
+    }
+
+    fuzz_run(run, data, size);
 
     return 0;
 }
