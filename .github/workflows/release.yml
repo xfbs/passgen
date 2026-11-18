@@ -130,16 +130,20 @@ jobs:
           ctest --test-dir build --output-on-failure
           ./scripts/test-relocatable.sh build
 
+      # both end up next to each other, so that the artifact does not have
+      # any directories in it (it keeps them, relative to where its files
+      # are, which the release would then have, too).
       - name: Package
         run: |
           (cd build && cpack -G DEB)
+          mv build/*.deb .
           ./scripts/package-archive.sh build "$PACKAGE"
 
       # the package installs, and what it installs works from there: the
       # command-line tool, and building against the library.
       - name: Install the package
         run: |
-          sudo apt-get install -y ./build/*.deb
+          sudo apt-get install -y ./*.deb
           passgen --version
           test "$(passgen -r zero '[a-z]{8}')" = aaaaaaaa
           cc -o /tmp/generate examples/generate.c $(pkg-config --cflags --libs passgen)
@@ -149,7 +153,7 @@ jobs:
         with:
           name: linux-${{ matrix.arch }}
           path: |
-            build/*.deb
+            *.deb
             ${{ env.PACKAGE }}.tar.xz
           if-no-files-found: error
 
@@ -268,9 +272,11 @@ jobs:
           path: ${{ env.PACKAGE }}-source.tar.gz
           if-no-files-found: error
 
+  # Everything up to creating the release also runs when the workflow is
+  # started by hand, so that a dry run finds problems with the files of the
+  # release, too.
   publish:
     name: publish release
-    if: github.ref_type == 'tag'
     needs: [version, linux-static, linux, linux-rpm, macos, source]
     runs-on: ubuntu-latest
     permissions:
@@ -281,13 +287,20 @@ jobs:
           path: artifacts
           merge-multiple: true
 
+      # the release is the files, without any directories.
       - name: Checksums
         working-directory: artifacts
         run: |
+          ls -la
+          if find . -mindepth 1 -type d | grep -q .; then
+            echo "::error::the artifacts have directories in them"
+            exit 1
+          fi
           sha256sum * > SHA256SUMS
           cat SHA256SUMS
 
       - name: Create release
+        if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
