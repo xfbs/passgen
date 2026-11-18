@@ -735,6 +735,59 @@ test_result test_error_wordlist_load(void) {
 }
 #endif
 
+/// A length of a Markov chain which is not between 1 and 255 is rejected
+/// (256 used to wrap around to zero, which crashed in release builds), and
+/// the file is closed anyway.
+test_result test_error_wordlist_markov_length(void) {
+    passgen_random random;
+    assert(passgen_random_open(&random, "xorshift:1"));
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+
+    const size_t invalid[] = {0, 256, SIZE_MAX};
+    for(size_t i = 0; i < sizeof(invalid) / sizeof(invalid[0]); i++) {
+        FILE *file = tmpfile();
+        assert(file);
+        assert(
+            PASSGEN_ERROR_INVALID_ARGUMENT ==
+            passgen_env_wordlist_add(env, "words", file, invalid[i]));
+    }
+
+    // the shortest and the longest work, and generate from the words.
+    const size_t valid[] = {1, 255};
+    for(size_t i = 0; i < sizeof(valid) / sizeof(valid[0]); i++) {
+        FILE *file = tmpfile();
+        assert(file);
+        fputs("alpha\nbravo\n", file);
+        assert(PASSGEN_OK == passgen_env_wordlist_add(env, "words", file, valid[i]));
+
+        passgen_pattern *pattern;
+        assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\m{words}"));
+        uint8_t output[64];
+        size_t length = 0;
+        assert(
+            PASSGEN_OK == passgen_generate_fill_utf8(
+                              pattern,
+                              env,
+                              NULL,
+                              NULL,
+                              output,
+                              sizeof(output),
+                              &length));
+        assert(length > 0);
+        passgen_pattern_free(pattern);
+    }
+
+    assert_streq(
+        passgen_status_string(PASSGEN_ERROR_INVALID_ARGUMENT),
+        "invalid argument");
+
+    passgen_env_free(env);
+    passgen_random_close(&random);
+
+    return test_ok;
+}
+
 /// A word which is not valid UTF-8 fails generating when it is picked, and
 /// says that this is why.
 test_result test_error_wordlist_utf8(void) {

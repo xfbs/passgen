@@ -4,6 +4,7 @@
 #include "passgen/util/clear.h"
 #include "passgen/util/utf8.h"
 #include "passgen/wordlist.h"
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -55,6 +56,14 @@ passgen_status passgen_env_wordlist_add(
     const char *name,
     FILE *file,
     size_t markov_length) {
+    // a Markov chain looks at between one and 255 codepoints (it keeps the
+    // length in a byte).
+    if(markov_length < 1 || markov_length > UINT8_MAX) {
+        // the file is ours to close, whether this works or not.
+        fclose(file);
+        return PASSGEN_ERROR_INVALID_ARGUMENT;
+    }
+
     char *name_copy = passgen_alloc_string(name);
     passgen_wordlist *wordlist = passgen_alloc(sizeof(passgen_wordlist));
     if(!name_copy || !wordlist) {

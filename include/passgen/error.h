@@ -39,6 +39,10 @@ typedef enum passgen_status {
     /// Something which should not be possible happened. This is a bug in the
     /// library.
     PASSGEN_ERROR_INTERNAL,
+    /// A function was given an argument which is not valid, such as a length
+    /// of a Markov chain of zero. This is a mistake in the program which uses
+    /// the library.
+    PASSGEN_ERROR_INVALID_ARGUMENT,
     /// A file could not be read. The detail of the error is the reason.
     PASSGEN_ERROR_IO,
 

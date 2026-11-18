@@ -617,8 +617,8 @@ static int passgen_generate_item(
                 try(passgen_generate_group(context, &item->data.group));
                 break;
             default:
-                passgen_assert(false);
-                break;
+                // the parser does not make any other kinds of items.
+                return fail(context, PASSGEN_ERROR_INTERNAL);
         }
     }
 

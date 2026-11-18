@@ -1,7 +1,6 @@
 #include "passgen/markov.h"
 #include "passgen/assert.h"
 #include "passgen/config.h"
-#include <assert.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -108,16 +107,16 @@ void passgen_markov_node_free(passgen_markov_node *node, size_t level) {
 }
 
 void passgen_markov_node_check(passgen_markov_node *node, size_t level) {
-    assert(node->capacity);
-    assert(node->capacity % 2);
+    passgen_assert(node->capacity);
+    passgen_assert(node->capacity % 2);
     for(size_t i = 0; i < node->capacity; i++) {
         void *data = passgen_markov_node_child(node, i).node;
         uint32_t codepoint = passgen_markov_node_codepoint(node, i);
         if(codepoint) {
-            assert(data);
+            passgen_assert(data);
         }
         if(data) {
-            assert((codepoint % node->capacity) == i);
+            passgen_assert((codepoint % node->capacity) == i);
             if(level > 2) {
                 passgen_markov_node_check(data, level - 1);
             }
@@ -397,7 +396,7 @@ uint32_t passgen_markov_generate(
         node =
             (passgen_markov_node *) passgen_markov_node_child(node, current[i])
                 .leaf;
-        assert(node);
+        passgen_assert(node);
     }
 
     passgen_markov_leaf *leaf = (passgen_markov_leaf *) node;
@@ -424,7 +423,7 @@ uint32_t passgen_markov_generate(
         }
     }
 
-    assert(false);
+    passgen_assert(false);
 
     return 0;
 }
