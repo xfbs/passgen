@@ -34,12 +34,18 @@ function(passgen_check_symbols target)
 endfunction()
 
 function(passgen_target_defaults target)
+  # with PUBLIC_ONLY, the target only gets the public headers, like anything
+  # outside of this project would. the command-line interface does this.
+  cmake_parse_arguments(PARSE_ARGV 1 defaults "PUBLIC_ONLY" "" "")
+
   # the headers in include/ are the public interface, and are what is
   # installed. the ones for the internals are in src/include/, and can only be
   # used by what is built as part of this project: the library itself, the
-  # tests, the benchmarks, the tools and the command-line interface.
-  target_include_directories(${target}
-      PRIVATE ${PROJECT_SOURCE_DIR}/src/include)
+  # tests, the benchmarks and the tools.
+  if(NOT defaults_PUBLIC_ONLY)
+    target_include_directories(${target}
+        PRIVATE ${PROJECT_SOURCE_DIR}/src/include)
+  endif()
 
   # enable clang-format
   target_clangformat_setup(${target})

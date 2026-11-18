@@ -127,6 +127,19 @@ typedef struct {
 /// @relatesalso passgen_random
 PASSGEN_EXPORT passgen_random *passgen_random_open(passgen_random *random, const char *desc);
 
+/// Whether a description of a source of randomness (see
+/// @ref passgen_random_open) may hold a secret: the key of `chacha20`, or the
+/// master passphrase of `chacha20-argon2`. Such a description must not be
+/// shown, such as in an error message saying that it cannot be opened.
+///
+/// This only looks at the kind of source, so it works for descriptions which
+/// are not valid. A kind which is not known may be a mistyped one which holds
+/// a secret, so it counts as one.
+///
+/// @param desc The description, as a NUL-terminated string
+/// @returns Whether the description may hold a secret
+PASSGEN_EXPORT bool passgen_random_desc_secret(const char *desc);
+
 /// Opens the source of randomness of the operating system. This is what
 /// should be used to generate secrets.
 ///

@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `passgen_allocator_set()` replaces the allocator which the library uses.
 - `passgen/passgen.h` includes all of the public headers.
 - A pkg-config file, `passgen.pc`.
+- `passgen_random_desc_secret()` says whether a description of a source of
+  randomness may hold a secret, so that it is not shown.
 - The public headers can be used from C++.
 - The API documentation has a main page with the conventions of the library,
   and an example which is built and run as a test (`examples/`).
@@ -55,7 +57,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `random.h`, `error.h`, `allocator.h`, `version.h`, `config.h` and
   `export.h`.
 - The shared library only exports the public interface.
-- The command-line tool is linked against the static library.
+- The command-line tool is linked against the static library, and only uses
+  the public interface.
+- `--list` shows the presets sorted by name.
 - Releases show the commit they were built from in `--version`.
 - Releases and continuous integration use Alpine 3.24 and Debian 12.
 - Nightly builds are named `passgen-nightly-*`, and their packages have a

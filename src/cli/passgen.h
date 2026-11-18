@@ -6,13 +6,35 @@
 /// and run the tool.
 
 #pragma once
+#include <passgen/passgen.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <passgen/random.h>
-#include <passgen/config.h>
-#include <passgen/container/hashmap.h>
-#include "passgen/pattern/pattern.h"
-#include "passgen/env.h"
+
+/// Returns from the function if the statement does not result in zero.
+#define try(statement)       \
+    do {                     \
+        int ret = statement; \
+        if(ret != 0) {       \
+            return ret;      \
+        }                    \
+    } while(0)
+
+/// A preset, which is a name for a pattern.
+typedef struct {
+    /// The name, followed by its NUL byte and the pattern, in a single
+    /// allocation which this owns.
+    char *name;
+    /// The pattern, which points into the allocation of the name.
+    const char *pattern;
+} passgen_cli_preset;
+
+/// The presets, sorted by their names.
+typedef struct {
+    passgen_cli_preset *items;
+    size_t count;
+    size_t capacity;
+} passgen_cli_presets;
 
 /// The kinds of errors that cause the binary to exit early and with a nonzero
 /// return code. These are the exit statuses of the command-line tool, so they
@@ -62,7 +84,7 @@ typedef struct {
 #endif
 
     /// Presets to choose from.
-    passgen_hashmap presets;
+    passgen_cli_presets presets;
     /// Source of randomness to generate from. This is what the environment
     /// uses, but it is owned by the options.
     passgen_random *random;

@@ -80,15 +80,7 @@ typedef struct {
 ///   sources are only valid when the library is built with Monocypher.
 bool passgen_random_desc_parse(passgen_random_desc *desc, const char *string);
 
-/// Whether a description of a source of randomness may hold a secret (the key
-/// of `chacha20`, or the master passphrase of `chacha20-argon2`), and must
-/// not be shown, such as in an error message. This only looks at the kind, so
-/// it works for descriptions which are not valid. A kind which is not known
-/// may be a mistyped one which holds a secret, so it counts as one.
-///
-/// @param string The description, as a NUL-terminated string
-/// @returns Whether the description may hold a secret
-bool passgen_random_desc_secret(const char *string);
+// passgen_random_desc_secret() is public, and in passgen/random.h.
 
 /// Opens the source of randomness which a parsed description is for.
 ///

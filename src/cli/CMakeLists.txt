@@ -1,7 +1,8 @@
 add_executable(passgen-cli passgen.c main.c)
 target_link_libraries(passgen-cli PUBLIC ${PASSGEN_LIB} m)
 set_target_properties(passgen-cli PROPERTIES OUTPUT_NAME passgen)
-passgen_target_defaults(passgen-cli)
+# the command-line interface only uses the public interface of the library.
+passgen_target_defaults(passgen-cli PUBLIC_ONLY)
 
 # lock memory, if turned on
 if(PASSGEN_MLOCK)

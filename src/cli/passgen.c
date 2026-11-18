@@ -17,16 +17,6 @@
 #include <sys/types.h>
 #endif
 
-#include "../try.h"
-#include "passgen/generate.h"
-#include "passgen/parser/parser.h"
-#include "passgen/parser/token.h"
-#include "passgen/passgen.h"
-#include "passgen/random_desc.h"
-#include "passgen/pattern/pattern.h"
-#include "passgen/util/utf8.h"
-#include "passgen/version.h"
-#include "passgen/wordlist.h"
 
 #define UNUSED(x)              (void) x
 #define strprefix(prefix, str) strncmp(prefix, str, strlen(prefix))
@@ -138,6 +128,34 @@ passgen_cli_buffer_push(passgen_cli_buffer *buffer, const char *data, size_t len
     return 0;
 }
 
+/// Encodes a codepoint as UTF-8, and returns how many bytes that took, or
+/// zero if it is not a codepoint which can be encoded.
+static int passgen_cli_utf8_encode(uint8_t *out, uint32_t codepoint) {
+    if(codepoint <= 0x7F) {
+        out[0] = (uint8_t) codepoint;
+        return 1;
+    }
+    if(codepoint <= 0x7FF) {
+        out[0] = (uint8_t) (0xC0 | (codepoint >> 6));
+        out[1] = (uint8_t) (0x80 | (codepoint & 0x3F));
+        return 2;
+    }
+    if(codepoint <= 0xFFFF) {
+        out[0] = (uint8_t) (0xE0 | (codepoint >> 12));
+        out[1] = (uint8_t) (0x80 | ((codepoint >> 6) & 0x3F));
+        out[2] = (uint8_t) (0x80 | (codepoint & 0x3F));
+        return 3;
+    }
+    if(codepoint <= 0x10FFFF) {
+        out[0] = (uint8_t) (0xF0 | (codepoint >> 18));
+        out[1] = (uint8_t) (0x80 | ((codepoint >> 12) & 0x3F));
+        out[2] = (uint8_t) (0x80 | ((codepoint >> 6) & 0x3F));
+        out[3] = (uint8_t) (0x80 | (codepoint & 0x3F));
+        return 4;
+    }
+    return 0;
+}
+
 static int passgen_cli_buffer_puts(passgen_cli_buffer *buffer, const char *str) {
     return passgen_cli_buffer_push(buffer, str, strlen(str));
 }
@@ -174,7 +192,7 @@ static int passgen_cli_buffer_emit(void *data, uint32_t codepoint) {
         }
     }
 
-    int bytes = passgen_utf8_encode_codepoint((uint8_t *) encoded, codepoint);
+    int bytes = passgen_cli_utf8_encode((uint8_t *) encoded, codepoint);
     if(bytes <= 0) {
         return -1;
     }
@@ -339,6 +357,76 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
     return status == PASSGEN_OK ? 0 : PASSGEN_CLI_ERROR_ALLOC;
 }
 
+/// Finds where a preset with the name is, or where it would go to keep them
+/// sorted. Sets `found` to whether it is there.
+static size_t passgen_cli_presets_find(
+    const passgen_cli_presets *presets,
+    const char *name,
+    bool *found) {
+    size_t low = 0;
+    size_t high = presets->count;
+    while(low < high) {
+        size_t middle = low + (high - low) / 2;
+        int order = strcmp(presets->items[middle].name, name);
+        if(order == 0) {
+            *found = true;
+            return middle;
+        }
+        if(order < 0) {
+            low = middle + 1;
+        } else {
+            high = middle;
+        }
+    }
+    *found = false;
+    return low;
+}
+
+/// Defines a preset, which takes over the allocation of the name (which the
+/// pattern points into). A preset with the same name is replaced. Returns
+/// nonzero if there is no memory for it, the name is not taken over then.
+static int passgen_cli_presets_set(
+    passgen_cli_presets *presets,
+    char *name,
+    const char *pattern) {
+    bool found;
+    size_t index = passgen_cli_presets_find(presets, name, &found);
+    if(found) {
+        free(presets->items[index].name);
+        presets->items[index].name = name;
+        presets->items[index].pattern = pattern;
+        return 0;
+    }
+
+    if(presets->count == presets->capacity) {
+        size_t capacity = presets->capacity ? presets->capacity * 2 : 16;
+        passgen_cli_preset *items =
+            realloc(presets->items, capacity * sizeof(*items));
+        if(!items) {
+            return -1;
+        }
+        presets->items = items;
+        presets->capacity = capacity;
+    }
+
+    memmove(
+        &presets->items[index + 1],
+        &presets->items[index],
+        (presets->count - index) * sizeof(presets->items[0]));
+    presets->items[index].name = name;
+    presets->items[index].pattern = pattern;
+    presets->count += 1;
+    return 0;
+}
+
+/// Returns the pattern of the preset with the name, or NULL if there is none.
+static const char *
+passgen_cli_presets_get(const passgen_cli_presets *presets, const char *name) {
+    bool found;
+    size_t index = passgen_cli_presets_find(presets, name, &found);
+    return found ? presets->items[index].pattern : NULL;
+}
+
 int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
     size_t arg_len = strlen(arg);
     char *arg_copy = malloc(arg_len + 1);
@@ -359,14 +447,11 @@ int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
     *colon = 0;
 
     // the name and the pattern share a single allocation, which is owned by
-    // the hashmap. if this replaces a previous definition, free that one.
-    passgen_hashmap_entry old;
-    if(PASSGEN_OK !=
-       passgen_hashmap_insert(&opts->presets, arg_copy, colon + 1, &old)) {
+    // the presets.
+    if(0 != passgen_cli_presets_set(&opts->presets, arg_copy, colon + 1)) {
         free(arg_copy);
         return PASSGEN_CLI_ERROR_ALLOC;
     }
-    free((void *) old.key);
     return 0;
 }
 
@@ -382,13 +467,12 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->master_domain = NULL;
     opts->master_token = NULL;
 #endif
-    passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_utf8);
+    opts->presets = (passgen_cli_presets){0};
     opts->random = NULL;
     opts->env = passgen_env_new(NULL);
 
     // some defaults. these are defined the same way as presets from the
-    // command line or configuration, so that every entry in the hashmap owns
-    // its memory.
+    // command line or configuration, so that every preset owns its memory.
     static const char *const defaults[] = {
         "apple1:([a-zA-Z0-9]{3}-){3}[a-zA-Z0-9]{3}",
         "apple2:([a-zA-Z0-9]{6}-){2}[a-zA-Z0-9]{6}",
@@ -419,20 +503,14 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     }
 }
 
-int passgen_cli_preset_show(void *data, passgen_hashmap_entry *entry) {
-    (void) data;
-    printf(
-        "preset %s %s\n",
-        (const char *) entry->key,
-        (const char *) entry->value);
-    return 0;
-}
-
 void passgen_cli_presets_list(const passgen_cli_opts *opts) {
-    passgen_hashmap_foreach(
-        &opts->presets,
-        (void *) opts,
-        passgen_cli_preset_show);
+    // these are sorted by name.
+    for(size_t i = 0; i < opts->presets.count; i++) {
+        printf(
+            "preset %s %s\n",
+            opts->presets.items[i].name,
+            opts->presets.items[i].pattern);
+    }
 }
 
 // the options for master passphrase mode only exist when it does, which is
@@ -558,12 +636,10 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 
     // if a preset was given, parse it.
     if(preset) {
-        passgen_hashmap_entry *entry =
-            passgen_hashmap_lookup(&opts->presets, preset);
-        if(!entry) {
+        opts->pattern = passgen_cli_presets_get(&opts->presets, preset);
+        if(!opts->pattern) {
             return passgen_cli_bail(PASSGEN_CLI_ERROR_PRESET_NOT_FOUND, preset);
         }
-        opts->pattern = entry->value;
     }
 
     // parse a given format, making sure we don't have multiple."
@@ -787,16 +863,12 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
     return error;
 }
 
-static int passgen_cli_preset_free(void *data, passgen_hashmap_entry *entry) {
-    (void) data;
-    // this frees the value too, as they share an allocation.
-    free((void *) entry->key);
-    return 0;
-}
-
 void passgen_cli_opts_free(passgen_cli_opts *opts) {
-    passgen_hashmap_foreach(&opts->presets, NULL, passgen_cli_preset_free);
-    passgen_hashmap_free(&opts->presets);
+    // this frees the patterns too, as they share an allocation.
+    for(size_t i = 0; i < opts->presets.count; i++) {
+        free(opts->presets.items[i].name);
+    }
+    free(opts->presets.items);
     passgen_env_free(opts->env);
 
     // the environment only borrows the source of randomness.

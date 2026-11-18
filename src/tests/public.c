@@ -122,6 +122,12 @@ int main(void) {
     passgen_env_depth_limit_set(env, 0);
     check(0 != passgen_generate(pattern, env, NULL, NULL, &codepoint_count, count));
 
+    // which descriptions of sources of randomness may hold a secret, which
+    // the command-line tool uses to not print them.
+    check(passgen_random_desc_secret("chacha20-argon2:master"));
+    check(passgen_random_desc_secret("chacha:mistyped"));
+    check(!passgen_random_desc_secret("xorshift:1234"));
+
     // another source of randomness can be set later.
     passgen_random *zero = passgen_random_open(NULL, "zero");
     check(zero != NULL);
