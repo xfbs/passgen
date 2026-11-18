@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The shared library only exports the public interface.
 - The command-line tool is linked against the static library.
 - Releases show the commit they were built from in `--version`.
+- Releases and continuous integration use Alpine 3.24.
 - Nightly builds are named `passgen-nightly-*`, and their packages have a
   version like `0.2.0+nightly20261117`.
 - The documentation for users is on passgen.io, and no longer in `docs/`.
