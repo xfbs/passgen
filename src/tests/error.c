@@ -777,6 +777,8 @@ test_result test_error_parse_out_of_memory(void) {
 
             if(status == PASSGEN_OK) {
                 done = true;
+                // the environment for generating is allocated, too.
+                allocator.fail_at = TEST_ALLOCATOR_NEVER;
                 if(!strstr(patterns[i], "\\")) {
                     uint8_t output[1024];
                     size_t output_len =
@@ -797,6 +799,141 @@ test_result test_error_parse_out_of_memory(void) {
             test_allocator_remove();
         }
     }
+
+    return test_ok;
+}
+
+/// Writes a wordlist with more words than there is room for at first, and with
+/// letters from all over Unicode, so that the nodes of the Markov chain have to
+/// grow.
+static FILE *wordlist_file(void) {
+    static const char *letters[] = {
+        "a", "e", "i", "o", "u", "s", "t", "é", "ß", "ü", "λ", "ж", "日", "本", "🙂"};
+    size_t letters_count = sizeof(letters) / sizeof(letters[0]);
+
+    FILE *file = tmpfile();
+    if(!file) {
+        return NULL;
+    }
+    for(size_t i = 0; i < 300; i++) {
+        for(size_t j = 0; j < 3 + i % 4; j++) {
+            fputs(letters[(i * 7 + j * j * 3 + j) % letters_count], file);
+        }
+        fputc('\n', file);
+    }
+    return file;
+}
+
+/// Running out of memory at any point while adding a wordlist, reading it or
+/// building its Markov chain fails, and leaves nothing allocated. Once there
+/// is enough memory, trying again generates the same as always.
+test_result test_error_wordlist_out_of_memory(void) {
+    // the pattern is parsed with the usual allocator, it is not what this is
+    // about.
+    passgen_pattern *pattern;
+    assert(
+        PASSGEN_OK ==
+        passgen_parse(&pattern, NULL, "\\w{words}-\\w{words} \\m{words}{3}"));
+
+    // what it is when nothing fails, for comparing.
+    uint8_t expected[4096];
+    size_t expected_len = 0;
+    {
+        passgen_random random;
+        assert(passgen_random_open(&random, "xorshift:1234"));
+        passgen_env *env = passgen_env_new(&random);
+        assert(env);
+        FILE *file = wordlist_file();
+        assert(file);
+        assert(PASSGEN_OK == passgen_env_wordlist_add(env, "words", file, 3));
+        assert(
+            PASSGEN_OK == passgen_generate_fill_utf8(
+                              pattern,
+                              env,
+                              NULL,
+                              NULL,
+                              expected,
+                              sizeof(expected),
+                              &expected_len));
+        assert(expected_len > 0);
+        passgen_env_free(env);
+        passgen_random_close(&random);
+    }
+
+    bool done = false;
+    for(size_t fail_at = 0; !done; fail_at++) {
+        // these are opened with the usual allocator, so that only the
+        // environment uses the failing one.
+        passgen_random random, again;
+        assert(passgen_random_open(&random, "xorshift:1234"));
+        assert(passgen_random_open(&again, "xorshift:1234"));
+        FILE *file = wordlist_file();
+        assert(file);
+
+        test_allocator allocator;
+        test_allocator_install(&allocator, fail_at);
+
+        passgen_status status = PASSGEN_ERROR_OUT_OF_MEMORY;
+        passgen_env *env = passgen_env_new(&random);
+        if(env) {
+            // this closes the file, whether it works or not.
+            status = passgen_env_wordlist_add(env, "words", file, 3);
+        } else {
+            fclose(file);
+        }
+
+        if(status == PASSGEN_OK) {
+            uint8_t output[4096];
+            size_t output_len = 0;
+            passgen_error error;
+            status = passgen_generate_fill_utf8(
+                pattern,
+                env,
+                &error,
+                NULL,
+                output,
+                sizeof(output),
+                &output_len);
+
+            if(status == PASSGEN_OK) {
+                done = true;
+            } else {
+                // the wordlist could not be read, or its Markov chain could
+                // not be built.
+                assert_eq(status, PASSGEN_ERROR_WORDLIST_READ);
+                assert_streq(error.detail, "words");
+                assert(error.cause);
+                assert_eq(error.cause->kind, PASSGEN_ERROR_OUT_OF_MEMORY);
+                passgen_error_free(&error);
+
+                // nothing of what was read before is used twice.
+                allocator.fail_at = TEST_ALLOCATOR_NEVER;
+                passgen_env_random_set(env, &again);
+                output_len = 0;
+                assert(
+                    PASSGEN_OK == passgen_generate_fill_utf8(
+                                      pattern,
+                                      env,
+                                      NULL,
+                                      NULL,
+                                      output,
+                                      sizeof(output),
+                                      &output_len));
+            }
+
+            assert_eq(output_len, expected_len);
+            assert(0 == memcmp(output, expected, output_len));
+        }
+
+        passgen_env_free(env);
+        assert(test_allocator_clean(&allocator));
+        test_allocator_remove();
+
+        passgen_random_close(&random);
+        passgen_random_close(&again);
+    }
+
+    passgen_pattern_free(pattern);
 
     return test_ok;
 }

@@ -1,5 +1,6 @@
 #include "passgen/pattern/env.h"
 #include "passgen/config.h"
+#include "passgen/util/alloc.h"
 #include "passgen/util/clear.h"
 #include "passgen/util/utf8.h"
 #include "passgen/wordlist.h"
@@ -7,7 +8,7 @@
 #include <string.h>
 
 passgen_env *passgen_env_new(passgen_random *random) {
-    passgen_env *env = malloc(sizeof(passgen_env));
+    passgen_env *env = passgen_alloc(sizeof(passgen_env));
     if(!env) {
         return NULL;
     }
@@ -22,9 +23,9 @@ passgen_env *passgen_env_new(passgen_random *random) {
 
 static int wordlist_entry_free(void *user, passgen_hashmap_entry *entry) {
     (void) user;
-    free((void *) entry->key);
+    passgen_free_string((char *) entry->key);
     passgen_wordlist_free(entry->value);
-    free(entry->value);
+    passgen_free(entry->value, sizeof(passgen_wordlist));
     return 0;
 }
 
@@ -38,7 +39,7 @@ void passgen_env_free(passgen_env *env) {
     passgen_hashmap_free(&env->presets);
 
     PASSGEN_CLEAR(env);
-    free(env);
+    passgen_free(env, sizeof(passgen_env));
 }
 
 void passgen_env_random_set(passgen_env *env, passgen_random *random) {
@@ -54,18 +55,16 @@ passgen_status passgen_env_wordlist_add(
     const char *name,
     FILE *file,
     size_t markov_length) {
-    size_t name_size = strlen(name) + 1;
-    char *name_copy = malloc(name_size);
-    passgen_wordlist *wordlist = malloc(sizeof(passgen_wordlist));
+    char *name_copy = passgen_alloc_string(name);
+    passgen_wordlist *wordlist = passgen_alloc(sizeof(passgen_wordlist));
     if(!name_copy || !wordlist) {
         // the file is ours to close, whether this works or not.
-        free(name_copy);
-        free(wordlist);
+        passgen_free_string(name_copy);
+        passgen_free(wordlist, sizeof(passgen_wordlist));
         fclose(file);
         return PASSGEN_ERROR_OUT_OF_MEMORY;
     }
 
-    memcpy(name_copy, name, name_size);
     passgen_wordlist_init(wordlist, file, markov_length);
 
     // if a wordlist with this name was already defined, the new one replaces
@@ -75,8 +74,8 @@ passgen_status passgen_env_wordlist_add(
        passgen_hashmap_insert(&env->wordlists, name_copy, wordlist, &old)) {
         // this closes the file.
         passgen_wordlist_free(wordlist);
-        free(wordlist);
-        free(name_copy);
+        passgen_free(wordlist, sizeof(passgen_wordlist));
+        passgen_free_string(name_copy);
         return PASSGEN_ERROR_OUT_OF_MEMORY;
     }
     if(old.key) {

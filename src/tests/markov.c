@@ -181,8 +181,9 @@ test_result test_markov_node_insert_word(void) {
 
     const uint32_t word[] = {'h', 'e', 'l', 'l', 'o'};
 
-    root_node =
-        passgen_markov_node_insert_word(root_node, (void *) &word, 5, 1);
+    assert_eq(
+        passgen_markov_node_insert_word(&root_node, (void *) &word, 5, 1),
+        PASSGEN_OK);
     passgen_markov_node *node = root_node;
 
     assert_eq(passgen_markov_node_codepoint(node, 'h'), 'h');

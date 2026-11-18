@@ -30,6 +30,9 @@ typedef struct passgen_wordlist {
     /// Words in wordlist, separately. These are pointers into @ref data.
     char **words;
 
+    /// How many words there is room for in @ref words.
+    size_t capacity;
+
     /// Count of words in wordlist.
     size_t count;
 
@@ -67,6 +70,8 @@ passgen_status
 passgen_wordlist_parse(passgen_wordlist *wordlist, passgen_error *error);
 
 /// Generate markov chain from wordlist, which has to be parsed.
+///
+/// If this fails, the Markov chain is empty, and this can be tried again.
 ///
 /// @memberof passgen_wordlist
 /// @param error Set to what went wrong on failure, may be NULL

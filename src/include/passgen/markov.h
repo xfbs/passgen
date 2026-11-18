@@ -8,6 +8,7 @@
 /// pronounceable (in the language of the word list) but mostly not real words.
 #pragma once
 #include "passgen/random.h"
+#include <passgen/error.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -83,6 +84,7 @@ typedef struct {
 /// them more efficient.  The @ref size_index is an index into a static array
 /// of precomputed prime sizes.
 ///
+/// @returns The node, or NULL if there is no memory for it
 /// @memberof passgen_markov_node
 passgen_markov_node *passgen_markov_node_new(size_t size_index);
 
@@ -97,7 +99,8 @@ void passgen_markov_node_free(passgen_markov_node *node, size_t level);
 /// Insert a new codepoint into a Markov chain node.
 ///
 /// This returns a pointer to a passgen_markov_node because the node may need
-/// to be reallocated if it would otherwise overflow.
+/// to be reallocated if it would otherwise overflow. If there is no memory for
+/// that, it returns NULL, and the node is unchanged.
 ///
 /// @memberof passgen_markov_node
 passgen_markov_node *passgen_markov_node_insert(passgen_markov_node *node, uint32_t codepoint);
@@ -109,9 +112,13 @@ passgen_markov_node *passgen_markov_node_insert(passgen_markov_node *node, uint3
 /// of the Markov chain, minus the depth it has already traversed) and the
 /// weight of the word.
 ///
+/// The node is replaced if it has to grow, and allocated if it is NULL.
+///
+/// @returns @ref PASSGEN_OK, or @ref PASSGEN_ERROR_OUT_OF_MEMORY. In that
+///   case, some of the word may have been inserted.
 /// @memberof passgen_markov_node
-passgen_markov_node *passgen_markov_node_insert_word(
-    passgen_markov_node *node,
+passgen_status passgen_markov_node_insert_word(
+    passgen_markov_node **node,
     const uint32_t *sequence,
     size_t length,
     size_t weight);
@@ -124,6 +131,7 @@ passgen_markov_node *passgen_markov_node_insert_word(
 /// more efficient.  The @ref size_index is an index into a static array of
 /// precomputed prime sizes.
 ///
+/// @returns The leaf, or NULL if there is no memory for it
 /// @memberof passgen_markov_leaf
 passgen_markov_leaf *passgen_markov_leaf_new(size_t size_index);
 
@@ -133,6 +141,10 @@ passgen_markov_leaf *passgen_markov_leaf_new(size_t size_index);
 void passgen_markov_leaf_free(passgen_markov_leaf *leaf);
 
 /// Insert a final codepoint and weight into a Markov leaf node.
+///
+/// This returns a pointer to the leaf because it may need to be reallocated if
+/// it would otherwise overflow. If there is no memory for that, it returns
+/// NULL, and the leaf is unchanged.
 ///
 /// @memberof passgen_markov_leaf
 passgen_markov_leaf *passgen_markov_leaf_insert(passgen_markov_leaf *leaf, uint32_t codepoint, size_t weight);
@@ -144,13 +156,18 @@ uint32_t passgen_markov_leaf_count(passgen_markov_leaf *leaf, uint32_t codepoint
 
 /// Initialize new markov chain with a given level
 ///
+/// This does not allocate anything until a word is added.
+///
 /// @memberof passgen_markov
 void passgen_markov_init(passgen_markov *markov, uint8_t level);
 
 /// Add a word to a markov chain
 ///
+/// @returns @ref PASSGEN_OK, or @ref PASSGEN_ERROR_OUT_OF_MEMORY. In that
+///   case, some of the word may have been added, and the chain should be
+///   freed.
 /// @memberof passgen_markov
-void passgen_markov_add(
+passgen_status passgen_markov_add(
     passgen_markov *markov,
     const uint32_t *word,
     size_t word_len,

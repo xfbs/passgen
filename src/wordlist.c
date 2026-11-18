@@ -1,6 +1,7 @@
 #include "passgen/wordlist.h"
 #include "passgen/assert.h"
 #include "passgen/config.h"
+#include "passgen/util/alloc.h"
 #include "passgen/util/utf8.h"
 #include "passgen/util/error.h"
 #include <errno.h>
@@ -22,6 +23,7 @@ void passgen_wordlist_init(
     wordlist->data = NULL;
     wordlist->size = 0;
     wordlist->words = NULL;
+    wordlist->capacity = 0;
     wordlist->count = 0;
     passgen_markov_init(&wordlist->markov, markov_length);
 }
@@ -39,10 +41,11 @@ passgen_wordlist_parse(passgen_wordlist *wordlist, passgen_error *error) {
         // nothing is kept of a wordlist which was not read completely, as
         // words would be missing from it. the file is kept, so that this
         // fails in the same way when it is tried again.
-        free(wordlist->words);
-        free(wordlist->data);
+        passgen_free(wordlist->words, wordlist->capacity * sizeof(char *));
+        passgen_free(wordlist->data, wordlist->size + 1);
         wordlist->words = NULL;
         wordlist->data = NULL;
+        wordlist->capacity = 0;
         wordlist->count = 0;
         wordlist->size = 0;
         return status;
@@ -73,12 +76,14 @@ passgen_wordlist_parse_markov(passgen_wordlist *wordlist, passgen_error *error) 
         }
     }
 
-    uint32_t *unicode_buffer = malloc(unicode_buffer_len * sizeof(uint32_t));
+    size_t unicode_buffer_size = unicode_buffer_len * sizeof(uint32_t);
+    uint32_t *unicode_buffer = passgen_alloc(unicode_buffer_size);
     if(!unicode_buffer) {
         return passgen_error_set(error, PASSGEN_ERROR_OUT_OF_MEMORY);
     }
 
-    for(size_t i = 0; i < wordlist->count; i++) {
+    passgen_status status = PASSGEN_OK;
+    for(size_t i = 0; status == PASSGEN_OK && i < wordlist->count; i++) {
         uint32_t *unicode_buffer_pos = &unicode_buffer[0];
         const uint8_t *word = (const uint8_t *) wordlist->words[i];
         size_t word_length = strlen((const char *) word);
@@ -97,14 +102,24 @@ passgen_wordlist_parse_markov(passgen_wordlist *wordlist, passgen_error *error) 
         }
 
         // add word to markov chain
-        passgen_markov_add(
+        status = passgen_markov_add(
             &wordlist->markov,
             unicode_buffer,
             unicode_buffer_pos - &unicode_buffer[0],
             1);
     }
 
-    free(unicode_buffer);
+    passgen_free(unicode_buffer, unicode_buffer_size);
+
+    if(status != PASSGEN_OK) {
+        // a chain with only some of the words in it would be generated from
+        // as if nothing happened. it starts over when this is tried again.
+        size_t level = wordlist->markov.level;
+        passgen_markov_free(&wordlist->markov);
+        passgen_markov_init(&wordlist->markov, level);
+        return passgen_error_set(error, status);
+    }
+
     wordlist->parsed_markov = true;
 
     return PASSGEN_OK;
@@ -148,7 +163,7 @@ passgen_wordlist_read(passgen_wordlist *wordlist, passgen_error *error) {
     wordlist->size = (size_t) size;
 
     // allocate buffer to hold entire file and read in (plus zero termination)
-    wordlist->data = malloc(wordlist->size + 1);
+    wordlist->data = passgen_alloc(wordlist->size + 1);
     if(!wordlist->data) {
         return passgen_error_set(error, PASSGEN_ERROR_OUT_OF_MEMORY);
     }
@@ -173,25 +188,29 @@ passgen_status
 passgen_wordlist_scan(passgen_wordlist *wordlist, passgen_error *error) {
     char *state = NULL, *token;
 
-    size_t capacity = ALLOC_INITIAL;
-    wordlist->words = malloc(sizeof(char *) * capacity);
+    wordlist->words = passgen_alloc(sizeof(char *) * ALLOC_INITIAL);
     wordlist->count = 0;
     if(!wordlist->words) {
         return passgen_error_set(error, PASSGEN_ERROR_OUT_OF_MEMORY);
     }
+    wordlist->capacity = ALLOC_INITIAL;
 
     token = strtok_r(wordlist->data, "\n", &state);
     while(token) {
         // expand array if needed
-        if(capacity == wordlist->count) {
-            capacity *= ALLOC_INCREASE;
-            char **words = realloc(wordlist->words, sizeof(char *) * capacity);
+        if(wordlist->capacity == wordlist->count) {
+            size_t capacity = wordlist->capacity * ALLOC_INCREASE;
+            char **words = passgen_resize(
+                wordlist->words,
+                sizeof(char *) * wordlist->capacity,
+                sizeof(char *) * capacity);
             if(!words) {
                 // a wordlist with only some of its words would be chosen
                 // from as if nothing happened, so this is an error.
                 return passgen_error_set(error, PASSGEN_ERROR_OUT_OF_MEMORY);
             }
             wordlist->words = words;
+            wordlist->capacity = capacity;
         }
 
         // save word
@@ -203,11 +222,14 @@ passgen_wordlist_scan(passgen_wordlist *wordlist, passgen_error *error) {
     }
 
     // resize array finally (shrink it down to what is really needed)
-    if(wordlist->count > 0) {
-        char **words =
-            realloc(wordlist->words, sizeof(char *) * wordlist->count);
+    if(wordlist->count > 0 && wordlist->count < wordlist->capacity) {
+        char **words = passgen_resize(
+            wordlist->words,
+            sizeof(char *) * wordlist->capacity,
+            sizeof(char *) * wordlist->count);
         if(words) {
             wordlist->words = words;
+            wordlist->capacity = wordlist->count;
         }
     }
 
@@ -226,8 +248,8 @@ passgen_wordlist_random(passgen_wordlist *wordlist, passgen_random *random) {
 void passgen_wordlist_free(passgen_wordlist *wordlist) {
     passgen_markov_free(&wordlist->markov);
 
-    free(wordlist->words);
-    free(wordlist->data);
+    passgen_free(wordlist->words, wordlist->capacity * sizeof(char *));
+    passgen_free(wordlist->data, wordlist->size + 1);
 
     if(wordlist->should_close_file && wordlist->file) {
         fclose(wordlist->file);

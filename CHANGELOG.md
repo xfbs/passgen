@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `passgen_env_wordlist_add()` returns a `passgen_status`.
 - Running out of memory while parsing a pattern is an error
   (`PASSGEN_ERROR_OUT_OF_MEMORY`), rather than a crash.
+- Running out of memory while reading a wordlist or building its Markov chain
+  is an error, rather than a crash.
 - A source of randomness which runs out is an error (`PASSGEN_ERROR_RANDOM`,
   `passgen_random_failed()`), rather than aborting.
 - Entropy is in bits in the API, rather than a number of possibilities.
