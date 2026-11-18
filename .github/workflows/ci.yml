@@ -64,6 +64,26 @@ jobs:
         if: runner.os == 'Linux'
         run: cmake --build build --target symbols-check
 
+  # Build without Monocypher, which leaves out master passphrase mode, so
+  # that this keeps working.
+  no-monocypher:
+    name: ubuntu-latest / without monocypher
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y ninja-build ruby
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DPASSGEN_MONOCYPHER=OFF
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
   # Run the tests with sanitizers enabled. Any finding fails the job.
   sanitize:
     name: sanitizer / ${{ matrix.name }}

@@ -92,6 +92,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   systems without `getrandom()` or `arc4random()`.
 - A repetition or question mark following an empty group applying to what
   comes before the group: `a(){3}` generated `aaa`.
+- Building with `-DPASSGEN_MONOCYPHER=OFF`. Such a build does not have the
+  options for master passphrase mode.
 - An alternative with a multiplier of zero making the group choose wrongly:
   `({0}a|b)` generated nothing, and `({0}a|b|c)` always chose `b`. Passwords
   derived from such a pattern change.

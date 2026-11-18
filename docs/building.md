@@ -58,7 +58,7 @@ Note that you usually have to delete and recreate the build folder if you want t
 | `PASSGEN_STATIC` | Link the passgen utility against the static library rather than the dynamic one. Disabled by default. |
 | `PASSGEN_SECCOMP` | Enable [seccomp][] filters. These will run at startup to lock passgen down into a sandbox-like mode, used to enhance security, but can be fragile. Disabled by default. |
 | `PASSGEN_MLOCK` | Enable the use of [`mlock()`](https://www.man7.org/linux/man-pages/man2/mlock.2.html) on startup, which prevents Passgen memory from being swapped out to disk. |
-| `PASSGEN_MONOCYPHER` | Enable building [Monocypher](https://monocypher.org/manual/), a cryptographic library. This is used to implement the masterpass mode. | 
+| `PASSGEN_MONOCYPHER` | Enable building [Monocypher](https://monocypher.org/manual/), a cryptographic library (on by default). The ChaCha20 sources of randomness need it, including master passphrase mode: without it, the command-line tool does not have `--master`, `--domain` and `--token`. | 
 | `PASSGEN_DEBUG` | Enable debugging code. Defaults to on unless building in release mode. |
 | `PASSGEN_FUZZ` | Build the [fuzzing](tooling/fuzzing.md) harnesses with libFuzzer, to look for new inputs. Needs Clang. Disabled by default. |
 | `USE_SANITIZER` | Enables use of one of the [LLVM sanitizers][asan]. Disabled by default. |

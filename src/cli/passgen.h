@@ -53,7 +53,7 @@ typedef struct {
     size_t markov_length;
 
 #ifdef PASSGEN_MONOCYPHER
-    /// Master passphrase to use for mater-passphrase mode
+    /// Master passphrase to use for master-passphrase mode
     const char *master_passphrase;
     /// Domain name to use for master-passphrase mode
     const char *master_domain;

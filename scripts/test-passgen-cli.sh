@@ -167,6 +167,15 @@ if $passgen -r chacha20:key "a" > /dev/null 2>&1; then
     long="$(printf 'A%.0s' $(seq 1 300))"
     fails $passgen -r "chacha20:$long" "a"
     fails $passgen -r "chacha20-argon2:$long" "a"
+else
+    # without monocypher, the options for master passphrase mode do not
+    # exist, so using them is an error rather than being ignored, which would
+    # generate something which cannot be generated again.
+    fails $passgen -m master "a"
+    fails $passgen --master master -d example.com -t user -p apple2
+    fails $passgen -d example.com "a"
+    fails $passgen -t user "a"
+    test "$($passgen --help 2>&1 | grep -c -- '--master\|--domain\|--token' || true)" = 0
 fi
 
 # JSON output

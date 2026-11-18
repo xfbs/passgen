@@ -359,9 +359,11 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->json = false;
     opts->markov_length = 3;
     opts->entropy = false;
+#ifdef PASSGEN_MONOCYPHER
     opts->master_passphrase = NULL;
     opts->master_domain = NULL;
     opts->master_token = NULL;
+#endif
     passgen_hashmap_init(&opts->presets, &passgen_hashmap_context_utf8);
     opts->random = NULL;
     opts->env = passgen_env_new(NULL);
@@ -415,8 +417,16 @@ void passgen_cli_presets_list(const passgen_cli_opts *opts) {
         passgen_cli_preset_show);
 }
 
+// the options for master passphrase mode only exist when it does, which is
+// when building with monocypher.
+#ifdef PASSGEN_MONOCYPHER
+#define PASSGEN_CLI_MASTER_OPTS "d:m:t:"
+#else
+#define PASSGEN_CLI_MASTER_OPTS ""
+#endif
+
 int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
-    const char *short_opts = "a:p:P:d:w:r:m:D:M:t:ezhvjl";
+    const char *short_opts = "a:p:P:w:r:D:M:ezhvjl" PASSGEN_CLI_MASTER_OPTS;
     const char *preset = NULL;
     // whether the randomness source was set on the command line, rather than
     // in the configuration.
@@ -436,9 +446,11 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
         {"define-preset", required_argument, NULL, 'P'},
         {"json", no_argument, NULL, 'j'},
         {"markov-length", required_argument, NULL, 'M'},
+#ifdef PASSGEN_MONOCYPHER
         {"master", required_argument, NULL, 'm'},
         {"domain", required_argument, NULL, 'd'},
         {"token", required_argument, NULL, 't'},
+#endif
         {NULL, no_argument, NULL, 0}};
 
     while(true) {
@@ -458,6 +470,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 }
                 opts->amount = opt;
                 break;
+#ifdef PASSGEN_MONOCYPHER
             case 'm':
                 opts->master_passphrase = optarg;
                 break;
@@ -467,6 +480,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             case 't':
                 opts->master_token = optarg;
                 break;
+#endif
             case 'p':
                 preset = optarg;
                 break;
@@ -585,6 +599,9 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             return passgen_cli_bail(PASSGEN_CLI_ERROR_RANDOM_ALLOC, NULL);
         }
     }
+#else
+    // only master passphrase mode needs to know about this.
+    (void) random_given;
 #endif
 
     // fallback to system randomness if nothing else is defined
@@ -600,6 +617,21 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 
     return 0;
 }
+
+// the help for the options of master passphrase mode, which are only there
+// when building with monocypher.
+#ifdef PASSGEN_MONOCYPHER
+#define PASSGEN_CLI_HELP_DOMAIN \
+    "    -d, --domain DOMAIN  Domain to use (for master-passphrase mode)\n"
+#define PASSGEN_CLI_HELP_MASTER \
+    "    -m, --master PASS  Master passphrase to use\n"
+#define PASSGEN_CLI_HELP_TOKEN \
+    "    -t, --token TOKEN  Token to use (for master-passphrase mode)\n"
+#else
+#define PASSGEN_CLI_HELP_DOMAIN ""
+#define PASSGEN_CLI_HELP_MASTER ""
+#define PASSGEN_CLI_HELP_TOKEN ""
+#endif
 
 void passgen_cli_usage(const char *executable) {
     passgen_version version = passgen_version_get();
@@ -623,20 +655,20 @@ void passgen_cli_usage(const char *executable) {
         "\n"
         "OPTIONS\n"
         "    -a, --amount       Amount of passwords to generate\n"
-        "    -d, --domain DOMAIN  Domain to use (for master-passphrase mode)\n"
+        PASSGEN_CLI_HELP_DOMAIN
         "    -D, --depth DEPTH  Maximum nesting depth of groups (default: 1024)\n"
         "    -e, --entropy      Compute entropy for each password in bits.\n"
         "    -h, --help         Show this help information\n"
         "    -j, --json         Output as JSON\n"
         "    -l, --list         List loaded presets\n"
-        "    -m, --master PASS  Master passphrase to use\n"
+        PASSGEN_CLI_HELP_MASTER
         "    -M, --markov-length LENGTH\n"
         "                       Specify markov chain length for next wordlist\n"
         "    -p, --preset NAME  Use the given preset\n"
         "    -P, --define-preset NAME:PATTERN\n"
         "                       Define a preset\n"
         "    -r, --random RAND  Source of randomness to use\n"
-        "    -t, --token TOKEN  Token to use (for master-passphrase mode)\n"
+        PASSGEN_CLI_HELP_TOKEN
         "    -v, --version      Show the version of this build\n"
         "    -w, --wordlist NAME:PATH\n"
         "                       Load wordlist NAME from PATH\n"

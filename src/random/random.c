@@ -98,6 +98,7 @@ void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
     }
 }
 
+#ifdef PASSGEN_MONOCYPHER
 // Copies the part of a description up to the next colon (or its end) into a
 // string, and moves past it. Returns false if it does not fit.
 static bool desc_string(const char **pos, char *string, size_t size) {
@@ -114,6 +115,7 @@ static bool desc_string(const char **pos, char *string, size_t size) {
     *pos = *end ? end + 1 : end;
     return true;
 }
+#endif
 
 bool passgen_random_desc_parse(passgen_random_desc *desc, const char *string) {
     memset(desc, 0, sizeof(*desc));
