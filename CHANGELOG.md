@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-18
+
 ### Passwords which change
 
 Passwords derived from a master passphrase (or from any deterministic source
@@ -40,8 +42,9 @@ password back, use 0.2.0.
   run out (such as a short `file:`), are errors.
 - `--list` is sorted, and `--version` shows the commit.
 - Releases include a statically linked command-line tool, and archives and a
-  Debian package with the library, also for macOS. They are built on Alpine
-  3.24 and Debian 12.
+  Debian package with the library, also for macOS. The statically linked tool
+  is built on Alpine 3.24, the rest for Linux on Ubuntu 22.04, and the RPM
+  packages on AlmaLinux 9.
 - Nightly builds are named `passgen-nightly-*`.
 - The documentation is on <https://passgen.io>.
 - The library interface changed incompatibly.
@@ -141,7 +144,8 @@ password back, use 0.2.0.
 
 - Initial release of project.
 
-[Unreleased]: https://github.com/xfbs/passgen/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/xfbs/passgen/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/xfbs/passgen/releases/tag/v0.3.0
 [0.2.0]: https://github.com/xfbs/passgen/releases/tag/v0.2.0
 [0.1.1]: https://github.com/xfbs/passgen/releases/tag/v0.1.1
 [0.1.0]: https://github.com/xfbs/passgen/releases/tag/v0.1.0
