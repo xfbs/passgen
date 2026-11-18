@@ -1,11 +1,10 @@
-FROM debian:11
+FROM debian:12
 
 RUN apt update \
     && apt install -y \
         clang \
         cmake \
         gcc \
-        git \
         git \
         lcov \
         make \

@@ -1,4 +1,4 @@
-FROM debian:11
+FROM debian:12
 
 # create unprivileged user
 RUN useradd -ms /bin/bash user
