@@ -104,13 +104,13 @@ typedef struct {
 /// | File | `file:<path>` | `file:/dev/urandom` | @ref passgen_random_path_open |
 /// | Xorshift | `xorshift:<seed>` | `xorshift:123` | @ref passgen_random_xorshift_open |
 /// | Zero | `zero` | `zero` | @ref passgen_random_zero_open |
-/// | ChaCha20 | `chacha20:<key>[:<iv>]` | `chacha20:secretkey:iv` | @ref passgen_random_chacha20_open |
+/// | ChaCha20 | `chacha20:<key>[:<iv>]` | `chacha20:00010203...1e1f:0001020304050607` | @ref passgen_random_chacha20_open |
 /// | Master passphrase | `chacha20-argon2:<passphrase>[:<domain>[:<token>]]` | `chacha20-argon2:passphrase:example.com:1` | @ref passgen_random_chacha20_argon2_open |
 ///
 /// - The seed of xorshift is a number from 1 to 2^64 - 1, in decimal.
-/// - The key and IV of ChaCha20 are taken as they are, and padded with zero
-///   bytes. The key is at most 32 bytes, the IV is cut off after 8 bytes, and
-///   it is `passgen` (followed by a zero byte) if there is none.
+/// - The key and IV of ChaCha20 are in hex (in either case): exactly 64 hex
+///   digits for the 32 bytes of the key, and exactly 16 for the 8 bytes of the
+///   IV. Without an IV, it is `passgen` (followed by a zero byte).
 /// - The master passphrase, the domain and the token are at most 128 bytes
 ///   each, and cannot contain colons. One colon right after
 ///   `chacha20-argon2:` is skipped. Keys are derived with

@@ -165,15 +165,15 @@ test_result test_regression_random_open_overlong(void) {
     char desc[1024];
     passgen_random random;
 
-    // 32 bytes of key is fine, 33 is not.
+    // 32 bytes of key (64 hex digits) is fine, more is not.
     strcpy(desc, "chacha20:");
-    memset(desc + strlen(desc), 'A', 32);
-    desc[9 + 32] = 0;
+    memset(desc + strlen(desc), 'A', 64);
+    desc[9 + 64] = 0;
     assert(passgen_random_open(&random, desc));
     passgen_random_close(&random);
 
-    desc[9 + 32] = 'A';
-    desc[9 + 33] = 0;
+    desc[9 + 64] = 'A';
+    desc[9 + 65] = 0;
     assert(!passgen_random_open(&random, desc));
 
     memset(desc, 'A', sizeof(desc) - 1);

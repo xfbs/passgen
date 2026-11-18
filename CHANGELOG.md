@@ -75,6 +75,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   source of randomness, including every password derived from a master
   passphrase with such a pattern, and with the presets `apple1`, `apple2`,
   `edge` and `firefox`.
+- The key and IV of the `chacha20` source of randomness are in hex: exactly 64
+  hex digits for the key, and exactly 16 for the IV (if there is one). They
+  used to be taken as bytes, padded with zero bytes, and an IV which was too
+  long was cut off. To keep using an old key, write its bytes in hex and pad
+  it with zeroes: `chacha20:key` is
+  `chacha20:6b6579` followed by 58 zeroes. An empty IV (`chacha20:key:`) is
+  16 zeroes.
 
 ### Removed
 - `passgen_env_init()` and `passgen_env_config()`.

@@ -106,6 +106,15 @@ class Xorshift:
         return out
 
 
+def strict_hex(digits, size, description):
+    """Exactly `2 * size` hex digits, in either case, as bytes."""
+    if len(digits) != 2 * size or any(
+        c not in "0123456789abcdefABCDEF" for c in digits
+    ):
+        raise ValueError(description)
+    return bytes.fromhex(digits)
+
+
 def open_source(description):
     """Opens a randomness source from a description, in the syntax of the
     `--random` option."""
@@ -113,14 +122,11 @@ def open_source(description):
     if kind == "xorshift":
         return Xorshift(int(rest))
     if kind == "chacha20":
+        # the key is exactly 64 hex digits, and the IV, if there is one,
+        # exactly 16. without one, the default IV is used.
         key, colon, iv = rest.partition(":")
-        key = key.encode()
-        if len(key) > 32:
-            raise ValueError(description)
-        key = key.ljust(32, b"\0")
-        # an IV which is given replaces the default one, even an empty one,
-        # and is cut off after eight bytes.
-        iv = iv.encode()[:8].ljust(8, b"\0") if colon else CHACHA20_DEFAULT_IV
+        key = strict_hex(key, 32, description)
+        iv = strict_hex(iv, 8, description) if colon else CHACHA20_DEFAULT_IV
         return ChaCha20(key, iv)
     if kind == "chacha20-argon2":
         # one colon before the master passphrase is skipped, so that
@@ -308,11 +314,16 @@ SOURCES = [
     MASTER + "pässwörd:exämple.com:üser",
     MASTER + "correct horse battery staple:example.com",
     # the other deterministic sources
-    "chacha20:key",
-    "chacha20:key:iv",
-    # an empty IV is all zeroes, rather than the default one
-    "chacha20:key:",
-    "chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
+    # the key and IV are in hex. this key is the bytes of `key`, padded with
+    # zeroes, and the IVs are `iv` padded with zeroes, and all zeroes.
+    "chacha20:6b65790000000000000000000000000000000000000000000000000000000000",
+    "chacha20:6b65790000000000000000000000000000000000000000000000000000000000:6976000000000000",
+    "chacha20:6b65790000000000000000000000000000000000000000000000000000000000:0000000000000000",
+    # 32 times `a`, and the IV `12345678`
+    "chacha20:6161616161616161616161616161616161616161616161616161616161616161:3132333435363738",
+    # every byte value of a key, in both cases of hex digits
+    "chacha20:000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+    "chacha20:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFFFFFFFF",
     "xorshift:1",
     "xorshift:1234",
     "xorshift:18446744073709551615",

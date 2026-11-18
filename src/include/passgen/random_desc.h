@@ -24,7 +24,7 @@ typedef enum {
     PASSGEN_RANDOM_DESC_FILE,
     /// `xorshift:<seed>`
     PASSGEN_RANDOM_DESC_XORSHIFT,
-    /// `chacha20:<key>[:<iv>]`
+    /// `chacha20:<key>[:<iv>]`, with the key and IV in hex
     PASSGEN_RANDOM_DESC_CHACHA20,
     /// `chacha20-argon2:<master-pass>[:<domain>[:<token>]]`
     PASSGEN_RANDOM_DESC_CHACHA20_ARGON2,

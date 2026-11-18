@@ -135,7 +135,8 @@ test "$($passgen --list | wc -l)" -eq 13
 
 # master passphrase mode is deterministic, and depends on all of its inputs.
 # these only work when built with monocypher (the default).
-if $passgen -r chacha20:key "a" > /dev/null 2>&1; then
+key="000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+if $passgen -r "chacha20:$key" "a" > /dev/null 2>&1; then
     a="$($passgen -m master -d example.com -t user -p apple2)"
     test "$a" = "$($passgen -m master -d example.com -t user -p apple2)"
     test "$a" != "$($passgen -m other -d example.com -t user -p apple2)"
@@ -162,6 +163,17 @@ if $passgen -r chacha20:key "a" > /dev/null 2>&1; then
     if (ulimit -l 8192) 2> /dev/null; then
         test "$a" = "$(ulimit -l 8192; $passgen -m master -d example.com -t user -p apple2)"
     fi
+
+    # the key and IV of chacha20 are exactly 64 and 16 hex digits, and the
+    # default IV is `passgen` followed by a zero byte.
+    test "$($passgen -r "chacha20:$key" "[a-z]{16}")" = \
+        "$($passgen -r "chacha20:$key:7061737367656e00" "[a-z]{16}")"
+    test "$($passgen -r "chacha20:$key" "[a-z]{16}")" != \
+        "$($passgen -r "chacha20:$key:0000000000000000" "[a-z]{16}")"
+    fails $passgen -r "chacha20:key" "a"
+    fails $passgen -r "chacha20:${key}0" "a"
+    fails $passgen -r "chacha20:$key:" "a"
+    fails $passgen -r "chacha20:$key:00000000" "a"
 
     # overlong keys are rejected
     long="$(printf 'A%.0s' $(seq 1 300))"

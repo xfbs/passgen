@@ -117,6 +117,32 @@ static bool desc_string(const char **pos, char *string, size_t size) {
 }
 #endif
 
+#ifdef PASSGEN_MONOCYPHER
+/// Decodes exactly `2 * size` hex digits (in either case) at the start of
+/// `string` into `size` bytes. Returns false if there are fewer of them.
+static bool hex_decode(const char *string, uint8_t *bytes, size_t size) {
+    for(size_t i = 0; i < 2 * size; i++) {
+        char c = string[i];
+        uint8_t digit;
+        if(c >= '0' && c <= '9') {
+            digit = c - '0';
+        } else if(c >= 'a' && c <= 'f') {
+            digit = c - 'a' + 10;
+        } else if(c >= 'A' && c <= 'F') {
+            digit = c - 'A' + 10;
+        } else {
+            return false;
+        }
+        if(i % 2 == 0) {
+            bytes[i / 2] = digit << 4;
+        } else {
+            bytes[i / 2] |= digit;
+        }
+    }
+    return true;
+}
+#endif
+
 bool passgen_random_desc_parse(passgen_random_desc *desc, const char *string) {
     memset(desc, 0, sizeof(*desc));
 
@@ -162,27 +188,33 @@ bool passgen_random_desc_parse(passgen_random_desc *desc, const char *string) {
     }
 
 #ifdef PASSGEN_MONOCYPHER
-    // use chacha20 with raw key and IV
+    // use chacha20 with a key and an IV in hex: exactly 64 hex digits for the
+    // 32 bytes of the key, and if there is an IV, exactly 16 for its 8 bytes.
     if(_strprefix("chacha20:", string)) {
-        const char *key_ptr = &string[9];
-        const char *key_end = strchr(key_ptr, ':');
-        if(!key_end) {
-            key_end = key_ptr + strlen(key_ptr);
-        }
-        size_t key_len = (size_t) (key_end - key_ptr);
-        if(key_len > sizeof(desc->data.chacha20.key)) {
+        const char *pos = &string[9];
+        uint8_t *key = desc->data.chacha20.key;
+        uint8_t *iv = desc->data.chacha20.iv;
+        if(!hex_decode(pos, key, 32)) {
+            PASSGEN_CLEAR(desc);
             return false;
         }
-        memcpy(desc->data.chacha20.key, key_ptr, key_len);
+        pos += 64;
 
-        uint8_t *iv = desc->data.chacha20.iv;
         memcpy(iv, "passgen", 8);
-        if(*key_end == ':') {
-            const char *iv_ptr = key_end + 1;
-            size_t iv_len = strlen(iv_ptr);
-            iv_len = iv_len > 8 ? 8 : iv_len;
-            memset(iv, 0, 8);
-            memcpy(iv, iv_ptr, iv_len);
+        if(*pos == ':') {
+            pos++;
+            if(!hex_decode(pos, iv, 8)) {
+                PASSGEN_CLEAR(desc);
+                return false;
+            }
+            pos += 16;
+        }
+
+        // nothing may follow, so that a key or IV which is too long is not
+        // silently cut off.
+        if(*pos) {
+            PASSGEN_CLEAR(desc);
+            return false;
         }
 
         desc->kind = PASSGEN_RANDOM_DESC_CHACHA20;

@@ -16,6 +16,9 @@
 #include <unistd.h>
 #endif
 
+/// A ChaCha20 key in hex: the bytes 0 to 31.
+#define KEY "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+
 /// Tests that a given function covers all possible outputs (0..max, inclusive).
 #define TEST_COVERAGE(max, collate, function)                    \
     do {                                                         \
@@ -586,7 +589,7 @@ test_result test_random_out_of_memory(void) {
         "file:/dev/zero",
 #endif
 #ifdef PASSGEN_MONOCYPHER
-        "chacha20:passgen-out-of-memory-test-key:iv",
+        "chacha20:" KEY ":0123456789abcdef",
 #endif
     };
 
@@ -714,32 +717,49 @@ test_result test_random_desc_parse(void) {
 }
 
 #ifdef PASSGEN_MONOCYPHER
-/// ChaCha20 keys and IVs are padded with zeroes, and the master passphrase,
-/// domain and token are separated by colons.
+/// ChaCha20 keys and IVs are in hex, and the master passphrase, domain and
+/// token are separated by colons.
 test_result test_random_desc_parse_chacha20(void) {
     passgen_random_desc desc;
 
-    assert(passgen_random_desc_parse(&desc, "chacha20:key"));
+    // the key is exactly 64 hex digits, and without an IV, the default one is
+    // used.
+    assert(passgen_random_desc_parse(&desc, "chacha20:" KEY));
     assert_eq(desc.kind, PASSGEN_RANDOM_DESC_CHACHA20);
-    uint8_t key[32] = "key";
+    uint8_t key[32];
+    for(size_t i = 0; i < sizeof(key); i++) {
+        key[i] = (uint8_t) i;
+    }
     assert(0 == memcmp(desc.data.chacha20.key, key, sizeof(key)));
     assert(0 == memcmp(desc.data.chacha20.iv, "passgen", 8));
 
-    // an IV which is given replaces the default one, and is cut off.
-    assert(passgen_random_desc_parse(&desc, "chacha20:key:iv"));
-    assert(0 == memcmp(desc.data.chacha20.iv, "iv\0\0\0\0\0\0", 8));
-    assert(passgen_random_desc_parse(&desc, "chacha20:key:ivivivivXX"));
-    assert(0 == memcmp(desc.data.chacha20.iv, "iviviviv", 8));
-    assert(passgen_random_desc_parse(&desc, "chacha20:key:"));
-    assert(0 == memcmp(desc.data.chacha20.iv, "\0\0\0\0\0\0\0\0", 8));
+    // the IV is exactly 16 hex digits, and both cases of them work.
+    assert(passgen_random_desc_parse(&desc, "chacha20:" KEY ":0123456789ABCDEF"));
+    const uint8_t iv[8] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef};
+    assert(0 == memcmp(desc.data.chacha20.key, key, sizeof(key)));
+    assert(0 == memcmp(desc.data.chacha20.iv, iv, sizeof(iv)));
 
-    // keys are at most 32 bytes.
-    assert(passgen_random_desc_parse(
-        &desc,
-        "chacha20:0123456789abcdef0123456789abcdef"));
-    assert(!passgen_random_desc_parse(
-        &desc,
-        "chacha20:0123456789abcdef0123456789abcdefX"));
+    // keys and IVs which are not exactly as long, or not hex, used to be
+    // taken as bytes, padded or cut off. they are not valid.
+    const char *invalid[] = {
+        "chacha20:",
+        "chacha20:key",
+        "chacha20:key:iv",
+        // one digit short, one too many, not hex
+        "chacha20:000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1",
+        "chacha20:" KEY "0",
+        "chacha20:000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1g",
+        "chacha20:" KEY ":",
+        "chacha20:" KEY ":012345678abcdef",
+        "chacha20:" KEY ":0123456789abcdef0",
+        "chacha20:" KEY ":0123456789abcdeg",
+        "chacha20:" KEY ":0123456789abcdef:",
+        "chacha20: " KEY,
+        "chacha20:0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+    };
+    for(size_t i = 0; i < sizeof(invalid) / sizeof(invalid[0]); i++) {
+        assert(!passgen_random_desc_parse(&desc, invalid[i]));
+    }
 
     assert(passgen_random_desc_parse(&desc, "chacha20-argon2:master:domain:token"));
     assert_eq(desc.kind, PASSGEN_RANDOM_DESC_CHACHA20_ARGON2);
@@ -784,7 +804,9 @@ test_result test_random_desc_open(void) {
     const char *descs[] = {
         "zero",
         "xorshift:1234",
-        "chacha20:key:iv",
+#ifdef PASSGEN_MONOCYPHER
+        "chacha20:" KEY ":0123456789abcdef",
+#endif
     };
 
     for(size_t i = 0; i < sizeof(descs) / sizeof(descs[0]); i++) {

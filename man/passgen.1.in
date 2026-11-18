@@ -256,8 +256,12 @@ What master passphrase mode uses, see
 .Sx MASTER PASSPHRASE MODE .
 Every part can be up to 128 bytes long, and cannot contain colons.
 .It Li chacha20\&: Ns Ar key Ns Op : Ns Ar iv
-The ChaCha20 stream cipher, with a key of up to 32 bytes and an initialization
-vector of up to 8 bytes, which are used as they are.
+The ChaCha20 stream cipher, with a key of 32 bytes and an initialization
+vector of 8 bytes, written in hex: exactly 64 hex digits for the key, and 16
+for the initialization vector.
+Without one, the initialization vector is
+.Ql passgen
+followed by a zero byte.
 This is deterministic, but the key is not derived from a passphrase, so this
 is not a substitute for master passphrase mode.
 .It Li xorshift\&: Ns Ar seed
