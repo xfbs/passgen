@@ -78,10 +78,15 @@ target_compile_definitions(passgen-static PUBLIC -DPASSGEN_STATIC_DEFINE)
 # static library, which is what the tests do.
 set_target_properties(passgen-shared PROPERTIES C_VISIBILITY_PRESET hidden)
 
+# the shared library is needed to run the command-line tool when it is linked
+# against it, so it is part of the runtime. the static library, and the link
+# to the shared one which the linker uses, are only needed to build against
+# the library.
 install(
     TARGETS passgen-static passgen-shared
-    DESTINATION lib
-    COMPONENT runtime
+    ARCHIVE DESTINATION lib COMPONENT development
+    LIBRARY DESTINATION lib COMPONENT runtime NAMELINK_COMPONENT development
+    RUNTIME DESTINATION bin COMPONENT runtime
     OPTIONAL)
 
 if(NOT LIBPASSGEN_STATIC)

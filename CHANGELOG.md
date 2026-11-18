@@ -63,6 +63,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the public interface.
 - `--list` shows the presets sorted by name.
 - Releases show the commit they were built from in `--version`.
+- Releases have an archive with only the statically linked command-line tool
+  (`-static`), and archives and a Debian package with the library and the
+  command-line tool linked against it, also for macOS. The static library is
+  part of the development files rather than the runtime ones.
 - Releases and continuous integration use Alpine 3.24 and Debian 12.
 - Nightly builds are named `passgen-nightly-*`, and their packages have a
   version like `0.2.0+nightly20261117`.

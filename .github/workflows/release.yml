@@ -42,7 +42,8 @@ jobs:
           fi
 
   # Statically linked binaries (built on Alpine against musl), these run on
-  # any Linux distribution.
+  # any Linux distribution. The archive only has the binary (and its man
+  # page), as it is for people who only want the command-line tool.
   linux-static:
     name: linux / ${{ matrix.arch }} / static
     needs: version
@@ -56,12 +57,9 @@ jobs:
           - arch: aarch64
             runner: ubuntu-24.04-arm
     env:
-      PACKAGE: passgen-${{ needs.version.outputs.version }}-linux-${{ matrix.arch }}
+      PACKAGE: passgen-${{ needs.version.outputs.version }}-linux-${{ matrix.arch }}-static
     steps:
       - uses: actions/checkout@v4
-
-      - name: Fetch wordlists
-        run: ./scripts/fetch-wordlists.sh
 
       # This runs in a plain `docker run` rather than a job container, because
       # JavaScript actions don't work in Alpine containers on ARM runners.
@@ -79,29 +77,34 @@ jobs:
               -DPASSGEN_BUILD_INFO="$GITHUB_SHA"
             cmake --build build
             ctest --test-dir build --output-on-failure
-            cd build
-            cpack -G TXZ -D CPACK_PACKAGE_FILE_NAME="$PACKAGE"
+            ./scripts/test-relocatable.sh build
+            ./scripts/package-archive.sh build "$PACKAGE" runtime
           '
 
       - uses: actions/upload-artifact@v4
         with:
           name: linux-static-${{ matrix.arch }}
-          path: build/${{ env.PACKAGE }}.tar.xz
+          path: ${{ env.PACKAGE }}.tar.xz
           if-no-files-found: error
 
-  # Debian packages, dynamically linked against glibc.
-  linux-deb:
-    name: linux / ${{ matrix.arch }} / deb
+  # The library and the command-line tool, which is linked against it, built
+  # against glibc on an older Ubuntu, so that they run on systems which are
+  # not quite as old as that. As a Debian package, and as an archive which
+  # works wherever it is unpacked.
+  linux:
+    name: linux / ${{ matrix.arch }}
     needs: version
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - arch: amd64
+          - arch: x86_64
             runner: ubuntu-22.04
-          - arch: arm64
+          - arch: aarch64
             runner: ubuntu-22.04-arm
+    env:
+      PACKAGE: passgen-${{ needs.version.outputs.version }}-linux-${{ matrix.arch }}
     steps:
       - uses: actions/checkout@v4
 
@@ -116,22 +119,28 @@ jobs:
           cmake -S . -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=/usr \
+            -DPASSGEN_CLI_SHARED=ON \
             -DBUILD_BENCH=OFF \
             -DBUILD_GIT_INFO=OFF \
             -DPASSGEN_BUILD_INFO="$GITHUB_SHA"
           cmake --build build
 
       - name: Test
-        run: ctest --test-dir build --output-on-failure
+        run: |
+          ctest --test-dir build --output-on-failure
+          ./scripts/test-relocatable.sh build
 
       - name: Package
-        working-directory: build
-        run: cpack -G DEB
+        run: |
+          (cd build && cpack -G DEB)
+          ./scripts/package-archive.sh build "$PACKAGE"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: linux-deb-${{ matrix.arch }}
-          path: build/*.deb
+          name: linux-${{ matrix.arch }}
+          path: |
+            build/*.deb
+            ${{ env.PACKAGE }}.tar.xz
           if-no-files-found: error
 
   macos:
@@ -149,29 +158,31 @@ jobs:
       - name: Fetch wordlists
         run: ./scripts/fetch-wordlists.sh
 
-      # The CLI is linked against the static libpassgen, so that the binary
-      # does not depend on where libpassgen.dylib ends up.
+      # The command-line tool is linked against libpassgen.dylib, which it
+      # finds relative to where it is, so that the archive works wherever it
+      # is unpacked.
       - name: Build
         run: |
           cmake -S . -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DLIBPASSGEN_SHARED=OFF \
+            -DPASSGEN_CLI_SHARED=ON \
             -DBUILD_BENCH=OFF \
             -DBUILD_GIT_INFO=OFF \
             -DPASSGEN_BUILD_INFO="$GITHUB_SHA"
           cmake --build build
 
       - name: Test
-        run: ctest --test-dir build --output-on-failure
+        run: |
+          ctest --test-dir build --output-on-failure
+          ./scripts/test-relocatable.sh build
 
       - name: Package
-        working-directory: build
-        run: cpack -G TXZ -D CPACK_PACKAGE_FILE_NAME="$PACKAGE"
+        run: ./scripts/package-archive.sh build "$PACKAGE"
 
       - uses: actions/upload-artifact@v4
         with:
           name: macos-arm64
-          path: build/${{ env.PACKAGE }}.tar.xz
+          path: ${{ env.PACKAGE }}.tar.xz
           if-no-files-found: error
 
   source:
@@ -195,7 +206,7 @@ jobs:
   publish:
     name: publish release
     if: github.ref_type == 'tag'
-    needs: [version, linux-static, linux-deb, macos, source]
+    needs: [version, linux-static, linux, macos, source]
     runs-on: ubuntu-latest
     permissions:
       contents: write
