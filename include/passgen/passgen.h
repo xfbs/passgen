@@ -7,6 +7,7 @@
 #include <passgen/allocator.h>
 #include <passgen/error.h>
 
+/// @struct passgen_pattern
 /// A parsed pattern, such as `abc(def|ghi)[a-z]{5}`.
 ///
 /// Patterns are created by parsing them with @ref passgen_parse, and have to
@@ -34,7 +35,7 @@ PASSGEN_EXPORT passgen_status passgen_parse(
 
 /// Free a pattern which was created by @ref passgen_parse.
 ///
-/// @memberof passgen_pattern
+/// @relatesalso passgen_pattern
 /// @param pattern Pattern to free. May be NULL, in which case this does
 ///   nothing.
 PASSGEN_EXPORT void passgen_pattern_free(passgen_pattern *pattern);

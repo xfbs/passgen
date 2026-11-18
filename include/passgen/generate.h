@@ -1,12 +1,14 @@
 /// @file generate.h
 /// @author Patrick M. Elsen
-/// @brief Functions for generating passwords using a parsed pattern.
+/// @brief Generating from a pattern.
 ///
-/// This file contains functions used to generate passwords using a parsed
-/// `passgen_pattern`. These functions all need some sort of source of
-/// randomness, which is a @ref passgen_random object. These can use
-/// of the system-specific randomness source, or read from a file, or use a
-/// custom randomness generator. 
+/// Generating takes a pattern (see @ref passgen_parse) and an environment
+/// (see @ref passgen_env_new), which has the source of randomness and the
+/// wordlists. What is generated can be written into a buffer, as codepoints
+/// or as UTF-8, or be passed to a callback one codepoint at a time.
+///
+/// If generating fails, whatever was written or passed on so far is not
+/// what the pattern generates, and has to be thrown away.
 #pragma once
 #include <passgen/export.h>
 #include <stdbool.h>
@@ -16,16 +18,24 @@
 #include "passgen/passgen.h"
 #include "passgen/env.h"
 
-/// Callback for generation. Takes an arbitrary data pointer and the codepoint
-/// that was generated. If it returns anything other than zero, generating
-/// stops, and fails with @ref PASSGEN_ERROR_ABORTED.
+/// Callback which is given what is generated, one codepoint at a time.
+///
+/// @param data What was passed to @ref passgen_generate as it is
+/// @param codepoint The codepoint which was generated
+/// @returns Zero to go on. Anything else stops generating, which then fails
+///   with @ref PASSGEN_ERROR_ABORTED.
 typedef int passgen_generate_cb(void *data, uint32_t codepoint);
 
-/// Generate a password from a pattern, filling the unicode codepoints into the
-/// provided buffer. Will not NULL-terminate anything.
+/// Generates from a pattern into a buffer of codepoints. This does not
+/// terminate it with a zero.
 ///
-/// See @ref passgen_generate for the other parameters.
-///
+/// @param pattern A pattern which was parsed successfully
+/// @param env The environment, which has the source of randomness and the
+///   wordlists
+/// @param error If generating fails, this is set to what went wrong. It then
+///   has to be released with @ref passgen_error_free. May be NULL.
+/// @param entropy If not NULL, set to the entropy of what was generated, in
+///   bits (see @ref passgen_generate)
 /// @param buffer Where to write the codepoints
 /// @param len How many codepoints fit into the buffer
 /// @param written Set to the number of codepoints written, or to zero if
@@ -42,11 +52,16 @@ PASSGEN_EXPORT passgen_status passgen_generate_fill_unicode(
     size_t len,
     size_t *written);
 
-/// Generate a password from a pattern, filling the result UTF-8 encoded into
-/// the provided buffer. Will not NULL-terminate the buffer.
+/// Generates from a pattern into a buffer, encoded as UTF-8. This does not
+/// terminate it with a NUL byte, so leave room for one if it is needed.
 ///
-/// See @ref passgen_generate for the other parameters.
-///
+/// @param pattern A pattern which was parsed successfully
+/// @param env The environment, which has the source of randomness and the
+///   wordlists
+/// @param error If generating fails, this is set to what went wrong. It then
+///   has to be released with @ref passgen_error_free. May be NULL.
+/// @param entropy If not NULL, set to the entropy of what was generated, in
+///   bits (see @ref passgen_generate)
 /// @param buffer Where to write the output
 /// @param len How many bytes fit into the buffer
 /// @param written Set to the number of bytes written, or to zero if
@@ -63,12 +78,18 @@ PASSGEN_EXPORT passgen_status passgen_generate_fill_utf8(
     size_t len,
     size_t *written);
 
-/// Generate a password from a pattern, filling the result UTF-8 encoded and
-/// escaped for use in a JSON string into the provided buffer. Will not
-/// NULL-terminate the buffer.
+/// Generates from a pattern into a buffer, encoded as UTF-8 and escaped to be
+/// put into a JSON string: quotes, backslashes and control characters are
+/// escaped. The quotes around the string are not written. This does not
+/// terminate it with a NUL byte, so leave room for one if it is needed.
 ///
-/// See @ref passgen_generate for the other parameters.
-///
+/// @param pattern A pattern which was parsed successfully
+/// @param env The environment, which has the source of randomness and the
+///   wordlists
+/// @param error If generating fails, this is set to what went wrong. It then
+///   has to be released with @ref passgen_error_free. May be NULL.
+/// @param entropy If not NULL, set to the entropy of what was generated, in
+///   bits (see @ref passgen_generate)
 /// @param buffer Where to write the output
 /// @param len How many bytes fit into the buffer
 /// @param written Set to the number of bytes written, or to zero if
@@ -85,8 +106,9 @@ PASSGEN_EXPORT passgen_status passgen_generate_fill_json_utf8(
     size_t len,
     size_t *written);
 
-/// Generate a password from a pattern, calling the provided callback function
-/// with the provided data pointer as well as each codepoint as it is generated.
+/// Generates from a pattern, passing each codepoint to a callback as it is
+/// generated. This is what the other functions for generating are built on,
+/// and the only one for output which does not have a size limit.
 ///
 /// @param pattern A pattern which was parsed successfully
 /// @param env The environment, which has the source of randomness and the
@@ -98,7 +120,8 @@ PASSGEN_EXPORT passgen_status passgen_generate_fill_json_utf8(
 ///   equally likely choices that were made to generate it: with 64 bits,
 ///   someone who knows the pattern needs up to 2^64 guesses to find it. For a
 ///   pattern which can generate the same output in more than one way (such as
-///   `[aa]`), this is more than the entropy of the output.
+///   `[aa]`), this is more than the entropy of the output. It does not mean
+///   anything if generating fails.
 /// @param data Passed to the callback as it is
 /// @param func Called for every codepoint which is generated
 /// @returns @ref PASSGEN_OK on success, and otherwise why generating failed:
@@ -109,6 +132,8 @@ PASSGEN_EXPORT passgen_status passgen_generate_fill_json_utf8(
 ///     the depth limit of the environment,
 ///   - @ref PASSGEN_ERROR_GROUP_EMPTY, if there is a group with nothing to
 ///     choose from,
+///   - @ref PASSGEN_ERROR_RANDOM, if the source of randomness ran out (see
+///     @ref passgen_random_failed),
 ///   - @ref PASSGEN_ERROR_ABORTED, if the callback returns nonzero.
 PASSGEN_EXPORT passgen_status passgen_generate(
     const passgen_pattern *pattern,

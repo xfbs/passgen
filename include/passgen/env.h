@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
+/// @struct passgen_env
 /// Environment that is needed when generating from patterns.
 ///
 /// This has what a pattern needs to generate something, apart from the
@@ -26,7 +27,7 @@ typedef struct passgen_env passgen_env;
 /// has to stay open for as long as the environment is used to generate
 /// anything, and it is not closed when the environment is freed.
 ///
-/// @memberof passgen_env
+/// @relatesalso passgen_env
 /// @param random Source of randomness to generate from. May be NULL if it is
 ///   set later, with @ref passgen_env_random_set.
 /// @returns The environment, or NULL if it could not be allocated.
@@ -35,7 +36,7 @@ PASSGEN_EXPORT passgen_env *passgen_env_new(passgen_random *random);
 /// Free an environment, along with its wordlists. This does not close the
 /// source of randomness.
 ///
-/// @memberof passgen_env
+/// @relatesalso passgen_env
 /// @param env Environment to free. May be NULL, in which case this does
 ///   nothing.
 PASSGEN_EXPORT void passgen_env_free(passgen_env *env);
@@ -44,7 +45,7 @@ PASSGEN_EXPORT void passgen_env_free(passgen_env *env);
 ///
 /// The environment does not take ownership of it, see @ref passgen_env_new.
 ///
-/// @memberof passgen_env
+/// @relatesalso passgen_env
 /// @param env Environment to change
 /// @param random Source of randomness to generate from
 PASSGEN_EXPORT void passgen_env_random_set(passgen_env *env, passgen_random *random);
@@ -53,7 +54,7 @@ PASSGEN_EXPORT void passgen_env_random_set(passgen_env *env, passgen_random *ran
 /// Generating fails for patterns which are nested more deeply. The default is
 /// 1024.
 ///
-/// @memberof passgen_env
+/// @relatesalso passgen_env
 /// @param env Environment to change
 /// @param depth_limit How deeply groups may be nested. The pattern itself
 ///   counts as a group, so with zero, nothing can be generated.
@@ -67,7 +68,7 @@ PASSGEN_EXPORT void passgen_env_depth_limit_set(passgen_env *env, size_t depth_l
 /// when the environment is freed. This is also the case if adding the wordlist
 /// fails.
 ///
-/// @memberof passgen_env
+/// @relatesalso passgen_env
 /// @param env Environment to add the wordlist to
 /// @param name Name of the wordlist, as a NUL-terminated string. It is
 ///   copied.

@@ -17,13 +17,16 @@ typedef struct passgen_version {
     /// Build information, such as the commit it was built from. This is an
     /// empty string if there is none.
     const char *build;
-    /// Prerelease information
+    /// Prerelease information, such as `rc1`, or NULL for a release. None of
+    /// the versions so far had any.
     const char *prerelease;
 } passgen_version;
 
-/// Returns the version of libpassgen.
+/// Returns the version of the library which is used, which may be another
+/// one than that of the headers (see `PASSGEN_VERSION_MAJOR` and friends in
+/// `passgen/config.h`).
 ///
-/// @related passgen_version
+/// @relatesalso passgen_version
 PASSGEN_EXPORT passgen_version passgen_version_get(void);
 
 /// Test if the version of passgen is compatible with the one passed, which
@@ -34,10 +37,12 @@ PASSGEN_EXPORT passgen_version passgen_version_get(void);
 /// and the minor and patch version must not be smaller. Before version 1.0.0,
 /// the minor version has to be the same as well.
 ///
-/// @related passgen_version
+/// @relatesalso passgen_version
 /// @param version Minimum version that is expected
 /// @returns `true` if the library is compatible
 PASSGEN_EXPORT bool passgen_version_compatible(passgen_version version);
 
-/// Checks if this is a debug build.
+/// Whether the library is a debug build. Those check more, which makes them
+/// slower, and stop with a message when something which should not be
+/// possible happens.
 PASSGEN_EXPORT bool passgen_is_debug(void);

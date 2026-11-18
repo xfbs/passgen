@@ -59,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `config.h.in` being installed along with the headers.
 - Ranges ending in an escaped character (`[+-\-]`) failing to generate.
 - Entropy above 1024 bits being reported as infinite.
+- The API documentation leaving out the ChaCha20 sources of randomness.
 
 ## [0.2.0] - 2026-11-17
 ### Added

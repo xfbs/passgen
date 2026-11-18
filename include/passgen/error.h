@@ -140,14 +140,14 @@ PASSGEN_EXPORT const char *passgen_status_string(passgen_status status);
 /// This is not needed before passing an error to a function. It is useful to
 /// be able to call @ref passgen_error_free whether or not there was an error.
 ///
-/// @memberof passgen_error
+/// @relatesalso passgen_error
 /// @param error Error to initialize
 PASSGEN_EXPORT void passgen_error_init(passgen_error *error);
 
 /// Release what an error holds, which are its causes, and initialize it
 /// again. The error itself is not freed.
 ///
-/// @memberof passgen_error
+/// @relatesalso passgen_error
 /// @param error Error to release. May be NULL, in which case this does
 ///   nothing.
 PASSGEN_EXPORT void passgen_error_free(passgen_error *error);
@@ -162,7 +162,7 @@ PASSGEN_EXPORT void passgen_error_free(passgen_error *error);
 /// This does not print where in a pattern the error is, see @ref
 /// passgen_error::start for that.
 ///
-/// @memberof passgen_error
+/// @relatesalso passgen_error
 /// @param error Error to print
 /// @param file Where to print it to, such as `stderr`
 PASSGEN_EXPORT void passgen_error_print(const passgen_error *error, FILE *file);
