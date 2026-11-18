@@ -245,19 +245,6 @@ int passgen_parse_token(passgen_parser *parser, passgen_token *token) {
     }
 }
 
-static void passgen_pattern_segment_clean(passgen_pattern_segment *segment) {
-    if(segment->items.len > 0) {
-        // get last item
-        passgen_pattern_item *last = passgen_stack_top(&segment->items);
-
-        if(last->kind == PASSGEN_PATTERN_GROUP &&
-           last->data.group.multiplier_sum == 0) {
-            passgen_pattern_group_free(&last->data.group);
-            passgen_stack_pop(&segment->items, NULL);
-        }
-    }
-}
-
 int passgen_parse_group(
     passgen_parser *parser,
     passgen_token *token,
@@ -267,8 +254,9 @@ int passgen_parse_group(
     passgen_pattern_special *special;
     passgen_pattern_item *item;
 
-    passgen_pattern_segment_clean(state->data.group.segment);
-
+    // note that groups are kept even when they are empty, such as `()`: they
+    // generate nothing, but a repetition or a question mark following them
+    // applies to them, and not to what comes before them.
     if(codepoint & PASSGEN_TOKEN_ESCAPED_BIT) {
         codepoint &= ~PASSGEN_TOKEN_ESCAPED_BIT;
         // note that this must compare the whole codepoint: truncating it to
@@ -335,7 +323,6 @@ int passgen_parse_group(
                 if(parser->state.len <= 1) {
                     return PASSGEN_ERROR_GROUP_UNOPENED;
                 }
-                passgen_pattern_group_finish(state->data.group.group);
                 passgen_stack_pop(&parser->state, NULL);
                 return 0;
             case '(':
@@ -689,9 +676,6 @@ int passgen_parse_finish(passgen_parser *parser) {
                 return PASSGEN_ERROR_INTERNAL;
         }
     }
-
-    // clean last state
-    passgen_pattern_segment_clean(state->data.group.segment);
 
     return 0;
 }

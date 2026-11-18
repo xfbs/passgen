@@ -413,13 +413,24 @@ test_result test_error_generate(void) {
     passgen_error_free(&error);
     passgen_pattern_free(pattern);
 
-    // a group in which every segment has a multiplier of zero
-    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "{0}a"));
+    // a group in which every segment has a multiplier of zero, also when it
+    // is not the whole pattern.
+    const char *empty_groups[] = {"{0}a", "x({0}a)y", "x({0}a|{0}b)"};
+    for(size_t i = 0; i < 3; i++) {
+        assert(PASSGEN_OK == passgen_parse(&pattern, NULL, empty_groups[i]));
+        assert(
+            PASSGEN_ERROR_GROUP_EMPTY ==
+            passgen_generate(pattern, env, &error, NULL, &count, count_callback));
+        assert(error.kind == PASSGEN_ERROR_GROUP_EMPTY);
+        passgen_error_free(&error);
+        passgen_pattern_free(pattern);
+    }
+
+    // which is not a problem if it is never generated.
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "x({0}a){0}y"));
     assert(
-        PASSGEN_ERROR_GROUP_EMPTY ==
+        PASSGEN_OK ==
         passgen_generate(pattern, env, &error, NULL, &count, count_callback));
-    assert(error.kind == PASSGEN_ERROR_GROUP_EMPTY);
-    passgen_error_free(&error);
     passgen_pattern_free(pattern);
 
     // nested more deeply than the limit

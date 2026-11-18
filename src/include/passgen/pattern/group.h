@@ -41,15 +41,6 @@ typedef struct {
 /// @param group Pattern group to initialize
 void passgen_pattern_group_init(passgen_pattern_group *group);
 
-/// Finishes a pattern group.
-///
-/// If none of the segments in the group have any items, this sets the
-/// #multiplier_sum to zero, which marks the group as empty, so that it can be
-/// removed. Otherwise, it leaves the #multiplier_sum as it is.
-///
-/// @memberof passgen_pattern_group
-/// @param group Pattern group to finish
-void passgen_pattern_group_finish(passgen_pattern_group *group);
 
 /// Free a pattern group.
 ///

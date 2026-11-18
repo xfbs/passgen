@@ -173,6 +173,7 @@ test_result test_parser_empty_group(void) {
     assert(segment);
     assert(1 == segment->items.len);
 
+    // empty groups are kept, as a repetition following one applies to it.
     for(size_t i = 0; i < 100; i++) {
         PARSE_CODEPOINT('(');
         PARSE_CODEPOINT(')');
@@ -180,10 +181,83 @@ test_result test_parser_empty_group(void) {
         assert(1 == parser.pattern->group.segments.len);
         segment = passgen_pattern_group_segment_get(&parser.pattern->group, 0);
         assert(segment);
-        assert(1 == segment->items.len);
+        assert_eq(segment->items.len, i + 2);
     }
 
     POSTAMBLE();
+    return test_ok;
+}
+
+/// Parses a pattern, and returns the items of its only segment.
+static passgen_pattern_segment *
+parse_segment(passgen_pattern **pattern, const char *string) {
+    if(PASSGEN_OK != passgen_parse(pattern, NULL, string)) {
+        return NULL;
+    }
+    if((*pattern)->group.segments.len != 1) {
+        return NULL;
+    }
+    return passgen_pattern_group_segment_get(&(*pattern)->group, 0);
+}
+
+/// A repetition or a question mark following an empty group applies to the
+/// group, and not to what comes before it.
+test_result test_parser_empty_group_modifiers(void) {
+    passgen_pattern *pattern;
+    passgen_pattern_segment *segment;
+    passgen_pattern_item *item;
+
+    // a(){3} is `a`, followed by nothing three times.
+    segment = parse_segment(&pattern, "a(){3}");
+    assert(segment);
+    assert_eq(segment->items.len, 2);
+    item = passgen_pattern_segment_get_item(segment, 0);
+    assert(item->kind == PASSGEN_PATTERN_LITERAL);
+    assert_eq(item->repeat.min, 1);
+    assert_eq(item->repeat.max, 1);
+    item = passgen_pattern_segment_get_item(segment, 1);
+    assert(item->kind == PASSGEN_PATTERN_GROUP);
+    assert_eq(item->repeat.min, 3);
+    assert_eq(item->repeat.max, 3);
+    passgen_pattern_free(pattern);
+
+    // the same for groups with only empty choices, and for ranges.
+    segment = parse_segment(&pattern, "a(|){1,3}");
+    assert(segment);
+    assert_eq(segment->items.len, 2);
+    item = passgen_pattern_segment_get_item(segment, 0);
+    assert_eq(item->repeat.max, 1);
+    item = passgen_pattern_segment_get_item(segment, 1);
+    assert(item->kind == PASSGEN_PATTERN_GROUP);
+    assert_eq(item->data.group.multiplier_sum, 2);
+    assert_eq(item->repeat.min, 1);
+    assert_eq(item->repeat.max, 3);
+    passgen_pattern_free(pattern);
+
+    // a()? makes the group optional, and not `a`.
+    segment = parse_segment(&pattern, "a()?");
+    assert(segment);
+    assert_eq(segment->items.len, 2);
+    item = passgen_pattern_segment_get_item(segment, 0);
+    assert(!item->maybe);
+    item = passgen_pattern_segment_get_item(segment, 1);
+    assert(item->kind == PASSGEN_PATTERN_GROUP);
+    assert(item->maybe);
+    passgen_pattern_free(pattern);
+
+    // at the start of a segment, (){0} is a group repeated zero times, and
+    // not a multiplier of zero for the segment.
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "x|(){0}y"));
+    assert_eq(pattern->group.segments.len, 2);
+    assert_eq(pattern->group.multiplier_sum, 2);
+    segment = passgen_pattern_group_segment_get(&pattern->group, 1);
+    assert_eq(segment->multiplier, 1);
+    assert_eq(segment->items.len, 2);
+    item = passgen_pattern_segment_get_item(segment, 0);
+    assert(item->kind == PASSGEN_PATTERN_GROUP);
+    assert_eq(item->repeat.max, 0);
+    passgen_pattern_free(pattern);
+
     return test_ok;
 }
 

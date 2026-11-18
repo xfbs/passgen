@@ -338,6 +338,9 @@ PATTERNS = [
     "[ba]{16}",
     "[aab]{24}",
     "[a-zc0-9a-f]{24}",
+    # empty groups generate nothing, but are chosen from like any other, and
+    # what follows them applies to them
+    "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
     # characters whose codepoints end in the same byte as characters which
     # have a meaning in patterns
     "(zażółć|gęślą|jaźń){3}[żśŻ]{4}",

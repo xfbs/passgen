@@ -34,6 +34,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `passgen_random_failed()`), rather than aborting.
 - Entropy is in bits in the API, rather than a number of possibilities.
 - Empty sets (`[]`) are rejected.
+- Empty groups such as `()` are kept rather than removed, and use randomness
+  like other groups, as the reference implementation does. What patterns with
+  empty groups generate changes, also in master passphrase mode.
+- A group in which every choice has a multiplier of zero, such as `x({0}a)`,
+  fails to generate (`PASSGEN_ERROR_GROUP_EMPTY`), as it does for the whole
+  pattern, rather than being left out.
 - `passgen_random_chacha20_argon2_open()` takes `passgen_argon2_params`.
 - `passgen_random_chacha20_seek()` returns whether it could seek, and leaves
   other sources alone, rather than corrupting them in release builds.
@@ -84,6 +90,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The API documentation leaving out the ChaCha20 sources of randomness.
 - The library printing to stderr when `/dev/urandom` cannot be opened, on
   systems without `getrandom()` or `arc4random()`.
+- A repetition or question mark following an empty group applying to what
+  comes before the group: `a(){3}` generated `aaa`.
 - An alternative with a multiplier of zero making the group choose wrongly:
   `({0}a|b)` generated nothing, and `({0}a|b|c)` always chose `b`. Passwords
   derived from such a pattern change.

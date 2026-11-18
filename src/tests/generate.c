@@ -202,6 +202,15 @@ test_result test_generate_group(void) {
     assert(generates_exactly("(a|b)c", EXPECTED("ac", "bc")));
     assert(generates_exactly("((a|b)|c)", EXPECTED("a", "b", "c")));
 
+    // empty groups generate nothing, also when they are repeated or optional,
+    // which does not apply to what comes before them.
+    assert(generates_exactly("()", EXPECTED("")));
+    assert(generates_exactly("a(){3}", EXPECTED("a")));
+    assert(generates_exactly("a(){3}b", EXPECTED("ab")));
+    assert(generates_exactly("a(|){1,3}", EXPECTED("a")));
+    assert(generates_exactly("a()?", EXPECTED("a")));
+    assert(generates_exactly("x|(){0}y", EXPECTED("x", "y")));
+
     return test_ok;
 }
 

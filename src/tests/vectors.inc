@@ -54,6 +54,9 @@ VECTOR("chacha20-argon2:master",
        "[a-zc0-9a-f]{24}",
        "cpd2cg710gs6rceqgrc984kk")
 VECTOR("chacha20-argon2:master",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "urpaxhbafqip")
+VECTOR("chacha20-argon2:master",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "za\305\274\303\263\305\202\304\207g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207\305\274\305\274\305\274\305\273")
 VECTOR("chacha20-argon2:master",
@@ -110,6 +113,9 @@ VECTOR("chacha20-argon2:master:example.com",
 VECTOR("chacha20-argon2:master:example.com",
        "[a-zc0-9a-f]{24}",
        "dj1io0ceqdacz8eeg4mgewcm")
+VECTOR("chacha20-argon2:master:example.com",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "xrstzarpeqqu")
 VECTOR("chacha20-argon2:master:example.com",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "g\304\231\305\233l\304\205ja\305\272\305\204ja\305\272\305\204\305\273\305\273\305\273\305\233")
@@ -168,6 +174,9 @@ VECTOR("chacha20-argon2:master:example.com:user",
        "[a-zc0-9a-f]{24}",
        "serq4c3hzwc2xh6jpa2b6vb5")
 VECTOR("chacha20-argon2:master:example.com:user",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "tductdlzzdpn")
+VECTOR("chacha20-argon2:master:example.com:user",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "za\305\274\303\263\305\202\304\207ja\305\272\305\204g\304\231\305\233l\304\205\305\233\305\273\305\233\305\274")
 VECTOR("chacha20-argon2:master:example.com:user",
@@ -224,6 +233,9 @@ VECTOR("chacha20-argon2:other:example.com:user",
 VECTOR("chacha20-argon2:other:example.com:user",
        "[a-zc0-9a-f]{24}",
        "b5oxsbeu6e6gz49dypbx33ar")
+VECTOR("chacha20-argon2:other:example.com:user",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "mfniwntfwnil")
 VECTOR("chacha20-argon2:other:example.com:user",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "za\305\274\303\263\305\202\304\207g\304\231\305\233l\304\205g\304\231\305\233l\304\205\305\233\305\273\305\274\305\273")
@@ -282,6 +294,9 @@ VECTOR("chacha20-argon2:master:example.org:user",
        "[a-zc0-9a-f]{24}",
        "bbcpdfj9kptcmcqirfpyzguj")
 VECTOR("chacha20-argon2:master:example.org:user",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "mnpavljljddm")
+VECTOR("chacha20-argon2:master:example.org:user",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "za\305\274\303\263\305\202\304\207g\304\231\305\233l\304\205g\304\231\305\233l\304\205\305\233\305\273\305\273\305\273")
 VECTOR("chacha20-argon2:master:example.org:user",
@@ -338,6 +353,9 @@ VECTOR("chacha20-argon2:master:example.com:admin",
 VECTOR("chacha20-argon2:master:example.com:admin",
        "[a-zc0-9a-f]{24}",
        "hui5zdcyc5cxw79mycqdp655")
+VECTOR("chacha20-argon2:master:example.com:admin",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "yspfkrptllay")
 VECTOR("chacha20-argon2:master:example.com:admin",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "za\305\274\303\263\305\202\304\207ja\305\272\305\204g\304\231\305\233l\304\205\305\274\305\273\305\273\305\274")
@@ -396,6 +414,9 @@ VECTOR("chacha20-argon2:master::user",
        "[a-zc0-9a-f]{24}",
        "jyidgrlcdfh2ccrnc5w76lf3")
 VECTOR("chacha20-argon2:master::user",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "jtyxcqqslyyp")
+VECTOR("chacha20-argon2:master::user",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "ja\305\272\305\204g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207\305\274\305\273\305\273\305\274")
 VECTOR("chacha20-argon2:master::user",
@@ -452,6 +473,9 @@ VECTOR("chacha20-argon2::master:example.com",
 VECTOR("chacha20-argon2::master:example.com",
        "[a-zc0-9a-f]{24}",
        "dj1io0ceqdacz8eeg4mgewcm")
+VECTOR("chacha20-argon2::master:example.com",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "xrstzarpeqqu")
 VECTOR("chacha20-argon2::master:example.com",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "g\304\231\305\233l\304\205ja\305\272\305\204ja\305\272\305\204\305\273\305\273\305\273\305\233")
@@ -510,6 +534,9 @@ VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
        "[a-zc0-9a-f]{24}",
        "k2hhhmlnq65p0t480lgb55vf")
 VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "czyzyrzbflnv")
+VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "ja\305\272\305\204g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207\305\273\305\233\305\273\305\233")
 VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
@@ -566,6 +593,9 @@ VECTOR("chacha20-argon2:correct horse battery staple:example.com",
 VECTOR("chacha20-argon2:correct horse battery staple:example.com",
        "[a-zc0-9a-f]{24}",
        "w4zofwajdb9k0r88qbdcdi2o")
+VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "hrekhpksttcb")
 VECTOR("chacha20-argon2:correct horse battery staple:example.com",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207ja\305\272\305\204\305\274\305\274\305\274\305\274")
@@ -624,6 +654,9 @@ VECTOR("chacha20:key",
        "[a-zc0-9a-f]{24}",
        "6d6aq7ri73b3jcycavanp7lo")
 VECTOR("chacha20:key",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "lgsgthczeala")
+VECTOR("chacha20:key",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "ja\305\272\305\204ja\305\272\305\204ja\305\272\305\204\305\274\305\273\305\274\305\273")
 VECTOR("chacha20:key",
@@ -680,6 +713,9 @@ VECTOR("chacha20:key:iv",
 VECTOR("chacha20:key:iv",
        "[a-zc0-9a-f]{24}",
        "ecrxicg6k7la1tgmgcjv5bzw")
+VECTOR("chacha20:key:iv",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "upcighwliclv")
 VECTOR("chacha20:key:iv",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "za\305\274\303\263\305\202\304\207ja\305\272\305\204za\305\274\303\263\305\202\304\207\305\273\305\233\305\274\305\274")
@@ -738,6 +774,9 @@ VECTOR("chacha20:key:",
        "[a-zc0-9a-f]{24}",
        "dcbtagi3ckpad7dy0t1h6xg3")
 VECTOR("chacha20:key:",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "pspnztxzbrpy")
+VECTOR("chacha20:key:",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "ja\305\272\305\204g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207\305\273\305\274\305\273\305\273")
 VECTOR("chacha20:key:",
@@ -794,6 +833,9 @@ VECTOR("chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
 VECTOR("chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
        "[a-zc0-9a-f]{24}",
        "xadypuz4jia4z3tzn4i6er7y")
+VECTOR("chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "pikrafkekktg")
 VECTOR("chacha20:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:12345678",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "za\305\274\303\263\305\202\304\207ja\305\272\305\204za\305\274\303\263\305\202\304\207\305\273\305\273\305\274\305\233")
@@ -852,6 +894,9 @@ VECTOR("xorshift:1",
        "[a-zc0-9a-f]{24}",
        "1yuu1bt9vstulrilyzbe4lda")
 VECTOR("xorshift:1",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "bjffoejgdppk")
+VECTOR("xorshift:1",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "g\304\231\305\233l\304\205g\304\231\305\233l\304\205g\304\231\305\233l\304\205\305\273\305\273\305\273\305\273")
 VECTOR("xorshift:1",
@@ -909,6 +954,9 @@ VECTOR("xorshift:1234",
        "[a-zc0-9a-f]{24}",
        "38jh2fbhc6cbccpfn696zrgb")
 VECTOR("xorshift:1234",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "dxincwsmqszv")
+VECTOR("xorshift:1234",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "za\305\274\303\263\305\202\304\207ja\305\272\305\204g\304\231\305\233l\304\205\305\274\305\233\305\274\305\274")
 VECTOR("xorshift:1234",
@@ -965,6 +1013,9 @@ VECTOR("xorshift:18446744073709551615",
 VECTOR("xorshift:18446744073709551615",
        "[a-zc0-9a-f]{24}",
        "ptt4cpdk56tct81q8grxcgem")
+VECTOR("xorshift:18446744073709551615",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "aeerpasfpvwe")
 VECTOR("xorshift:18446744073709551615",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
        "za\305\274\303\263\305\202\304\207za\305\274\303\263\305\202\304\207za\305\274\303\263\305\202\304\207\305\273\305\274\305\233\305\233")

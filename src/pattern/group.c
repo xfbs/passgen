@@ -21,29 +21,6 @@ void passgen_pattern_group_free(passgen_pattern_group *group) {
     PASSGEN_CLEAR(group);
 }
 
-void passgen_pattern_group_finish(passgen_pattern_group *group) {
-    // iterate through the segments and find out if there are any non-empty
-    // ones.
-    bool empty = true;
-    for(size_t i = 0; i < group->segments.len; i++) {
-        passgen_pattern_segment *segment =
-            passgen_stack_get(&group->segments, i);
-
-        // make this as non-empty only if it has items and a non-zero
-        // multiplier. zero multiplier segments are removed during parsing,
-        // so we can assume that all segments have a positive multiplier.
-        if(segment->items.len > 0) {
-            empty = false;
-        }
-    }
-
-    // if no non-empty segments were found, set the multiplier sum to zero to
-    // indicate that this group can be removed.
-    if(empty) {
-        group->multiplier_sum = 0;
-    }
-}
-
 passgen_pattern_segment *
 passgen_pattern_group_segment_append(passgen_pattern_group *group) {
     passgen_pattern_segment *segment =
