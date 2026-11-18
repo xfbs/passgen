@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "stats.h"
 #include "testalloc.h"
 #include "tests.h"
 
@@ -41,25 +42,126 @@
         free(coverage);                                          \
     } while(false)
 
-double standard_deviation(size_t count, uint32_t *elements) {
-    (void) count;
-    (void) elements;
-    // TODO: determine deviation
-    return 0;
+/// How many numbers are drawn to check how they are distributed.
+#define DISTRIBUTION_SAMPLES 200000
+
+/// Seed for checking how numbers are distributed, so that every run draws the
+/// same ones.
+#define DISTRIBUTION_SEED 0x5eed5eed
+
+/// Draws a number below max (or of the full width, with zero).
+typedef uint64_t draw_func(passgen_random *random, uint64_t max);
+
+static uint64_t draw_u8(passgen_random *random, uint64_t max) {
+    return max ? passgen_random_u8_max(random, (uint8_t) max)
+               : passgen_random_u8(random);
 }
 
-/// Tests that a given function has an even distribution
-#define TEST_DISTRIBUTION(max, bucket_num, target, function)   \
-    uint32_t *buckets = calloc(bucket_num, sizeof(uint32_t));  \
-    while(true) {                                              \
-        size_t bucket = function / ((max) / (bucket_num) + 1); \
-        buckets[bucket] += 1;                                  \
-        if(buckets[bucket] == target) {                        \
-            break;                                             \
-        }                                                      \
-    }                                                          \
-    assert(standard_deviation(bucket_num, buckets) < 10);      \
-    free(buckets)
+static uint64_t draw_u16(passgen_random *random, uint64_t max) {
+    return max ? passgen_random_u16_max(random, (uint16_t) max)
+               : passgen_random_u16(random);
+}
+
+static uint64_t draw_u32(passgen_random *random, uint64_t max) {
+    return max ? passgen_random_u32_max(random, (uint32_t) max)
+               : passgen_random_u32(random);
+}
+
+static uint64_t draw_u64(passgen_random *random, uint64_t max) {
+    return max ? passgen_random_u64_max(random, max)
+               : passgen_random_u64(random);
+}
+
+/// Whether the numbers which a function draws below max are spread evenly.
+/// The range is split into at most 64 buckets of the same size (apart from
+/// the last one, if it does not divide evenly), and each has to come up as
+/// often as its size says.
+static bool distribution_fits(draw_func *draw, uint64_t max) {
+    size_t buckets = max < 64 ? (size_t) max : 64;
+    uint64_t size = max / buckets + (max % buckets != 0);
+    size_t used = (size_t) ((max - 1) / size + 1);
+
+    uint64_t counts[64] = {0};
+    double weights[64];
+    for(size_t i = 0; i < used; i++) {
+        uint64_t start = i * size;
+        weights[i] = (double) (max - start < size ? max - start : size);
+    }
+
+    passgen_random random;
+    if(!passgen_random_xorshift_open(&random, DISTRIBUTION_SEED)) {
+        return false;
+    }
+
+    bool okay = true;
+    for(size_t i = 0; okay && i < DISTRIBUTION_SAMPLES; i++) {
+        uint64_t value = draw(&random, max);
+        okay = value < max;
+        if(okay) {
+            counts[value / size] += 1;
+        }
+    }
+    passgen_random_close(&random);
+
+    return okay && chi_squared_fits(used, counts, weights);
+}
+
+/// Whether numbers of the full width are spread evenly, by their top eight
+/// bits.
+static bool full_distribution_fits(draw_func *draw, unsigned bits) {
+    uint64_t counts[256] = {0};
+    double weights[256];
+    for(size_t i = 0; i < 256; i++) {
+        weights[i] = 1;
+    }
+
+    passgen_random random;
+    if(!passgen_random_xorshift_open(&random, DISTRIBUTION_SEED)) {
+        return false;
+    }
+    for(size_t i = 0; i < DISTRIBUTION_SAMPLES; i++) {
+        counts[draw(&random, 0) >> (bits - 8)] += 1;
+    }
+    passgen_random_close(&random);
+
+    return chi_squared_fits(256, counts, weights);
+}
+
+/// Numbers are spread evenly, also for maximums which do not divide the
+/// range evenly, where taking the remainder would make some numbers more
+/// likely than others.
+test_result test_random_distribution(void) {
+    assert(full_distribution_fits(draw_u8, 8));
+    assert(full_distribution_fits(draw_u16, 16));
+    assert(full_distribution_fits(draw_u32, 32));
+    assert(full_distribution_fits(draw_u64, 64));
+
+    const uint64_t u8_maxes[] = {2, 3, 6, 100, 192, UINT8_MAX};
+    for(size_t i = 0; i < sizeof(u8_maxes) / sizeof(u8_maxes[0]); i++) {
+        assert(distribution_fits(draw_u8, u8_maxes[i]));
+    }
+
+    const uint64_t u16_maxes[] = {3, 1000, 40000, UINT16_MAX};
+    for(size_t i = 0; i < sizeof(u16_maxes) / sizeof(u16_maxes[0]); i++) {
+        assert(distribution_fits(draw_u16, u16_maxes[i]));
+    }
+
+    const uint64_t u32_maxes[] = {3, 1000000, 3000000000u, UINT32_MAX};
+    for(size_t i = 0; i < sizeof(u32_maxes) / sizeof(u32_maxes[0]); i++) {
+        assert(distribution_fits(draw_u32, u32_maxes[i]));
+    }
+
+    const uint64_t u64_maxes[] = {
+        3,
+        1000000000000ull,
+        0xc000000000000000ull,
+        UINT64_MAX};
+    for(size_t i = 0; i < sizeof(u64_maxes) / sizeof(u64_maxes[0]); i++) {
+        assert(distribution_fits(draw_u64, u64_maxes[i]));
+    }
+
+    return test_ok;
+}
 
 test_result test_random_u8(void) {
     passgen_random random;
@@ -118,11 +220,6 @@ test_result test_random_u32(void) {
     assert(passgen_random_open(&random, NULL));
 
     TEST_COVERAGE(UINT32_MAX, 1 << 16, passgen_random_u32(&random));
-    TEST_DISTRIBUTION(
-        UINT32_MAX,
-        1 << 10,
-        1 << 10,
-        passgen_random_u32(&random));
 
     passgen_random_close(&random);
 
@@ -150,13 +247,8 @@ test_result test_random_u64(void) {
     passgen_random random;
     assert(passgen_random_open(&random, NULL));
 
-    // FIXME
-    //TEST_COVERAGE(UINT64_MAX, 1ULL << 48, 1024, passgen_random_u32(&random));
-    TEST_DISTRIBUTION(
-        UINT64_MAX,
-        1 << 10,
-        1 << 10,
-        passgen_random_u64(&random));
+    // every one of 2^16 equal parts of the range comes up.
+    TEST_COVERAGE(UINT64_MAX, 1ULL << 48, passgen_random_u64(&random));
 
     passgen_random_close(&random);
 

@@ -11,6 +11,7 @@
 #include "passgen/pattern/segment.h"
 #include "passgen/pattern/segment_item.h"
 #include "passgen/pattern/set.h"
+#include "stats.h"
 #include "tests.h"
 #include <string.h>
 
@@ -182,6 +183,101 @@ generates_exactly(const char *pattern_string, const char *const *expected) {
 }
 
 #define EXPECTED(...) ((const char *const[]){__VA_ARGS__, NULL})
+
+/// Whether a pattern generates each of the outputs (the list is terminated by
+/// NULL) as often as their weights say, and nothing else.
+static bool generates_weighted(
+    const char *pattern_string,
+    const char *const *outputs,
+    const double *weights) {
+    passgen_pattern *pattern;
+    if(0 != passgen_parse(&pattern, NULL, pattern_string)) {
+        return false;
+    }
+
+    size_t outputs_len = 0;
+    while(outputs[outputs_len]) {
+        outputs_len++;
+    }
+
+    passgen_random random;
+    if(!passgen_random_xorshift_open(&random, SEED)) {
+        passgen_pattern_free(pattern);
+        return false;
+    }
+    passgen_env *env = passgen_env_new(&random);
+
+    uint64_t counts[16] = {0};
+    bool okay = env && outputs_len >= 2 && outputs_len <= 16;
+    for(size_t i = 0; okay && i < 60000; i++) {
+        uint8_t output[64];
+        size_t len = 0;
+        okay = PASSGEN_OK == passgen_generate_fill_utf8(
+                                 pattern,
+                                 env,
+                                 NULL,
+                                 NULL,
+                                 output,
+                                 sizeof(output) - 1,
+                                 &len);
+        output[len] = 0;
+
+        // anything which is not one of the outputs fails.
+        size_t found = outputs_len;
+        for(size_t o = 0; okay && o < outputs_len; o++) {
+            if(0 == strcmp((const char *) output, outputs[o])) {
+                found = o;
+            }
+        }
+        okay = okay && found < outputs_len;
+        if(okay) {
+            counts[found] += 1;
+        }
+    }
+
+    passgen_env_free(env);
+    passgen_random_close(&random);
+    passgen_pattern_free(pattern);
+
+    return okay && chi_squared_fits(outputs_len, counts, weights);
+}
+
+#define WEIGHTS(...) ((const double[]){__VA_ARGS__})
+
+/// What is generated comes up as often as the pattern says: characters which
+/// are listed more than once in a set, choices with multipliers, optional
+/// items and ranges of repetitions.
+test_result test_generate_distribution(void) {
+    assert(generates_weighted("[ab]", EXPECTED("a", "b"), WEIGHTS(1, 1)));
+    assert(generates_weighted("[aab]", EXPECTED("a", "b"), WEIGHTS(2, 1)));
+    assert(generates_weighted("[ba]", EXPECTED("a", "b"), WEIGHTS(1, 1)));
+    assert(generates_weighted(
+        "[a-cb]",
+        EXPECTED("a", "b", "c"),
+        WEIGHTS(1, 2, 1)));
+    assert(generates_weighted(
+        "(a|b|c)",
+        EXPECTED("a", "b", "c"),
+        WEIGHTS(1, 1, 1)));
+    assert(generates_weighted("{3}a|b", EXPECTED("a", "b"), WEIGHTS(3, 1)));
+    assert(generates_weighted("a?", EXPECTED("a", ""), WEIGHTS(1, 1)));
+    assert(generates_weighted(
+        "a{0,3}",
+        EXPECTED("", "a", "aa", "aaa"),
+        WEIGHTS(1, 1, 1, 1)));
+    // half of the time nothing, and the rest split two to one.
+    assert(generates_weighted(
+        "({2}a|b)?",
+        EXPECTED("", "a", "b"),
+        WEIGHTS(3, 2, 1)));
+
+    // the check notices when something is off.
+    assert(!generates_weighted("[aab]", EXPECTED("a", "b"), WEIGHTS(1, 1)));
+    assert(!generates_weighted("[ab]", EXPECTED("a"), WEIGHTS(1, 1)));
+
+    return test_ok;
+}
+
 
 test_result test_generate_segments(void) {
     // either a or b

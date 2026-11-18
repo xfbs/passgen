@@ -1,5 +1,5 @@
 # custom testing framework.
-add_library(passgen-test-lib STATIC "tests.c" "tests.h")
+add_library(passgen-test-lib STATIC "tests.c" "tests.h" "stats.c" "stats.h")
 target_include_directories(passgen-test-lib PUBLIC ".")
 passgen_target_defaults(passgen-test-lib)
 
