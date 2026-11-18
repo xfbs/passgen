@@ -2,6 +2,7 @@
 #include "passgen/config.h"
 #include "passgen/monocypher.h"
 #include "passgen/random.h"
+#include "passgen/util/alloc.h"
 #include <stdlib.h>
 #include <string.h>
 #include "passgen/util/clear.h"
@@ -63,7 +64,7 @@ passgen_random_chacha20_read(void *context_raw, void *dest, size_t size) {
 static void passgen_random_chacha20_close(void *context_raw) {
     passgen_random_chacha20_context *context = context_raw;
     PASSGEN_CLEAR(context);
-    free(context);
+    passgen_free(context, sizeof(*context));
 }
 
 passgen_random *passgen_random_chacha20_open(
@@ -71,15 +72,15 @@ passgen_random *passgen_random_chacha20_open(
     const uint8_t key[CHACHA20_KEY_SIZE],
     const uint8_t iv[8]) {
     passgen_random_chacha20_context *data =
-        malloc(sizeof(passgen_random_chacha20_context));
+        passgen_alloc(sizeof(passgen_random_chacha20_context));
     if(!data) {
         return NULL;
     }
 
     if(!random) {
-        random = malloc(sizeof(passgen_random));
+        random = passgen_alloc(sizeof(passgen_random));
         if(!random) {
-            free(data);
+            passgen_free(data, sizeof(*data));
             return NULL;
         }
     }
@@ -170,12 +171,14 @@ passgen_random *passgen_random_chacha20_argon2_open(
     };
 
     uint8_t hash[CHACHA20_KEY_SIZE];
-    void *work_area = malloc((size_t) 1024 * config.nb_blocks);
+    // this is wiped by Monocypher once it is done.
+    size_t work_area_size = (size_t) 1024 * config.nb_blocks;
+    void *work_area = passgen_alloc(work_area_size);
     if(!work_area) {
         return NULL;
     }
     passgen_argon2(&hash[0], sizeof(hash), work_area, config, inputs, extras);
-    free(work_area);
+    passgen_free(work_area, work_area_size);
 
     static const uint8_t iv[8] = "passgen";
     random = passgen_random_chacha20_open(random, hash, iv);

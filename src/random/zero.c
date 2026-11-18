@@ -1,6 +1,7 @@
 #include "passgen/assert.h"
 #include "passgen/config.h"
 #include "passgen/random.h"
+#include "passgen/util/alloc.h"
 #include "passgen/util/endian.h"
 #include <stdlib.h>
 #include <string.h>
@@ -17,7 +18,7 @@ static void passgen_random_zero_close(void *context) {
 
 passgen_random *passgen_random_zero_open(passgen_random *random) {
     if(!random) {
-        random = malloc(sizeof(passgen_random));
+        random = passgen_alloc(sizeof(passgen_random));
         if(!random) return NULL;
     }
 

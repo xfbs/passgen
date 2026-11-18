@@ -13,9 +13,16 @@ typedef union {
     void *align_ptr;
 } header;
 
+// Whether the next request fails.
+static bool test_fails(test_allocator *allocator) {
+    size_t request = allocator->requests++;
+    return request >= allocator->fail_at &&
+           request - allocator->fail_at < allocator->fail_count;
+}
+
 static void *test_alloc(void *state, size_t size) {
     test_allocator *allocator = state;
-    if(allocator->requests++ >= allocator->fail_at) {
+    if(test_fails(allocator)) {
         return NULL;
     }
 
@@ -41,7 +48,7 @@ static void *
 test_resize(void *state, void *ptr, size_t old_size, size_t new_size) {
     test_allocator *allocator = state;
     header *block = test_header(allocator, ptr, old_size);
-    if(allocator->requests++ >= allocator->fail_at) {
+    if(test_fails(allocator)) {
         return NULL;
     }
 
@@ -71,6 +78,7 @@ static void test_free(void *state, void *ptr, size_t size) {
 void test_allocator_install(test_allocator *allocator, size_t fail_at) {
     memset(allocator, 0, sizeof(*allocator));
     allocator->fail_at = fail_at;
+    allocator->fail_count = TEST_ALLOCATOR_NEVER;
     passgen_allocator config = {
         .alloc = test_alloc,
         .resize = test_resize,
@@ -178,6 +186,19 @@ test_result test_alloc_fail(void) {
     test_allocator_install(&allocator, 0);
     assert(!passgen_alloc(1));
     assert(!passgen_alloc_string("abc"));
+    assert(test_allocator_clean(&allocator));
+    test_allocator_remove();
+
+    // failing once.
+    test_allocator_install(&allocator, 1);
+    allocator.fail_count = 1;
+    first = passgen_alloc(1);
+    assert(first);
+    assert(!passgen_alloc(1));
+    second = passgen_alloc(1);
+    assert(second);
+    passgen_free(first, 1);
+    passgen_free(second, 1);
     assert(test_allocator_clean(&allocator));
     test_allocator_remove();
 

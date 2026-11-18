@@ -1,4 +1,5 @@
 #include "passgen/random.h"
+#include "passgen/util/alloc.h"
 #include "passgen/util/endian.h"
 #include <stdlib.h>
 #include <string.h>
@@ -34,19 +35,19 @@ passgen_random_xorshift_read(void *context, void *dest, size_t size) {
 }
 
 static void passgen_random_xorshift_close(void *context) {
-    free(context);
+    passgen_free(context, sizeof(uint64_t));
 }
 
 passgen_random *
 passgen_random_xorshift_open(passgen_random *random, uint64_t seed) {
     // create state
-    uint64_t *state = malloc(sizeof(uint64_t));
+    uint64_t *state = passgen_alloc(sizeof(uint64_t));
     if(!state) return NULL;
 
     if(!random) {
-        random = malloc(sizeof(passgen_random));
+        random = passgen_alloc(sizeof(passgen_random));
         if(!random) {
-            free(state);
+            passgen_free(state, sizeof(uint64_t));
             return NULL;
         }
     }

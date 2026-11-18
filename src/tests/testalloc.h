@@ -17,6 +17,11 @@ typedef struct {
     /// The request, counting from zero, which fails, and every one after it.
     /// @ref TEST_ALLOCATOR_NEVER for none.
     size_t fail_at;
+    /// How many requests fail, starting with @ref fail_at. It is
+    /// @ref TEST_ALLOCATOR_NEVER when installed, which means all of them, as
+    /// when running out of memory. With one, the allocation which follows a
+    /// failed one works again.
+    size_t fail_count;
     /// Number of allocations which have not been released.
     size_t live;
     /// Number of bytes which have not been released.

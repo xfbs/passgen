@@ -257,6 +257,42 @@ test_result test_error_chain(void) {
     return test_ok;
 }
 
+/// Without memory to keep the cause in, an error is still what it is, and the
+/// cause is released.
+test_result test_error_wrap_out_of_memory(void) {
+    test_allocator allocator;
+    test_allocator_install(&allocator, TEST_ALLOCATOR_NEVER);
+
+    // a chain of two, which is all released when the next cause cannot be
+    // kept.
+    passgen_error error;
+    passgen_error_set(&error, PASSGEN_ERROR_UTF8);
+    passgen_error_wrap(&error, PASSGEN_ERROR_ESCAPE, &error);
+    assert(error.cause);
+    allocator.fail_at = allocator.requests;
+    assert(
+        PASSGEN_ERROR_WORDLIST_READ ==
+        passgen_error_wrap(&error, PASSGEN_ERROR_WORDLIST_READ, &error));
+    assert_eq(error.kind, PASSGEN_ERROR_WORDLIST_READ);
+    assert(!error.cause);
+    assert(printed(&error, "wordlist could not be read\n"));
+
+    // the same with another error as the cause, which is left as nothing
+    // wrong.
+    passgen_error inner;
+    passgen_error_set(&inner, PASSGEN_ERROR_IO);
+    passgen_error_wrap(&error, PASSGEN_ERROR_WORDLIST_READ, &inner);
+    assert_eq(error.kind, PASSGEN_ERROR_WORDLIST_READ);
+    assert(!error.cause);
+    assert_eq(inner.kind, PASSGEN_OK);
+
+    passgen_error_free(&error);
+    assert(test_allocator_clean(&allocator));
+    test_allocator_remove();
+
+    return test_ok;
+}
+
 /// Details which do not fit are cut off, rather than overflowing.
 test_result test_error_detail_long(void) {
     passgen_error error;
@@ -827,6 +863,10 @@ static FILE *wordlist_file(void) {
 /// Running out of memory at any point while adding a wordlist, reading it or
 /// building its Markov chain fails, and leaves nothing allocated. Once there
 /// is enough memory, trying again generates the same as always.
+///
+/// This is done twice: once running out of memory for good, where there is
+/// none left to keep the cause of the error in, and once with just one
+/// allocation failing, where the cause is kept.
 test_result test_error_wordlist_out_of_memory(void) {
     // the pattern is parsed with the usual allocator, it is not what this is
     // about.
@@ -860,77 +900,88 @@ test_result test_error_wordlist_out_of_memory(void) {
         passgen_random_close(&random);
     }
 
-    bool done = false;
-    for(size_t fail_at = 0; !done; fail_at++) {
-        // these are opened with the usual allocator, so that only the
-        // environment uses the failing one.
-        passgen_random random, again;
-        assert(passgen_random_open(&random, "xorshift:1234"));
-        assert(passgen_random_open(&again, "xorshift:1234"));
-        FILE *file = wordlist_file();
-        assert(file);
+    const size_t fail_counts[] = {TEST_ALLOCATOR_NEVER, 1};
+    for(size_t mode = 0; mode < 2; mode++) {
+        const size_t fail_count = fail_counts[mode];
+        bool done = false;
+        for(size_t fail_at = 0; !done; fail_at++) {
+            // these are opened with the usual allocator, so that only the
+            // environment uses the failing one.
+            passgen_random random, again;
+            assert(passgen_random_open(&random, "xorshift:1234"));
+            assert(passgen_random_open(&again, "xorshift:1234"));
+            FILE *file = wordlist_file();
+            assert(file);
 
-        test_allocator allocator;
-        test_allocator_install(&allocator, fail_at);
+            test_allocator allocator;
+            test_allocator_install(&allocator, fail_at);
+            allocator.fail_count = fail_count;
 
-        passgen_status status = PASSGEN_ERROR_OUT_OF_MEMORY;
-        passgen_env *env = passgen_env_new(&random);
-        if(env) {
-            // this closes the file, whether it works or not.
-            status = passgen_env_wordlist_add(env, "words", file, 3);
-        } else {
-            fclose(file);
-        }
-
-        if(status == PASSGEN_OK) {
-            uint8_t output[4096];
-            size_t output_len = 0;
-            passgen_error error;
-            status = passgen_generate_fill_utf8(
-                pattern,
-                env,
-                &error,
-                NULL,
-                output,
-                sizeof(output),
-                &output_len);
-
-            if(status == PASSGEN_OK) {
-                done = true;
+            passgen_status status = PASSGEN_ERROR_OUT_OF_MEMORY;
+            passgen_env *env = passgen_env_new(&random);
+            if(env) {
+                // this closes the file, whether it works or not.
+                status = passgen_env_wordlist_add(env, "words", file, 3);
             } else {
-                // the wordlist could not be read, or its Markov chain could
-                // not be built.
-                assert_eq(status, PASSGEN_ERROR_WORDLIST_READ);
-                assert_streq(error.detail, "words");
-                assert(error.cause);
-                assert_eq(error.cause->kind, PASSGEN_ERROR_OUT_OF_MEMORY);
-                passgen_error_free(&error);
-
-                // nothing of what was read before is used twice.
-                allocator.fail_at = TEST_ALLOCATOR_NEVER;
-                passgen_env_random_set(env, &again);
-                output_len = 0;
-                assert(
-                    PASSGEN_OK == passgen_generate_fill_utf8(
-                                      pattern,
-                                      env,
-                                      NULL,
-                                      NULL,
-                                      output,
-                                      sizeof(output),
-                                      &output_len));
+                fclose(file);
             }
 
-            assert_eq(output_len, expected_len);
-            assert(0 == memcmp(output, expected, output_len));
+            if(status == PASSGEN_OK) {
+                uint8_t output[4096];
+                size_t output_len = 0;
+                passgen_error error;
+                status = passgen_generate_fill_utf8(
+                    pattern,
+                    env,
+                    &error,
+                    NULL,
+                    output,
+                    sizeof(output),
+                    &output_len);
+
+                if(status == PASSGEN_OK) {
+                    // with one allocation failing, it may be one which is not
+                    // needed. it is done once none of them failed.
+                    done = allocator.requests <= fail_at;
+                } else {
+                    // the wordlist could not be read, or its Markov chain could
+                    // not be built.
+                    assert_eq(status, PASSGEN_ERROR_WORDLIST_READ);
+                    assert_streq(error.detail, "words");
+                    if(fail_count == 1) {
+                        assert(error.cause);
+                        assert_eq(error.cause->kind, PASSGEN_ERROR_OUT_OF_MEMORY);
+                    } else {
+                        assert(!error.cause);
+                    }
+                    passgen_error_free(&error);
+
+                    // nothing of what was read before is used twice.
+                    allocator.fail_at = TEST_ALLOCATOR_NEVER;
+                    passgen_env_random_set(env, &again);
+                    output_len = 0;
+                    assert(
+                        PASSGEN_OK == passgen_generate_fill_utf8(
+                                          pattern,
+                                          env,
+                                          NULL,
+                                          NULL,
+                                          output,
+                                          sizeof(output),
+                                          &output_len));
+                }
+
+                assert_eq(output_len, expected_len);
+                assert(0 == memcmp(output, expected, output_len));
+            }
+
+            passgen_env_free(env);
+            assert(test_allocator_clean(&allocator));
+            test_allocator_remove();
+
+            passgen_random_close(&random);
+            passgen_random_close(&again);
         }
-
-        passgen_env_free(env);
-        assert(test_allocator_clean(&allocator));
-        test_allocator_remove();
-
-        passgen_random_close(&random);
-        passgen_random_close(&again);
     }
 
     passgen_pattern_free(pattern);

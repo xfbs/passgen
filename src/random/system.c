@@ -1,6 +1,7 @@
 #include "passgen/assert.h"
 #include "passgen/config.h"
 #include "passgen/random.h"
+#include "passgen/util/alloc.h"
 #include "passgen/util/endian.h"
 #include <stdlib.h>
 #include <string.h>
@@ -64,7 +65,7 @@ passgen_random_start(passgen_random *random, bool allocated) {
     if(random->failed) {
         random->close(random->context);
         if(allocated) {
-            free(random);
+            passgen_free(random, sizeof(passgen_random));
         }
         return NULL;
     }
@@ -76,7 +77,7 @@ passgen_random *passgen_random_system_open(passgen_random *random) {
 #ifdef PASSGEN_RANDOM_HAVE_SYSTEM
     bool allocated = !random;
     if(!random) {
-        random = malloc(sizeof(passgen_random));
+        random = passgen_alloc(sizeof(passgen_random));
         if(!random) return NULL;
     }
 
@@ -110,7 +111,7 @@ passgen_random_path_open(passgen_random *random, const char *path) {
 passgen_random *passgen_random_file_open(passgen_random *random, FILE *file) {
     bool allocated = !random;
     if(!random) {
-        random = malloc(sizeof(passgen_random));
+        random = passgen_alloc(sizeof(passgen_random));
         if(!random) {
             fclose(file);
             return NULL;

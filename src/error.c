@@ -1,3 +1,4 @@
+#include "passgen/util/alloc.h"
 #include "passgen/util/error.h"
 #include <passgen/config.h>
 #include <passgen/error.h>
@@ -77,7 +78,7 @@ void passgen_error_free(passgen_error *error) {
     passgen_error *cause = error->cause;
     while(cause) {
         passgen_error *next = cause->cause;
-        free(cause);
+        passgen_free(cause, sizeof(passgen_error));
         cause = next;
     }
 
@@ -144,7 +145,7 @@ passgen_status passgen_error_wrap(
     passgen_error *moved = NULL;
     if(cause && cause->kind != PASSGEN_OK) {
         if(error) {
-            moved = malloc(sizeof(passgen_error));
+            moved = passgen_alloc(sizeof(passgen_error));
         }
 
         if(moved) {

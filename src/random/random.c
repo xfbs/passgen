@@ -1,4 +1,5 @@
 #include "passgen/random.h"
+#include "passgen/util/alloc.h"
 #include "passgen/assert.h"
 #include "passgen/config.h"
 #include "passgen/util/endian.h"
@@ -223,7 +224,7 @@ void passgen_random_close(passgen_random *random) {
 
 void passgen_random_free(passgen_random *random) {
     passgen_random_close(random);
-    free(random);
+    passgen_free(random, sizeof(passgen_random));
 }
 
 inline uint8_t passgen_random_u8(passgen_random *random) {

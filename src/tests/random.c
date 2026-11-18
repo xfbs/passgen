@@ -4,7 +4,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include "testalloc.h"
 #include "tests.h"
 
 /// Tests that a given function covers all possible outputs (0..max, inclusive).
@@ -554,3 +556,104 @@ test_result test_random_chacha20_argon2(void) {
 }
 
 #endif
+
+/// Running out of memory at any point while opening a source of randomness
+/// fails, and leaves nothing allocated. Once there is enough memory, it is
+/// the same source as always.
+test_result test_random_out_of_memory(void) {
+    const char *descs[] = {
+        "zero",
+        "xorshift:1234",
+        "system",
+#ifndef _WIN32
+        "file:/dev/zero",
+#endif
+#ifdef PASSGEN_MONOCYPHER
+        "chacha20:passgen-out-of-memory-test-key:iv",
+#endif
+    };
+
+    for(size_t i = 0; i < sizeof(descs) / sizeof(descs[0]); i++) {
+        // what it is when nothing fails, for comparing.
+        passgen_random reference;
+        assert(passgen_random_open(&reference, descs[i]));
+        uint8_t expected[64];
+        passgen_random_read(&reference, expected, sizeof(expected));
+        passgen_random_close(&reference);
+        bool deterministic = 0 != strcmp(descs[i], "system");
+
+        // opening it in place, and allocating it.
+        for(int allocate = 0; allocate < 2; allocate++) {
+            bool done = false;
+            for(size_t fail_at = 0; !done; fail_at++) {
+                test_allocator allocator;
+                test_allocator_install(&allocator, fail_at);
+
+                passgen_random in_place;
+                passgen_random *random =
+                    passgen_random_open(allocate ? NULL : &in_place, descs[i]);
+
+                if(random) {
+                    done = true;
+                    assert(allocate || random == &in_place);
+                    uint8_t output[64];
+                    passgen_random_read(random, output, sizeof(output));
+                    assert(!passgen_random_failed(random));
+                    if(deterministic) {
+                        assert(0 == memcmp(output, expected, sizeof(output)));
+                    }
+
+                    if(allocate) {
+                        passgen_random_free(random);
+                    } else {
+                        passgen_random_close(random);
+                    }
+                }
+
+                assert(test_allocator_clean(&allocator));
+                test_allocator_remove();
+            }
+        }
+    }
+
+#ifdef PASSGEN_MONOCYPHER
+    // deriving a key from a master passphrase allocates the memory for it,
+    // which is kept small here so that this is quick.
+    const passgen_argon2_params params = {.memory = 8, .passes = 1, .lanes = 1};
+    passgen_random reference;
+    assert(passgen_random_chacha20_argon2_open(
+        &reference,
+        "master",
+        "example.com",
+        NULL,
+        &params));
+    uint8_t expected[64];
+    passgen_random_read(&reference, expected, sizeof(expected));
+    passgen_random_close(&reference);
+
+    bool done = false;
+    for(size_t fail_at = 0; !done; fail_at++) {
+        test_allocator allocator;
+        test_allocator_install(&allocator, fail_at);
+
+        passgen_random *random = passgen_random_chacha20_argon2_open(
+            NULL,
+            "master",
+            "example.com",
+            NULL,
+            &params);
+        if(random) {
+            done = true;
+            uint8_t output[64];
+            passgen_random_read(random, output, sizeof(output));
+            assert(0 == memcmp(output, expected, sizeof(output)));
+            passgen_random_free(random);
+        }
+
+        assert(test_allocator_clean(&allocator));
+        test_allocator_remove();
+    }
+#endif
+
+    return test_ok;
+}
