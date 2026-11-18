@@ -56,6 +56,7 @@ Note that you usually have to delete and recreate the build folder if you want t
 | `LIBPASSGEN_STATIC` | Build the static libpassgen library. Enabled by default. |
 | `LIBPASSGEN_SHARED` | Build the shared libpassgen library. Enabled by default. |
 | `PASSGEN_STATIC` | Link the passgen utility fully statically, including the C library, such as against musl. Disabled by default. |
+| `CMAKE_INSTALL_LIBDIR` | Where the libraries (and the pkg-config file) are installed, relative to the prefix. `lib` by default, as for [GNUInstallDirs][], which this follows, such as `lib64` for RPM-based distributions. The command-line tool and `passgen.pc` find the library relative to where they are, so it can be any directory below the prefix. |
 | `PASSGEN_CLI_SHARED` | Link the passgen utility against the shared library rather than the static one, which it is by default. It finds the library relative to where it is installed (`../lib`), so an installed or unpacked copy works anywhere (`scripts/test-relocatable.sh` checks that). Needs `LIBPASSGEN_SHARED`, and cannot be combined with `PASSGEN_STATIC`. Disabled by default. |
 | `PASSGEN_SECCOMP` | Enable [seccomp][] filters. These will run at startup to lock passgen down into a sandbox-like mode, used to enhance security, but can be fragile. Disabled by default. |
 | `PASSGEN_MLOCK` | Enable the use of [`mlock()`](https://www.man7.org/linux/man-pages/man2/mlock.2.html) on startup, which prevents Passgen memory from being swapped out to disk. |
@@ -107,3 +108,5 @@ If you want to install the version of Passgen that you have installed locally, i
     apt install ./passgen_*_amd64.deb
 
 See the [overview](README.md) for the other tools that the build system supports.
+
+[GNUInstallDirs]: https://cmake.org/cmake/help/latest/module/GNUInstallDirs.html

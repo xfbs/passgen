@@ -4,6 +4,7 @@ CPack is supported for generating packages from the built code.
 
     cpack -G TXZ
     cpack -G DEB
+    cpack -G RPM
 
 These are used in the CI pipeline to create nightly releases.
 
@@ -18,6 +19,7 @@ publishing it. A release has:
 | `passgen-VERSION-linux-ARCH-static.tar.xz` | Only the command-line tool (and its man page), linked statically against musl. Runs on any Linux. |
 | `passgen-VERSION-linux-ARCH.tar.xz` | The library (shared and static), its headers and pkg-config file, and the command-line tool linked against the shared library. Built on Ubuntu 22.04 against glibc. |
 | `passgen_VERSION_ARCH.deb` | The same, as a Debian package. |
+| `passgen-VERSION-1.ARCH.rpm` | The same, as an RPM package, built on AlmaLinux 9 with the libraries in `lib64`. For RHEL, Rocky and AlmaLinux 9 and newer, and current Fedora. |
 | `passgen-VERSION-macos-arm64.tar.xz` | The same, for macOS. |
 | `passgen-VERSION-source.tar.gz` | The source. |
 
@@ -29,7 +31,9 @@ pkg-config file are in `development`, and the wordlists are in `data`.
 
 The command-line tool finds the shared library relative to where it is (see
 `PASSGEN_CLI_SHARED` in [building](../building.md)), so the archives work
-wherever they are unpacked. `scripts/test-relocatable.sh` checks that.
+wherever they are unpacked. `scripts/test-relocatable.sh` checks that. The
+Debian and RPM packages are installed after they are built, to check that the
+command-line tool and building against the library work from there.
 
 ## pkg-config
 

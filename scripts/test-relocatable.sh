@@ -26,18 +26,24 @@ case "$(uname)" in
     Darwin)
         libraries="$(otool -L "$passgen" | tail -n +2)"
         runpath="$(otool -l "$passgen" | grep -A2 LC_RPATH | sed -n 's/^ *path \(.*\) (offset.*/\1/p')"
-        relative='@loader_path/../lib'
+        origin='@loader_path'
         ;;
     *)
         libraries="$(ldd "$passgen" 2>&1 || true)"
         runpath="$(objdump -p "$passgen" | sed -n 's/^ *\(RUNPATH\|RPATH\) *//p')"
-        relative='$ORIGIN/../lib'
+        origin='$ORIGIN'
         ;;
 esac
 
 if echo "$libraries" | grep -q libpassgen; then
     echo "linked against the shared library, with run path: $runpath"
-    test "$runpath" = "$relative"
+    # relative to the binary, into the directory with the libraries (which
+    # is not always lib), and nothing else.
+    case "$runpath" in
+        "$origin"/../*) ;;
+        *) false ;;
+    esac
+    test -e "$work/moved/bin/$(echo "$runpath" | sed "s|^$origin/||")"
 else
     echo "linked against the static library"
 fi

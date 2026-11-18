@@ -16,7 +16,8 @@ trap 'rm -rf "$prefix"' EXIT
 cmake --install "$build" --prefix "$prefix" --component development > /dev/null
 cmake --install "$build" --prefix "$prefix" --component runtime > /dev/null
 
-export PKG_CONFIG_PATH="$prefix/lib/pkgconfig"
+# the directory with the libraries is not always lib (such as lib64).
+export PKG_CONFIG_PATH="$(dirname "$(find "$prefix" -name passgen.pc)")"
 pkg-config --exists --print-errors passgen
 echo "passgen $(pkg-config --modversion passgen)"
 
@@ -24,5 +25,5 @@ echo "passgen $(pkg-config --modversion passgen)"
 # told where it is.
 # shellcheck disable=SC2046
 "$cc" -o "$prefix/generate" "$source/examples/generate.c" \
-    $(pkg-config --cflags --libs passgen) -Wl,-rpath,"$prefix/lib"
+    $(pkg-config --cflags --libs passgen) -Wl,-rpath,"$(pkg-config --variable=libdir passgen)"
 "$prefix/generate" "[a-z]{8}"

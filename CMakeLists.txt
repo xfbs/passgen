@@ -99,6 +99,26 @@ if(PASSGEN_FUZZ)
     add_compile_options(-fsanitize=fuzzer-no-link)
 endif()
 
+# where libraries are installed, relative to the prefix. this is what
+# GNUInstallDirs calls it, so that packaging for distributions which put them
+# elsewhere (such as lib64) works as usual, but it is lib unless set.
+# (a string rather than a path, as cmake would make a relative path given on
+# the command line absolute.)
+set(CMAKE_INSTALL_LIBDIR "lib"
+    CACHE STRING "Where to install libraries, relative to the prefix")
+if(IS_ABSOLUTE "${CMAKE_INSTALL_LIBDIR}")
+    message(FATAL_ERROR "CMAKE_INSTALL_LIBDIR has to be relative to the prefix")
+endif()
+
+# the command-line tool and the pkg-config file find the library relative to
+# where they are, so that they work wherever they are installed or unpacked.
+file(RELATIVE_PATH PASSGEN_BIN_TO_LIBDIR
+    "/prefix/bin" "/prefix/${CMAKE_INSTALL_LIBDIR}")
+file(RELATIVE_PATH PASSGEN_PKGCONFIG_TO_PREFIX
+    "/prefix/${CMAKE_INSTALL_LIBDIR}/pkgconfig" "/prefix")
+string(REGEX REPLACE "/$" "" PASSGEN_PKGCONFIG_TO_PREFIX
+    "${PASSGEN_PKGCONFIG_TO_PREFIX}")
+
 # build libpassgen
 add_subdirectory(src)
 
@@ -236,6 +256,19 @@ else()
     set(CPACK_DEBIAN_RUNTIME_PACKAGE_DEPENDS "libc6")
 endif()
 
+
+# RPM package, with everything in it, like the Debian package. What it needs
+# (glibc, and the library for the command-line tool) is worked out by rpm.
+set(CPACK_RPM_FILE_NAME "RPM-DEFAULT")
+set(CPACK_RPM_PACKAGE_RELEASE "1")
+set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+set(CPACK_RPM_PACKAGE_URL "${CPACK_PACKAGE_HOMEPAGE_URL}")
+# directories which the system has, rather than this package.
+set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+    /usr/share/man
+    /usr/share/man/man1
+    /usr/${CMAKE_INSTALL_LIBDIR}
+    /usr/${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 include(CPack)
 

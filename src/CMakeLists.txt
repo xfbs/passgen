@@ -84,8 +84,9 @@ set_target_properties(passgen-shared PROPERTIES C_VISIBILITY_PRESET hidden)
 # the library.
 install(
     TARGETS passgen-static passgen-shared
-    ARCHIVE DESTINATION lib COMPONENT development
-    LIBRARY DESTINATION lib COMPONENT runtime NAMELINK_COMPONENT development
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT development
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+        NAMELINK_COMPONENT development
     RUNTIME DESTINATION bin COMPONENT runtime
     OPTIONAL)
 
@@ -116,7 +117,7 @@ install(
 configure_file(passgen.pc.in passgen.pc @ONLY)
 install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/passgen.pc"
-    DESTINATION lib/pkgconfig
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
     COMPONENT development)
 
 if(USE_LIBEXECINFO)

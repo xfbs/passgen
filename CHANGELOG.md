@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A pkg-config file, `passgen.pc`.
 - `-DPASSGEN_CLI_SHARED=ON` links the command-line tool against the shared
   library, which it finds relative to where it is installed.
+- RPM packages, built on AlmaLinux 9.
+- `CMAKE_INSTALL_LIBDIR` sets where the libraries are installed (such as
+  `lib64`).
 - `passgen_random_desc_secret()` says whether a description of a source of
   randomness may hold a secret, so that it is not shown.
 - The public headers can be used from C++.

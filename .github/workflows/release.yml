@@ -135,12 +135,77 @@ jobs:
           (cd build && cpack -G DEB)
           ./scripts/package-archive.sh build "$PACKAGE"
 
+      # the package installs, and what it installs works from there: the
+      # command-line tool, and building against the library.
+      - name: Install the package
+        run: |
+          sudo apt-get install -y ./build/*.deb
+          passgen --version
+          test "$(passgen -r zero '[a-z]{8}')" = aaaaaaaa
+          cc -o /tmp/generate examples/generate.c $(pkg-config --cflags --libs passgen)
+          /tmp/generate '[a-z]{8}'
+
       - uses: actions/upload-artifact@v4
         with:
           name: linux-${{ matrix.arch }}
           path: |
             build/*.deb
             ${{ env.PACKAGE }}.tar.xz
+          if-no-files-found: error
+
+  # RPM packages, built on AlmaLinux 9, so that they work on RHEL, Rocky and
+  # AlmaLinux 9 and newer, and on current versions of Fedora. Libraries go to
+  # lib64, as they do there.
+  linux-rpm:
+    name: linux / ${{ matrix.arch }} / rpm
+    needs: version
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch wordlists
+        run: ./scripts/fetch-wordlists.sh
+
+      # This runs in a plain `docker run` rather than a job container, like
+      # the static build. Once packaged, the package is installed, and what
+      # it installs has to work from there: the command-line tool, and
+      # building against the library (which is found in lib64 without a run
+      # path).
+      - name: Build, test, package and install
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src -e GITHUB_SHA almalinux:9 bash -euxc '
+            dnf install -y gcc make cmake ruby git rpm-build pkgconf-pkg-config binutils
+            cmake -S . -B build \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_INSTALL_PREFIX=/usr \
+              -DCMAKE_INSTALL_LIBDIR=lib64 \
+              -DPASSGEN_CLI_SHARED=ON \
+              -DBUILD_BENCH=OFF \
+              -DBUILD_GIT_INFO=OFF \
+              -DPASSGEN_BUILD_INFO="$GITHUB_SHA"
+            cmake --build build -j "$(nproc)"
+            ctest --test-dir build --output-on-failure
+            ./scripts/test-relocatable.sh build
+            (cd build && cpack -G RPM)
+            dnf install -y ./build/*.rpm
+            passgen --version
+            test "$(passgen -r zero "[a-z]{8}")" = aaaaaaaa
+            gcc -o /tmp/generate examples/generate.c $(pkg-config --cflags --libs passgen)
+            /tmp/generate "[a-z]{8}"
+          '
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-rpm-${{ matrix.arch }}
+          path: build/*.rpm
           if-no-files-found: error
 
   macos:
@@ -206,7 +271,7 @@ jobs:
   publish:
     name: publish release
     if: github.ref_type == 'tag'
-    needs: [version, linux-static, linux, macos, source]
+    needs: [version, linux-static, linux, linux-rpm, macos, source]
     runs-on: ubuntu-latest
     permissions:
       contents: write

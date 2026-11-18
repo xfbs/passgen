@@ -12,15 +12,14 @@ if(PASSGEN_CLI_SHARED)
     endif()
     target_link_libraries(passgen-cli PRIVATE passgen-shared m)
 
-    # the library is installed into lib/, next to bin/. the binary looks for
-    # it relative to where it is, so that it can be installed or unpacked
-    # anywhere.
+    # the binary looks for the library relative to where it is (such as
+    # ../lib), so that it can be installed or unpacked anywhere.
     if(APPLE)
         set_target_properties(passgen-cli PROPERTIES
-            INSTALL_RPATH "@loader_path/../lib")
+            INSTALL_RPATH "@loader_path/${PASSGEN_BIN_TO_LIBDIR}")
     else()
         set_target_properties(passgen-cli PROPERTIES
-            INSTALL_RPATH "$ORIGIN/../lib")
+            INSTALL_RPATH "$ORIGIN/${PASSGEN_BIN_TO_LIBDIR}")
     endif()
 else()
     target_link_libraries(passgen-cli PRIVATE ${PASSGEN_LIB} m)

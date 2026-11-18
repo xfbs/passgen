@@ -1,8 +1,8 @@
 # pkg-config file for libpassgen. The prefix is found from where this file
 # is, so that it works wherever the library is installed or unpacked.
-prefix=${pcfiledir}/../..
+prefix=${pcfiledir}/@PASSGEN_PKGCONFIG_TO_PREFIX@
 exec_prefix=${prefix}
-libdir=${exec_prefix}/lib
+libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
 includedir=${prefix}/include
 
 Name: passgen
