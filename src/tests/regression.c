@@ -7,6 +7,8 @@
 #include <passgen/generate.h>
 #include <passgen/passgen.h>
 #include <passgen/pattern/pattern.h>
+#include <passgen/pattern/segment.h>
+#include <passgen/pattern/segment_item.h>
 #include <passgen/env.h>
 #include <passgen/random.h>
 #include <passgen/util/utf8.h>
@@ -245,6 +247,42 @@ test_result test_regression_parse_multiplier_twice(void) {
                  &pattern,
                  &error,
                  "{18446744073709551615}a|{18446744073709551615}b"));
+    passgen_pattern_free(pattern);
+
+    return test_ok;
+}
+
+/// A segment with a zero multiplier is recycled at the next `|`, which sets
+/// its multiplier back to one. The sum of the group used to not count it
+/// again, so that `({0}a|b)` generated nothing and `({0}a|b|c)` never chose
+/// the last segment.
+test_result test_regression_parse_multiplier_zero_recycled(void) {
+    passgen_pattern *pattern;
+    passgen_error error;
+
+    assert(0 == passgen_parse(&pattern, &error, "{0}a|b"));
+    assert(pattern->group.segments.len == 1);
+    assert(pattern->group.multiplier_sum == 1);
+    passgen_pattern_free(pattern);
+
+    assert(0 == passgen_parse(&pattern, &error, "{0}a|b|c"));
+    assert(pattern->group.segments.len == 2);
+    assert(pattern->group.multiplier_sum == 2);
+    passgen_pattern_free(pattern);
+
+    assert(0 == passgen_parse(&pattern, &error, "{0}a|{3}b|{0}c|d"));
+    assert(pattern->group.segments.len == 2);
+    assert(pattern->group.multiplier_sum == 4);
+    passgen_pattern_free(pattern);
+
+    // the same holds within a nested group.
+    assert(0 == passgen_parse(&pattern, &error, "({0}a|b|c)"));
+    passgen_pattern_segment *segment =
+        passgen_pattern_group_segment_get(&pattern->group, 0);
+    passgen_pattern_item *item = passgen_stack_get(&segment->items, 0);
+    assert(item->kind == PASSGEN_PATTERN_GROUP);
+    assert(item->data.group.segments.len == 2);
+    assert(item->data.group.multiplier_sum == 2);
     passgen_pattern_free(pattern);
 
     return test_ok;

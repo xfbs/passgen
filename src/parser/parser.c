@@ -315,9 +315,14 @@ int passgen_parse_group(
                     }
                     state->data.group.segment = segment;
                 } else {
-                    // if the previous segment had a zero multiplier, recycle it
+                    // if the previous segment had a zero multiplier, recycle
+                    // it. initializing it sets its multiplier back to one,
+                    // which the sum of the group has to count again (just
+                    // like when appending a new segment).
                     passgen_pattern_segment_free(state->data.group.segment);
                     passgen_pattern_segment_init(state->data.group.segment);
+                    state->data.group.group->multiplier_sum +=
+                        state->data.group.segment->multiplier;
                 }
                 return 0;
             case ')':
