@@ -41,6 +41,13 @@ function pattern_matches() {
     $passgen "$1" | matches "$1"
 }
 
+# writing to /dev/null works. with seccomp, checking whether the output is a
+# terminal (which the C library does for character devices such as this one)
+# used to kill the process.
+$passgen "a" > /dev/null
+$passgen -r zero "a" > /dev/null 2>&1
+fails $passgen "[" 2> /dev/null
+
 # test simple grammar
 pattern_matches "a"
 pattern_matches "a?"

@@ -110,6 +110,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A randomness source which cannot be used printing all of its description in
   the error, including a key or a master passphrase. Only the kind is printed
   now, except for sources which cannot hold a secret (`file`, `xorshift`).
+- Builds with seccomp (`PASSGEN_SECCOMP`) being killed when the output is not
+  a terminal or a pipe (such as `passgen a > /dev/null`), with glibc 2.41 and
+  later (which implements `getrandom()` in the vDSO), when deriving a key with
+  transparent huge pages enabled, and with musl on architectures which only
+  have `openat` (such as aarch64). They also did not compile with GCC 14 and
+  later.
 
 ## [0.2.0] - 2026-11-17
 ### Added
