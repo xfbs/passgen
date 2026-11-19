@@ -80,10 +80,11 @@ start from, along with the [options of libFuzzer][libFuzzer]:
 
 ## Limits
 
-Generating from a pattern can take arbitrarily long, as a short pattern such as
-`(a{999}){999}` results in a lot of output. To keep every run short, the
-harnesses stop generating after some amount of output or randomness, and skip
-patterns with long numbers in them. They also do not open files, so the `file:`
-randomness source and the configuration file are not covered.
+A short pattern such as `(a{999}){999}` results in a lot of output, and one
+such as `(){999999999}` takes long without any. To keep every run short, the
+harnesses stop generating after some amount of output or randomness, and use a
+lower step limit than the default (see `FUZZ_STEP_LIMIT` in
+`src/fuzz/common.h`). They do not open files, so the `file:` randomness source
+and the configuration file are not covered.
 
 [libFuzzer]: https://llvm.org/docs/LibFuzzer.html

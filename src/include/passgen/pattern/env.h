@@ -15,6 +15,8 @@
 struct passgen_env {
     /// Recursion depth limit for generation
     size_t depth_limit;
+    /// How many steps generating may take, see passgen_env_step_limit_set()
+    size_t step_limit;
     /// Wordlists that are loaded. The keys are the names, which are owned by
     /// the environment, as are the wordlists.
     passgen_hashmap wordlists;

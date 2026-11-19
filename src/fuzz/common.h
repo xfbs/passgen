@@ -2,10 +2,10 @@
 ///
 /// Helpers shared by the fuzzing harnesses.
 ///
-/// Generating from a pattern is not bounded: a pattern such as `(a{999}){999}`
-/// is short, but results in a lot of output. To keep every run of a harness
-/// short, there is a budget for the output, and one for the randomness which
-/// may be consumed.
+/// A pattern such as `(a{999}){999}` is short, but results in a lot of
+/// output. To keep every run of a harness short, there is a budget for the
+/// output, one for the randomness which may be consumed, and a lower step
+/// limit than the default.
 ///
 /// Every input is run twice, using an allocator which checks that everything
 /// is released, with the size it was allocated with: once as it is, and once
@@ -22,6 +22,11 @@
 
 /// How many codepoints may be generated per run.
 #define FUZZ_OUTPUT_BUDGET 4096
+
+/// How many steps generating may take per run (see
+/// passgen_env_step_limit_set()). This is what bounds patterns which take
+/// long without generating anything, such as `(){999999999}`.
+#define FUZZ_STEP_LIMIT 100000
 
 /// How many bytes of randomness may be consumed per run.
 #define FUZZ_RANDOM_BUDGET (256 * 1024)
@@ -79,20 +84,6 @@ static inline int fuzz_output(void *data, uint32_t codepoint) {
         return -1;
     }
     *budget -= 1;
-    return 0;
-}
-
-/// Repetitions are parsed as numbers, and a pattern such as `[]{999999999}`
-/// loops that many times without generating output or consuming randomness.
-/// So inputs with long numbers in them are skipped.
-static inline int fuzz_has_long_number(const uint8_t *data, size_t size) {
-    size_t digits = 0;
-    for(size_t i = 0; i < size; i++) {
-        digits = (data[i] >= '0' && data[i] <= '9') ? digits + 1 : 0;
-        if(digits > 4) {
-            return 1;
-        }
-    }
     return 0;
 }
 

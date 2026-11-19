@@ -46,6 +46,8 @@ const char *passgen_status_string(passgen_status status) {
             return "expected a name in braces";
         case PASSGEN_ERROR_DEPTH_LIMIT:
             return "nested too deeply";
+        case PASSGEN_ERROR_STEP_LIMIT:
+            return "takes too many steps";
         case PASSGEN_ERROR_WORDLIST_NOT_FOUND:
             return "wordlist not found";
         case PASSGEN_ERROR_WORDLIST_EMPTY:

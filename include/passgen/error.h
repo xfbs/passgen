@@ -80,6 +80,9 @@ typedef enum passgen_status {
     PASSGEN_ERROR_SPECIAL,
     /// Groups are nested more deeply than the limit.
     PASSGEN_ERROR_DEPTH_LIMIT,
+    /// Generating takes more steps than the limit, such as `(a{1000}){1000}`
+    /// with the default limit. See @ref passgen_env_step_limit_set.
+    PASSGEN_ERROR_STEP_LIMIT,
 
     /// The pattern uses a wordlist which is not in the environment. The
     /// detail of the error is its name.

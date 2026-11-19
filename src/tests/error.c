@@ -447,6 +447,20 @@ test_result test_error_generate(void) {
         passgen_generate(pattern, env, &error, NULL, &count, count_callback));
     passgen_pattern_free(pattern);
 
+    // taking more steps than the limit
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "(a){5}"));
+    passgen_env_step_limit_set(env, 9);
+    assert(
+        PASSGEN_ERROR_STEP_LIMIT ==
+        passgen_generate(pattern, env, &error, NULL, &count, count_callback));
+    assert(error.kind == PASSGEN_ERROR_STEP_LIMIT);
+    passgen_error_free(&error);
+    passgen_env_step_limit_set(env, 10);
+    assert(
+        PASSGEN_OK ==
+        passgen_generate(pattern, env, &error, NULL, &count, count_callback));
+    passgen_pattern_free(pattern);
+
     // the callback asking to stop
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "abcdef"));
     size_t remaining = 3;

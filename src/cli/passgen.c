@@ -1,6 +1,7 @@
 #include "passgen.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <getopt.h>
 #include <math.h>
 #include <stdbool.h>
@@ -522,7 +523,7 @@ void passgen_cli_presets_list(const passgen_cli_opts *opts) {
 #endif
 
 int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
-    const char *short_opts = "a:p:P:w:r:D:M:ezhvjl" PASSGEN_CLI_MASTER_OPTS;
+    const char *short_opts = "a:p:P:w:r:D:S:M:ezhvjl" PASSGEN_CLI_MASTER_OPTS;
     const char *preset = NULL;
     // whether the randomness source was set on the command line, rather than
     // in the configuration.
@@ -533,6 +534,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
         {"help", no_argument, NULL, 'h'},
         {"preset", required_argument, NULL, 'p'},
         {"depth", required_argument, NULL, 'D'},
+        {"steps", required_argument, NULL, 'S'},
         {"version", no_argument, NULL, 'v'},
         {"null", no_argument, NULL, 'z'},
         {"entropy", no_argument, NULL, 'e'},
@@ -587,6 +589,17 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 }
                 passgen_env_depth_limit_set(opts->env, opt);
                 break;
+            case 'S': {
+                char *end;
+                errno = 0;
+                unsigned long long steps = strtoull(optarg, &end, 10);
+                if(*optarg < '0' || *optarg > '9' || *end || errno ||
+                   steps < 1 || steps > SIZE_MAX) {
+                    return passgen_cli_bail(PASSGEN_CLI_ERROR_ILLEGAL_STEPS, optarg);
+                }
+                passgen_env_step_limit_set(opts->env, (size_t) steps);
+                break;
+            }
             case 'z':
                 opts->null = true;
                 break;
@@ -762,6 +775,8 @@ void passgen_cli_usage(const char *executable) {
         "    -P, --define-preset NAME:PATTERN\n"
         "                       Define a preset\n"
         "    -r, --random RAND  Source of randomness to use\n"
+        "    -S, --steps STEPS  Maximum number of steps to generate (default: "
+        "1000000)\n"
         PASSGEN_CLI_HELP_TOKEN
         "    -v, --version      Show the version of this build\n"
         "    -w, --wordlist NAME:PATH\n"
@@ -840,6 +855,12 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
                 stderr,
                 "\033[1;31merror\033[0m: illegal depth entered (%i)\n",
                 *((const int *) data));
+            break;
+        case PASSGEN_CLI_ERROR_ILLEGAL_STEPS:
+            fprintf(
+                stderr,
+                "\033[1;31merror\033[0m: illegal number of steps entered (%s)\n",
+                (const char *) data);
             break;
         case PASSGEN_CLI_ERROR_GENERATE:
             // what went wrong was printed by whoever noticed.

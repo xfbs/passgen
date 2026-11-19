@@ -494,6 +494,67 @@ test_result test_generate_depth_limit_two_over(void) {
     return test_ok;
 }
 
+// Generate from the pattern with the given step limit, or the default one if
+// it is zero, and return the status.
+static int generate_steps(const char *string, size_t step_limit) {
+    passgen_pattern *pattern;
+    passgen_error error;
+    if(0 != passgen_parse(&pattern, &error, string)) {
+        return -1;
+    }
+
+    passgen_random random;
+    passgen_random_open(&random, "xorshift:1234");
+
+    passgen_env *env = passgen_env_new(&random);
+    if(step_limit) {
+        passgen_env_step_limit_set(env, step_limit);
+    }
+
+    int ret = passgen_generate(pattern, env, NULL, NULL, NULL, dummy_callback);
+
+    passgen_pattern_free(pattern);
+    passgen_env_free(env);
+    passgen_random_close(&random);
+
+    return ret;
+}
+
+test_result test_generate_step_limit(void) {
+    // every character of a set is a step.
+    assert_eq(generate_steps("[a-z]{20}", 20), PASSGEN_OK);
+    assert_eq(generate_steps("[a-z]{20}", 19), PASSGEN_ERROR_STEP_LIMIT);
+
+    // as is every repetition of a group, and what is in it.
+    assert_eq(generate_steps("([ab]){3}", 6), PASSGEN_OK);
+    assert_eq(generate_steps("([ab]){3}", 5), PASSGEN_ERROR_STEP_LIMIT);
+
+    // a run of literal characters is one step.
+    assert_eq(generate_steps("abc", 1), PASSGEN_OK);
+    assert_eq(generate_steps("abc{2}", 2), PASSGEN_ERROR_STEP_LIMIT);
+
+    // what is left out does not take a step.
+    assert_eq(generate_steps("[ab]{0}", 1), PASSGEN_OK);
+
+    // the pattern itself does not count, so nothing takes no steps.
+    assert_eq(generate_steps("", 1), PASSGEN_OK);
+
+    return test_ok;
+}
+
+test_result test_generate_step_limit_default(void) {
+    // the default is a million steps.
+    assert_eq(generate_steps("(a{1000}){999}", 0), PASSGEN_OK);
+    assert_eq(generate_steps("(a{1000}){1000}", 0), PASSGEN_ERROR_STEP_LIMIT);
+
+    // which is what keeps this from running practically forever: it does
+    // not generate anything, but every repetition is a step.
+    assert_eq(generate_steps("(){999999999}", 0), PASSGEN_ERROR_STEP_LIMIT);
+    assert_eq(generate_steps("((((){999}){999}){999}){999}", 0), PASSGEN_ERROR_STEP_LIMIT);
+
+    return test_ok;
+}
+
 #undef SEED
 #undef PREAMBLE
 #undef POSTAMBLE

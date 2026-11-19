@@ -50,6 +50,8 @@ static void run(const uint8_t *data, size_t size) {
             }
 
             if(env) {
+                passgen_env_step_limit_set(env, FUZZ_STEP_LIMIT);
+
                 // with and without computing the entropy.
                 double entropy;
                 size_t budget = FUZZ_OUTPUT_BUDGET;
@@ -69,10 +71,6 @@ static void run(const uint8_t *data, size_t size) {
 }
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-    if(fuzz_has_long_number(data, size)) {
-        return 0;
-    }
-
     run_index = 0;
     fuzz_run(run, data, size);
 

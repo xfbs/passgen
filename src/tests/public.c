@@ -121,6 +121,14 @@ int main(void) {
     // with a depth limit of zero, nothing can be generated.
     passgen_env_depth_limit_set(env, 0);
     check(0 != passgen_generate(pattern, env, NULL, NULL, &codepoint_count, count));
+    passgen_env_depth_limit_set(env, 100);
+
+    // and with a step limit of one, neither can this.
+    passgen_env_step_limit_set(env, 1);
+    check(
+        PASSGEN_ERROR_STEP_LIMIT ==
+        passgen_generate(pattern, env, NULL, NULL, &codepoint_count, count));
+    passgen_env_step_limit_set(env, 1000);
 
     // which descriptions of sources of randomness may hold a secret, which
     // the command-line tool uses to not print them.

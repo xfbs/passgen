@@ -1,4 +1,4 @@
-.Dd November 17, 2026
+.Dd November 19, 2026
 .Dt PASSGEN 1
 .Os Passgen v@PROJECT_VERSION@
 .Sh NAME
@@ -12,6 +12,7 @@
 .Op Fl M Ar length
 .Op Fl P Ar name:pattern
 .Op Fl r Ar random
+.Op Fl S Ar steps
 .Op Fl w Ar name:path
 .Op Fl m Ar master Op Fl d Ar domain Op Fl t Ar token
 .Ar pattern | Fl p Ar preset
@@ -86,6 +87,17 @@ If there is a preset with this name already, it is replaced.
 .It Fl r , Fl -random Ar random
 Use another source of randomness, see
 .Sx RANDOMNESS SOURCES .
+.It Fl S , Fl -steps Ar steps
+Limit how many steps generating may take.
+Has to be at least one, the default is 1000000.
+Every character of a set, run of literal characters, word and group that is
+generated is a step, counting each repetition: so
+.Ql [a-z]{20}
+takes 20 steps.
+Generating fails for patterns which take more, which keeps a short pattern
+such as
+.Ql (){999999999}
+from running practically forever.
 .It Fl v , Fl -version
 Show the version and exit.
 .It Fl w , Fl -wordlist Ar name:path
@@ -376,7 +388,7 @@ valid.
 .It 9
 Generating failed, for example because the pattern uses a wordlist which was
 not loaded or is empty, or because it is nested more deeply than the depth
-limit.
+limit or takes more steps than the step limit.
 The message says which.
 .It 10
 A wordlist could not be opened, or its definition is not valid.
@@ -386,6 +398,8 @@ The depth is not valid.
 The options for master passphrase mode cannot be used this way: together with
 .Fl -random ,
 or a domain or token without a master passphrase.
+.It 13
+The number of steps is not valid.
 .El
 .Pp
 If a source of randomness does not supply enough data,

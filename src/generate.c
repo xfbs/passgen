@@ -25,6 +25,8 @@
 typedef struct {
     passgen_env *env;
     size_t depth;
+    // how many more steps may be taken.
+    size_t steps;
     double *entropy;
     passgen_error *error;
     void *data;
@@ -116,6 +118,18 @@ static inline int descend(passgen_generate_context *context) {
 
 static inline void ascend(passgen_generate_context *context) {
     context->depth += 1;
+}
+
+// Take a step, which is generating one item once. Every step does an amount
+// of work which is bounded by the size of the pattern (or of a word), so this
+// bounds how long generating takes.
+static inline int step(passgen_generate_context *context) {
+    if(!context->steps) {
+        return fail(context, PASSGEN_ERROR_STEP_LIMIT);
+    }
+
+    context->steps -= 1;
+    return 0;
 }
 
 static size_t passgen_generate_repeat(
@@ -603,6 +617,8 @@ static int passgen_generate_item(
     size_t reps = passgen_generate_repeat(context, &item->repeat);
 
     for(size_t i = 0; i < reps; i++) {
+        try(step(context));
+
         switch(item->kind) {
             case PASSGEN_PATTERN_SET:
                 try(passgen_generate_set(context, &item->data.set));
@@ -699,6 +715,7 @@ passgen_status passgen_generate(
     passgen_generate_context context = {
         .env = env,
         .depth = env->depth_limit,
+        .steps = env->step_limit,
         .func = func,
         .data = data,
         .entropy = entropy,

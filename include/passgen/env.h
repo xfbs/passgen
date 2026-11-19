@@ -64,6 +64,26 @@ PASSGEN_EXPORT void passgen_env_random_set(passgen_env *env, passgen_random *ran
 ///   counts as a group, so with zero, nothing can be generated.
 PASSGEN_EXPORT void passgen_env_depth_limit_set(passgen_env *env, size_t depth_limit);
 
+/// Set how many steps generating from a pattern may take. Generating fails
+/// with @ref PASSGEN_ERROR_STEP_LIMIT for patterns which take more. The
+/// default is 1000000.
+///
+/// Without a limit, a short pattern can take practically forever:
+/// `(){999999999}` repeats an empty group that many times, and repetitions
+/// which are nested multiply. This matters when patterns come from someone
+/// else.
+///
+/// Every time something in a pattern is generated is a step: a character of
+/// a set, a run of literal characters, a word, or a group, and each of its
+/// repetitions counts. So `[a-z]{20}` takes 20 steps, and `(ab){3}` takes 3
+/// for the group and 3 for what is inside of it.
+///
+/// @relatesalso passgen_env
+/// @param env Environment to change
+/// @param step_limit How many steps generating may take. Use `SIZE_MAX` for
+///   practically no limit.
+PASSGEN_EXPORT void passgen_env_step_limit_set(passgen_env *env, size_t step_limit);
+
 /// Adds a wordlist, which patterns can then refer to by its name. If there is
 /// a wordlist with this name already, it is replaced.
 ///

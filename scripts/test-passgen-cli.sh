@@ -110,9 +110,10 @@ test "$($passgen -a 3 "[a-z]{500}" | wc -l)" -eq 3
 
 # large outputs work when only little memory may be locked. the subshell keeps
 # the limit from applying to the rest of the tests, and this is skipped where
-# the limit cannot be set to this value.
+# the limit cannot be set to this value. it takes more than the default
+# limit of steps.
 if (ulimit -l 8192) 2> /dev/null; then
-    test "$(ulimit -l 8192; $passgen "a{20000000}" | tr -d '\n' | wc -c)" -eq 20000000
+    test "$(ulimit -l 8192; $passgen -S 20000000 "a{20000000}" | tr -d '\n' | wc -c)" -eq 20000000
 fi
 
 # deterministic randomness sources always produce the same output
@@ -239,6 +240,20 @@ function nested() {
 $passgen "$(nested 1023)" | matches "a"
 fails $passgen "$(nested 1024)"
 
+# step limit: every character of a set, run of literals, and group is a step,
+# and the default is a million.
+$passgen -S 20 "[a-z]{20}" | matches "[a-z]{20}"
+fails $passgen -S 19 "[a-z]{20}"
+$passgen --steps 6 "([ab]){3}" | matches "[ab]{3}"
+fails $passgen --steps 5 "([ab]){3}"
+test "$($passgen "(a{1000}){999}" | tr -d '\n' | wc -c)" -eq 999000
+fails $passgen "(a{1000}){1000}"
+fails $passgen "(){999999999}"
+for steps in 0 -1 abc 5x "" " 5" 99999999999999999999999; do
+    fails $passgen -S "$steps" "a"
+    $passgen -S "$steps" a >/dev/null 2>&1 || test "$?" = 13
+done
+
 fails $passgen "a{5,2}"
 fails $passgen "(abc"
 fails $passgen "[z-a]"
@@ -303,6 +318,8 @@ test "$(error_of $passgen '\m{undefined}')" = "error: wordlist not found: undefi
 test "$(error_of $passgen -w "test:$tmpdir/empty.txt" '\w{test}')" = "error: wordlist is empty: test"
 test "$(error_of $passgen -D 2 '((((a))))')" = "error: nested too deeply"
 test "$(error_of $passgen '{0}a')" = "error: nothing to choose from"
+test "$(error_of $passgen "(){999999999}")" = "error: takes too many steps"
+test "$(error_of $passgen -S 0 a)" = "error: illegal number of steps entered (0)"
 
 # a wordlist which cannot be read (a pipe cannot be rewound) says why.
 if [ -e /dev/stdin ]; then
