@@ -18,8 +18,13 @@ typedef struct passgen_wordlist {
     /// Should close file when done reading.
     bool should_close_file;
 
-    /// File of the wordlist
+    /// File of the wordlist, until it is read. NULL if it was not opened
+    /// yet, in which case it is opened from @ref path.
     FILE *file;
+
+    /// Path of the file of the wordlist, which it is opened from when it is
+    /// first read, or NULL if it was given a file. Owned by the wordlist.
+    char *path;
 
     /// Entire wordlist
     char *data;
@@ -57,14 +62,24 @@ passgen_status passgen_wordlist_load(
 /// @memberof passgen_wordlist
 void passgen_wordlist_init(passgen_wordlist *wordlist, FILE *file);
 
-/// Load words from wordlist, and close the file.
+/// Initialize a wordlist with the path of its file, which is only opened
+/// when it is read.
 ///
-/// If this fails, the wordlist is as it was before, and still has the file.
+/// @memberof passgen_wordlist
+/// @param path Path of the file, allocated with @ref passgen_alloc_string.
+///   The wordlist takes ownership of it.
+void passgen_wordlist_init_path(passgen_wordlist *wordlist, char *path);
+
+/// Load words from wordlist, and close the file. If the wordlist only has
+/// the path of its file, it is opened first.
+///
+/// If this fails, the wordlist is as it was before, and still has the file
+/// (if it could be opened).
 ///
 /// @memberof passgen_wordlist
 /// @param error Set to what went wrong on failure, may be NULL
 /// @returns @ref PASSGEN_OK, @ref PASSGEN_ERROR_IO if the file cannot be
-///   read (the detail of the error is the reason), or
+///   opened or read (the detail of the error is the reason), or
 ///   @ref PASSGEN_ERROR_OUT_OF_MEMORY
 passgen_status
 passgen_wordlist_parse(passgen_wordlist *wordlist, passgen_error *error);

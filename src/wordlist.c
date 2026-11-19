@@ -12,10 +12,19 @@
 #define ALLOC_INITIAL  256
 #define ALLOC_INCREASE 2
 
+// Fails because of the file, with what the system has to say about it.
+static passgen_status
+passgen_wordlist_fail_io(passgen_error *error, int code, const char *fallback) {
+    passgen_error_set(error, PASSGEN_ERROR_IO);
+    passgen_error_detail_set(error, code ? strerror(code) : fallback);
+    return PASSGEN_ERROR_IO;
+}
+
 void passgen_wordlist_init(passgen_wordlist *wordlist, FILE *file) {
     wordlist->parsed = false;
     wordlist->parsed_markov = 0;
     wordlist->file = file;
+    wordlist->path = NULL;
     wordlist->should_close_file = true;
     wordlist->data = NULL;
     wordlist->size = 0;
@@ -27,9 +36,24 @@ void passgen_wordlist_init(passgen_wordlist *wordlist, FILE *file) {
     }
 }
 
+void passgen_wordlist_init_path(passgen_wordlist *wordlist, char *path) {
+    passgen_wordlist_init(wordlist, NULL);
+    wordlist->path = path;
+}
+
 passgen_status
 passgen_wordlist_parse(passgen_wordlist *wordlist, passgen_error *error) {
     passgen_assert(!wordlist->parsed);
+    passgen_assert(wordlist->file || wordlist->path);
+
+    // a wordlist which was given by its path is opened when it is needed.
+    if(!wordlist->file) {
+        errno = 0;
+        wordlist->file = fopen(wordlist->path, "r");
+        if(!wordlist->file) {
+            return passgen_wordlist_fail_io(error, errno, "cannot open");
+        }
+    }
 
     passgen_status status = passgen_wordlist_read(wordlist, error);
     if(status == PASSGEN_OK) {
@@ -137,14 +161,6 @@ passgen_status passgen_wordlist_load(
     FILE *file) {
     passgen_wordlist_init(wordlist, file);
     return passgen_wordlist_parse(wordlist, error);
-}
-
-// Fails because of the file, with what the system has to say about it.
-static passgen_status
-passgen_wordlist_fail_io(passgen_error *error, int code, const char *fallback) {
-    passgen_error_set(error, PASSGEN_ERROR_IO);
-    passgen_error_detail_set(error, code ? strerror(code) : fallback);
-    return PASSGEN_ERROR_IO;
 }
 
 passgen_status
@@ -264,6 +280,7 @@ void passgen_wordlist_free(passgen_wordlist *wordlist) {
     if(wordlist->should_close_file && wordlist->file) {
         fclose(wordlist->file);
     }
+    passgen_free_string(wordlist->path);
 
     PASSGEN_CLEAR(wordlist);
 }

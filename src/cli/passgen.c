@@ -374,26 +374,16 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
     }
     size_t offset = colon - input;
 
-    FILE *file = fopen(colon + 1, "r");
-    if(!file) {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: cannot open wordlist `%s`\n",
-            colon + 1);
-        return PASSGEN_CLI_ERROR_WORDLIST;
-    }
-
     char *name = malloc(offset + 1);
     if(!name) {
-        fclose(file);
         return PASSGEN_CLI_ERROR_ALLOC;
     }
     memcpy(name, input, offset);
     name[offset] = 0;
 
-    // the name is copied, and the file is closed, whether this works or not.
+    // the file is only opened when a pattern uses the wordlist.
     passgen_status status =
-        passgen_env_wordlist_add(opt->env, name, file);
+        passgen_env_wordlist_add_path(opt->env, name, colon + 1);
     free(name);
 
     return status == PASSGEN_OK ? 0 : PASSGEN_CLI_ERROR_ALLOC;

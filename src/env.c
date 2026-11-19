@@ -62,19 +62,18 @@ void passgen_env_step_limit_set(passgen_env *env, size_t step_limit) {
     env->step_limit = step_limit;
 }
 
-passgen_status
-passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file) {
+// Adds a wordlist which was initialized, under a copy of the name. The
+// wordlist is freed if this fails.
+static passgen_status wordlist_insert(
+    passgen_env *env,
+    const char *name,
+    passgen_wordlist *wordlist) {
     char *name_copy = passgen_alloc_string(name);
-    passgen_wordlist *wordlist = passgen_alloc(sizeof(passgen_wordlist));
-    if(!name_copy || !wordlist) {
-        // the file is ours to close, whether this works or not.
-        passgen_free_string(name_copy);
+    if(!name_copy) {
+        passgen_wordlist_free(wordlist);
         passgen_free(wordlist, sizeof(passgen_wordlist));
-        fclose(file);
         return PASSGEN_ERROR_OUT_OF_MEMORY;
     }
-
-    passgen_wordlist_init(wordlist, file);
 
     // patterns which were resolved before may point to a wordlist which this
     // replaces, so they have to be resolved again.
@@ -85,7 +84,6 @@ passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file) {
     passgen_hashmap_entry old;
     if(PASSGEN_OK !=
        passgen_hashmap_insert(&env->wordlists, name_copy, wordlist, &old)) {
-        // this closes the file.
         passgen_wordlist_free(wordlist);
         passgen_free(wordlist, sizeof(passgen_wordlist));
         passgen_free_string(name_copy);
@@ -96,6 +94,36 @@ passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file) {
     }
 
     return PASSGEN_OK;
+}
+
+passgen_status
+passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file) {
+    passgen_wordlist *wordlist = passgen_alloc(sizeof(passgen_wordlist));
+    if(!wordlist) {
+        // the file is ours to close, whether this works or not.
+        fclose(file);
+        return PASSGEN_ERROR_OUT_OF_MEMORY;
+    }
+    passgen_wordlist_init(wordlist, file);
+
+    // this closes the file if it fails.
+    return wordlist_insert(env, name, wordlist);
+}
+
+passgen_status passgen_env_wordlist_add_path(
+    passgen_env *env,
+    const char *name,
+    const char *path) {
+    char *path_copy = passgen_alloc_string(path);
+    passgen_wordlist *wordlist = passgen_alloc(sizeof(passgen_wordlist));
+    if(!path_copy || !wordlist) {
+        passgen_free_string(path_copy);
+        passgen_free(wordlist, sizeof(passgen_wordlist));
+        return PASSGEN_ERROR_OUT_OF_MEMORY;
+    }
+    passgen_wordlist_init_path(wordlist, path_copy);
+
+    return wordlist_insert(env, name, wordlist);
 }
 
 passgen_status

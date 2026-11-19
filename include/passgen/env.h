@@ -78,15 +78,10 @@ PASSGEN_EXPORT void passgen_env_step_limit_set(passgen_env *env, size_t step_lim
 /// a wordlist with this name already, it is replaced.
 ///
 /// The wordlist is not read right away, but when a pattern which uses it is
-/// resolved (see @ref passgen_resolve). So the
-/// environment takes ownership of the file: it is closed once it was read, or
-/// when the environment is freed. This is also the case if adding the wordlist
-/// fails.
+/// resolved (see @ref passgen_resolve). So the environment takes ownership of
+/// the file: it is closed once it was read, or when the environment is freed.
+/// This is also the case if adding the wordlist fails.
 ///
-/// @relatesalso passgen_env
-/// @param env Environment to add the wordlist to
-/// @param name Name of the wordlist, as a NUL-terminated string. It is
-///   copied.
 /// Markov chains are built from it as patterns need them, of the length that
 /// they ask for (as in `\m{name:2}`).
 ///
@@ -101,6 +96,27 @@ PASSGEN_EXPORT void passgen_env_step_limit_set(passgen_env *env, size_t step_lim
 ///   uses it, which then fails with @ref PASSGEN_ERROR_WORDLIST_READ.
 PASSGEN_EXPORT passgen_status
 passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file);
+
+/// Adds a wordlist by the path of its file, like @ref
+/// passgen_env_wordlist_add. The file is not even opened until a pattern
+/// which uses the wordlist is resolved, so one which does not exist is only
+/// a problem if it is used.
+///
+/// @relatesalso passgen_env
+/// @param env Environment to add the wordlist to
+/// @param name Name of the wordlist, as a NUL-terminated string. It is
+///   copied.
+/// @param path Path of the file to read the wordlist from, with one word per
+///   line, as a NUL-terminated string. It is copied, and opened as it is,
+///   so a relative path is relative to the working directory at the time.
+/// @returns @ref PASSGEN_OK or @ref PASSGEN_ERROR_OUT_OF_MEMORY. A file which
+///   cannot be opened or read is not noticed here, but when resolving a
+///   pattern which uses it, which then fails with @ref
+///   PASSGEN_ERROR_WORDLIST_READ.
+PASSGEN_EXPORT passgen_status passgen_env_wordlist_add_path(
+    passgen_env *env,
+    const char *name,
+    const char *path);
 
 /// Adds a preset, which is a named pattern. Patterns can use it as
 /// `\p{name}`, also other presets, so that patterns can be built from parts.

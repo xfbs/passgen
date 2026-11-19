@@ -11,6 +11,7 @@
 #include <passgen/generate.h>
 #include <passgen/random.h>
 #include <passgen/passgen.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -817,6 +818,92 @@ test_result test_error_wordlist_load(void) {
 /// A length of a Markov chain which is not between 1 and 255 is rejected
 /// (256 used to wrap around to zero, which crashed in release builds), and
 /// the file is closed anyway.
+test_result test_error_wordlist_path(void) {
+    passgen_random random;
+    assert(passgen_random_open(&random, "zero"));
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+
+    // a wordlist is only opened when a pattern uses it, so one which does
+    // not exist is fine until then.
+    assert(
+        PASSGEN_OK ==
+        passgen_env_wordlist_add_path(env, "missing", "/nonexistent/words"));
+    passgen_pattern *pattern;
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "abc"));
+    assert(PASSGEN_OK == passgen_resolve(pattern, env, NULL));
+    passgen_pattern_free(pattern);
+
+    // and then fails every time it is used.
+    const char *patterns[] = {"\\w{missing}", "\\m{missing}", "\\w{missing}"};
+    for(size_t i = 0; i < 3; i++) {
+        passgen_error error;
+        assert(PASSGEN_OK == passgen_parse(&pattern, NULL, patterns[i]));
+        assert(
+            PASSGEN_ERROR_WORDLIST_READ ==
+            passgen_resolve(pattern, env, &error));
+        assert_streq(error.detail, "missing");
+        assert(error.cause);
+        assert_eq(error.cause->kind, PASSGEN_ERROR_IO);
+        assert_streq(error.cause->detail, strerror(ENOENT));
+        passgen_error_free(&error);
+        passgen_pattern_free(pattern);
+    }
+
+    // one which exists is read when it is used, and not again after.
+    char path[] = "/tmp/passgen-test-XXXXXX";
+    int fd = mkstemp(path);
+    assert(fd >= 0);
+    assert(5 == write(fd, "word\n", 5));
+    close(fd);
+    assert(PASSGEN_OK == passgen_env_wordlist_add_path(env, "words", path));
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\w{words}"));
+    assert(PASSGEN_OK == passgen_resolve(pattern, env, NULL));
+    unlink(path);
+    assert(PASSGEN_OK == passgen_resolve(pattern, env, NULL));
+    uint8_t output[16];
+    size_t output_len = 0;
+    assert(
+        PASSGEN_OK == passgen_generate_fill_utf8(
+                          pattern,
+                          env,
+                          NULL,
+                          NULL,
+                          output,
+                          sizeof(output),
+                          &output_len));
+    assert_eq(output_len, 4);
+    assert(0 == memcmp(output, "word", 4));
+    passgen_pattern_free(pattern);
+
+    passgen_env_free(env);
+
+    // adding it fails cleanly when there is no memory, at any point.
+    bool done = false;
+    for(size_t fail_at = 0; !done; fail_at++) {
+        test_allocator allocator;
+        test_allocator_install(&allocator, fail_at);
+        env = passgen_env_new(&random);
+        if(env) {
+            passgen_status status = passgen_env_wordlist_add_path(
+                env,
+                "words",
+                "/nonexistent/words");
+            done = status == PASSGEN_OK;
+            if(!done) {
+                assert_eq(status, PASSGEN_ERROR_OUT_OF_MEMORY);
+            }
+            passgen_env_free(env);
+        }
+        assert(test_allocator_clean(&allocator));
+        test_allocator_remove();
+    }
+
+    passgen_random_close(&random);
+
+    return test_ok;
+}
+
 test_result test_error_wordlist_markov_length(void) {
     passgen_random random;
     assert(passgen_random_open(&random, "xorshift:1"));

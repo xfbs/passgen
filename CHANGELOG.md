@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- A wordlist is only opened when a pattern uses it, so one which does not
+  exist is only an error then.
+
 ## [0.4.0] - 2026-11-19
 
 ### Passwords which change

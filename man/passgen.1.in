@@ -90,6 +90,7 @@ Load the wordlist at
 which is a file with one word per line, and make it available to patterns as
 .Ar name .
 If there is a wordlist with this name already, it is replaced.
+The file is only read when a pattern uses the wordlist.
 .It Fl z , Fl -null
 Separate the sequences by a NUL character instead of a newline.
 .El
@@ -402,10 +403,10 @@ There is no preset with this name, or the definition of a preset is not
 valid.
 .It 9
 Generating failed, for example because the pattern uses a wordlist which was
-not loaded or is empty, or because it takes more steps than the step limit.
+not defined, cannot be read, or is empty, or because it takes more steps than the step limit.
 The message says which.
 .It 10
-A wordlist could not be opened, or its definition is not valid.
+The definition of a wordlist is not valid.
 .It 12
 The options for master passphrase mode cannot be used this way: together with
 .Fl -random ,

@@ -50,7 +50,7 @@ test_result test_sizes_wordlist(void) {
     assert_eq(sizeof(passgen_markov), 24);
     assert_eq(sizeof(passgen_markov_leaf), 16);
     assert_eq(sizeof(passgen_markov_node), 8);
-    assert_eq(sizeof(passgen_wordlist), 248);
+    assert_eq(sizeof(passgen_wordlist), 256);
     return test_ok;
 }
 

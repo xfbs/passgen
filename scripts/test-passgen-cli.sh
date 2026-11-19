@@ -312,7 +312,9 @@ fails $passgen -r nonsense "a"
 fails $passgen -r xorshift: "a"
 fails $passgen -r "file:$tmpdir/doesnotexist" "a"
 fails $passgen -w "nocolon" "a"
-fails $passgen -w "test:$tmpdir/doesnotexist" "a"
+fails $passgen -w "test:$tmpdir/doesnotexist" '\w{test}'
+# a wordlist is only opened when a pattern uses it.
+test "$($passgen -w "test:$tmpdir/doesnotexist" a)" = "a"
 fails $passgen -w "test:$tmpdir/empty.txt" '\w{test}'
 fails $passgen -w "test:$tmpdir/empty.txt" '\m{test}'
 fails $passgen '\w{undefined}'
@@ -349,6 +351,8 @@ rm "$XDG_CONFIG_HOME/passgen.conf"
 # sources without secrets are printed in full.
 test "$(error_of $passgen -r "file:/nonexistent" a)" = "error: cannot use randomness source 'file:/nonexistent'"
 test "$(error_of $passgen -r "xorshift:0" a)" = "error: cannot use randomness source 'xorshift:0'"
+test "$(error_lines $passgen -w "test:$tmpdir/doesnotexist" '\w{test}' | head -n 2)" = "error in pattern: wordlist could not be read: test
+caused by: cannot read file: No such file or directory"
 test "$(error_of $passgen '\w{}')" = "error in pattern: expected a name in braces"
 test "$(error_of $passgen '\m{test:9}')" = "error in pattern: length of a Markov chain must be a number from 1 to 8"
 test "$(error_of $passgen '\w{test:2}')" = "error in pattern: only a Markov chain takes a parameter"
