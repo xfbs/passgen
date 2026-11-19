@@ -6,51 +6,59 @@
 /// pronounceable phrases by loading in a word list, generating a Markov chain
 /// from it, and then using the Markov chain to generate sequences that are
 /// pronounceable (in the language of the word list) but mostly not real words.
+///
+/// The chain is a tree: the nodes are keyed by the previous codepoints, one
+/// level for each, and the leaves have the counts of the codepoints which
+/// followed them. Both keep their entries in arrays which are sorted by
+/// codepoint, which are searched with a binary search, and which grow by one
+/// entry at a time. This needs as little memory as possible, which matters
+/// for longer chains, which have many nodes with few entries each.
 #pragma once
 #include "passgen/random.h"
 #include <passgen/error.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
 
-/// Get the child with the given codepoint.
-/// @memberof passgen_markov_node
-/// @param node Node to get child of
-/// @param codepoint Codepoint to lookup child for
-#define passgen_markov_node_child(node, codepoint) \
-    node->entries[(node->capacity + 1) / 2].child[codepoint % node->capacity]
-
-/// Get the codepoint at the given index
-/// @memberof passgen_markov_node
-/// @param node Node to get codepoint for
-/// @param index Index to lookup
-#define passgen_markov_node_codepoint(node, index) \
-    node->entries[0].codepoint[index % node->capacity]
-
-/// Leaf node in the Markov chain. This contains a sorted list of
-/// codepoint-count tuples.  During insertion, these are sorted by the
-/// codepoint. When finalizing the Markov chain, they might be reordered to be
-/// sorted by the frequency to allow for more efficient generation.
+/// A codepoint which followed a prefix, and how often.
 typedef struct {
+    /// The codepoint, or zero for the end of the word.
+    uint32_t codepoint;
+    /// How often it followed the prefix, with the weights of the words.
+    uint32_t count;
+} passgen_markov_frequency;
+
+/// Leaf in the Markov chain: which codepoints followed a prefix, and how
+/// often, sorted by codepoint.
+typedef struct {
+    /// The sum of the counts.
     size_t total_count;
-    size_t capacity;
-    union {
-        uint32_t count[1];
-        uint32_t codepoint[1];
-    } entries[0];
+    /// How many codepoints there are.
+    size_t len;
+    /// The codepoints and their counts, sorted by codepoint.
+    passgen_markov_frequency entries[];
 } passgen_markov_leaf;
 
-/// Intermediate nodes in the markov chain tree. Implemented as custom hash map
-/// where the keys are codepoints and the values are nodes or leafs.
+struct passgen_markov_node;
+
+/// What a node of the Markov chain points to: another node, or in the last
+/// level, a leaf.
+typedef union {
+    struct passgen_markov_node *node;
+    passgen_markov_leaf *leaf;
+} passgen_markov_child;
+
+/// Intermediate node in the Markov chain: a child for every codepoint which
+/// can be at this position of a prefix, sorted by codepoint.
+///
+/// The children come first, and are followed by the codepoints (see @ref
+/// passgen_markov_node_codepoints), in the same allocation. Keeping them
+/// apart rather than in pairs saves the padding that pairs would need.
 typedef struct passgen_markov_node {
-  size_t capacity;
-  union {
-    uint32_t codepoint[1];
-    union {
-        struct passgen_markov_node *node;
-        passgen_markov_leaf *leaf;
-    } child[1];
-  } entries[0];
+    /// How many children there are.
+    size_t len;
+    /// The children, in the order of their codepoints.
+    passgen_markov_child children[];
 } passgen_markov_node;
 
 /// Markov chain, used to generate pronounceable random words
@@ -71,51 +79,52 @@ typedef struct {
     size_t level;
     /// How many words are in this Markov chain
     size_t count;
-    /// Root node of markov chain
+    /// Root node of markov chain, or NULL if nothing was added yet.
     passgen_markov_node *root;
 } passgen_markov;
 
-
-/// Allocates a new Markov chain node with a size determined by the @ref
-/// size_index.
+/// The codepoints of a node, which follow its children.
 ///
-/// Markov chain nodes only exist in specific, discrete sizes that are prime
-/// numbers.  This is because they implement a kind of hash map and that makes
-/// them more efficient.  The @ref size_index is an index into a static array
-/// of precomputed prime sizes.
+/// @memberof passgen_markov_node
+static inline uint32_t *
+passgen_markov_node_codepoints(const passgen_markov_node *node) {
+    return (uint32_t *) &node->children[node->len];
+}
+
+/// Allocates a new Markov chain node, without any children.
 ///
 /// @returns The node, or NULL if there is no memory for it
 /// @memberof passgen_markov_node
-passgen_markov_node *passgen_markov_node_new(size_t size_index);
+passgen_markov_node *passgen_markov_node_new(void);
 
-/// Free a Markov chain node.
+/// Free a Markov chain node, and its children.
 ///
-/// The parameter @ref level is the level of the Markov chain, this needs to be
-/// passed so that the method knows how deep to free data.
+/// The parameter @ref level is how many levels of nodes there are below and
+/// including this one, so that it knows whether its children are nodes or
+/// leaves (for a level of one).
 ///
 /// @memberof passgen_markov_node
 void passgen_markov_node_free(passgen_markov_node *node, size_t level);
 
-/// Insert a new codepoint into a Markov chain node.
+/// Find the child of a node for a codepoint.
 ///
-/// This returns a pointer to a passgen_markov_node because the node may need
-/// to be reallocated if it would otherwise overflow. If there is no memory for
-/// that, it returns NULL, and the node is unchanged.
-///
+/// @returns The child, or NULL if there is none for this codepoint
 /// @memberof passgen_markov_node
-passgen_markov_node *passgen_markov_node_insert(passgen_markov_node *node, uint32_t codepoint);
+passgen_markov_child *
+passgen_markov_node_child(const passgen_markov_node *node, uint32_t codepoint);
 
 /// Insert a new word into this Markov chain node.
 ///
 /// This will recursively insert the word into the appropriate child nodes. It
 /// needs to know the @ref length of the word (this is equal to the @ref level
-/// of the Markov chain, minus the depth it has already traversed) and the
-/// weight of the word.
+/// of the Markov chain, minus the depth it has already traversed, plus one)
+/// and the weight of the word.
 ///
 /// The node is replaced if it has to grow, and allocated if it is NULL.
 ///
 /// @returns @ref PASSGEN_OK, or @ref PASSGEN_ERROR_OUT_OF_MEMORY. In that
-///   case, some of the word may have been inserted.
+///   case, some of the word may have been inserted, and the node is still
+///   valid.
 /// @memberof passgen_markov_node
 passgen_status passgen_markov_node_insert_word(
     passgen_markov_node **node,
@@ -123,36 +132,34 @@ passgen_status passgen_markov_node_insert_word(
     size_t length,
     size_t weight);
 
-/// Allocates a new Markov leaf node with a size determined by the @ref
-/// size_index.
-///
-/// Markov leaf nodes only exist in specific, discrete sizes that are prime
-/// numbers.  This is because they implement a kind of hash map that makes them
-/// more efficient.  The @ref size_index is an index into a static array of
-/// precomputed prime sizes.
+/// Allocates a new Markov leaf, without any codepoints.
 ///
 /// @returns The leaf, or NULL if there is no memory for it
 /// @memberof passgen_markov_leaf
-passgen_markov_leaf *passgen_markov_leaf_new(size_t size_index);
+passgen_markov_leaf *passgen_markov_leaf_new(void);
 
 /// Free a Markov leaf node.
 ///
 /// @memberof passgen_markov_leaf
 void passgen_markov_leaf_free(passgen_markov_leaf *leaf);
 
-/// Insert a final codepoint and weight into a Markov leaf node.
+/// Add to the count of a codepoint in a Markov leaf.
 ///
-/// This returns a pointer to the leaf because it may need to be reallocated if
-/// it would otherwise overflow. If there is no memory for that, it returns
+/// This returns a pointer to the leaf because it may need to be reallocated
+/// to make room for the codepoint. If there is no memory for that, it returns
 /// NULL, and the leaf is unchanged.
 ///
 /// @memberof passgen_markov_leaf
-passgen_markov_leaf *passgen_markov_leaf_insert(passgen_markov_leaf *leaf, uint32_t codepoint, size_t weight);
+passgen_markov_leaf *passgen_markov_leaf_insert(
+    passgen_markov_leaf *leaf,
+    uint32_t codepoint,
+    size_t weight);
 
 /// Given a codepoint, return a count or zero if the codepoint does not exist.
 ///
 /// @memberof passgen_markov_leaf
-uint32_t passgen_markov_leaf_count(passgen_markov_leaf *leaf, uint32_t codepoint);
+uint32_t
+passgen_markov_leaf_count(const passgen_markov_leaf *leaf, uint32_t codepoint);
 
 /// Initialize new markov chain with a given level
 ///
@@ -173,7 +180,14 @@ passgen_status passgen_markov_add(
     size_t word_len,
     size_t weight);
 
-/// Generate the next character at random using the Markov chain and a @ref passgen_random instance.
+/// Generate the next character at random using the Markov chain and a @ref
+/// passgen_random instance.
+///
+/// The codepoints which can follow are chosen from in the order of their
+/// codepoints, so what is generated from a deterministic source of
+/// randomness only depends on the words. If only one codepoint can follow,
+/// this takes no randomness.
+///
 /// @param current Must contain markov->level amount of previous chars
 /// @param markov Must be a parsed markov chain
 /// @param random Must be a valid randomness instance

@@ -364,6 +364,8 @@ static int passgen_generate_set(
         return 0;
     }
 
+    passgen_assert(set->choices_list != NULL);
+
     // compute number of possible choices
     size_t possible = set->choices_list[set->items.len - 1];
     passgen_assert(possible != 0);

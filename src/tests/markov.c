@@ -4,289 +4,173 @@
 
 #define SEED 234720984723
 
-#define passgen_markov_leaf_count_raw(leaf, codepoint) \
-    leaf->entries[leaf->capacity].count[codepoint % leaf->capacity]
-
-#define passgen_markov_leaf_codepoint_raw(leaf, index) \
-    leaf->entries[0].codepoint[index % leaf->capacity]
-
 #define passgen_random_unicode(rand) (passgen_random_u32(rand) & 0x10FFFF)
 
+/// The codepoints of a node follow its children, in the same allocation.
 test_result test_markov_node_layout(void) {
-    passgen_markov_node *node = passgen_markov_node_new(0);
-
-    assert_eq(node->capacity, 3);
-
-    assert_eq(
-        &passgen_markov_node_codepoint(node, 0),
-        ((void *) node) + sizeof(size_t));
-    assert_eq(
-        &passgen_markov_node_codepoint(node, 1),
-        ((void *) node) + sizeof(size_t) + 1 * sizeof(uint32_t));
-    assert_eq(
-        &passgen_markov_node_codepoint(node, 2),
-        ((void *) node) + sizeof(size_t) + 2 * sizeof(uint32_t));
-
-    assert_eq(
-        &passgen_markov_node_child(node, 0),
-        ((void *) node) + sizeof(size_t) + 4 * sizeof(uint32_t));
-    assert_eq(
-        &passgen_markov_node_child(node, 1),
-        ((void *) node) + 2 * sizeof(size_t) + 4 * sizeof(uint32_t));
-    assert_eq(
-        &passgen_markov_node_child(node, 2),
-        ((void *) node) + 3 * sizeof(size_t) + 4 * sizeof(uint32_t));
-
-    free(node);
-
-    return test_ok;
-}
-
-test_result test_markov_leaf_layout(void) {
-    passgen_markov_leaf *leaf = passgen_markov_leaf_new(0);
-
-    assert_eq(leaf->capacity, 3);
-
-    assert_eq(
-        &passgen_markov_leaf_codepoint_raw(leaf, 0),
-        ((void *) leaf) + 2 * sizeof(size_t));
-    assert_eq(
-        &passgen_markov_leaf_codepoint_raw(leaf, 1),
-        ((void *) leaf) + 2 * sizeof(size_t) + 1 * sizeof(uint32_t));
-    assert_eq(
-        &passgen_markov_leaf_codepoint_raw(leaf, 2),
-        ((void *) leaf) + 2 * sizeof(size_t) + 2 * sizeof(uint32_t));
-
-    assert_eq(
-        &passgen_markov_leaf_count_raw(leaf, 0),
-        ((void *) leaf) + 2 * sizeof(size_t) + 3 * sizeof(uint32_t));
-    assert_eq(
-        &passgen_markov_leaf_count_raw(leaf, 1),
-        ((void *) leaf) + 2 * sizeof(size_t) + 4 * sizeof(uint32_t));
-    assert_eq(
-        &passgen_markov_leaf_count_raw(leaf, 2),
-        ((void *) leaf) + 2 * sizeof(size_t) + 5 * sizeof(uint32_t));
-
-    free(leaf);
-
-    return test_ok;
-}
-
-test_result test_markov_node_insert(void) {
-    passgen_markov_node *node = passgen_markov_node_new(0);
-    assert_eq(node->capacity, 3);
-
-    node = passgen_markov_node_insert(node, 0);
-    assert(!passgen_markov_node_child(node, 0).node);
-    passgen_markov_node_child(node, 0).node = (passgen_markov_node *) &node;
-
-    node = passgen_markov_node_insert(node, 1);
-    assert(!passgen_markov_node_child(node, 1).node);
-    passgen_markov_node_child(node, 1).node = (passgen_markov_node *) &node;
-
-    node = passgen_markov_node_insert(node, 2);
-    assert(!passgen_markov_node_child(node, 2).node);
-    passgen_markov_node_child(node, 2).node = (passgen_markov_node *) &node;
-
-    assert_eq(node->capacity, 3);
-
-    node = passgen_markov_node_insert(node, 3);
-    assert(!passgen_markov_node_child(node, 3).node);
-    passgen_markov_node_child(node, 3).node = (passgen_markov_node *) &node;
-
-    assert_eq(node->capacity, 7);
-
-    node = passgen_markov_node_insert(node, 4);
-    assert(!passgen_markov_node_child(node, 4).node);
-    passgen_markov_node_child(node, 4).node = (passgen_markov_node *) &node;
-
-    node = passgen_markov_node_insert(node, 5);
-    assert(!passgen_markov_node_child(node, 5).node);
-    passgen_markov_node_child(node, 5).node = (passgen_markov_node *) &node;
-
-    node = passgen_markov_node_insert(node, 6);
-    assert(!passgen_markov_node_child(node, 6).node);
-    passgen_markov_node_child(node, 6).node = (passgen_markov_node *) &node;
-
-    node = passgen_markov_node_insert(node, 7);
-    assert(!passgen_markov_node_child(node, 7).node);
-    passgen_markov_node_child(node, 7).node = (passgen_markov_node *) &node;
-
-    assert_eq(node->capacity, 17);
-
-    for(size_t i = 8; i < 1000; i++) {
-        node = passgen_markov_node_insert(node, i);
-        assert(!passgen_markov_node_child(node, i).node);
-        passgen_markov_node_child(node, i).node = (passgen_markov_node *) &node;
+    passgen_markov_node *node = NULL;
+    const uint32_t words[][2] = {{'c', 'x'}, {'a', 'y'}, {'b', 'z'}};
+    for(size_t i = 0; i < 3; i++) {
+        assert_eq(
+            PASSGEN_OK,
+            passgen_markov_node_insert_word(&node, words[i], 2, 1));
     }
 
-    assert_eq(node->capacity, 1361);
+    assert_eq(node->len, 3);
+    uint32_t *codepoints = passgen_markov_node_codepoints(node);
+    assert_eq(
+        (void *) codepoints,
+        (void *) ((char *) node + sizeof(size_t) + 3 * sizeof(void *)));
 
-    free(node);
+    // sorted, whatever order they were added in.
+    assert_eq(codepoints[0], 'a');
+    assert_eq(codepoints[1], 'b');
+    assert_eq(codepoints[2], 'c');
+    assert_eq(passgen_markov_leaf_count(node->children[0].leaf, 'y'), 1);
+    assert_eq(passgen_markov_leaf_count(node->children[1].leaf, 'z'), 1);
+    assert_eq(passgen_markov_leaf_count(node->children[2].leaf, 'x'), 1);
+    assert(passgen_markov_node_child(node, 'b') == &node->children[1]);
+    assert(passgen_markov_node_child(node, 'd') == NULL);
+
+    passgen_markov_node_free(node, 1);
 
     return test_ok;
 }
 
+/// Leaves keep their codepoints sorted, with no room to spare.
 test_result test_markov_leaf_insert(void) {
-    passgen_markov_leaf *leaf = passgen_markov_leaf_new(0);
-    assert_eq(leaf->capacity, 3);
+    passgen_markov_leaf *leaf = passgen_markov_leaf_new();
+    assert(leaf);
+    assert_eq(leaf->len, 0);
 
-    leaf = passgen_markov_leaf_insert(leaf, 0, 1);
-    assert(passgen_markov_leaf_count_raw(leaf, 0) == 1);
-
-    leaf = passgen_markov_leaf_insert(leaf, 0, 1);
-    assert(passgen_markov_leaf_count_raw(leaf, 0) == 2);
-
-    leaf = passgen_markov_leaf_insert(leaf, 1, 3);
-    assert(passgen_markov_leaf_count_raw(leaf, 1) == 3);
-
-    leaf = passgen_markov_leaf_insert(leaf, 2, 7);
-    assert(passgen_markov_leaf_count_raw(leaf, 2) == 7);
-
-    assert_eq(leaf->capacity, 3);
-
-    leaf = passgen_markov_leaf_insert(leaf, 3, 2);
-    assert(passgen_markov_leaf_count_raw(leaf, 3) == 2);
-
-    assert_eq(leaf->capacity, 7);
-
-    leaf = passgen_markov_leaf_insert(leaf, 4, 4);
-    assert(passgen_markov_leaf_count_raw(leaf, 4) == 4);
-
-    leaf = passgen_markov_leaf_insert(leaf, 5, 6);
-    assert(passgen_markov_leaf_count_raw(leaf, 5) == 6);
-
-    leaf = passgen_markov_leaf_insert(leaf, 6, 8);
-    assert(passgen_markov_leaf_count_raw(leaf, 6) == 8);
-
-    leaf = passgen_markov_leaf_insert(leaf, 7, 10);
-    assert(passgen_markov_leaf_count_raw(leaf, 7) == 10);
-
-    assert_eq(leaf->capacity, 17);
-
-    for(size_t i = 8; i < 1000; i++) {
-        leaf = passgen_markov_leaf_insert(leaf, i, i);
-        assert(passgen_markov_leaf_count_raw(leaf, i) == i);
+    const uint32_t codepoints[] = {'m', 'a', 'z', 'm', 0, 'a', 0x10FFFF};
+    const size_t weights[] = {1, 2, 3, 4, 5, 6, 7};
+    for(size_t i = 0; i < 7; i++) {
+        leaf = passgen_markov_leaf_insert(leaf, codepoints[i], weights[i]);
+        assert(leaf);
     }
 
-    assert_eq(leaf->capacity, 1361);
+    // a weight of zero does not add anything.
+    leaf = passgen_markov_leaf_insert(leaf, 'q', 0);
 
-    free(leaf);
+    assert_eq(leaf->len, 5);
+    assert_eq(leaf->total_count, 28);
+    const passgen_markov_frequency expected[] = {
+        {0, 5},
+        {'a', 8},
+        {'m', 5},
+        {'z', 3},
+        {0x10FFFF, 7},
+    };
+    for(size_t i = 0; i < 5; i++) {
+        assert_eq(leaf->entries[i].codepoint, expected[i].codepoint);
+        assert_eq(leaf->entries[i].count, expected[i].count);
+        assert_eq(
+            passgen_markov_leaf_count(leaf, expected[i].codepoint),
+            expected[i].count);
+    }
+    assert_eq(passgen_markov_leaf_count(leaf, 'b'), 0);
+    assert_eq(passgen_markov_leaf_count(leaf, 'q'), 0);
+
+    passgen_markov_leaf_free(leaf);
 
     return test_ok;
 }
 
 test_result test_markov_node_insert_word(void) {
-    passgen_markov_node *root_node = passgen_markov_node_new(0);
+    passgen_markov_node *root_node = NULL;
 
     const uint32_t word[] = {'h', 'e', 'l', 'l', 'o'};
 
     assert_eq(
-        passgen_markov_node_insert_word(&root_node, (void *) &word, 5, 1),
+        passgen_markov_node_insert_word(&root_node, word, 5, 1),
         PASSGEN_OK);
     passgen_markov_node *node = root_node;
 
-    assert_eq(passgen_markov_node_codepoint(node, 'h'), 'h');
-    node = passgen_markov_node_child(node, 'h').node;
-    assert(node);
+    const uint32_t path[] = {'h', 'e', 'l'};
+    for(size_t i = 0; i < 3; i++) {
+        assert_eq(node->len, 1);
+        passgen_markov_child *child = passgen_markov_node_child(node, path[i]);
+        assert(child);
+        node = child->node;
+        assert(node);
+    }
 
-    assert_eq(passgen_markov_node_codepoint(node, 'e'), 'e');
-    node = passgen_markov_node_child(node, 'e').node;
-    assert(node);
-
-    assert_eq(passgen_markov_node_codepoint(node, 'l'), 'l');
-    node = passgen_markov_node_child(node, 'l').node;
-    assert(node);
-
-    assert_eq(passgen_markov_node_codepoint(node, 'l'), 'l');
-    passgen_markov_leaf *leaf = passgen_markov_node_child(node, 'l').leaf;
-    assert(leaf);
-    assert_eq(leaf->capacity, 3);
+    passgen_markov_child *child = passgen_markov_node_child(node, 'l');
+    assert(child);
+    passgen_markov_leaf *leaf = child->leaf;
+    assert_eq(leaf->len, 1);
     assert_eq(leaf->total_count, 1);
-
-    assert_eq(passgen_markov_leaf_codepoint_raw(leaf, 'o'), 'o');
-    assert_eq(passgen_markov_leaf_count_raw(leaf, 'o'), 1);
+    assert_eq(passgen_markov_leaf_count(leaf, 'o'), 1);
 
     passgen_markov_node_free(root_node, 4);
 
     return test_ok;
 }
 
+/// Finds the leaf for a prefix of two codepoints.
+static passgen_markov_leaf *
+leaf_of(passgen_markov *markov, uint32_t first, uint32_t second) {
+    passgen_markov_child *child = passgen_markov_node_child(markov->root, first);
+    if(!child) {
+        return NULL;
+    }
+    child = passgen_markov_node_child(child->node, second);
+    return child ? child->leaf : NULL;
+}
+
 test_result test_markov_add(void) {
     passgen_markov markov;
-    passgen_markov_node *node;
     passgen_markov_leaf *leaf;
 
     // markov chain level 2, meaning two prefix chars
     passgen_markov_init(&markov, 2);
 
     // this should have added 00a and 0a0 into the chain.
-    passgen_markov_add(&markov, (void *) &(const uint32_t[]){'a'}, 1, 1);
+    passgen_markov_add(&markov, (const uint32_t[]){'a'}, 1, 1);
 
-    // verify 00a is there
-    node = passgen_markov_node_child(markov.root, 0).node;
-    assert(node);
-    leaf = passgen_markov_node_child(node, 0).leaf;
+    leaf = leaf_of(&markov, 0, 0);
     assert(leaf);
     assert_eq(leaf->total_count, 1);
-    assert_eq(passgen_markov_leaf_codepoint_raw(leaf, 'a'), 'a');
-    assert_eq(passgen_markov_leaf_count_raw(leaf, 'a'), 1);
+    assert_eq(passgen_markov_leaf_count(leaf, 'a'), 1);
 
-    // verify 0a0 is there
-    node = passgen_markov_node_child(markov.root, 0).node;
-    assert(node);
-    leaf = passgen_markov_node_child(node, 'a').leaf;
+    leaf = leaf_of(&markov, 0, 'a');
     assert(leaf);
     assert_eq(leaf->total_count, 1);
-    assert_eq(passgen_markov_leaf_codepoint_raw(leaf, 0), 0);
-    assert_eq(passgen_markov_leaf_count_raw(leaf, 0), 1);
+    assert_eq(passgen_markov_leaf_count(leaf, 0), 1);
 
     // this should have added 00l, 0la, la0, each with a weight of 2.
-    passgen_markov_add(&markov, (void *) &(const uint32_t[]){'l', 'a'}, 2, 2);
+    passgen_markov_add(&markov, (const uint32_t[]){'l', 'a'}, 2, 2);
 
-    // verify 00l is there
-    node = passgen_markov_node_child(markov.root, 0).node;
-    assert(node);
-    leaf = passgen_markov_node_child(node, 0).leaf;
+    leaf = leaf_of(&markov, 0, 0);
     assert(leaf);
     assert_eq(leaf->total_count, 3);
-    assert_eq(passgen_markov_leaf_codepoint_raw(leaf, 'l'), 'l');
-    assert_eq(passgen_markov_leaf_count_raw(leaf, 'l'), 2);
+    assert_eq(passgen_markov_leaf_count(leaf, 'l'), 2);
 
-    // verify 0la is there
-    node = passgen_markov_node_child(markov.root, 0).node;
-    assert(node);
-    leaf = passgen_markov_node_child(node, 'l').leaf;
+    leaf = leaf_of(&markov, 0, 'l');
     assert(leaf);
     assert_eq(leaf->total_count, 2);
-    assert_eq(passgen_markov_leaf_codepoint_raw(leaf, 'a'), 'a');
-    assert_eq(passgen_markov_leaf_count_raw(leaf, 'a'), 2);
+    assert_eq(passgen_markov_leaf_count(leaf, 'a'), 2);
 
-    // verify la0 is there
-    node = passgen_markov_node_child(markov.root, 'l').node;
-    assert(node);
-    leaf = passgen_markov_node_child(node, 'a').leaf;
+    leaf = leaf_of(&markov, 'l', 'a');
     assert(leaf);
     assert_eq(leaf->total_count, 2);
-    assert_eq(passgen_markov_leaf_codepoint_raw(leaf, 0), 0);
-    assert_eq(passgen_markov_leaf_count_raw(leaf, 0), 2);
+    assert_eq(passgen_markov_leaf_count(leaf, 0), 2);
 
-    passgen_markov_add(&markov, (void *) &(const uint32_t[]){'l', 'e'}, 2, 1);
+    passgen_markov_add(&markov, (const uint32_t[]){'l', 'e'}, 2, 1);
+    passgen_markov_add(&markov, (const uint32_t[]){'t', 'h', 'e'}, 3, 1);
+    passgen_markov_add(&markov, (const uint32_t[]){'p', 'a', 'r', 't'}, 4, 1);
     passgen_markov_add(
         &markov,
-        (void *) &(const uint32_t[]){'t', 'h', 'e'},
-        3,
-        1);
-    passgen_markov_add(
-        &markov,
-        (void *) &(const uint32_t[]){'p', 'a', 'r', 't'},
-        4,
-        1);
-    passgen_markov_add(
-        &markov,
-        (void *) &(const uint32_t[]){'p', 'h', 'o', 'n', 'e'},
+        (const uint32_t[]){'p', 'h', 'o', 'n', 'e'},
         5,
         1);
+
+    // the root has the codepoints which words start with, sorted.
+    uint32_t *codepoints = passgen_markov_node_codepoints(markov.root);
+    for(size_t i = 1; i < markov.root->len; i++) {
+        assert(codepoints[i - 1] < codepoints[i]);
+    }
 
     passgen_markov_free(&markov);
 
@@ -314,7 +198,7 @@ test_result test_markov_add_random(void) {
                 } while(word[offset] == 0);
             }
 
-            passgen_markov_add(&markov, &word[0], 12, 1);
+            assert_eq(PASSGEN_OK, passgen_markov_add(&markov, &word[0], 12, 1));
         }
 
         passgen_markov_free(&markov);
@@ -378,7 +262,7 @@ test_result test_markov_generate_random(void) {
 test_result test_markov_leaf_count_random(void) {
     passgen_random rand;
     passgen_random_xorshift_open(&rand, SEED);
-    passgen_markov_leaf *leaf = passgen_markov_leaf_new(0);
+    passgen_markov_leaf *leaf = passgen_markov_leaf_new();
 
     for(size_t count = 0; count < 10000; count++) {
         uint32_t codepoint = passgen_random_unicode(&rand);
@@ -395,7 +279,7 @@ test_result test_markov_leaf_count_random(void) {
 test_result test_markov_leaf_insert_random(void) {
     passgen_random rand;
     passgen_random_xorshift_open(&rand, SEED);
-    passgen_markov_leaf *leaf = passgen_markov_leaf_new(0);
+    passgen_markov_leaf *leaf = passgen_markov_leaf_new();
 
     for(size_t count = 0; count < 1000; count++) {
         uint32_t codepoint = passgen_random_unicode(&rand);
@@ -406,6 +290,16 @@ test_result test_markov_leaf_insert_random(void) {
         assert_eq(after - before, weight);
     }
 
+    // they are sorted, and add up to the total.
+    size_t total = 0;
+    for(size_t i = 0; i < leaf->len; i++) {
+        if(i) {
+            assert(leaf->entries[i - 1].codepoint < leaf->entries[i].codepoint);
+        }
+        total += leaf->entries[i].count;
+    }
+    assert_eq(total, leaf->total_count);
+
     passgen_markov_leaf_free(leaf);
     passgen_random_close(&rand);
 
@@ -415,7 +309,7 @@ test_result test_markov_leaf_insert_random(void) {
 test_result test_markov_leaf_insert_sequential(void) {
     passgen_random rand;
     passgen_random_xorshift_open(&rand, SEED);
-    passgen_markov_leaf *leaf = passgen_markov_leaf_new(0);
+    passgen_markov_leaf *leaf = passgen_markov_leaf_new();
 
     for(size_t count = 0; count < 100000; count++) {
         uint32_t codepoint = count;
@@ -432,44 +326,49 @@ test_result test_markov_leaf_insert_sequential(void) {
     return test_ok;
 }
 
+/// What is generated only depends on the words, not on the order in which
+/// they were added: the codepoints which can follow are chosen from in the
+/// order of their codepoints.
 test_result test_markov_generate(void) {
-    passgen_random *rand = passgen_random_xorshift_open(NULL, SEED);
-    // passgen_random_xorshift_open(&rand, SEED);
+    const uint32_t words[][1] = {{'b'}, {'c'}, {'a'}};
+    passgen_markov forward, backward;
+    passgen_markov_init(&forward, 2);
+    passgen_markov_init(&backward, 2);
+    for(size_t i = 0; i < 3; i++) {
+        assert_eq(PASSGEN_OK, passgen_markov_add(&forward, words[i], 1, 1));
+        assert_eq(PASSGEN_OK, passgen_markov_add(&backward, words[2 - i], 1, 1));
+    }
 
-    passgen_markov markov;
-    passgen_markov_init(&markov, 2);
+    // with zeroes for randomness, the first choice is always made.
+    passgen_random *zero = passgen_random_open(NULL, "zero");
+    assert(zero);
+    const uint32_t start[2] = {0, 0};
+    double entropy = 0;
+    assert_eq(passgen_markov_generate(&forward, start, zero, &entropy), 'a');
+    assert_eq(passgen_markov_generate(&backward, start, zero, NULL), 'a');
+    assert(entropy > 1.58 && entropy < 1.59);
 
-    passgen_markov_add(&markov, &(const uint32_t[]){'a', 'b'}[0], 2, 1);
-    passgen_markov_add(&markov, &(const uint32_t[]){'b'}[0], 1, 1);
-    passgen_markov_add(
-        &markov,
-        &(const uint32_t[]){'c', 'd', 'e', 'f'}[0],
-        4,
-        1);
+    // only the end of the word can follow, which takes no randomness.
+    const uint32_t after[2] = {0, 'a'};
+    entropy = 0;
+    assert_eq(passgen_markov_generate(&forward, after, zero, &entropy), 0);
+    assert(entropy == 0);
 
-    /*
-    uint32_t next, word[32];
-    memset(word, 0, sizeof(word));
+    // with the same randomness, they generate the same.
+    passgen_random *one = passgen_random_open(NULL, "xorshift:1");
+    passgen_random *two = passgen_random_open(NULL, "xorshift:1");
+    assert(one && two);
+    for(size_t i = 0; i < 100; i++) {
+        assert_eq(
+            passgen_markov_generate(&forward, start, one, NULL),
+            passgen_markov_generate(&backward, start, two, NULL));
+    }
 
-    word[2] = passgen_markov_generate(&markov, &word[0], rand);
-    assert(word[2] == 'c');
-    word[3] = passgen_markov_generate(&markov, &word[1], rand);
-    assert(word[3] == 'd');
-    word[4] = passgen_markov_generate(&markov, &word[2], rand);
-    assert(word[4] == 'e');
-    word[5] = passgen_markov_generate(&markov, &word[3], rand);
-    assert(word[5] == 'f');
-    word[6] = passgen_markov_generate(&markov, &word[4], rand);
-    assert(word[6] == 0);
-
-    word[2] = passgen_markov_generate(&markov, &word[0], rand);
-    assert(word[2] == 'b');
-    word[3] = passgen_markov_generate(&markov, &word[1], rand);
-    assert(word[3] == 0);
-    */
-
-    passgen_markov_free(&markov);
-    passgen_random_free(rand);
+    passgen_random_free(zero);
+    passgen_random_free(one);
+    passgen_random_free(two);
+    passgen_markov_free(&forward);
+    passgen_markov_free(&backward);
 
     return test_ok;
 }

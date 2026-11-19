@@ -1,133 +1,141 @@
 #include "passgen/markov.h"
 #include "passgen/assert.h"
 #include "passgen/config.h"
+#include "passgen/util/alloc.h"
+#include "passgen/util/clear.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "passgen/util/alloc.h"
-#include "passgen/util/clear.h"
+
 #define MIN(a, b)            ((a) < (b) ? (a) : (b))
 #define SATURATING_SUB(a, b) ((a) -MIN(a, b))
 
-#define MARKOV_LEAF_INITIAL    4
-#define MARKOV_LEAF_MULTIPLIER 2
-
-#define passgen_markov_leaf_count_raw(leaf, codepoint) \
-    leaf->entries[leaf->capacity].count[codepoint % leaf->capacity]
-
-#define passgen_markov_leaf_codepoint_raw(leaf, index) \
-    leaf->entries[0].codepoint[index % leaf->capacity]
-
-/// Sizes for the leaf and node hash maps. These are all prime numbers, with the
-/// property that every number is greater than double the previous one.
-/// Generated with Ruby with:
-///
-/// ```ruby
-/// require 'prime'
-/// p Prime.take(10000).inject([3]){|l, p| l << p if (2*l.last) < p; l}
-/// ```
-static const size_t markov_sizes[] = {
-    3,        7,        17,       37,     79,      163,     331,
-    673,      1361,     2729,     5471,   10949,   21911,   43853,
-    87719,    175447,   350899,   701819, 1403641, 2807303, 5614657,
-    11229331, 22458671, 44917381, 0};
-
-size_t passgen_markov_node_size(size_t capacity) {
-    // we use capacity + 1 there to make sure it's a round number, such that the
-    // child pointers are not misaligned.
-    return sizeof(passgen_markov_node) + (capacity + 1) * sizeof(uint32_t) +
-           capacity * sizeof(passgen_markov_node *);
+// Size of a node with the given number of children, which are followed by
+// their codepoints.
+static size_t markov_node_size(size_t len) {
+    return sizeof(passgen_markov_node) +
+           len * (sizeof(passgen_markov_child) + sizeof(uint32_t));
 }
 
-size_t passgen_markov_leaf_size(size_t capacity) {
-    return sizeof(passgen_markov_leaf) + capacity * sizeof(uint32_t) +
-           capacity * sizeof(uint32_t);
+// Size of a leaf with the given number of codepoints.
+static size_t markov_leaf_size(size_t len) {
+    return sizeof(passgen_markov_leaf) + len * sizeof(passgen_markov_frequency);
 }
 
-// Finds the index of a capacity in the list of sizes.
-static size_t markov_size_index(size_t capacity) {
-    size_t size_index = 0;
-    while(markov_sizes[size_index] < capacity) {
-        size_index++;
+// Finds where a codepoint is in a sorted list of them, or where it would go
+// to keep them sorted. Sets found to whether it is there.
+static size_t markov_search(
+    const uint32_t *codepoints,
+    size_t stride,
+    size_t len,
+    uint32_t codepoint,
+    bool *found) {
+    size_t low = 0;
+    size_t high = len;
+    while(low < high) {
+        size_t middle = low + (high - low) / 2;
+        uint32_t entry = codepoints[middle * stride];
+        if(entry == codepoint) {
+            *found = true;
+            return middle;
+        }
+        if(entry < codepoint) {
+            low = middle + 1;
+        } else {
+            high = middle;
+        }
     }
-    return size_index;
+    *found = false;
+    return low;
 }
 
-passgen_markov_node *passgen_markov_node_new(size_t size_index) {
-    size_t capacity = markov_sizes[size_index];
-    passgen_assert(capacity);
-    passgen_markov_node *node =
-        passgen_alloc_zeroed(passgen_markov_node_size(capacity));
+// Finds a codepoint in a leaf, see markov_search().
+static size_t markov_leaf_search(
+    const passgen_markov_leaf *leaf,
+    uint32_t codepoint,
+    bool *found) {
+    // the codepoints are every other uint32_t of the entries.
+    passgen_static_assert(
+        sizeof(passgen_markov_frequency) == 2 * sizeof(uint32_t));
+    return markov_search(
+        &leaf->entries[0].codepoint,
+        2,
+        leaf->len,
+        codepoint,
+        found);
+}
+
+// Finds a codepoint in a node, see markov_search().
+static size_t markov_node_search(
+    const passgen_markov_node *node,
+    uint32_t codepoint,
+    bool *found) {
+    return markov_search(
+        passgen_markov_node_codepoints(node),
+        1,
+        node->len,
+        codepoint,
+        found);
+}
+
+passgen_markov_node *passgen_markov_node_new(void) {
+    passgen_markov_node *node = passgen_alloc(markov_node_size(0));
     if(!node) {
         return NULL;
     }
-    node->capacity = capacity;
+    node->len = 0;
     return node;
 }
 
-passgen_markov_leaf *passgen_markov_leaf_new(size_t size_index) {
-    size_t capacity = markov_sizes[size_index];
-    passgen_assert(capacity);
-    passgen_markov_leaf *leaf =
-        passgen_alloc_zeroed(passgen_markov_leaf_size(capacity));
+passgen_markov_leaf *passgen_markov_leaf_new(void) {
+    passgen_markov_leaf *leaf = passgen_alloc(markov_leaf_size(0));
     if(!leaf) {
         return NULL;
     }
-    leaf->capacity = capacity;
+    leaf->len = 0;
     leaf->total_count = 0;
     return leaf;
 }
 
 void passgen_markov_leaf_free(passgen_markov_leaf *leaf) {
-    size_t size = passgen_markov_leaf_size(leaf->capacity);
-    PASSGEN_CLEAR(leaf);
+    size_t size = markov_leaf_size(leaf->len);
+    memset(leaf, 0, size);
     passgen_free(leaf, size);
 }
 
 // Releases a node, but not its children.
 static void markov_node_release(passgen_markov_node *node) {
-    size_t size = passgen_markov_node_size(node->capacity);
-    PASSGEN_CLEAR(node);
+    size_t size = markov_node_size(node->len);
+    memset(node, 0, size);
     passgen_free(node, size);
 }
 
+// Frees what a node points to, which is a node with the given level, or a
+// leaf for a level of zero.
+static void markov_child_free(passgen_markov_child child, size_t level) {
+    if(level == 0) {
+        passgen_markov_leaf_free(child.leaf);
+    } else {
+        passgen_markov_node_free(child.node, level);
+    }
+}
+
 void passgen_markov_node_free(passgen_markov_node *node, size_t level) {
-    for(size_t i = 0; i < node->capacity; i++) {
-        void *child = passgen_markov_node_child(node, i).leaf;
-        if(child) {
-            if(level < 2) {
-                passgen_markov_leaf_free(child);
-            } else {
-                passgen_markov_node_free(child, level - 1);
-            }
-        }
+    for(size_t i = 0; i < node->len; i++) {
+        markov_child_free(node->children[i], level - 1);
     }
 
     markov_node_release(node);
 }
 
-void passgen_markov_node_check(passgen_markov_node *node, size_t level) {
-    passgen_assert(node->capacity);
-    passgen_assert(node->capacity % 2);
-    for(size_t i = 0; i < node->capacity; i++) {
-        void *data = passgen_markov_node_child(node, i).node;
-        uint32_t codepoint = passgen_markov_node_codepoint(node, i);
-        if(codepoint) {
-            passgen_assert(data);
-        }
-        if(data) {
-            passgen_assert((codepoint % node->capacity) == i);
-            if(level > 2) {
-                passgen_markov_node_check(data, level - 1);
-            }
-        }
+passgen_markov_child *
+passgen_markov_node_child(const passgen_markov_node *node, uint32_t codepoint) {
+    bool found;
+    size_t index = markov_node_search(node, codepoint, &found);
+    if(!found) {
+        return NULL;
     }
-}
-
-void passgen_markov_check(passgen_markov *markov) {
-    if(markov->root) {
-        passgen_markov_node_check(markov->root, markov->level);
-    }
+    return (passgen_markov_child *) &node->children[index];
 }
 
 // Initialize new markov chain with a given level. The root node is only
@@ -139,48 +147,6 @@ void passgen_markov_init(passgen_markov *markov, uint8_t level) {
     markov->root = NULL;
 }
 
-// Moves the entries of a leaf into the next larger one in which none of them
-// collide, and there is room for the codepoint. Returns NULL if there is no
-// memory for it, the leaf is unchanged then.
-static passgen_markov_leaf *
-markov_leaf_grow(passgen_markov_leaf *leaf, uint32_t codepoint) {
-    size_t size_index = markov_size_index(leaf->capacity) + 1;
-    for(; markov_sizes[size_index]; size_index++) {
-        passgen_markov_leaf *new = passgen_markov_leaf_new(size_index);
-        if(!new) {
-            return NULL;
-        }
-
-        bool collides = false;
-        for(size_t i = 0; !collides && i < leaf->capacity; i++) {
-            uint32_t count = passgen_markov_leaf_count_raw(leaf, i);
-            if(!count) {
-                continue;
-            }
-            uint32_t entry = passgen_markov_leaf_codepoint_raw(leaf, i);
-            if(passgen_markov_leaf_count_raw(new, entry)) {
-                collides = true;
-            } else {
-                passgen_markov_leaf_codepoint_raw(new, entry) = entry;
-                passgen_markov_leaf_count_raw(new, entry) = count;
-            }
-        }
-        if(passgen_markov_leaf_count_raw(new, codepoint)) {
-            collides = true;
-        }
-
-        if(!collides) {
-            new->total_count = leaf->total_count;
-            passgen_markov_leaf_free(leaf);
-            return new;
-        }
-
-        passgen_markov_leaf_free(new);
-    }
-
-    return NULL;
-}
-
 passgen_markov_leaf *passgen_markov_leaf_insert(
     passgen_markov_leaf *leaf,
     uint32_t codepoint,
@@ -190,102 +156,74 @@ passgen_markov_leaf *passgen_markov_leaf_insert(
         return leaf;
     }
 
-    if(passgen_markov_leaf_count_raw(leaf, codepoint) &&
-       passgen_markov_leaf_codepoint_raw(leaf, codepoint) != codepoint) {
-        leaf = markov_leaf_grow(leaf, codepoint);
-        if(!leaf) {
+    bool found;
+    size_t index = markov_leaf_search(leaf, codepoint, &found);
+
+    if(!found) {
+        // this grows by a single entry, so that no memory is wasted. most
+        // leaves only have a few.
+        passgen_markov_leaf *grown = passgen_resize(
+            leaf,
+            markov_leaf_size(leaf->len),
+            markov_leaf_size(leaf->len + 1));
+        if(!grown) {
             return NULL;
         }
+        leaf = grown;
+
+        memmove(
+            &leaf->entries[index + 1],
+            &leaf->entries[index],
+            (leaf->len - index) * sizeof(leaf->entries[0]));
+        leaf->entries[index].codepoint = codepoint;
+        leaf->entries[index].count = 0;
+        leaf->len += 1;
     }
 
-    // set codepoint
-    passgen_markov_leaf_codepoint_raw(leaf, codepoint) = codepoint;
-    passgen_markov_leaf_count_raw(leaf, codepoint) += weight;
+    leaf->entries[index].count += weight;
     leaf->total_count += weight;
 
     return leaf;
 }
 
-// Moves the children of a node into the next larger one in which none of
-// them collide, and there is room for the codepoint. Returns NULL if there is
-// no memory for it, the node is unchanged then.
-static passgen_markov_node *
-markov_node_grow(passgen_markov_node *node, uint32_t codepoint) {
-    size_t size_index = markov_size_index(node->capacity) + 1;
-    for(; markov_sizes[size_index]; size_index++) {
-        passgen_markov_node *new = passgen_markov_node_new(size_index);
-        if(!new) {
-            return NULL;
-        }
-
-        bool collides = false;
-        for(size_t i = 0; !collides && i < node->capacity; i++) {
-            passgen_markov_node *child = passgen_markov_node_child(node, i).node;
-            if(!child) {
-                continue;
-            }
-            uint32_t entry = passgen_markov_node_codepoint(node, i);
-            if(passgen_markov_node_child(new, entry).node) {
-                collides = true;
-            } else {
-                passgen_markov_node_codepoint(new, entry) = entry;
-                passgen_markov_node_child(new, entry).node = child;
-            }
-        }
-        if(passgen_markov_node_child(new, codepoint).node) {
-            collides = true;
-        }
-
-        // the children now belong to the new node, or still to the old one.
-        if(!collides) {
-            markov_node_release(node);
-            return new;
-        }
-
-        markov_node_release(new);
-    }
-
-    return NULL;
-}
-
-passgen_markov_node *
-passgen_markov_node_insert(passgen_markov_node *node, uint32_t codepoint) {
-    if(passgen_markov_node_child(node, codepoint).node &&
-       passgen_markov_node_codepoint(node, codepoint) != codepoint) {
-        node = markov_node_grow(node, codepoint);
-        if(!node) {
-            return NULL;
-        }
-    }
-
-    // set codepoint
-    passgen_markov_node_codepoint(node, codepoint) = codepoint;
-
-    return node;
-}
-
-// Inserts the last codepoint of a sequence into the leaf below a node.
-static passgen_status markov_node_insert_leaf(
+// Adds a child to a node, at the index where its codepoint goes. Returns the
+// node, which may have moved, or NULL if there is no memory for it, the node
+// is unchanged then.
+static passgen_markov_node *markov_node_insert_at(
     passgen_markov_node *node,
+    size_t index,
     uint32_t codepoint,
-    uint32_t last,
-    size_t weight) {
-    passgen_markov_leaf *leaf = passgen_markov_node_child(node, codepoint).leaf;
-    if(!leaf) {
-        leaf = passgen_markov_leaf_new(0);
-        if(!leaf) {
-            return PASSGEN_ERROR_OUT_OF_MEMORY;
-        }
-        passgen_markov_node_child(node, codepoint).leaf = leaf;
+    passgen_markov_child child) {
+    size_t len = node->len;
+    passgen_markov_node *grown = passgen_resize(
+        node,
+        markov_node_size(len),
+        markov_node_size(len + 1));
+    if(!grown) {
+        return NULL;
     }
+    node = grown;
 
-    leaf = passgen_markov_leaf_insert(leaf, last, weight);
-    if(!leaf) {
-        return PASSGEN_ERROR_OUT_OF_MEMORY;
-    }
-    passgen_markov_node_child(node, codepoint).leaf = leaf;
+    // the codepoints follow the children, so they move along by one child
+    // first. they are where the new child goes otherwise.
+    uint32_t *old_codepoints = (uint32_t *) &node->children[len];
+    uint32_t *codepoints = (uint32_t *) &node->children[len + 1];
+    memmove(codepoints, old_codepoints, len * sizeof(uint32_t));
 
-    return PASSGEN_OK;
+    memmove(
+        &codepoints[index + 1],
+        &codepoints[index],
+        (len - index) * sizeof(uint32_t));
+    codepoints[index] = codepoint;
+
+    memmove(
+        &node->children[index + 1],
+        &node->children[index],
+        (len - index) * sizeof(node->children[0]));
+    node->children[index] = child;
+
+    node->len = len + 1;
+    return node;
 }
 
 passgen_status passgen_markov_node_insert_word(
@@ -293,37 +231,82 @@ passgen_status passgen_markov_node_insert_word(
     const uint32_t *sequence,
     size_t length,
     size_t weight) {
+    // a word without weight would leave a leaf without any codepoints, which
+    // there would be nothing to generate from.
+    if(weight == 0) {
+        return PASSGEN_OK;
+    }
+
     if(!*node) {
-        *node = passgen_markov_node_new(0);
+        *node = passgen_markov_node_new();
         if(!*node) {
             return PASSGEN_ERROR_OUT_OF_MEMORY;
         }
     }
 
-    uint32_t codepoint = sequence[0];
-    passgen_markov_node *grown = passgen_markov_node_insert(*node, codepoint);
-    if(!grown) {
-        return PASSGEN_ERROR_OUT_OF_MEMORY;
+    bool found;
+    size_t index = markov_node_search(*node, sequence[0], &found);
+    passgen_markov_child child = {NULL};
+    if(found) {
+        child = (*node)->children[index];
     }
-    *node = grown;
 
-    passgen_status status;
-    if(length == 2) {
-        status = markov_node_insert_leaf(grown, codepoint, sequence[1], weight);
+    // the levels of nodes below this one, and so of the child.
+    size_t level = length - 2;
+    passgen_status status = PASSGEN_OK;
+
+    if(level == 0) {
+        // the child is the leaf, which counts the last codepoint.
+        passgen_markov_leaf *leaf = child.leaf;
+        if(!leaf) {
+            leaf = passgen_markov_leaf_new();
+            if(!leaf) {
+                return PASSGEN_ERROR_OUT_OF_MEMORY;
+            }
+        }
+
+        passgen_markov_leaf *grown =
+            passgen_markov_leaf_insert(leaf, sequence[1], weight);
+        if(!grown) {
+            if(!found) {
+                passgen_markov_leaf_free(leaf);
+            }
+            return PASSGEN_ERROR_OUT_OF_MEMORY;
+        }
+        child.leaf = grown;
     } else {
+        // the child may move when it grows, or be allocated.
         status = passgen_markov_node_insert_word(
-            &passgen_markov_node_child(grown, codepoint).node,
+            &child.node,
             &sequence[1],
             length - 1,
             weight);
     }
 
-    // a codepoint without a child is not in the node.
-    if(!passgen_markov_node_child(grown, codepoint).node) {
-        passgen_markov_node_codepoint(grown, codepoint) = 0;
+    // a child which was there before is updated, whether this worked or not,
+    // as it may have moved.
+    if(found) {
+        (*node)->children[index] = child;
+        return status;
     }
 
-    return status;
+    // a new child which could not be filled in is not added.
+    if(status != PASSGEN_OK) {
+        if(child.node) {
+            markov_child_free(child, level);
+        }
+        return status;
+    }
+
+    passgen_markov_node *grown =
+        markov_node_insert_at(*node, index, sequence[0], child);
+    if(!grown) {
+        markov_child_free(child, level);
+        return PASSGEN_ERROR_OUT_OF_MEMORY;
+    }
+    *node = grown;
+
+    return PASSGEN_OK;
 }
 
 static passgen_status passgen_markov_insert(
@@ -391,66 +374,50 @@ uint32_t passgen_markov_generate(
     passgen_random *random,
     double *entropy) {
     passgen_markov_node *node = markov->root;
+    passgen_assert(node);
 
-    for(size_t i = 0; i < markov->level; i++) {
-        node =
-            (passgen_markov_node *) passgen_markov_node_child(node, current[i])
-                .leaf;
-        passgen_assert(node);
+    // the last of the previous codepoints leads to the leaf.
+    for(size_t i = 0; i + 1 < markov->level; i++) {
+        passgen_markov_child *child = passgen_markov_node_child(node, current[i]);
+        passgen_assert(child);
+        node = child->node;
     }
-
-    passgen_markov_leaf *leaf = (passgen_markov_leaf *) node;
-
-    // record total choices.
-    if(entropy) {
-        *entropy += log2((double) leaf->total_count);
-    }
+    passgen_markov_child *child =
+        passgen_markov_node_child(node, current[markov->level - 1]);
+    passgen_assert(child);
+    passgen_markov_leaf *leaf = child->leaf;
+    passgen_assert(leaf->len);
 
     // with only one codepoint which can follow (however often it was seen),
     // there is nothing to choose from, so this takes no randomness. the
     // entropy of that is zero.
-    size_t options = 0;
-    size_t only = 0;
-    for(size_t i = 0; i < leaf->capacity && options < 2; i++) {
-        if(passgen_markov_leaf_count_raw(leaf, i)) {
-            options += 1;
-            only = i;
-        }
-    }
-    if(options == 1) {
-        if(entropy) {
-            *entropy -= log2((double) leaf->total_count);
-        }
-        return passgen_markov_leaf_codepoint_raw(leaf, only);
+    if(leaf->len == 1) {
+        return leaf->entries[0].codepoint;
     }
 
+    // the codepoints are chosen from in their order.
     size_t choice = passgen_random_u64_max(random, leaf->total_count);
-    for(size_t i = 0; i < leaf->capacity; i++) {
-        uint32_t count = passgen_markov_leaf_count_raw(leaf, i);
-        if(count) {
-            if(choice < count) {
-                // record bucket (reduces total choices).
-                if(entropy) {
-                    *entropy -= log2((double) count);
-                }
-
-                return passgen_markov_leaf_codepoint_raw(leaf, i);
-            } else {
-                choice -= count;
+    for(size_t i = 0; i < leaf->len; i++) {
+        uint32_t count = leaf->entries[i].count;
+        if(choice < count) {
+            // this was one of total_count equally likely choices, of which
+            // count result in this codepoint.
+            if(entropy) {
+                *entropy += log2((double) leaf->total_count) - log2((double) count);
             }
+            return leaf->entries[i].codepoint;
         }
+        choice -= count;
     }
 
+    // the counts add up to the total, so one of them was chosen.
     passgen_assert(false);
-
     return 0;
 }
 
 uint32_t
-passgen_markov_leaf_count(passgen_markov_leaf *leaf, uint32_t codepoint) {
-    if(passgen_markov_leaf_codepoint_raw(leaf, codepoint) == codepoint) {
-        return passgen_markov_leaf_count_raw(leaf, codepoint);
-    } else {
-        return 0;
-    }
+passgen_markov_leaf_count(const passgen_markov_leaf *leaf, uint32_t codepoint) {
+    bool found;
+    size_t index = markov_leaf_search(leaf, codepoint, &found);
+    return found ? leaf->entries[index].count : 0;
 }
