@@ -11,7 +11,8 @@ void passgen_preset_init(passgen_preset *preset, char *value) {
     passgen_pattern_init(&preset->pattern);
 }
 
-passgen_status passgen_preset_parse(passgen_preset *preset, passgen_error *error) {
+passgen_status
+passgen_preset_parse(passgen_preset *preset, passgen_error *error) {
     if(preset->parsed) {
         return PASSGEN_OK;
     }

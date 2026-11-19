@@ -19,10 +19,8 @@ static size_t passgen_stack_bins(const passgen_stack *stack) {
     return (stack->len + stack->bin_size - 1) / stack->bin_size;
 }
 
-static inline char *passgen_stack_element(
-    const passgen_stack *stack,
-    size_t bin,
-    size_t offset) {
+static inline char *
+passgen_stack_element(const passgen_stack *stack, size_t bin, size_t offset) {
     return (char *) stack->data[bin] + offset * stack->element_size;
 }
 

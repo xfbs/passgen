@@ -8,10 +8,10 @@
 /// independent implementation of all of this.
 #include "tests.h"
 #include <passgen/config.h>
-#include <passgen/generate.h>
-#include <passgen/passgen.h>
 #include <passgen/env.h>
+#include <passgen/generate.h>
 #include <passgen/master.h>
+#include <passgen/passgen.h>
 #include <passgen/random.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,7 +33,7 @@ static const vector vectors[] = {
 #undef HASH
 #undef VECTOR
 
-#define WORD(word)                        word "\n"
+#define WORD(word) word "\n"
 #define HASH(passphrase, level, seed, expected)
 #define VECTOR(random, pattern, expected) ""
 static const char wordlist[] =

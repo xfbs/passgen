@@ -1,8 +1,8 @@
 /// @file newbench.h
 /// @brief Benchmark framework header file
 #pragma once
-#include <stdbool.h>
 #include <passgen/container/hashmap.h>
+#include <stdbool.h>
 
 /// Benchmark definition
 typedef struct bench {

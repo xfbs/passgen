@@ -77,6 +77,5 @@ passgen_pattern_segment_new_special(passgen_pattern_segment *segment);
 /// Lookup the [n]th segment item of this segment.
 ///
 /// @memberof passgen_pattern_segment
-passgen_pattern_item *passgen_pattern_segment_get_item(
-    passgen_pattern_segment *segment,
-    size_t n);
+passgen_pattern_item *
+passgen_pattern_segment_get_item(passgen_pattern_segment *segment, size_t n);

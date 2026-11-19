@@ -46,8 +46,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
             // the decoder only produces codepoints that can be encoded, and
             // encoding them cannot take more space than they took before.
-            int bytes =
-                passgen_utf8_encode_codepoint(&encoded[encoded_len], codepoints[i]);
+            int bytes = passgen_utf8_encode_codepoint(
+                &encoded[encoded_len],
+                codepoints[i]);
             if(bytes < 1 || bytes > 4 || bytes != widths[i]) {
                 abort();
             }

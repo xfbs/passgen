@@ -39,7 +39,8 @@ typedef struct {
     jmp_buf exhausted;
 } fuzz_random_context;
 
-static inline size_t fuzz_random_read(void *context_raw, void *dest, size_t size) {
+static inline size_t
+fuzz_random_read(void *context_raw, void *dest, size_t size) {
     fuzz_random_context *context = context_raw;
     if(context->budget < size) {
         longjmp(context->exhausted, 1);
@@ -145,7 +146,8 @@ fuzz_alloc_resize(void *state, void *ptr, size_t old_size, size_t new_size) {
     if(fuzz_alloc_fails(allocator)) {
         return NULL;
     }
-    fuzz_alloc_header *moved = realloc(block, sizeof(fuzz_alloc_header) + new_size);
+    fuzz_alloc_header *moved =
+        realloc(block, sizeof(fuzz_alloc_header) + new_size);
     if(!moved) {
         return NULL;
     }
@@ -204,7 +206,7 @@ static inline void fuzz_run(
         hash = (hash ^ data[i]) * UINT64_C(0x100000001b3);
     }
 
-    allocator = (fuzz_allocator){
+    allocator = (fuzz_allocator) {
         .fail_at = (size_t) (hash % requests),
         .fail_count = (hash >> 63) ? 1 : SIZE_MAX,
     };

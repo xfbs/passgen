@@ -15,12 +15,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define check(condition)                                              \
-    do {                                                              \
-        if(!(condition)) {                                            \
+#define check(condition)                                                    \
+    do {                                                                    \
+        if(!(condition)) {                                                  \
             fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, #condition); \
-            exit(EXIT_FAILURE);                                       \
-        }                                                             \
+            exit(EXIT_FAILURE);                                             \
+        }                                                                   \
     } while(0)
 
 static int count(void *data, uint32_t codepoint) {
@@ -43,7 +43,8 @@ int main(void) {
     // the default allocator can be put back, which it already is.
     passgen_allocator_set(NULL);
 
-    check(PASSGEN_ERROR_SET_UNCLOSED == passgen_parse(&pattern, &error, "[a-z"));
+    check(
+        PASSGEN_ERROR_SET_UNCLOSED == passgen_parse(&pattern, &error, "[a-z"));
     check(pattern == NULL);
     check(error.kind == PASSGEN_ERROR_SET_UNCLOSED);
     check(error.has_position);
@@ -99,23 +100,43 @@ int main(void) {
 
     uint32_t codepoints[64];
     check(
-        PASSGEN_OK ==
-        passgen_generate_fill_unicode(pattern, env, NULL, NULL, codepoints, 64, &length));
+        PASSGEN_OK == passgen_generate_fill_unicode(
+                          pattern,
+                          env,
+                          NULL,
+                          NULL,
+                          codepoints,
+                          64,
+                          &length));
     check(length >= strlen("alpha-abcd"));
     check(
-        PASSGEN_OK ==
-        passgen_generate_fill_json_utf8(pattern, env, NULL, NULL, output, 63, &length));
+        PASSGEN_OK == passgen_generate_fill_json_utf8(
+                          pattern,
+                          env,
+                          NULL,
+                          NULL,
+                          output,
+                          63,
+                          &length));
     check(length >= strlen("alpha-abcd"));
 
     // a buffer which is too small is an error, and not the same as nothing
     // being generated.
     check(
-        PASSGEN_ERROR_BUFFER_TOO_SMALL ==
-        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 3, &length));
+        PASSGEN_ERROR_BUFFER_TOO_SMALL == passgen_generate_fill_utf8(
+                                              pattern,
+                                              env,
+                                              NULL,
+                                              NULL,
+                                              output,
+                                              3,
+                                              &length));
     check(length == 0);
 
     size_t codepoint_count = 0;
-    check(0 == passgen_generate(pattern, env, NULL, NULL, &codepoint_count, count));
+    check(
+        0 ==
+        passgen_generate(pattern, env, NULL, NULL, &codepoint_count, count));
     check(codepoint_count >= strlen("alpha-abcd"));
 
     // with a step limit of one, this cannot be generated.
@@ -135,14 +156,7 @@ int main(void) {
     passgen_random *zero = passgen_random_open(NULL, "zero");
     check(zero != NULL);
     passgen_env_random_set(env, zero);
-    passgen_generate_fill_utf8(
-        pattern,
-        env,
-        NULL,
-        NULL,
-        output,
-        63,
-        &length);
+    passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 63, &length);
     output[length] = 0;
     check(0 == strcmp((const char *) output, "alpha-aaaa"));
 
@@ -159,11 +173,16 @@ int main(void) {
 #ifdef PASSGEN_MONOCYPHER
     // master passphrase mode, with a small cost so that this is quick.
     passgen_master_cost cost;
-    check(passgen_master_level(PASSGEN_MASTER_VERSION, PASSGEN_MASTER_LEVEL_DEFAULT, &cost));
+    check(passgen_master_level(
+        PASSGEN_MASTER_VERSION,
+        PASSGEN_MASTER_LEVEL_DEFAULT,
+        &cost));
     cost.memory = 8;
     cost.passes = 1;
     passgen_master master;
-    check(PASSGEN_OK == passgen_master_derive_cost(&master, 1, &cost, "pass", NULL, 0));
+    check(
+        PASSGEN_OK ==
+        passgen_master_derive_cost(&master, 1, &cost, "pass", NULL, 0));
     uint8_t hash[PASSGEN_MASTER_HASH_SIZE];
     passgen_master_hash(&master, hash);
     check(passgen_master_random_open(&random, &master, "example.com", "me"));

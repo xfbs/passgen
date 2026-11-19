@@ -1,6 +1,6 @@
 #include "tests.h"
-#include <passgen/allocator.h>
 #include <getopt.h>
+#include <passgen/allocator.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>

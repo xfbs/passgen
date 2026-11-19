@@ -1,11 +1,11 @@
 #include "passgen/pattern/special.h"
-#include "passgen/markov.h"
 #include "passgen/assert.h"
 #include "passgen/config.h"
-#include "passgen/util/utf8.h"
-#include <stdbool.h>
+#include "passgen/markov.h"
 #include "passgen/util/alloc.h"
 #include "passgen/util/clear.h"
+#include "passgen/util/utf8.h"
+#include <stdbool.h>
 
 #define PARAMETERS_INITIAL_SIZE 16
 #define PARAMETERS_MULTIPLIER   2
@@ -17,8 +17,8 @@ void passgen_pattern_special_init(
     special->parameters_cap = 0;
     special->parameters = NULL;
     special->markov_length = PASSGEN_MARKOV_LENGTH_DEFAULT;
-    special->start = (passgen_error_offset){0, 0};
-    special->end = (passgen_error_offset){0, 0};
+    special->start = (passgen_error_offset) {0, 0};
+    special->end = (passgen_error_offset) {0, 0};
     special->wordlist = NULL;
 
     switch(kind) {
@@ -51,8 +51,10 @@ passgen_status passgen_pattern_special_push(
         int32_t capacity = special->parameters_cap
                                ? special->parameters_cap * PARAMETERS_MULTIPLIER
                                : PARAMETERS_INITIAL_SIZE;
-        char *parameters =
-            passgen_resize(special->parameters, special->parameters_cap, capacity);
+        char *parameters = passgen_resize(
+            special->parameters,
+            special->parameters_cap,
+            capacity);
         if(!parameters) {
             return PASSGEN_ERROR_OUT_OF_MEMORY;
         }

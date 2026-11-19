@@ -1,6 +1,7 @@
 /// @file siphash.h
 /// @brief SipHash reference C implementation
-/// @author Copyright (c) 2012-2021 Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+/// @author Copyright (c) 2012-2021 Jean-Philippe Aumasson
+/// <jeanphilippe.aumasson@gmail.com>
 /// @author Copyright (c) 2012-2014 Daniel J. Bernstein <djb@cr.yp.to>
 /// @license CC0
 ///

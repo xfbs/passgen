@@ -1,13 +1,13 @@
 #include "passgen/random.h"
-#include "passgen/random_desc.h"
-#include "passgen/util/alloc.h"
 #include "passgen/assert.h"
 #include "passgen/config.h"
+#include "passgen/random_desc.h"
+#include "passgen/util/alloc.h"
+#include "passgen/util/clear.h"
 #include "passgen/util/endian.h"
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include "passgen/util/clear.h"
 
 static bool _strprefix(const char *prefix, const char *string) {
     size_t prefix_len = strlen(prefix);
@@ -94,7 +94,8 @@ void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
 // colon and `\\` a backslash, and any other backslash is not valid. Sets
 // last to whether it was the last field. Returns false if the field is not
 // valid, or it does not fit, with the NUL terminator.
-static bool desc_field(const char **pos, char *string, size_t size, bool *last) {
+static bool
+desc_field(const char **pos, char *string, size_t size, bool *last) {
     const char *current = *pos;
     size_t length = 0;
     while(*current && *current != ':') {
@@ -170,9 +171,8 @@ static bool random_desc_kind(
     size_t count = sizeof(random_desc_kinds) / sizeof(random_desc_kinds[0]);
     for(size_t i = 0; i < count; i++) {
         const char *prefix = random_desc_kinds[i].prefix;
-        bool matches = random_desc_kinds[i].whole
-                           ? 0 == strcmp(prefix, string)
-                           : _strprefix(prefix, string);
+        bool matches = random_desc_kinds[i].whole ? 0 == strcmp(prefix, string)
+                                                  : _strprefix(prefix, string);
         if(matches) {
             *kind = random_desc_kinds[i].kind;
             *params = &string[strlen(prefix)];
@@ -256,8 +256,7 @@ static bool random_desc_master(passgen_random_desc *desc, const char *params) {
         return false;
     }
     size_t digits = strlen(field);
-    if(digits % 2 ||
-       !hex_decode(field, desc->data.master.seed, digits / 2)) {
+    if(digits % 2 || !hex_decode(field, desc->data.master.seed, digits / 2)) {
         passgen_wipe(field, sizeof(field));
         return false;
     }

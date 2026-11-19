@@ -8,7 +8,7 @@
 #include <string.h>
 
 #define MIN(a, b)            ((a) < (b) ? (a) : (b))
-#define SATURATING_SUB(a, b) ((a) -MIN(a, b))
+#define SATURATING_SUB(a, b) ((a) - MIN(a, b))
 
 // Size of a node with the given number of children, which are followed by
 // their codepoints.
@@ -280,10 +280,8 @@ static passgen_markov_node *markov_node_insert_at(
     uint32_t codepoint,
     passgen_markov_child child) {
     size_t len = node->len;
-    passgen_markov_node *grown = passgen_resize(
-        node,
-        markov_node_size(len),
-        markov_node_size(len + 1));
+    passgen_markov_node *grown =
+        passgen_resize(node, markov_node_size(len), markov_node_size(len + 1));
     if(!grown) {
         return NULL;
     }
@@ -463,7 +461,8 @@ uint32_t passgen_markov_generate(
 
     // the last of the previous codepoints leads to the leaf.
     for(size_t i = 0; i + 1 < markov->level; i++) {
-        passgen_markov_child *child = passgen_markov_node_child(node, current[i]);
+        passgen_markov_child *child =
+            passgen_markov_node_child(node, current[i]);
         passgen_assert(child);
         node = child->node;
     }
@@ -488,7 +487,8 @@ uint32_t passgen_markov_generate(
             // this was one of total_count equally likely choices, of which
             // count result in this codepoint.
             if(entropy) {
-                *entropy += log2((double) leaf->total_count) - log2((double) count);
+                *entropy +=
+                    log2((double) leaf->total_count) - log2((double) count);
             }
             return leaf->entries[i].codepoint;
         }

@@ -230,11 +230,17 @@ test_result test_hashmap_foreach(void) {
     passgen_hashmap map;
     passgen_hashmap_init(&map, NULL);
 
-    assert(PASSGEN_OK == passgen_hashmap_insert(&map, "alpha", malloc(255), NULL));
-    assert(PASSGEN_OK == passgen_hashmap_insert(&map, "beta", malloc(255), NULL));
-    assert(PASSGEN_OK == passgen_hashmap_insert(&map, "gamma", malloc(255), NULL));
-    assert(PASSGEN_OK == passgen_hashmap_insert(&map, "delta", malloc(255), NULL));
-    assert(PASSGEN_OK == passgen_hashmap_insert(&map, "epsilon", malloc(255), NULL));
+    assert(
+        PASSGEN_OK == passgen_hashmap_insert(&map, "alpha", malloc(255), NULL));
+    assert(
+        PASSGEN_OK == passgen_hashmap_insert(&map, "beta", malloc(255), NULL));
+    assert(
+        PASSGEN_OK == passgen_hashmap_insert(&map, "gamma", malloc(255), NULL));
+    assert(
+        PASSGEN_OK == passgen_hashmap_insert(&map, "delta", malloc(255), NULL));
+    assert(
+        PASSGEN_OK ==
+        passgen_hashmap_insert(&map, "epsilon", malloc(255), NULL));
 
     assert_eq(passgen_hashmap_foreach(&map, NULL, function_fails), 7);
     assert_eq(passgen_hashmap_foreach(&map, NULL, free_value), 0);
@@ -373,7 +379,8 @@ test_result test_hashmap_out_of_memory(void) {
 
         assert_eq(map.len, inserted);
         for(size_t i = 0; i < inserted; i++) {
-            passgen_hashmap_entry *entry = passgen_hashmap_lookup(&map, keys[i]);
+            passgen_hashmap_entry *entry =
+                passgen_hashmap_lookup(&map, keys[i]);
             assert(entry);
             assert(entry->value == &keys[i]);
         }

@@ -1,10 +1,10 @@
 #include "passgen/container/hashmap.h"
 #include "passgen/config.h"
-#include "passgen/util/siphash.h"
 #include "passgen/util/alloc.h"
+#include "passgen/util/clear.h"
+#include "passgen/util/siphash.h"
 #include <stdlib.h>
 #include <string.h>
-#include "passgen/util/clear.h"
 #define UNUSED(x) (void) x
 
 static const size_t hashmap_sizes[] = {
@@ -137,8 +137,10 @@ passgen_hashmap_grow(passgen_hashmap *map, size_t capacity) {
         bool placed = true;
         for(size_t i = 0; placed && i < old.capacity; i++) {
             if(old.data[i].key) {
-                placed =
-                    passgen_hashmap_place(map, old.data[i].key, old.data[i].value);
+                placed = passgen_hashmap_place(
+                    map,
+                    old.data[i].key,
+                    old.data[i].value);
             }
         }
 
@@ -160,7 +162,7 @@ passgen_status passgen_hashmap_insert(
     void *value,
     passgen_hashmap_entry *previous) {
     if(previous) {
-        *previous = (passgen_hashmap_entry){NULL, NULL};
+        *previous = (passgen_hashmap_entry) {NULL, NULL};
     }
 
     // if the key is there already, it is replaced. this has to be checked in
@@ -183,7 +185,8 @@ passgen_status passgen_hashmap_insert(
     }
 
     while(!passgen_hashmap_place(map, key, value)) {
-        if(PASSGEN_OK != passgen_hashmap_grow(map, next_capacity(map->capacity))) {
+        if(PASSGEN_OK !=
+           passgen_hashmap_grow(map, next_capacity(map->capacity))) {
             return PASSGEN_ERROR_OUT_OF_MEMORY;
         }
     }
@@ -221,7 +224,7 @@ passgen_hashmap_remove(passgen_hashmap *map, const void *key) {
         }
     }
 
-    return (passgen_hashmap_entry){NULL, NULL};
+    return (passgen_hashmap_entry) {NULL, NULL};
 }
 
 passgen_hashmap_entry *

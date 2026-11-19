@@ -25,8 +25,8 @@ static void print_error(const passgen_error *error, const char *pattern) {
         // the end of the pattern (such as a set which is not closed) is
         // marked right after it.
         size_t start = error->start.codepoint;
-        size_t end = error->end.codepoint > start ? error->end.codepoint
-                                                  : start + 1;
+        size_t end =
+            error->end.codepoint > start ? error->end.codepoint : start + 1;
         fprintf(stderr, "  %s\n  ", pattern);
         for(size_t i = 0; i < start; i++) {
             fputc(' ', stderr);

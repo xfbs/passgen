@@ -16,7 +16,11 @@ static passgen_status generate_seeded(
     uint64_t seed,
     char *output) {
     char description[64];
-    snprintf(description, sizeof(description), "xorshift:%llu", (unsigned long long) seed);
+    snprintf(
+        description,
+        sizeof(description),
+        "xorshift:%llu",
+        (unsigned long long) seed);
     passgen_random random;
     if(!passgen_random_open(&random, description)) {
         return PASSGEN_ERROR_INTERNAL;
@@ -83,7 +87,9 @@ test_result test_preset_env(void) {
 test_result test_preset_generate(void) {
     passgen_env *env = passgen_env_new(NULL);
     assert(env);
-    assert(PASSGEN_OK == passgen_env_preset_add(env, "_segment", "[a-zA-Z0-9]{6}"));
+    assert(
+        PASSGEN_OK ==
+        passgen_env_preset_add(env, "_segment", "[a-zA-Z0-9]{6}"));
     assert(
         PASSGEN_OK == passgen_env_preset_add(
                           env,
@@ -93,13 +99,11 @@ test_result test_preset_generate(void) {
 
     const char *cases[][2] = {
         {"\\p{_segment}", "([a-zA-Z0-9]{6})"},
-        {"\\p{apple}",
-         "((([a-zA-Z0-9]{6})-){2}([a-zA-Z0-9]{6}))"},
+        {"\\p{apple}", "((([a-zA-Z0-9]{6})-){2}([a-zA-Z0-9]{6}))"},
         // the same as using the preset with `--preset`.
         {"\\p{apple}", "([a-zA-Z0-9]{6}-){2}[a-zA-Z0-9]{6}"},
         {"\\p{choice}", "a|b|c"},
-        {"x\\p{apple}{2}y",
-         "x((([a-zA-Z0-9]{6})-){2}([a-zA-Z0-9]{6})){2}y"},
+        {"x\\p{apple}{2}y", "x((([a-zA-Z0-9]{6})-){2}([a-zA-Z0-9]{6})){2}y"},
         // the choice stays inside of the preset.
         {"x\\p{choice}y", "x(a|b|c)y"},
         {"\\p{choice}?", "(a|b|c)?"},
@@ -108,8 +112,12 @@ test_result test_preset_generate(void) {
     for(size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
         for(uint64_t seed = 1; seed < 20; seed++) {
             char with[256], without[256];
-            assert_eq(PASSGEN_OK, generate_seeded(env, cases[i][0], seed, with));
-            assert_eq(PASSGEN_OK, generate_seeded(env, cases[i][1], seed, without));
+            assert_eq(
+                PASSGEN_OK,
+                generate_seeded(env, cases[i][0], seed, with));
+            assert_eq(
+                PASSGEN_OK,
+                generate_seeded(env, cases[i][1], seed, without));
             assert_streq(with, without);
         }
     }
@@ -128,7 +136,9 @@ test_result test_preset_errors(void) {
 
     // not there
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "ab\\p{missing}"));
-    assert_eq(PASSGEN_ERROR_PRESET_NOT_FOUND, passgen_resolve(pattern, env, &error));
+    assert_eq(
+        PASSGEN_ERROR_PRESET_NOT_FOUND,
+        passgen_resolve(pattern, env, &error));
     assert_streq(error.detail, "missing");
     assert(error.has_position);
     assert_eq(error.start.codepoint, 2);
@@ -139,7 +149,9 @@ test_result test_preset_errors(void) {
     // its pattern is not valid, which the cause points to.
     assert(PASSGEN_OK == passgen_env_preset_add(env, "bad", "ab[cd"));
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "x\\p{bad}"));
-    assert_eq(PASSGEN_ERROR_PRESET_INVALID, passgen_resolve(pattern, env, &error));
+    assert_eq(
+        PASSGEN_ERROR_PRESET_INVALID,
+        passgen_resolve(pattern, env, &error));
     assert_streq(error.detail, "bad");
     assert_eq(error.start.codepoint, 1);
     assert_eq(error.end.codepoint, 8);
@@ -159,7 +171,9 @@ test_result test_preset_errors(void) {
     assert(PASSGEN_OK == passgen_env_preset_add(env, "outer", "\\p{inner}"));
     assert(PASSGEN_OK == passgen_env_preset_add(env, "inner", "a\\w{words}"));
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\p{outer}"));
-    assert_eq(PASSGEN_ERROR_PRESET_INVALID, passgen_resolve(pattern, env, &error));
+    assert_eq(
+        PASSGEN_ERROR_PRESET_INVALID,
+        passgen_resolve(pattern, env, &error));
     assert_streq(error.detail, "outer");
     assert(error.cause);
     assert_eq(error.cause->kind, PASSGEN_ERROR_PRESET_INVALID);
@@ -171,7 +185,9 @@ test_result test_preset_errors(void) {
     passgen_error_free(&error);
 
     // the error is not needed to find out what went wrong.
-    assert_eq(PASSGEN_ERROR_PRESET_INVALID, passgen_resolve(pattern, env, NULL));
+    assert_eq(
+        PASSGEN_ERROR_PRESET_INVALID,
+        passgen_resolve(pattern, env, NULL));
 
     // once it is there, it works. adding the wordlist means that the pattern
     // has to be resolved again.
@@ -204,7 +220,9 @@ test_result test_preset_cycle(void) {
     passgen_error error;
 
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\p{self}"));
-    assert_eq(PASSGEN_ERROR_PRESET_INVALID, passgen_resolve(pattern, env, &error));
+    assert_eq(
+        PASSGEN_ERROR_PRESET_INVALID,
+        passgen_resolve(pattern, env, &error));
     assert(error.cause);
     assert_eq(error.cause->kind, PASSGEN_ERROR_PRESET_CYCLE);
     assert_streq(error.cause->detail, "self");
@@ -213,7 +231,9 @@ test_result test_preset_cycle(void) {
     passgen_pattern_free(pattern);
 
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\p{ping}"));
-    assert_eq(PASSGEN_ERROR_PRESET_INVALID, passgen_resolve(pattern, env, &error));
+    assert_eq(
+        PASSGEN_ERROR_PRESET_INVALID,
+        passgen_resolve(pattern, env, &error));
     assert_streq(error.detail, "ping");
     assert_eq(error.cause->kind, PASSGEN_ERROR_PRESET_INVALID);
     assert_streq(error.cause->detail, "pong");
@@ -222,7 +242,9 @@ test_result test_preset_cycle(void) {
     passgen_error_free(&error);
 
     // it stays that way, nothing is left behind from the last attempt.
-    assert_eq(PASSGEN_ERROR_PRESET_INVALID, passgen_resolve(pattern, env, NULL));
+    assert_eq(
+        PASSGEN_ERROR_PRESET_INVALID,
+        passgen_resolve(pattern, env, NULL));
     passgen_pattern_free(pattern);
 
     // using a preset more than once is not a cycle.
@@ -272,7 +294,9 @@ test_result test_preset_depth(void) {
     assert_eq(PASSGEN_OK, generate_seeded(env, "\\p{deepest}", 1, output));
     assert_streq(output, "a");
     // also when it is used again, once it is resolved.
-    assert_eq(PASSGEN_OK, generate_seeded(env, "\\p{deepest}\\p{deepest}", 1, output));
+    assert_eq(
+        PASSGEN_OK,
+        generate_seeded(env, "\\p{deepest}\\p{deepest}", 1, output));
     assert_eq(
         PASSGEN_ERROR_DEPTH_LIMIT,
         generate_seeded(env, "(\\p{deepest})", 1, output));
@@ -322,7 +346,12 @@ test_result test_preset_shared(void) {
     assert(PASSGEN_OK == passgen_env_preset_add(env, "double0", "a"));
     for(int i = 1; i <= 60; i++) {
         snprintf(name, sizeof(name), "double%d", i);
-        snprintf(value, sizeof(value), "\\p{double%d}\\p{double%d}", i - 1, i - 1);
+        snprintf(
+            value,
+            sizeof(value),
+            "\\p{double%d}\\p{double%d}",
+            i - 1,
+            i - 1);
         assert(PASSGEN_OK == passgen_env_preset_add(env, name, value));
     }
 
@@ -356,19 +385,40 @@ test_result test_preset_replace(void) {
     size_t length = 0;
     assert_eq(
         PASSGEN_OK,
-        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 15, &length));
+        passgen_generate_fill_utf8(
+            pattern,
+            env,
+            NULL,
+            NULL,
+            output,
+            15,
+            &length));
     output[length] = 0;
     assert_streq((char *) output, "old");
 
     assert(PASSGEN_OK == passgen_env_preset_add(env, "word", "new"));
     assert_eq(
         PASSGEN_ERROR_INVALID_ARGUMENT,
-        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 15, &length));
+        passgen_generate_fill_utf8(
+            pattern,
+            env,
+            NULL,
+            NULL,
+            output,
+            15,
+            &length));
 
     assert_eq(PASSGEN_OK, passgen_resolve(pattern, env, NULL));
     assert_eq(
         PASSGEN_OK,
-        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 15, &length));
+        passgen_generate_fill_utf8(
+            pattern,
+            env,
+            NULL,
+            NULL,
+            output,
+            15,
+            &length));
     output[length] = 0;
     assert_streq((char *) output, "new");
 
@@ -397,7 +447,14 @@ test_result test_preset_remove(void) {
     size_t length = 0;
     assert_eq(
         PASSGEN_OK,
-        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 15, &length));
+        passgen_generate_fill_utf8(
+            pattern,
+            env,
+            NULL,
+            NULL,
+            output,
+            15,
+            &length));
 
     // the pattern uses it through another preset, so it has to be resolved
     // again, which then fails.
@@ -405,7 +462,14 @@ test_result test_preset_remove(void) {
     assert(passgen_env_preset_get(env, "word") == NULL);
     assert_eq(
         PASSGEN_ERROR_INVALID_ARGUMENT,
-        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 15, &length));
+        passgen_generate_fill_utf8(
+            pattern,
+            env,
+            NULL,
+            NULL,
+            output,
+            15,
+            &length));
     passgen_error error;
     assert_eq(
         PASSGEN_ERROR_PRESET_INVALID,
@@ -421,7 +485,14 @@ test_result test_preset_remove(void) {
     assert_eq(PASSGEN_OK, passgen_resolve(pattern, env, NULL));
     assert_eq(
         PASSGEN_OK,
-        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 15, &length));
+        passgen_generate_fill_utf8(
+            pattern,
+            env,
+            NULL,
+            NULL,
+            output,
+            15,
+            &length));
     output[length] = 0;
     assert_streq((char *) output, "xyz");
 
@@ -459,7 +530,14 @@ test_result test_preset_wordlist_remove(void) {
     size_t length = 0;
     assert_eq(
         PASSGEN_ERROR_INVALID_ARGUMENT,
-        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 15, &length));
+        passgen_generate_fill_utf8(
+            pattern,
+            env,
+            NULL,
+            NULL,
+            output,
+            15,
+            &length));
     passgen_error error;
     assert_eq(
         PASSGEN_ERROR_WORDLIST_NOT_FOUND,

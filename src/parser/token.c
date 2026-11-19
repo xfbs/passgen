@@ -1,5 +1,5 @@
-#include "passgen/util/utf8.h"
 #include "passgen/parser/token.h"
+#include "passgen/util/utf8.h"
 
 void passgen_token_parser_init(struct passgen_token_parser *token_parser) {
     token_parser->state = PASSGEN_TOKEN_INIT;

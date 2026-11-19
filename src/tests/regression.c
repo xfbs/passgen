@@ -4,14 +4,14 @@
 /// only really meaningful when run with sanitizers enabled.
 #include "tests.h"
 #include <math.h>
+#include <passgen/env.h>
 #include <passgen/generate.h>
 #include <passgen/passgen.h>
 #include <passgen/pattern/pattern.h>
-#include <passgen/pattern/segment.h>
 #include <passgen/pattern/range.h>
+#include <passgen/pattern/segment.h>
 #include <passgen/pattern/segment_item.h>
 #include <passgen/pattern/set.h>
-#include <passgen/env.h>
 #include <passgen/random.h>
 #include <passgen/util/utf8.h>
 #include <stdlib.h>
@@ -106,7 +106,8 @@ test_result test_regression_random_xorshift_seed(void) {
     passgen_random_close(&direct);
 
     assert(passgen_random_open(&parsed, "xorshift:9223372036854775808"));
-    assert(passgen_random_xorshift_open(&direct, UINT64_C(9223372036854775808)));
+    assert(
+        passgen_random_xorshift_open(&direct, UINT64_C(9223372036854775808)));
     assert(passgen_random_u64(&parsed) == passgen_random_u64(&direct));
     passgen_random_close(&parsed);
     passgen_random_close(&direct);
@@ -297,7 +298,8 @@ test_result test_regression_parse_multiplier_zero_recycled(void) {
 
 /// Parses a pattern which consists of a single set, and checks that it has
 /// exactly the given ranges, as triples of start, end and multiplier.
-static bool set_ranges_are(const char *input, const uint32_t *ranges, size_t len) {
+static bool
+set_ranges_are(const char *input, const uint32_t *ranges, size_t len) {
     passgen_pattern *pattern;
     passgen_error error;
     if(0 != passgen_parse(&pattern, &error, input)) {
@@ -309,8 +311,10 @@ static bool set_ranges_are(const char *input, const uint32_t *ranges, size_t len
     bool same = segment->items.len == 1 && item->kind == PASSGEN_PATTERN_SET &&
                 item->data.set.items.len == len;
     for(size_t i = 0; same && i < len; i++) {
-        passgen_pattern_range *range = passgen_stack_get(&item->data.set.items, i);
-        same = range->start == ranges[3 * i] && range->end == ranges[3 * i + 1] &&
+        passgen_pattern_range *range =
+            passgen_stack_get(&item->data.set.items, i);
+        same = range->start == ranges[3 * i] &&
+               range->end == ranges[3 * i + 1] &&
                range->multiplier == ranges[3 * i + 2];
     }
     passgen_pattern_free(pattern);
@@ -326,7 +330,13 @@ test_result test_regression_parse_set_dash(void) {
     passgen_error error;
 
     const char *broken[] = {
-        "[-]", "[-a]", "[a-]", "[a-c-]", "[a-c-e]", "[a-c-b]", "[a-zA-Z0-9-_]",
+        "[-]",
+        "[-a]",
+        "[a-]",
+        "[a-c-]",
+        "[a-c-e]",
+        "[a-c-b]",
+        "[a-zA-Z0-9-_]",
         NULL};
     for(size_t i = 0; broken[i]; i++) {
         assert(
@@ -341,8 +351,8 @@ test_result test_regression_parse_set_dash(void) {
     const uint32_t range_dash_e[] = {'-', '-', 1, 'a', 'c', 1, 'e', 'e', 1};
     assert(set_ranges_are("[a-c\\-e]", range_dash_e, 3));
 
-    const uint32_t url_safe[] = {
-        '-', '-', 1, '0', '9', 1, 'A', 'Z', 1, '_', '_', 1, 'a', 'z', 1};
+    const uint32_t url_safe[] =
+        {'-', '-', 1, '0', '9', 1, 'A', 'Z', 1, '_', '_', 1, 'a', 'z', 1};
     assert(set_ranges_are("[a-zA-Z0-9\\-_]", url_safe, 5));
 
     // an escaped dash can start or end a range. here, both contain it.
@@ -379,7 +389,8 @@ test_result test_regression_parse_set_weights(void) {
     assert(set_ranges_are("[a-ma-z]", overlap, 2));
     assert(set_ranges_are("[a-za-m]", overlap, 2));
 
-    const uint32_t nested[] = {'a', 'b', 1, 'c', 'd', 2, 'e', 'e', 3, 'f', 'z', 1};
+    const uint32_t nested[] =
+        {'a', 'b', 1, 'c', 'd', 2, 'e', 'e', 3, 'f', 'z', 1};
     assert(set_ranges_are("[a-zc-ee]", nested, 4));
 
     // the last codepoint, whose range ends right before 0x110000.
@@ -690,13 +701,27 @@ test_result test_regression_entropy_maybe(void) {
 
     assert(0 == passgen_parse(&pattern, &error, "a?"));
     assert(0 == passgen_resolve(pattern, env, NULL));
-    assert(0 == passgen_generate(pattern, env, NULL, &entropy, &count, count_codepoints));
+    assert(
+        0 == passgen_generate(
+                 pattern,
+                 env,
+                 NULL,
+                 &entropy,
+                 &count,
+                 count_codepoints));
     assert(fabs(entropy - 1.0) < 0.0001);
     passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "a?[ab]?(c|d)?"));
     assert(0 == passgen_resolve(pattern, env, NULL));
-    assert(0 == passgen_generate(pattern, env, NULL, &entropy, &count, count_codepoints));
+    assert(
+        0 == passgen_generate(
+                 pattern,
+                 env,
+                 NULL,
+                 &entropy,
+                 &count,
+                 count_codepoints));
     // with the zero randomness source, every optional item is emitted, so
     // this is one bit for each of them, and one each for the set and the
     // group.
@@ -726,7 +751,14 @@ test_result test_regression_entropy_large(void) {
     // 300 lowercase letters have about 1410 bits.
     assert(0 == passgen_parse(&pattern, &error, "[a-z]{300}"));
     assert(0 == passgen_resolve(pattern, env, NULL));
-    assert(0 == passgen_generate(pattern, env, NULL, &entropy, &count, count_codepoints));
+    assert(
+        0 == passgen_generate(
+                 pattern,
+                 env,
+                 NULL,
+                 &entropy,
+                 &count,
+                 count_codepoints));
     assert(isfinite(entropy));
     assert(fabs(entropy - 300 * log2(26)) < 0.001);
     passgen_pattern_free(pattern);
@@ -734,7 +766,14 @@ test_result test_regression_entropy_large(void) {
     // something which always generates the same has none.
     assert(0 == passgen_parse(&pattern, &error, "abc(def){3}"));
     assert(0 == passgen_resolve(pattern, env, NULL));
-    assert(0 == passgen_generate(pattern, env, NULL, &entropy, &count, count_codepoints));
+    assert(
+        0 == passgen_generate(
+                 pattern,
+                 env,
+                 NULL,
+                 &entropy,
+                 &count,
+                 count_codepoints));
     assert(entropy == 0.0);
     passgen_pattern_free(pattern);
 
@@ -742,7 +781,14 @@ test_result test_regression_entropy_large(void) {
     // source of randomness, the first one is chosen, which is three of four.
     assert(0 == passgen_parse(&pattern, &error, "{3}a|b"));
     assert(0 == passgen_resolve(pattern, env, NULL));
-    assert(0 == passgen_generate(pattern, env, NULL, &entropy, &count, count_codepoints));
+    assert(
+        0 == passgen_generate(
+                 pattern,
+                 env,
+                 NULL,
+                 &entropy,
+                 &count,
+                 count_codepoints));
     assert(fabs(entropy - (log2(4) - log2(3))) < 0.0001);
     passgen_pattern_free(pattern);
 
@@ -835,12 +881,16 @@ test_result test_regression_wordlist_empty(void) {
     assert(env);
     assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
     assert(0 != passgen_resolve(pattern, env, NULL));
-    assert(0 != passgen_generate(pattern, env, NULL, NULL, &count, count_codepoints));
+    assert(
+        0 !=
+        passgen_generate(pattern, env, NULL, NULL, &count, count_codepoints));
     passgen_pattern_free(pattern);
 
     assert(0 == passgen_parse(&pattern, &error, "\\m{list}"));
     assert(0 != passgen_resolve(pattern, env, NULL));
-    assert(0 != passgen_generate(pattern, env, NULL, NULL, &count, count_codepoints));
+    assert(
+        0 !=
+        passgen_generate(pattern, env, NULL, NULL, &count, count_codepoints));
     passgen_pattern_free(pattern);
     passgen_env_free(env);
     passgen_random_free(random);
@@ -852,7 +902,9 @@ test_result test_regression_wordlist_empty(void) {
     assert(env);
     assert(0 == passgen_parse(&pattern, &error, "\\w{nope}\\m{nope}"));
     assert(0 != passgen_resolve(pattern, env, NULL));
-    assert(0 != passgen_generate(pattern, env, NULL, NULL, &count, count_codepoints));
+    assert(
+        0 !=
+        passgen_generate(pattern, env, NULL, NULL, &count, count_codepoints));
     passgen_pattern_free(pattern);
     passgen_env_free(env);
     passgen_random_free(random);
@@ -896,7 +948,9 @@ test_result test_regression_wordlist_long_words(void) {
     size_t count = 0;
     assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
     assert(0 == passgen_resolve(pattern, env, NULL));
-    assert(0 == passgen_generate(pattern, env, NULL, NULL, &count, count_codepoints));
+    assert(
+        0 ==
+        passgen_generate(pattern, env, NULL, NULL, &count, count_codepoints));
     assert_eq(count, word_len);
     passgen_pattern_free(pattern);
 
@@ -907,8 +961,13 @@ test_result test_regression_wordlist_long_words(void) {
     assert(0 == passgen_parse(&pattern, &error, "\\m{list:1}{100}"));
     assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
-        0 ==
-        passgen_generate(pattern, env, NULL, &entropy, &count, count_codepoints));
+        0 == passgen_generate(
+                 pattern,
+                 env,
+                 NULL,
+                 &entropy,
+                 &count,
+                 count_codepoints));
     assert(count > 128 * 100);
     assert(entropy > 0.0);
     passgen_pattern_free(pattern);

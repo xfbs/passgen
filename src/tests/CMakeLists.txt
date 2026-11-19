@@ -58,6 +58,7 @@ if(LIBPASSGEN_SHARED)
     target_link_libraries(passgen-test-public PRIVATE passgen-shared)
     target_compile_options(passgen-test-public PRIVATE -Wall -Wextra -g)
     target_compile_features(passgen-test-public PRIVATE c_std_99)
+    target_clangformat_setup(passgen-test-public)
 
     # the same from C++, which only links if the headers declare everything
     # as extern "C".
@@ -66,5 +67,6 @@ if(LIBPASSGEN_SHARED)
         target_link_libraries(passgen-test-public-cxx PRIVATE passgen-shared)
         target_compile_options(passgen-test-public-cxx PRIVATE -Wall -Wextra -g)
         target_compile_features(passgen-test-public-cxx PRIVATE cxx_std_11)
+        target_clangformat_setup(passgen-test-public-cxx)
     endif()
 endif()

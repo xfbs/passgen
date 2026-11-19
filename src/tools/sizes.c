@@ -13,14 +13,11 @@
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/special.h"
 
-#define add_type(name) \
-    { #name, sizeof(name) }
+#define add_type(name) {#name, sizeof(name)}
 
-#define add_struct(name) \
-    { #name, sizeof(name) }
+#define add_struct(name) {#name, sizeof(name)}
 
-#define size_info_end() \
-    { NULL, 0 }
+#define size_info_end() {NULL, 0}
 
 struct size_info {
     const char *name;

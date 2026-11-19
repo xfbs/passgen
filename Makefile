@@ -44,7 +44,7 @@ fuzz:
 
 # format source code
 format: $(BUILDDIR)
-	cd build && make clangformat
+	cd build && make format
 
 # build CLI and libraries
 $(BUILDDIR)/src/cli/passgen: $(BUILDDIR)

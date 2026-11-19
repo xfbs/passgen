@@ -55,6 +55,14 @@ include(CodeCoverage)
 include(IWYU)
 
 clangformat_setup()
+
+# headers are not part of the sources of the targets, which are what is
+# formatted for each of them. code by others is left out by
+# .clang-format-ignore.
+file(GLOB_RECURSE passgen_headers CONFIGURE_DEPENDS
+    "${PROJECT_SOURCE_DIR}/include/*.h"
+    "${PROJECT_SOURCE_DIR}/src/*.h")
+clangformat_add(passgen-headers ${passgen_headers})
 cmakeformat_setup(
     CMakeLists.txt
     data/CMakeLists.txt

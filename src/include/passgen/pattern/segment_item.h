@@ -5,8 +5,8 @@
 #include <stdbool.h>
 
 #include "passgen/container/stack.h"
-#include "passgen/pattern/literal.h"
 #include "passgen/pattern/group.h"
+#include "passgen/pattern/literal.h"
 #include "passgen/pattern/repeat.h"
 #include "passgen/pattern/set.h"
 #include "passgen/pattern/special.h"

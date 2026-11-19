@@ -111,7 +111,8 @@ test_result test_markov_node_insert_word(void) {
 /// Finds the leaf for a prefix of two codepoints.
 static passgen_markov_leaf *
 leaf_of(passgen_markov *markov, uint32_t first, uint32_t second) {
-    passgen_markov_child *child = passgen_markov_node_child(markov->root, first);
+    passgen_markov_child *child =
+        passgen_markov_node_child(markov->root, first);
     if(!child) {
         return NULL;
     }
@@ -127,7 +128,7 @@ test_result test_markov_add(void) {
     passgen_markov_init(&markov, 2);
 
     // this should have added 00a and 0a0 into the chain.
-    passgen_markov_add(&markov, (const uint32_t[]){'a'}, 1, 1);
+    passgen_markov_add(&markov, (const uint32_t[]) {'a'}, 1, 1);
 
     leaf = leaf_of(&markov, 0, 0);
     assert(leaf);
@@ -140,7 +141,7 @@ test_result test_markov_add(void) {
     assert_eq(passgen_markov_leaf_count(leaf, 0), 1);
 
     // this should have added 00l, 0la, la0, each with a weight of 2.
-    passgen_markov_add(&markov, (const uint32_t[]){'l', 'a'}, 2, 2);
+    passgen_markov_add(&markov, (const uint32_t[]) {'l', 'a'}, 2, 2);
 
     leaf = leaf_of(&markov, 0, 0);
     assert(leaf);
@@ -157,12 +158,12 @@ test_result test_markov_add(void) {
     assert_eq(leaf->total_count, 2);
     assert_eq(passgen_markov_leaf_count(leaf, 0), 2);
 
-    passgen_markov_add(&markov, (const uint32_t[]){'l', 'e'}, 2, 1);
-    passgen_markov_add(&markov, (const uint32_t[]){'t', 'h', 'e'}, 3, 1);
-    passgen_markov_add(&markov, (const uint32_t[]){'p', 'a', 'r', 't'}, 4, 1);
+    passgen_markov_add(&markov, (const uint32_t[]) {'l', 'e'}, 2, 1);
+    passgen_markov_add(&markov, (const uint32_t[]) {'t', 'h', 'e'}, 3, 1);
+    passgen_markov_add(&markov, (const uint32_t[]) {'p', 'a', 'r', 't'}, 4, 1);
     passgen_markov_add(
         &markov,
-        (const uint32_t[]){'p', 'h', 'o', 'n', 'e'},
+        (const uint32_t[]) {'p', 'h', 'o', 'n', 'e'},
         5,
         1);
 
@@ -336,7 +337,9 @@ test_result test_markov_generate(void) {
     passgen_markov_init(&backward, 2);
     for(size_t i = 0; i < 3; i++) {
         assert_eq(PASSGEN_OK, passgen_markov_add(&forward, words[i], 1, 1));
-        assert_eq(PASSGEN_OK, passgen_markov_add(&backward, words[2 - i], 1, 1));
+        assert_eq(
+            PASSGEN_OK,
+            passgen_markov_add(&backward, words[2 - i], 1, 1));
     }
 
     // with zeroes for randomness, the first choice is always made.
@@ -428,7 +431,8 @@ test_result test_markov_leaf_search_uneven(void) {
                 if(inserted[i] == 0 && offset < 0) {
                     continue;
                 }
-                uint32_t expected = contains(inserted, count, codepoint) ? 1 : 0;
+                uint32_t expected =
+                    contains(inserted, count, codepoint) ? 1 : 0;
                 assert_eq(passgen_markov_leaf_count(leaf, codepoint), expected);
             }
         }

@@ -242,8 +242,8 @@ test_result test_token_state_string(void) {
     assert(
         passgen_token_state_string(PASSGEN_TOKEN_UNICODE_PAYLOAD + 1) == NULL);
     assert(
-        passgen_token_state_string(
-            PASSGEN_TOKEN_ERROR_UNICODE_RANGE - 1) == NULL);
+        passgen_token_state_string(PASSGEN_TOKEN_ERROR_UNICODE_RANGE - 1) ==
+        NULL);
 
     return test_ok;
 }

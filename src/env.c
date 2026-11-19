@@ -1,6 +1,6 @@
 #include "passgen/pattern/env.h"
-#include "passgen/pattern/preset.h"
 #include "passgen/config.h"
+#include "passgen/pattern/preset.h"
 #include "passgen/util/alloc.h"
 #include "passgen/util/clear.h"
 #include "passgen/util/utf8.h"
@@ -126,7 +126,8 @@ passgen_status passgen_env_wordlist_add_path(
     return wordlist_insert(env, name, wordlist);
 }
 
-const char *passgen_env_wordlist_path(const passgen_env *env, const char *name) {
+const char *
+passgen_env_wordlist_path(const passgen_env *env, const char *name) {
     passgen_hashmap_entry *entry =
         passgen_hashmap_lookup(&env->wordlists, name);
     if(!entry) {
@@ -149,8 +150,10 @@ bool passgen_env_wordlist_remove(passgen_env *env, const char *name) {
     return true;
 }
 
-passgen_status
-passgen_env_preset_add(passgen_env *env, const char *name, const char *pattern) {
+passgen_status passgen_env_preset_add(
+    passgen_env *env,
+    const char *name,
+    const char *pattern) {
     char *name_copy = passgen_alloc_string(name);
     char *pattern_copy = passgen_alloc_string(pattern);
     passgen_preset *preset = passgen_alloc(sizeof(passgen_preset));

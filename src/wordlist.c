@@ -2,12 +2,12 @@
 #include "passgen/assert.h"
 #include "passgen/config.h"
 #include "passgen/util/alloc.h"
-#include "passgen/util/utf8.h"
+#include "passgen/util/clear.h"
 #include "passgen/util/error.h"
+#include "passgen/util/utf8.h"
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include "passgen/util/clear.h"
 
 #define ALLOC_INITIAL  256
 #define ALLOC_INCREASE 2

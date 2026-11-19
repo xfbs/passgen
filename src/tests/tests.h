@@ -39,12 +39,11 @@ typedef struct {
 
 bool run(test_run test, int width);
 
-#define test(id) \
-    { .name = #id, .func = test_##id }
+#define test(id) {.name = #id, .func = test_##id}
 
 #define assert(some)            \
     if(!(some))                 \
-        return (test_result){   \
+        return (test_result) {  \
             .ok = false,        \
             .assertion = #some, \
             .line = __LINE__,   \
@@ -52,7 +51,7 @@ bool run(test_run test, int width);
 
 #define assert_eq(lhs, rhs)                \
     if(lhs != rhs)                         \
-        return (test_result){              \
+        return (test_result) {             \
             .ok = false,                   \
             .assertion = #lhs " == " #rhs, \
             .line = __LINE__,              \
@@ -60,7 +59,7 @@ bool run(test_run test, int width);
 
 #define assert_ne(lhs, rhs)                \
     if(lhs == rhs)                         \
-        return (test_result){              \
+        return (test_result) {             \
             .ok = false,                   \
             .assertion = #lhs " != " #rhs, \
             .line = __LINE__,              \
@@ -68,7 +67,7 @@ bool run(test_run test, int width);
 
 #define assert_gt(lhs, rhs)               \
     if(lhs <= rhs)                        \
-        return (test_result){             \
+        return (test_result) {            \
             .ok = false,                  \
             .assertion = #lhs " > " #rhs, \
             .line = __LINE__,             \
@@ -76,7 +75,7 @@ bool run(test_run test, int width);
 
 #define assert_ge(lhs, rhs)                \
     if(lhs < rhs)                          \
-        return (test_result){              \
+        return (test_result) {             \
             .ok = false,                   \
             .assertion = #lhs " >= " #rhs, \
             .line = __LINE__,              \
@@ -84,7 +83,7 @@ bool run(test_run test, int width);
 
 #define assert_lt(lhs, rhs)               \
     if(lhs >= rhs)                        \
-        return (test_result){             \
+        return (test_result) {            \
             .ok = false,                  \
             .assertion = #lhs " < " #rhs, \
             .line = __LINE__,             \
@@ -92,7 +91,7 @@ bool run(test_run test, int width);
 
 #define assert_le(lhs, rhs)                \
     if(lhs > rhs)                          \
-        return (test_result){              \
+        return (test_result) {             \
             .ok = false,                   \
             .assertion = #lhs " <= " #rhs, \
             .line = __LINE__,              \
@@ -100,7 +99,7 @@ bool run(test_run test, int width);
 
 #define assert_streq(lhs, rhs)             \
     if(strcmp(lhs, rhs) != 0)              \
-        return (test_result){              \
+        return (test_result) {             \
             .ok = false,                   \
             .assertion = #lhs " == " #rhs, \
             .line = __LINE__,              \

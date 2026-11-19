@@ -43,7 +43,8 @@ void passgen_preset_init(passgen_preset *preset, char *value);
 /// @param error Set to what went wrong if it cannot be parsed, with the
 ///   position in the pattern of the preset. May be NULL.
 /// @returns @ref PASSGEN_OK on success
-passgen_status passgen_preset_parse(passgen_preset *preset, passgen_error *error);
+passgen_status
+passgen_preset_parse(passgen_preset *preset, passgen_error *error);
 
 /// Free what this preset holds, but not the preset itself.
 ///

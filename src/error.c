@@ -1,5 +1,5 @@
-#include "passgen/util/alloc.h"
 #include "passgen/util/error.h"
+#include "passgen/util/alloc.h"
 #include <passgen/config.h>
 #include <passgen/error.h>
 #include <stdio.h>

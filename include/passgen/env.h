@@ -38,8 +38,8 @@ typedef struct passgen_env passgen_env;
 /// @returns The environment, or NULL if it could not be allocated.
 PASSGEN_EXPORT passgen_env *passgen_env_new(passgen_random *random);
 
-/// Free an environment, along with its wordlists and presets. This does not close the
-/// source of randomness.
+/// Free an environment, along with its wordlists and presets. This does not
+/// close the source of randomness.
 ///
 /// @relatesalso passgen_env
 /// @param env Environment to free. May be NULL, in which case this does
@@ -53,7 +53,8 @@ PASSGEN_EXPORT void passgen_env_free(passgen_env *env);
 /// @relatesalso passgen_env
 /// @param env Environment to change
 /// @param random Source of randomness to generate from
-PASSGEN_EXPORT void passgen_env_random_set(passgen_env *env, passgen_random *random);
+PASSGEN_EXPORT void
+passgen_env_random_set(passgen_env *env, passgen_random *random);
 
 /// Set how many steps generating from a pattern may take. Generating fails
 /// with @ref PASSGEN_ERROR_STEP_LIMIT for patterns which take more. The
@@ -73,7 +74,8 @@ PASSGEN_EXPORT void passgen_env_random_set(passgen_env *env, passgen_random *ran
 /// @param env Environment to change
 /// @param step_limit How many steps generating may take. Use `SIZE_MAX` for
 ///   practically no limit.
-PASSGEN_EXPORT void passgen_env_step_limit_set(passgen_env *env, size_t step_limit);
+PASSGEN_EXPORT void
+passgen_env_step_limit_set(passgen_env *env, size_t step_limit);
 
 /// Adds a wordlist, which patterns can then refer to by its name. If there is
 /// a wordlist with this name already, it is replaced.
@@ -139,7 +141,8 @@ passgen_env_wordlist_path(const passgen_env *env, const char *name);
 /// @param env Environment to remove the wordlist from
 /// @param name Name of the wordlist
 /// @returns Whether there was a wordlist with this name
-PASSGEN_EXPORT bool passgen_env_wordlist_remove(passgen_env *env, const char *name);
+PASSGEN_EXPORT bool
+passgen_env_wordlist_remove(passgen_env *env, const char *name);
 
 /// Adds a preset, which is a named pattern. Patterns can use it as
 /// `\p{name}`, also other presets, so that patterns can be built from parts.
@@ -148,9 +151,9 @@ PASSGEN_EXPORT bool passgen_env_wordlist_remove(passgen_env *env, const char *na
 /// The pattern is not parsed right away, but when a pattern which uses it is
 /// resolved (see @ref passgen_resolve). Problems with it come up then.
 ///
-/// Names which start with an underscore (such as `_segment`) are meant for parts of
-/// other presets, rather than to be used on their own. That is up to whoever
-/// lists them, they work the same otherwise.
+/// Names which start with an underscore (such as `_segment`) are meant for
+/// parts of other presets, rather than to be used on their own. That is up to
+/// whoever lists them, they work the same otherwise.
 ///
 /// @relatesalso passgen_env
 /// @param env Environment to add the preset to
@@ -168,7 +171,8 @@ passgen_env_preset_add(passgen_env *env, const char *name, const char *pattern);
 /// @param env Environment to remove the preset from
 /// @param name Name of the preset
 /// @returns Whether there was a preset with this name
-PASSGEN_EXPORT bool passgen_env_preset_remove(passgen_env *env, const char *name);
+PASSGEN_EXPORT bool
+passgen_env_preset_remove(passgen_env *env, const char *name);
 
 /// Finds the pattern of a preset.
 ///

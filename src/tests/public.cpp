@@ -11,12 +11,17 @@
 #include <cstdlib>
 #include <cstring>
 
-#define check(condition)                                                     \
-    do {                                                                     \
-        if(!(condition)) {                                                   \
-            std::fprintf(stderr, "%s:%d: %s\n", __FILE__, __LINE__, #condition); \
-            std::exit(EXIT_FAILURE);                                         \
-        }                                                                    \
+#define check(condition)             \
+    do {                             \
+        if(!(condition)) {           \
+            std::fprintf(            \
+                stderr,              \
+                "%s:%d: %s\n",       \
+                __FILE__,            \
+                __LINE__,            \
+                #condition);         \
+            std::exit(EXIT_FAILURE); \
+        }                            \
     } while(0)
 
 int main() {
@@ -25,8 +30,11 @@ int main() {
 
     passgen_pattern *pattern = nullptr;
     passgen_error error;
-    check(PASSGEN_ERROR_SET_UNCLOSED == passgen_parse(&pattern, &error, "[a-z"));
-    check(0 == std::strcmp(passgen_status_string(error.kind), "set is not closed"));
+    check(
+        PASSGEN_ERROR_SET_UNCLOSED == passgen_parse(&pattern, &error, "[a-z"));
+    check(
+        0 ==
+        std::strcmp(passgen_status_string(error.kind), "set is not closed"));
     passgen_error_free(&error);
 
     check(PASSGEN_OK == passgen_parse(&pattern, nullptr, "[a-z]{8}"));

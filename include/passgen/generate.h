@@ -5,8 +5,9 @@
 /// Generating takes a pattern (see @ref passgen_parse) and an environment
 /// (see @ref passgen_env_new), which has the source of randomness and the
 /// wordlists. The pattern has to be resolved with the environment first (see
-/// @ref passgen_resolve), which reads the wordlists it uses. What is generated can be written into a buffer, as codepoints
-/// or as UTF-8, or be passed to a callback one codepoint at a time.
+/// @ref passgen_resolve), which reads the wordlists it uses. What is generated
+/// can be written into a buffer, as codepoints or as UTF-8, or be passed to a
+/// callback one codepoint at a time.
 ///
 /// If generating fails, whatever was written or passed on so far is not
 /// what the pattern generates, and has to be thrown away.

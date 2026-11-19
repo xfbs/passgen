@@ -31,8 +31,8 @@
 /// passgen_pattern_deinit(&pattern);
 /// ```
 #pragma once
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include "passgen/parser/token.h"
 #include "passgen/pattern/group.h"
@@ -88,7 +88,8 @@ typedef struct {
             /// Current segment
             passgen_pattern_segment *segment;
         } group;
-        /// Data for #PASSGEN_PARSER_REPEAT and #PASSGEN_PARSER_REPEAT_RANGE types.
+        /// Data for #PASSGEN_PARSER_REPEAT and #PASSGEN_PARSER_REPEAT_RANGE
+        /// types.
         struct {
             /// Current repeat
             passgen_pattern_repeat *repeat;
@@ -102,7 +103,8 @@ typedef struct {
             /// Current pattern range
             passgen_pattern_range *range;
         } set;
-        /// Data for #PASSGEN_PARSER_SPECIAL and #PASSGEN_PARSER_SPECIAL_NAME types.
+        /// Data for #PASSGEN_PARSER_SPECIAL and #PASSGEN_PARSER_SPECIAL_NAME
+        /// types.
         struct {
             /// Current pattern special
             passgen_pattern_special *special;
@@ -151,13 +153,11 @@ passgen_parser_state_get(passgen_parser *parser, size_t n);
 
 /// Get the last item in the parsing stack.
 /// @memberof passgen_parser
-passgen_parser_state *
-passgen_parser_state_last(passgen_parser *parser);
+passgen_parser_state *passgen_parser_state_last(passgen_parser *parser);
 
 /// Push a state item onto the stack and return a pointer to it.
 /// @memberof passgen_parser
-passgen_parser_state *
-passgen_parser_state_push(passgen_parser *parser);
+passgen_parser_state *passgen_parser_state_push(passgen_parser *parser);
 
 /// Push a group item onto the parsing stack.
 /// @memberof passgen_parser
@@ -228,7 +228,4 @@ int passgen_parser_unicode(
 /// @return @ref PASSGEN_OK (which is zero) on success, and a @ref
 ///   passgen_status saying what is wrong with the token otherwise.
 /// @memberof passgen_parser
-int passgen_parse_token(
-    passgen_parser *parser,
-    passgen_token *token);
-
+int passgen_parse_token(passgen_parser *parser, passgen_token *token);

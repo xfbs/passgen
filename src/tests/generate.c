@@ -59,7 +59,7 @@
         output[len] = 0;                                                   \
                                                                            \
         passgen_parser_free(&parser);                                      \
-        passgen_pattern_deinit(&parsed_pattern);                             \
+        passgen_pattern_deinit(&parsed_pattern);                           \
     } while(0)
 
 #define POSTAMBLE()        \
@@ -184,7 +184,7 @@ generates_exactly(const char *pattern_string, const char *const *expected) {
     return okay && seen_count == expected_len;
 }
 
-#define EXPECTED(...) ((const char *const[]){__VA_ARGS__, NULL})
+#define EXPECTED(...) ((const char *const[]) {__VA_ARGS__, NULL})
 
 /// Whether a pattern generates each of the outputs (the list is terminated by
 /// NULL) as often as their weights say, and nothing else.
@@ -245,7 +245,7 @@ static bool generates_weighted(
     return okay && chi_squared_fits(outputs_len, counts, weights);
 }
 
-#define WEIGHTS(...) ((const double[]){__VA_ARGS__})
+#define WEIGHTS(...) ((const double[]) {__VA_ARGS__})
 
 /// What is generated comes up as often as the pattern says: characters which
 /// are listed more than once in a set, choices with multipliers, optional
@@ -280,7 +280,6 @@ test_result test_generate_distribution(void) {
 
     return test_ok;
 }
-
 
 test_result test_generate_segments(void) {
     // either a or b
@@ -444,7 +443,9 @@ test_result test_generate_step_limit_default(void) {
     // which is what keeps this from running practically forever: it does
     // not generate anything, but every repetition is a step.
     assert_eq(generate_steps("(){999999999}", 0), PASSGEN_ERROR_STEP_LIMIT);
-    assert_eq(generate_steps("((((){999}){999}){999}){999}", 0), PASSGEN_ERROR_STEP_LIMIT);
+    assert_eq(
+        generate_steps("((((){999}){999}){999}){999}", 0),
+        PASSGEN_ERROR_STEP_LIMIT);
 
     return test_ok;
 }
@@ -552,7 +553,9 @@ test_result test_generate_single_word(void) {
     assert_streq(output, "only");
 
     // with more than one, there is something to choose.
-    assert_ne(random_after_words("\\w{words}", "one\ntwo\n", output), untouched);
+    assert_ne(
+        random_after_words("\\w{words}", "one\ntwo\n", output),
+        untouched);
     assert_ne(random_after_words("\\m{words}", "ab\nac\n", output), untouched);
 
     // the entropy of what has only one option is zero.
@@ -570,7 +573,15 @@ test_result test_generate_single_word(void) {
     assert(0 == passgen_resolve(pattern, env, NULL));
     double entropy = -1;
     uint8_t buffer[64];
-    assert(0 == passgen_generate_fill_utf8(pattern, env, NULL, &entropy, buffer, 63, NULL));
+    assert(
+        0 == passgen_generate_fill_utf8(
+                 pattern,
+                 env,
+                 NULL,
+                 &entropy,
+                 buffer,
+                 63,
+                 NULL));
     assert(entropy == 0);
     passgen_pattern_free(pattern);
     passgen_env_free(env);

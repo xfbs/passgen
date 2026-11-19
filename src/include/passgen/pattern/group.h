@@ -2,10 +2,11 @@
 /// @author Patrick M. Elsen <pelsen@xfbs.net>
 /// @brief Pattern group (such as `(abc|def)`)
 ///
-/// Data structure to hold pattern groups. A pattern group is a sequence like `(abc|def)`, where the
-/// subsequences `abc` and `def` are two *segments* of the group. That is, when generating sequences,
-/// passgen will pick either of these segments at random. The @ref passgen_pattern_group struct is how
-/// these groups are represented in memory.
+/// Data structure to hold pattern groups. A pattern group is a sequence like
+/// `(abc|def)`, where the subsequences `abc` and `def` are two *segments* of
+/// the group. That is, when generating sequences, passgen will pick either of
+/// these segments at random. The @ref passgen_pattern_group struct is how these
+/// groups are represented in memory.
 #pragma once
 #include <stddef.h>
 
@@ -41,11 +42,10 @@ typedef struct {
 /// @param group Pattern group to initialize
 void passgen_pattern_group_init(passgen_pattern_group *group);
 
-
 /// Free a pattern group.
 ///
-/// This will free all of the segments contained in the group. It will not free the
-/// memory of the group struct itself.
+/// This will free all of the segments contained in the group. It will not free
+/// the memory of the group struct itself.
 ///
 /// @memberof passgen_pattern_group
 /// @param group Pattern group to free

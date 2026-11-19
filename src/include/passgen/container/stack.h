@@ -45,7 +45,9 @@ void passgen_stack_free(passgen_stack *stack);
 /// @memberof passgen_stack
 /// @param stack Stack to iterate over
 /// @param func Function to call for every item in the stack
-void passgen_stack_foreach(const passgen_stack *stack, void (*func)(void *element));
+void passgen_stack_foreach(
+    const passgen_stack *stack,
+    void (*func)(void *element));
 
 /// Push a new value onto this stack. If a non-NULL pointer is passed, it is
 /// copied to the new value. A pointer to the value on the stack is returned.
@@ -55,7 +57,8 @@ void passgen_stack_foreach(const passgen_stack *stack, void (*func)(void *elemen
 ///
 /// @memberof passgen_stack
 /// @param stack Stack to push into
-/// @param value Pointer to value to insert. If NULL, new space is created on the stack but it is not initialized.
+/// @param value Pointer to value to insert. If NULL, new space is created on
+/// the stack but it is not initialized.
 /// @returns Pointer to the new item on the stack, or NULL if there is no
 ///   memory for it. The stack is unchanged then.
 void *passgen_stack_push(passgen_stack *stack, const void *value);

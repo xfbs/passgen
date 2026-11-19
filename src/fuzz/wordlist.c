@@ -3,9 +3,9 @@
 /// Fuzzing harness for wordlists and Markov chains. The first byte of the
 /// input is the length of the Markov chain, the rest is the wordlist.
 #include "common.h"
+#include <passgen/env.h>
 #include <passgen/generate.h>
 #include <passgen/passgen.h>
-#include <passgen/env.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -45,7 +45,13 @@ static void run(const uint8_t *data, size_t size) {
 
             double entropy;
             size_t budget = FUZZ_OUTPUT_BUDGET;
-            passgen_generate(pattern, env, NULL, &entropy, &budget, fuzz_output);
+            passgen_generate(
+                pattern,
+                env,
+                NULL,
+                &entropy,
+                &budget,
+                fuzz_output);
         } else if(file) {
             fclose(file);
         }

@@ -95,8 +95,9 @@ static int resolve_wordlist(
     // nothing can be picked from an empty wordlist, and an empty Markov chain
     // cannot generate anything.
     size_t count =
-        markov ? passgen_wordlist_markov(wordlist, special->markov_length)->count
-               : passgen_wordlist_count(wordlist);
+        markov
+            ? passgen_wordlist_markov(wordlist, special->markov_length)->count
+            : passgen_wordlist_count(wordlist);
     if(count == 0) {
         return fail_special(context, PASSGEN_ERROR_WORDLIST_EMPTY, special);
     }
@@ -261,11 +262,12 @@ static int resolve_group(
             passgen_stack_get(&group->segments, i);
         for(size_t j = 0; j < segment->items.len; j++) {
             size_t item_depth = 0;
-            try(resolve_item(
-                context,
-                passgen_stack_get(&segment->items, j),
-                level,
-                &item_depth));
+            try
+                (resolve_item(
+                    context,
+                    passgen_stack_get(&segment->items, j),
+                    level,
+                    &item_depth));
             if(item_depth > deepest) {
                 deepest = item_depth;
             }
@@ -276,8 +278,10 @@ static int resolve_group(
     return PASSGEN_OK;
 }
 
-passgen_status
-passgen_resolve(passgen_pattern *pattern, passgen_env *env, passgen_error *error) {
+passgen_status passgen_resolve(
+    passgen_pattern *pattern,
+    passgen_env *env,
+    passgen_error *error) {
     // whatever happens, the pattern is only resolved if all of it is.
     pattern->env = NULL;
 

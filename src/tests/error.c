@@ -6,12 +6,12 @@
 #include "passgen/wordlist.h"
 #include "testalloc.h"
 #include "tests.h"
+#include <errno.h>
 #include <passgen/env.h>
 #include <passgen/error.h>
 #include <passgen/generate.h>
-#include <passgen/random.h>
 #include <passgen/passgen.h>
-#include <errno.h>
+#include <passgen/random.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -77,11 +77,11 @@ test_result test_error_parse(void) {
     for(size_t i = 0; cases[i].pattern; i++) {
         passgen_pattern *pattern;
         passgen_error error;
-        passgen_status status = passgen_parse(&pattern, &error, cases[i].pattern);
+        passgen_status status =
+            passgen_parse(&pattern, &error, cases[i].pattern);
 
         if(status != cases[i].status || error.kind != cases[i].status ||
-           !error.has_position ||
-           error.start.codepoint != cases[i].start ||
+           !error.has_position || error.start.codepoint != cases[i].start ||
            error.end.codepoint != cases[i].end) {
             fprintf(
                 stderr,
@@ -105,7 +105,8 @@ test_result test_error_parse(void) {
         assert(pattern == NULL);
 
         // the same status is returned without an error to fill in.
-        assert(passgen_parse(&pattern, NULL, cases[i].pattern) == cases[i].status);
+        assert(
+            passgen_parse(&pattern, NULL, cases[i].pattern) == cases[i].status);
 
         passgen_error_free(&error);
     }
@@ -120,7 +121,9 @@ test_result test_error_parse_bytes(void) {
 
     // every one of the first three characters is two bytes long.
     const char *string = "\xc4\x85\xc4\x99\xc5\x9b)";
-    assert(PASSGEN_ERROR_GROUP_UNOPENED == passgen_parse(&pattern, &error, string));
+    assert(
+        PASSGEN_ERROR_GROUP_UNOPENED ==
+        passgen_parse(&pattern, &error, string));
     assert(error.start.codepoint == 3);
     assert(error.start.byte == 6);
     assert(error.end.codepoint == 4);
@@ -128,7 +131,8 @@ test_result test_error_parse_bytes(void) {
     passgen_error_free(&error);
 
     // an escape sequence is a single token, which starts at the backslash.
-    assert(PASSGEN_ERROR_ESCAPE == passgen_parse(&pattern, &error, "\xc4\x85\\q"));
+    assert(
+        PASSGEN_ERROR_ESCAPE == passgen_parse(&pattern, &error, "\xc4\x85\\q"));
     assert(error.start.codepoint == 1);
     assert(error.start.byte == 2);
     assert(error.end.codepoint == 3);
@@ -208,7 +212,8 @@ test_result test_error_status_string(void) {
         assert(0 != strcmp(string, "unknown error"));
 
         for(int b = a + 1; b <= PASSGEN_ERROR_ABORTED; b++) {
-            assert(0 != strcmp(string, passgen_status_string((passgen_status) b)));
+            assert(
+                0 != strcmp(string, passgen_status_string((passgen_status) b)));
         }
     }
 
@@ -253,7 +258,9 @@ test_result test_error_chain(void) {
     passgen_error_free(&error);
 
     // a single error, with and without a detail
-    assert(PASSGEN_ERROR_SET_EMPTY == passgen_error_set(&error, PASSGEN_ERROR_SET_EMPTY));
+    assert(
+        PASSGEN_ERROR_SET_EMPTY ==
+        passgen_error_set(&error, PASSGEN_ERROR_SET_EMPTY));
     assert(!error.has_position);
     assert(printed(&error, "set is empty\n"));
 
@@ -270,7 +277,8 @@ test_result test_error_chain(void) {
     assert(error.cause->kind == PASSGEN_ERROR_SET_EMPTY);
     assert_streq(error.cause->detail, "english");
     assert(error.cause->cause == NULL);
-    assert(printed(&error, "internal error\ncaused by: set is empty: english\n"));
+    assert(
+        printed(&error, "internal error\ncaused by: set is empty: english\n"));
 
     // and again, for a chain of three.
     passgen_error_detail_set(&error, "middle");
@@ -382,7 +390,9 @@ test_result test_error_null(void) {
     passgen_error_set(&cause, PASSGEN_ERROR_UTF8);
     passgen_error_wrap(&inner, PASSGEN_ERROR_ESCAPE, &cause);
     assert(inner.cause != NULL);
-    assert(PASSGEN_ERROR_INTERNAL == passgen_error_wrap(NULL, PASSGEN_ERROR_INTERNAL, &inner));
+    assert(
+        PASSGEN_ERROR_INTERNAL ==
+        passgen_error_wrap(NULL, PASSGEN_ERROR_INTERNAL, &inner));
     assert(inner.kind == PASSGEN_OK);
     assert(inner.cause == NULL);
 
@@ -447,7 +457,9 @@ test_result test_error_generate(void) {
     passgen_pattern_free(pattern);
 
     // positions count codepoints and bytes, which differ for this.
-    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\xc3\xa4\xc3\xa4\\m{missing}"));
+    assert(
+        PASSGEN_OK ==
+        passgen_parse(&pattern, NULL, "\xc3\xa4\xc3\xa4\\m{missing}"));
     assert(
         PASSGEN_ERROR_WORDLIST_NOT_FOUND ==
         passgen_resolve(pattern, env, &error));
@@ -477,15 +489,20 @@ test_result test_error_generate(void) {
 
     // a preset which is not there. the first problem in the pattern is the
     // one which is reported.
-    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "(a|\\p{name})\\w{missing}"));
-    assert(PASSGEN_ERROR_PRESET_NOT_FOUND == passgen_resolve(pattern, env, &error));
+    assert(
+        PASSGEN_OK ==
+        passgen_parse(&pattern, NULL, "(a|\\p{name})\\w{missing}"));
+    assert(
+        PASSGEN_ERROR_PRESET_NOT_FOUND ==
+        passgen_resolve(pattern, env, &error));
     assert_streq(error.detail, "name");
     assert(error.start.codepoint == 3);
     assert(error.end.codepoint == 11);
     passgen_error_free(&error);
 
     // the error is not needed to find out what went wrong.
-    assert(PASSGEN_ERROR_PRESET_NOT_FOUND == passgen_resolve(pattern, env, NULL));
+    assert(
+        PASSGEN_ERROR_PRESET_NOT_FOUND == passgen_resolve(pattern, env, NULL));
     passgen_pattern_free(pattern);
 
     // a group in which every segment has a multiplier of zero, also when it
@@ -495,8 +512,13 @@ test_result test_error_generate(void) {
         assert(PASSGEN_OK == passgen_parse(&pattern, NULL, empty_groups[i]));
         assert(0 == passgen_resolve(pattern, env, NULL));
         assert(
-            PASSGEN_ERROR_GROUP_EMPTY ==
-            passgen_generate(pattern, env, &error, NULL, &count, count_callback));
+            PASSGEN_ERROR_GROUP_EMPTY == passgen_generate(
+                                             pattern,
+                                             env,
+                                             &error,
+                                             NULL,
+                                             &count,
+                                             count_callback));
         assert(error.kind == PASSGEN_ERROR_GROUP_EMPTY);
         passgen_error_free(&error);
         passgen_pattern_free(pattern);
@@ -530,16 +552,26 @@ test_result test_error_generate(void) {
     size_t remaining = 3;
     assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
-        PASSGEN_ERROR_ABORTED ==
-        passgen_generate(pattern, env, &error, NULL, &remaining, stopping_callback));
+        PASSGEN_ERROR_ABORTED == passgen_generate(
+                                     pattern,
+                                     env,
+                                     &error,
+                                     NULL,
+                                     &remaining,
+                                     stopping_callback));
     assert(error.kind == PASSGEN_ERROR_ABORTED);
     passgen_error_free(&error);
 
     // the error is not needed to find out what went wrong.
     remaining = 3;
     assert(
-        PASSGEN_ERROR_ABORTED ==
-        passgen_generate(pattern, env, NULL, NULL, &remaining, stopping_callback));
+        PASSGEN_ERROR_ABORTED == passgen_generate(
+                                     pattern,
+                                     env,
+                                     NULL,
+                                     NULL,
+                                     &remaining,
+                                     stopping_callback));
 
     // the output not fitting. this is not the same as nothing being
     // generated, which is fine.
@@ -547,25 +579,49 @@ test_result test_error_generate(void) {
     uint32_t codepoints[8];
     size_t written = 99;
     assert(
-        PASSGEN_ERROR_BUFFER_TOO_SMALL ==
-        passgen_generate_fill_utf8(pattern, env, &error, NULL, utf8, 5, &written));
+        PASSGEN_ERROR_BUFFER_TOO_SMALL == passgen_generate_fill_utf8(
+                                              pattern,
+                                              env,
+                                              &error,
+                                              NULL,
+                                              utf8,
+                                              5,
+                                              &written));
     assert(error.kind == PASSGEN_ERROR_BUFFER_TOO_SMALL);
     assert(written == 0);
     passgen_error_free(&error);
 
     written = 99;
     assert(
-        PASSGEN_ERROR_BUFFER_TOO_SMALL ==
-        passgen_generate_fill_unicode(pattern, env, NULL, NULL, codepoints, 5, &written));
+        PASSGEN_ERROR_BUFFER_TOO_SMALL == passgen_generate_fill_unicode(
+                                              pattern,
+                                              env,
+                                              NULL,
+                                              NULL,
+                                              codepoints,
+                                              5,
+                                              &written));
     assert(written == 0);
     assert(
-        PASSGEN_ERROR_BUFFER_TOO_SMALL ==
-        passgen_generate_fill_json_utf8(pattern, env, NULL, NULL, utf8, 5, &written));
+        PASSGEN_ERROR_BUFFER_TOO_SMALL == passgen_generate_fill_json_utf8(
+                                              pattern,
+                                              env,
+                                              NULL,
+                                              NULL,
+                                              utf8,
+                                              5,
+                                              &written));
 
     // it fits exactly, and the length does not have to be asked for.
     assert(
-        PASSGEN_OK ==
-        passgen_generate_fill_utf8(pattern, env, NULL, NULL, utf8, 6, &written));
+        PASSGEN_OK == passgen_generate_fill_utf8(
+                          pattern,
+                          env,
+                          NULL,
+                          NULL,
+                          utf8,
+                          6,
+                          &written));
     assert(written == 6);
     assert(
         PASSGEN_OK ==
@@ -577,8 +633,14 @@ test_result test_error_generate(void) {
     written = 99;
     assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
-        PASSGEN_OK ==
-        passgen_generate_fill_utf8(pattern, env, &error, NULL, utf8, 0, &written));
+        PASSGEN_OK == passgen_generate_fill_utf8(
+                          pattern,
+                          env,
+                          &error,
+                          NULL,
+                          utf8,
+                          0,
+                          &written));
     assert(written == 0);
     passgen_pattern_free(pattern);
 
@@ -626,8 +688,14 @@ test_result test_error_generate_random(void) {
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "[a-z]{100}"));
     assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
-        PASSGEN_OK ==
-        passgen_generate_fill_utf8(pattern, env, &error, NULL, output, 512, &written));
+        PASSGEN_OK == passgen_generate_fill_utf8(
+                          pattern,
+                          env,
+                          &error,
+                          NULL,
+                          output,
+                          512,
+                          &written));
     assert(written == 100);
     assert(!passgen_random_failed(&random));
     passgen_pattern_free(pattern);
@@ -636,8 +704,14 @@ test_result test_error_generate_random(void) {
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "[a-z]{300}"));
     assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
-        PASSGEN_ERROR_RANDOM ==
-        passgen_generate_fill_utf8(pattern, env, &error, NULL, output, 512, &written));
+        PASSGEN_ERROR_RANDOM == passgen_generate_fill_utf8(
+                                    pattern,
+                                    env,
+                                    &error,
+                                    NULL,
+                                    output,
+                                    512,
+                                    &written));
     assert(error.kind == PASSGEN_ERROR_RANDOM);
     assert(written == 0);
     assert(passgen_random_failed(&random));
@@ -650,8 +724,14 @@ test_result test_error_generate_random(void) {
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "(a?){0,3}"));
     assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
-        PASSGEN_ERROR_RANDOM ==
-        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 512, &written));
+        PASSGEN_ERROR_RANDOM == passgen_generate_fill_utf8(
+                                    pattern,
+                                    env,
+                                    NULL,
+                                    NULL,
+                                    output,
+                                    512,
+                                    &written));
     passgen_pattern_free(pattern);
 
     assert(passgen_random_u64(&random) == 0);
@@ -667,8 +747,14 @@ test_result test_error_generate_random(void) {
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "abc"));
     assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
-        PASSGEN_ERROR_RANDOM ==
-        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 512, &written));
+        PASSGEN_ERROR_RANDOM == passgen_generate_fill_utf8(
+                                    pattern,
+                                    env,
+                                    NULL,
+                                    NULL,
+                                    output,
+                                    512,
+                                    &written));
     passgen_pattern_free(pattern);
 
     passgen_env_free(env);
@@ -1004,7 +1090,8 @@ test_result test_error_wordlist_utf8(void) {
 
 /// Generates from a pattern into the buffer, with the same randomness every
 /// time. Returns the length, or zero if it failed.
-static size_t generate_fixed(passgen_pattern *pattern, uint8_t *output, size_t size) {
+static size_t
+generate_fixed(passgen_pattern *pattern, uint8_t *output, size_t size) {
     passgen_random random;
     if(!passgen_random_open(&random, "xorshift:1234")) {
         return 0;
@@ -1012,7 +1099,14 @@ static size_t generate_fixed(passgen_pattern *pattern, uint8_t *output, size_t s
     passgen_env *env = passgen_env_new(&random);
     size_t written = 0;
     if(env && PASSGEN_OK == passgen_resolve(pattern, env, NULL)) {
-        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, size, &written);
+        passgen_generate_fill_utf8(
+            pattern,
+            env,
+            NULL,
+            NULL,
+            output,
+            size,
+            &written);
     }
     passgen_env_free(env);
     passgen_random_close(&random);
@@ -1062,7 +1156,8 @@ test_result test_error_parse_out_of_memory(void) {
 
             passgen_error error;
             pattern = (passgen_pattern *) &error;
-            passgen_status status = passgen_parse(&pattern, &error, patterns[i]);
+            passgen_status status =
+                passgen_parse(&pattern, &error, patterns[i]);
 
             if(status == PASSGEN_OK) {
                 done = true;
@@ -1097,7 +1192,21 @@ test_result test_error_parse_out_of_memory(void) {
 /// grow.
 static FILE *wordlist_file(void) {
     static const char *letters[] = {
-        "a", "e", "i", "o", "u", "s", "t", "é", "ß", "ü", "λ", "ж", "日", "本", "🙂"};
+        "a",
+        "e",
+        "i",
+        "o",
+        "u",
+        "s",
+        "t",
+        "é",
+        "ß",
+        "ü",
+        "λ",
+        "ж",
+        "日",
+        "本",
+        "🙂"};
     size_t letters_count = sizeof(letters) / sizeof(letters[0]);
 
     FILE *file = tmpfile();
@@ -1209,7 +1318,9 @@ test_result test_error_wordlist_out_of_memory(void) {
                     assert_streq(error.detail, "words");
                     if(fail_count == 1) {
                         assert(error.cause);
-                        assert_eq(error.cause->kind, PASSGEN_ERROR_OUT_OF_MEMORY);
+                        assert_eq(
+                            error.cause->kind,
+                            PASSGEN_ERROR_OUT_OF_MEMORY);
                     } else {
                         assert(!error.cause);
                     }

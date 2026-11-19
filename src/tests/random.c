@@ -1,6 +1,6 @@
 #include "passgen/random.h"
-#include "passgen/random_desc.h"
 #include "passgen/config.h"
+#include "passgen/random_desc.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -151,11 +151,8 @@ test_result test_random_distribution(void) {
         assert(distribution_fits(draw_u32, u32_maxes[i]));
     }
 
-    const uint64_t u64_maxes[] = {
-        3,
-        1000000000000ull,
-        0xc000000000000000ull,
-        UINT64_MAX};
+    const uint64_t u64_maxes[] =
+        {3, 1000000000000ull, 0xc000000000000000ull, UINT64_MAX};
     for(size_t i = 0; i < sizeof(u64_maxes) / sizeof(u64_maxes[0]); i++) {
         assert(distribution_fits(draw_u64, u64_maxes[i]));
     }
@@ -687,7 +684,8 @@ test_result test_random_master(void) {
     assert_eq(master_first(&master, "domain", "user"), reference);
     assert(master_first(&master, "domain", "users") != reference);
     assert(master_first(&master, "domains", "user") != reference);
-    assert(master_first(&master, "ab", "c") != master_first(&master, "a", "bc"));
+    assert(
+        master_first(&master, "ab", "c") != master_first(&master, "a", "bc"));
     assert(master_first(&master, "x", "") != master_first(&master, "", "x"));
     assert_eq(master_first(&master, NULL, NULL), master_first(&master, "", ""));
 
@@ -899,7 +897,8 @@ test_result test_random_desc_parse_chacha20(void) {
     assert(0 == memcmp(desc.data.chacha20.iv, "passgen", 8));
 
     // the IV is exactly 16 hex digits, and both cases of them work.
-    assert(passgen_random_desc_parse(&desc, "chacha20:" KEY ":0123456789ABCDEF"));
+    assert(
+        passgen_random_desc_parse(&desc, "chacha20:" KEY ":0123456789ABCDEF"));
     const uint8_t iv[8] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef};
     assert(0 == memcmp(desc.data.chacha20.key, key, sizeof(key)));
     assert(0 == memcmp(desc.data.chacha20.iv, iv, sizeof(iv)));
@@ -911,16 +910,19 @@ test_result test_random_desc_parse_chacha20(void) {
         "chacha20:key",
         "chacha20:key:iv",
         // one digit short, one too many, not hex
-        "chacha20:000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1",
+        "chacha20:"
+        "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1",
         ("chacha20:" KEY "0"),
-        "chacha20:000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1g",
+        "chacha20:"
+        "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1g",
         ("chacha20:" KEY ":"),
         ("chacha20:" KEY ":012345678abcdef"),
         ("chacha20:" KEY ":0123456789abcdef0"),
         ("chacha20:" KEY ":0123456789abcdeg"),
         ("chacha20:" KEY ":0123456789abcdef:"),
         ("chacha20: " KEY),
-        "chacha20:0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        "chacha20:"
+        "0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
     };
     for(size_t i = 0; i < sizeof(invalid) / sizeof(invalid[0]); i++) {
         assert(!passgen_random_desc_parse(&desc, invalid[i]));
@@ -934,7 +936,8 @@ test_result test_random_desc_parse_chacha20(void) {
 test_result test_random_desc_parse_master(void) {
     passgen_random_desc desc;
 
-    assert(passgen_random_desc_parse(&desc, "master:1:2:pass:0aFF:domain:user"));
+    assert(
+        passgen_random_desc_parse(&desc, "master:1:2:pass:0aFF:domain:user"));
     assert_eq(desc.kind, PASSGEN_RANDOM_DESC_MASTER);
     assert_eq(desc.data.master.version, 1);
     assert_eq(desc.data.master.level, 2);
@@ -1084,7 +1087,8 @@ test_result test_random_desc_open(void) {
     // keys are derived with the parameters which it has. the usual ones
     // are slow, and checked by the test vectors.
     passgen_random_desc desc;
-    assert(passgen_random_desc_parse(&desc, "master:1:3:pass:00:example.com:1"));
+    assert(
+        passgen_random_desc_parse(&desc, "master:1:3:pass:00:example.com:1"));
     desc.data.master.cost = &small_cost;
     passgen_random *parsed = passgen_random_desc_open(NULL, &desc);
     passgen_master master;
@@ -1093,7 +1097,9 @@ test_result test_random_desc_open(void) {
         PASSGEN_OK,
         passgen_master_derive_cost(&master, 1, &small_cost, "pass", seed, 1));
     assert(parsed);
-    assert_eq(passgen_random_u64(parsed), master_first(&master, "example.com", "1"));
+    assert_eq(
+        passgen_random_u64(parsed),
+        master_first(&master, "example.com", "1"));
     passgen_random_free(parsed);
     passgen_master_wipe(&master);
 

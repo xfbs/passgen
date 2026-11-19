@@ -3,9 +3,9 @@
 /// Fuzzing harness for parsing a pattern and generating from it. The input is
 /// the pattern.
 #include "common.h"
+#include <passgen/env.h>
 #include <passgen/generate.h>
 #include <passgen/passgen.h>
-#include <passgen/env.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -59,9 +59,21 @@ static void run(const uint8_t *data, size_t size) {
                 // with and without computing the entropy.
                 double entropy;
                 size_t budget = FUZZ_OUTPUT_BUDGET;
-                passgen_generate(pattern, env, NULL, &entropy, &budget, fuzz_output);
+                passgen_generate(
+                    pattern,
+                    env,
+                    NULL,
+                    &entropy,
+                    &budget,
+                    fuzz_output);
                 budget = FUZZ_OUTPUT_BUDGET;
-                passgen_generate(pattern, env, NULL, NULL, &budget, fuzz_output);
+                passgen_generate(
+                    pattern,
+                    env,
+                    NULL,
+                    NULL,
+                    &budget,
+                    fuzz_output);
             }
         }
 

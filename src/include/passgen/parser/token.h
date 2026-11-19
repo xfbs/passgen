@@ -17,7 +17,7 @@
 
 /// Bit that is ORed together with a parsed Unicode codepoint to indicate that
 /// it was preceded by a backslash character.
-#define PASSGEN_TOKEN_ESCAPED_BIT  (1 << 30)
+#define PASSGEN_TOKEN_ESCAPED_BIT (1 << 30)
 
 /// Bitmask for extracting only the Unicode codepoint from the parsed @ref
 /// passgen_token.
@@ -33,7 +33,8 @@
 enum passgen_token_state {
     /// Initial state.
     PASSGEN_TOKEN_INIT = 0,
-    /// Has parsed a backslash (`\`) and is currently parsing an escape sequence.
+    /// Has parsed a backslash (`\`) and is currently parsing an escape
+    /// sequence.
     PASSGEN_TOKEN_ESCAPED,
     /// Currently parsing a unicode escape sequence (`\u`).
     PASSGEN_TOKEN_UNICODE,
@@ -43,7 +44,8 @@ enum passgen_token_state {
     PASSGEN_TOKEN_ERROR_UNICODE_START = -1,
     /// Error while parsing unicode escape sequence payload.
     PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD = -2,
-    /// While parsing a unicode escape sequence, encountered a payload that was too large.
+    /// While parsing a unicode escape sequence, encountered a payload that was
+    /// too large.
     PASSGEN_TOKEN_ERROR_UNICODE_PAYLOAD_LEN = -3,
     /// Error state, the unicode literal is not a valid codepoint
     PASSGEN_TOKEN_ERROR_UNICODE_RANGE = -4
@@ -117,13 +119,16 @@ const char *passgen_token_state_string(enum passgen_token_state state);
 /// string) which is used to keep track of the exact byte offset for every
 /// token to make diagnostic error reporting easier.
 ///
-/// @param parser An initialized `passgen_token_parser`. Use `passgen_token_parser_init` to
+/// @param parser An initialized `passgen_token_parser`. Use
+/// `passgen_token_parser_init` to
 ///   initialize it if you are not sure.
 /// @param token The token that is parsed, this is an output.
-/// @param width The width (in bytes) of the codepoint. This can be set to 1 if the original
+/// @param width The width (in bytes) of the codepoint. This can be set to 1 if
+/// the original
 ///   input was Unicode codepoints.
 /// @param codepoint The codepoint to parse.
-/// @return The status of the parsing. This is an @ref passgen_token_state enum value.
+/// @return The status of the parsing. This is an @ref passgen_token_state enum
+/// value.
 /// @memberof passgen_token_parser
 int passgen_token_parse(
     struct passgen_token_parser *parser,

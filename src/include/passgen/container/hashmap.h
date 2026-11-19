@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdbool.h>
 #include <passgen/error.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 
 struct passgen_hashmap_context;
 
@@ -58,7 +58,8 @@ typedef struct {
     passgen_hashmap_entry *data;
 } passgen_hashmap;
 
-/// Context, this determines the hash function and comparison functions that are used.
+/// Context, this determines the hash function and comparison functions that are
+/// used.
 ///
 /// When these functions are called, they are always also passed a pointer to
 /// the hashmap itself. This way, additional data can be stored in the memory
@@ -89,20 +90,23 @@ extern const passgen_hashmap_context passgen_hashmap_context_utf32;
 
 /// Initialize new hashmap.
 /// The context parameter determines how keys should be compared and hashed.
-/// When not supplied, it falls back to the default context, which treats them as
-/// UTF-8 encoded, NULL-terminated strings.
+/// When not supplied, it falls back to the default context, which treats them
+/// as UTF-8 encoded, NULL-terminated strings.
 ///
 /// Possible contexts to choose from are:
 ///
 /// | Name | Description |
 /// | --- | --- |
-/// | #passgen_hashmap_context_utf8 | UTF-8 context, treats keys as UTF-8 encoded, NULL-terminated strings. |
-/// | #passgen_hashmap_context_utf32 | UTF-32 context, treats keys as UTF-32 encoded, NULL-terminated strings. |
+/// | #passgen_hashmap_context_utf8 | UTF-8 context, treats keys as UTF-8
+/// encoded, NULL-terminated strings. | | #passgen_hashmap_context_utf32 |
+/// UTF-32 context, treats keys as UTF-32 encoded, NULL-terminated strings. |
 ///
 /// @memberof passgen_hashmap
 /// @param map Hashmap to initialize
 /// @param context Pointer to context to to use for the hashmap
-void passgen_hashmap_init(passgen_hashmap *map, const passgen_hashmap_context *context);
+void passgen_hashmap_init(
+    passgen_hashmap *map,
+    const passgen_hashmap_context *context);
 
 /// Free the hashmap.
 ///
@@ -139,7 +143,8 @@ passgen_status passgen_hashmap_insert(
 /// @param key Key to remove
 /// @returns Entry for the key if one existed, else an empty entry (where
 ///   `key` is NULL).
-passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, const void *key);
+passgen_hashmap_entry
+passgen_hashmap_remove(passgen_hashmap *map, const void *key);
 
 /// Lookup an entry in the hashmap. Returns NULL if not found.
 ///
@@ -151,7 +156,8 @@ passgen_hashmap_entry passgen_hashmap_remove(passgen_hashmap *map, const void *k
 /// @param map Hashmap to lookup in
 /// @param key Key to lookup
 /// @returns Entry for the key if one exists, else NULL.
-passgen_hashmap_entry *passgen_hashmap_lookup(const passgen_hashmap *map, const void *key);
+passgen_hashmap_entry *
+passgen_hashmap_lookup(const passgen_hashmap *map, const void *key);
 
 /// Run the passed function for every value.
 ///
@@ -159,10 +165,13 @@ passgen_hashmap_entry *passgen_hashmap_lookup(const passgen_hashmap *map, const 
 /// @param map Hashmap to loop over
 /// @param user Arbitrary user data that is passed to the function
 /// @param func Function that is called for every #passgen_hashmap_entry in the
-///   hashmap. If the function returns non-zero, the iteration is aborted and the
-///   return value of the function is returned.
+///   hashmap. If the function returns non-zero, the iteration is aborted and
+///   the return value of the function is returned.
 /// @returns Zero on success, whatever the #func returned on failure.
-int passgen_hashmap_foreach(const passgen_hashmap *map, void *user, int (*func)(void *user, passgen_hashmap_entry *entry));
+int passgen_hashmap_foreach(
+    const passgen_hashmap *map,
+    void *user,
+    int (*func)(void *user, passgen_hashmap_entry *entry));
 
 /// Free both key and entry in hashmap.
 ///

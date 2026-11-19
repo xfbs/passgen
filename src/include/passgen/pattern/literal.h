@@ -15,7 +15,8 @@
 typedef struct {
     /// How many characters are stored here
     uint8_t count;
-    /// If this literal is tainted, new characters must go into a new, empty @ref passgen_pattern_literal.
+    /// If this literal is tainted, new characters must go into a new, empty
+    /// @ref passgen_pattern_literal.
     uint8_t tainted;
     /// Space for seven characters to be encoded.
     int32_t codepoints[7];
@@ -35,4 +36,6 @@ void passgen_pattern_literal_taint(passgen_pattern_literal *literal);
 /// @param literal Literal to append codepoint to
 /// @param codepoint Codepoint to append to literal
 /// @returns 0 on success, nonzero on failure (maximum capacity or tainted)
-int passgen_pattern_literal_append(passgen_pattern_literal *literal, uint32_t codepoint);
+int passgen_pattern_literal_append(
+    passgen_pattern_literal *literal,
+    uint32_t codepoint);

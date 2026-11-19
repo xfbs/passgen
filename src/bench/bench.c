@@ -48,48 +48,63 @@ static int show_help(const options *options) {
     printf("    -l, --list\n");
     printf("        List available benchmarks and quit.\n");
     printf("    -s, --oneshot\n");
-    printf("        Run in oneshot mode. This will run the benchmark only once "
-           "and will not\n");
-    printf("        generate a report. Useful for running a benchmark under "
-           "Cachegrind to\n");
+    printf(
+        "        Run in oneshot mode. This will run the benchmark only once "
+        "and will not\n");
+    printf(
+        "        generate a report. Useful for running a benchmark under "
+        "Cachegrind to\n");
     printf("        measure instructions and cache behaviour.\n");
     printf("    -t, --time TIME\n");
-    printf("        Runs benchmark for specified TIME. This will increase the "
-           "iteration count\n");
-    printf("        until the benchmark has run for the specified time, in "
-           "order to generate\n");
-    printf("        more samples and have more confidence in the measured "
-           "throughput. It will\n");
-    printf("        never decrease the number of iterations. Can be set to "
-           "zero to strictly\n");
+    printf(
+        "        Runs benchmark for specified TIME. This will increase the "
+        "iteration count\n");
+    printf(
+        "        until the benchmark has run for the specified time, in "
+        "order to generate\n");
+    printf(
+        "        more samples and have more confidence in the measured "
+        "throughput. It will\n");
+    printf(
+        "        never decrease the number of iterations. Can be set to "
+        "zero to strictly\n");
     printf("        run benchmarks ITER times. Defaults to 1s.\n");
     printf("    -i, --iterations ITER\n");
-    printf("        Run the benchmarks for at least the specified iteration "
-           "count. Benchmarks\n");
-    printf("        will run longer if the alotted TIME has not been used up. "
-           "Has to be a\n");
+    printf(
+        "        Run the benchmarks for at least the specified iteration "
+        "count. Benchmarks\n");
+    printf(
+        "        will run longer if the alotted TIME has not been used up. "
+        "Has to be a\n");
     printf("        positive, non-zero integer. Defaults to 100.\n");
     printf("    -o, --option NAME=VALUE\n");
-    printf("        Overrides the benchmark option NAME with VALUE. This "
-           "option can be set\n");
+    printf(
+        "        Overrides the benchmark option NAME with VALUE. This "
+        "option can be set\n");
     printf("        multiple times to override multiple options.\n");
     printf("    -w, --checkpoint FILE\n");
-    printf("        Write a checkpoint to the given FILE. This will write out "
-           "the current\n");
-    printf("        benchmark stats to the file in a CSV format for detecting "
-           "regressions.\n");
+    printf(
+        "        Write a checkpoint to the given FILE. This will write out "
+        "the current\n");
+    printf(
+        "        benchmark stats to the file in a CSV format for detecting "
+        "regressions.\n");
     printf("        Recommended to use with the --valgrind flag.\n");
     printf("    -r, --check FILE\n");
-    printf("        Read current benchmark state from the given FILE and warn "
-           "if a regression\n");
-    printf("        is detected. It is recommended to only use checkpoints "
-           "generated on the\n");
-    printf("        same machine or to use the --valgrind flag to get "
-           "machine-independent\n");
+    printf(
+        "        Read current benchmark state from the given FILE and warn "
+        "if a regression\n");
+    printf(
+        "        is detected. It is recommended to only use checkpoints "
+        "generated on the\n");
+    printf(
+        "        same machine or to use the --valgrind flag to get "
+        "machine-independent\n");
     printf("        data.\n");
     printf("    -c, --valgrind PATH\n");
-    printf("        Use the valgrind tool at the given PATH to compute "
-           "machine-indepdendent\n");
+    printf(
+        "        Use the valgrind tool at the given PATH to compute "
+        "machine-indepdendent\n");
     printf("        benchmark statistics, used to detect regressions.\n");
     printf("    -v, --verbose\n");
     printf("        Enables verbose logging output.\n");

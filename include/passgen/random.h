@@ -101,11 +101,14 @@ typedef struct {
 /// | Source | Description | Example | Opened with |
 /// | --- | --- | --- | --- |
 /// | System | `system` | `system` | @ref passgen_random_system_open |
-/// | File | `file:<path>` | `file:/dev/urandom` | @ref passgen_random_path_open |
-/// | Xorshift | `xorshift:<seed>` | `xorshift:123` | @ref passgen_random_xorshift_open |
-/// | Zero | `zero` | `zero` | @ref passgen_random_zero_open |
-/// | ChaCha20 | `chacha20:<key>[:<iv>]` | `chacha20:00010203...1e1f:0001020304050607` | @ref passgen_random_chacha20_open |
-/// | Master passphrase | `master:<version>:<level>:<passphrase>:<seed>:<domain>:<user>` | `master:1:2:passphrase::example.com:me` | @ref passgen_master_random_open |
+/// | File | `file:<path>` | `file:/dev/urandom` | @ref passgen_random_path_open
+/// | | Xorshift | `xorshift:<seed>` | `xorshift:123` | @ref
+/// passgen_random_xorshift_open | | Zero | `zero` | `zero` | @ref
+/// passgen_random_zero_open | | ChaCha20 | `chacha20:<key>[:<iv>]` |
+/// `chacha20:00010203...1e1f:0001020304050607` | @ref
+/// passgen_random_chacha20_open | | Master passphrase |
+/// `master:<version>:<level>:<passphrase>:<seed>:<domain>:<user>` |
+/// `master:1:2:passphrase::example.com:me` | @ref passgen_master_random_open |
 ///
 /// - The seed of xorshift is a number from 1 to 2^64 - 1, in decimal.
 /// - The key and IV of ChaCha20 are in hex (in either case): exactly 64 hex
@@ -127,7 +130,8 @@ typedef struct {
 /// @returns The source, or NULL if the description is not valid, or the
 ///   source cannot be opened
 /// @relatesalso passgen_random
-PASSGEN_EXPORT passgen_random *passgen_random_open(passgen_random *random, const char *desc);
+PASSGEN_EXPORT passgen_random *
+passgen_random_open(passgen_random *random, const char *desc);
 
 /// Whether a description of a source of randomness (see
 /// @ref passgen_random_open) may hold a secret: the key of `chacha20`, or the
@@ -155,7 +159,8 @@ PASSGEN_EXPORT bool passgen_random_desc_secret(const char *desc);
 ///   @ref passgen_random for who closes or frees it.
 /// @returns The source, or NULL if it cannot be opened
 /// @relatesalso passgen_random
-PASSGEN_EXPORT passgen_random *passgen_random_system_open(passgen_random *random);
+PASSGEN_EXPORT passgen_random *
+passgen_random_system_open(passgen_random *random);
 
 /// Opens a file as a source of randomness, such as `/dev/urandom`.
 ///
@@ -208,8 +213,7 @@ passgen_random_xorshift_open(passgen_random *random, uint64_t seed);
 ///   @ref passgen_random for who closes or frees it.
 /// @returns The source, or NULL if there is no memory for it
 /// @relatesalso passgen_random
-PASSGEN_EXPORT passgen_random *
-passgen_random_zero_open(passgen_random *random);
+PASSGEN_EXPORT passgen_random *passgen_random_zero_open(passgen_random *random);
 
 #ifdef PASSGEN_MONOCYPHER
 /// Opens a source which gives out the same data for the same key and IV, which
@@ -260,7 +264,8 @@ PASSGEN_EXPORT void passgen_random_free(passgen_random *random);
 /// @param dest Where to write the data
 /// @param bytes How many bytes to write
 /// @relatesalso passgen_random
-PASSGEN_EXPORT void passgen_random_read(passgen_random *random, void *dest, size_t bytes);
+PASSGEN_EXPORT void
+passgen_random_read(passgen_random *random, void *dest, size_t bytes);
 
 /// Reads a `uint8_t` from a source.
 ///
@@ -299,7 +304,8 @@ PASSGEN_EXPORT bool passgen_random_bool(passgen_random *random);
 /// @param max Must not be zero, as nothing is smaller than that. The library
 ///   aborts if it is.
 /// @relatesalso passgen_random
-PASSGEN_EXPORT uint8_t passgen_random_u8_max(passgen_random *random, uint8_t max);
+PASSGEN_EXPORT uint8_t
+passgen_random_u8_max(passgen_random *random, uint8_t max);
 
 /// Reads a `uint16_t` which is smaller than @p max from a source. Every number
 /// from zero up to @p max - 1 is equally likely.
@@ -308,7 +314,8 @@ PASSGEN_EXPORT uint8_t passgen_random_u8_max(passgen_random *random, uint8_t max
 /// @param max Must not be zero, as nothing is smaller than that. The library
 ///   aborts if it is.
 /// @relatesalso passgen_random
-PASSGEN_EXPORT uint16_t passgen_random_u16_max(passgen_random *random, uint16_t max);
+PASSGEN_EXPORT uint16_t
+passgen_random_u16_max(passgen_random *random, uint16_t max);
 
 /// Reads a `uint32_t` which is smaller than @p max from a source. Every number
 /// from zero up to @p max - 1 is equally likely.
@@ -317,7 +324,8 @@ PASSGEN_EXPORT uint16_t passgen_random_u16_max(passgen_random *random, uint16_t 
 /// @param max Must not be zero, as nothing is smaller than that. The library
 ///   aborts if it is.
 /// @relatesalso passgen_random
-PASSGEN_EXPORT uint32_t passgen_random_u32_max(passgen_random *random, uint32_t max);
+PASSGEN_EXPORT uint32_t
+passgen_random_u32_max(passgen_random *random, uint32_t max);
 
 /// Reads a `uint64_t` which is smaller than @p max from a source. Every number
 /// from zero up to @p max - 1 is equally likely.
@@ -326,7 +334,8 @@ PASSGEN_EXPORT uint32_t passgen_random_u32_max(passgen_random *random, uint32_t 
 /// @param max Must not be zero, as nothing is smaller than that. The library
 ///   aborts if it is.
 /// @relatesalso passgen_random
-PASSGEN_EXPORT uint64_t passgen_random_u64_max(passgen_random *random, uint64_t max);
+PASSGEN_EXPORT uint64_t
+passgen_random_u64_max(passgen_random *random, uint64_t max);
 
 /// Fills the buffer of a source with new data from it, throwing away what was
 /// not used yet. This is needed once when writing a source (see

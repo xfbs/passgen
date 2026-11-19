@@ -21,7 +21,6 @@
 #include <sys/types.h>
 #endif
 
-
 #define UNUSED(x)              (void) x
 #define strprefix(prefix, str) strncmp(prefix, str, strlen(prefix))
 
@@ -223,7 +222,8 @@ static void passgen_cli_master_hash_hex(
 // what its hash starts with.
 static int
 passgen_cli_master_open(const passgen_cli_opts *opts, passgen_random **random) {
-    const passgen_cli_master *config = passgen_cli_master_find(opts, opts->master);
+    const passgen_cli_master *config =
+        passgen_cli_master_find(opts, opts->master);
     if(!config) {
         fprintf(
             stderr,
@@ -445,8 +445,10 @@ typedef struct {
     bool json;
 } passgen_cli_buffer;
 
-static int
-passgen_cli_buffer_push(passgen_cli_buffer *buffer, const char *data, size_t len) {
+static int passgen_cli_buffer_push(
+    passgen_cli_buffer *buffer,
+    const char *data,
+    size_t len) {
     if(buffer->capacity - buffer->len < len) {
         size_t capacity = buffer->capacity ? buffer->capacity : 256;
         while(capacity - buffer->len < len) {
@@ -493,7 +495,8 @@ static int passgen_cli_utf8_encode(uint8_t *out, uint32_t codepoint) {
     return 0;
 }
 
-static int passgen_cli_buffer_puts(passgen_cli_buffer *buffer, const char *str) {
+static int
+passgen_cli_buffer_puts(passgen_cli_buffer *buffer, const char *str) {
     return passgen_cli_buffer_push(buffer, str, strlen(str));
 }
 
@@ -626,11 +629,7 @@ int passgen_cli_generate_json(passgen_cli_opts opts, passgen_pattern *pattern) {
 
         if(opts.entropy) {
             char number[64];
-            snprintf(
-                number,
-                sizeof(number),
-                "\",\"entropy\":%lf}",
-                entropy);
+            snprintf(number, sizeof(number), "\",\"entropy\":%lf}", entropy);
             ret = passgen_cli_buffer_puts(&buffer, number);
         } else {
             ret = passgen_cli_buffer_puts(&buffer, "\"}");
@@ -783,10 +782,8 @@ typedef struct {
     size_t capacity;
 } passgen_cli_listed_presets;
 
-static int passgen_cli_presets_collect(
-    void *user,
-    const char *name,
-    const char *pattern) {
+static int
+passgen_cli_presets_collect(void *user, const char *name, const char *pattern) {
     passgen_cli_listed_presets *list = user;
 
     // presets whose names start with an underscore are parts of other
@@ -911,7 +908,9 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             case 'a':
                 opt = atoi(optarg);
                 if(opt < 1) {
-                    return passgen_cli_bail(PASSGEN_CLI_ERROR_ILLEGAL_AMOUNT, &opt);
+                    return passgen_cli_bail(
+                        PASSGEN_CLI_ERROR_ILLEGAL_AMOUNT,
+                        &opt);
                 }
                 opts->amount = opt;
                 break;
@@ -953,7 +952,9 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 unsigned long long steps = strtoull(optarg, &end, 10);
                 if(*optarg < '0' || *optarg > '9' || *end || errno ||
                    steps < 1 || steps > SIZE_MAX) {
-                    return passgen_cli_bail(PASSGEN_CLI_ERROR_ILLEGAL_STEPS, optarg);
+                    return passgen_cli_bail(
+                        PASSGEN_CLI_ERROR_ILLEGAL_STEPS,
+                        optarg);
                 }
                 passgen_env_step_limit_set(opts->env, (size_t) steps);
                 break;
@@ -973,10 +974,11 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             case 'P':
                 // added once the configuration is loaded.
                 opts->definitions[opts->definitions_len++] =
-                    (passgen_cli_definition){opt, optarg};
+                    (passgen_cli_definition) {opt, optarg};
                 break;
             case 'r':
-                try(passgen_cli_opts_random(opts, optarg));
+                try
+                    (passgen_cli_opts_random(opts, optarg));
                 random_given = true;
                 break;
             case 'j':
@@ -1069,6 +1071,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 
 // the help for master passphrase mode, and for the sources of randomness
 // which it is built on, which are only there when building with monocypher.
+// clang-format off
 #ifdef PASSGEN_MONOCYPHER
 #define PASSGEN_CLI_HELP_DOMAIN \
     "    -d, --domain DOMAIN    Domain for master passphrase mode\n"
@@ -1091,6 +1094,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 #define PASSGEN_CLI_HELP_USER     ""
 #define PASSGEN_CLI_HELP_CHACHA20 ""
 #endif
+// clang-format on
 
 void passgen_cli_usage(const char *executable) {
     passgen_version version = passgen_version_get();
@@ -1100,6 +1104,9 @@ void passgen_cli_usage(const char *executable) {
         version.major,
         version.minor,
         version.patch);
+    // one option per line, which is easier to keep up to date than what
+    // clang-format makes of it.
+    // clang-format off
     fprintf(
         stderr,
         "Generate random sequences from a regex-like pattern.\n"
@@ -1151,6 +1158,7 @@ void passgen_cli_usage(const char *executable) {
         "See passgen(1) for more.\n",
         executable,
         executable);
+    // clang-format on
 }
 
 void passgen_cli_show_version(void) {
@@ -1207,7 +1215,8 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
         case PASSGEN_CLI_ERROR_ILLEGAL_STEPS:
             fprintf(
                 stderr,
-                "\033[1;31merror\033[0m: illegal number of steps entered (%s)\n",
+                "\033[1;31merror\033[0m: illegal number of steps entered "
+                "(%s)\n",
                 (const char *) data);
             break;
         case PASSGEN_CLI_ERROR_GENERATE:
@@ -1446,8 +1455,9 @@ static int passgen_cli_config_master(
         } else if(0 == strcmp(key, "seed")) {
             size_t digits = value.type == TOML_STRING ? strlen(value.u.s) : 0;
             if(value.type != TOML_STRING ||
-               (digits && (digits % 2 ||
-                           !passgen_cli_hex(value.u.s, 2 * sizeof(master->seed))))) {
+               (digits &&
+                (digits % 2 ||
+                 !passgen_cli_hex(value.u.s, 2 * sizeof(master->seed))))) {
                 return passgen_cli_config_error(
                     path,
                     &value,
@@ -1571,11 +1581,14 @@ static int passgen_cli_config_apply(
         }
 
         if(wordlists) {
-            try(passgen_cli_config_wordlists(opts, path, value));
+            try
+                (passgen_cli_config_wordlists(opts, path, value));
         } else if(master) {
-            try(passgen_cli_config_masters(opts, path, value));
+            try
+                (passgen_cli_config_masters(opts, path, value));
         } else {
-            try(passgen_cli_config_presets(opts, path, value));
+            try
+                (passgen_cli_config_presets(opts, path, value));
         }
     }
 
@@ -1641,7 +1654,8 @@ static int passgen_cli_opts_config_user(passgen_cli_opts *opts) {
 
 // Loads the configuration files in a list which is separated by colons, like
 // $PATH. Empty entries are skipped, as are files which do not exist.
-static int passgen_cli_opts_config_list(passgen_cli_opts *opts, const char *list) {
+static int
+passgen_cli_opts_config_list(passgen_cli_opts *opts, const char *list) {
     char *copy = malloc(strlen(list) + 1);
     if(!copy) {
         return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
@@ -1669,7 +1683,8 @@ int passgen_cli_opts_config(passgen_cli_opts *opts) {
     // the ones which are given with --config have to exist.
     if(opts->configs_len) {
         for(size_t i = 0; i < opts->configs_len; i++) {
-            try(passgen_cli_opts_config_file(opts, opts->configs[i], true));
+            try
+                (passgen_cli_opts_config_file(opts, opts->configs[i], true));
         }
         return 0;
     }
@@ -1682,22 +1697,27 @@ int passgen_cli_opts_config(passgen_cli_opts *opts) {
 
     // what is installed along with passgen, what is set for the system, and
     // then what the user set, each of which can replace what came before.
-    try(passgen_cli_opts_config_file(opts, PASSGEN_CLI_CONFIG_DATA, false));
-    try(passgen_cli_opts_config_file(opts, PASSGEN_CLI_CONFIG_SYSTEM, false));
+    try
+        (passgen_cli_opts_config_file(opts, PASSGEN_CLI_CONFIG_DATA, false));
+    try
+        (passgen_cli_opts_config_file(opts, PASSGEN_CLI_CONFIG_SYSTEM, false));
     return passgen_cli_opts_config_user(opts);
 }
 
 int passgen_cli_opts_load(passgen_cli_opts *opts) {
-    try(passgen_cli_opts_config(opts));
+    try
+        (passgen_cli_opts_config(opts));
 
     // what is defined on the command line replaces what the configuration
     // defines.
     for(size_t i = 0; i < opts->definitions_len; i++) {
         const passgen_cli_definition *definition = &opts->definitions[i];
         if(definition->option == 'P') {
-            try(passgen_cli_opts_preset(opts, definition->argument));
+            try
+                (passgen_cli_opts_preset(opts, definition->argument));
         } else {
-            try(passgen_cli_opts_wordlist(opts, definition->argument));
+            try
+                (passgen_cli_opts_wordlist(opts, definition->argument));
         }
     }
 

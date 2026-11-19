@@ -12,6 +12,7 @@ licenses. The files have the full text of their license at the top.
 | [SipHash](https://github.com/veorq/SipHash) reference implementation, by Jean-Philippe Aumasson and Daniel J. Bernstein. | `src/util/siphash.c` | CC0-1.0 |
 | [UTF-8 decoder](https://bjoern.hoehrmann.de/utf-8/decoder/dfa/), by Björn Höhrmann. | `src/util/utf8.c` | MIT |
 | UTF-8 encoder, by Ondřej Hruška. | `src/util/utf8.c` | MIT |
+| [Portable endian conversion](https://gist.github.com/panzi/6856583), by Mathias Panzenböck. | `src/include/passgen/util/endian.h` | Public domain, or BSD, MIT or Apache |
 
 ## Only part of the command-line tool
 

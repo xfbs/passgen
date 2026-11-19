@@ -143,7 +143,9 @@ passgen_status passgen_pattern_parse(
         // make sure utf8 decoding was successful. the error is at what
         // follows the last codepoint which could be decoded.
         if(decode_ret < PASSGEN_UTF8_SUCCESS) {
-            passgen_error_offset end = {decoded.codepoint + 1, decoded.byte + 1};
+            passgen_error_offset end = {
+                decoded.codepoint + 1,
+                decoded.byte + 1};
             passgen_parser_free(&parser);
             return passgen_error_set_at(
                 error,

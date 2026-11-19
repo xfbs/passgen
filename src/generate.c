@@ -174,7 +174,7 @@ static int passgen_generate_write_buffer_utf8(void *data, uint32_t codepoint) {
             return -1;
         }
 
-        if((size_t)bytes <= (fillpos->len - fillpos->cur)) {
+        if((size_t) bytes <= (fillpos->len - fillpos->cur)) {
             memcpy(&fillpos->buffer[fillpos->cur], &buffer[0], bytes);
             fillpos->cur += bytes;
         } else {
@@ -258,26 +258,26 @@ passgen_generate_write_buffer_json_utf8(void *data, uint32_t codepoint) {
 
 // Runs a callback which fills a buffer, and works out the status from what
 // it has to say about why it stopped.
-#define PASSGEN_GENERATE_FILL(fillpos, callback)                             \
-    do {                                                                     \
-        passgen_status status = passgen_generate(                            \
-            pattern,                                                         \
-            env,                                                             \
-            error,                                                           \
-            entropy,                                                         \
-            &fillpos,                                                        \
-            callback);                                                       \
-                                                                             \
-        /* if the callback is what stopped it, it knows the reason. */       \
+#define PASSGEN_GENERATE_FILL(fillpos, callback)                              \
+    do {                                                                      \
+        passgen_status status = passgen_generate(                             \
+            pattern,                                                          \
+            env,                                                              \
+            error,                                                            \
+            entropy,                                                          \
+            &fillpos,                                                         \
+            callback);                                                        \
+                                                                              \
+        /* if the callback is what stopped it, it knows the reason. */        \
         if(status == PASSGEN_ERROR_ABORTED && fillpos.status != PASSGEN_OK) { \
-            status = passgen_error_set(error, fillpos.status);               \
-        }                                                                    \
-                                                                             \
-        if(written) {                                                        \
-            *written = (status == PASSGEN_OK) ? fillpos.cur : 0;             \
-        }                                                                    \
-                                                                             \
-        return status;                                                       \
+            status = passgen_error_set(error, fillpos.status);                \
+        }                                                                     \
+                                                                              \
+        if(written) {                                                         \
+            *written = (status == PASSGEN_OK) ? fillpos.cur : 0;              \
+        }                                                                     \
+                                                                              \
+        return status;                                                        \
     } while(0)
 
 passgen_status passgen_generate_fill_unicode(
@@ -408,7 +408,9 @@ static int passgen_generate_set(
     }
 
     // every character of the range is there multiplier many times.
-    return emit(context, range->start + (uint32_t) (choice / range->multiplier));
+    return emit(
+        context,
+        range->start + (uint32_t) (choice / range->multiplier));
 }
 
 static int passgen_generate_literal(
@@ -418,7 +420,8 @@ static int passgen_generate_literal(
     passgen_assert(literal->count < 8);
 
     for(size_t i = 0; i < literal->count; i++) {
-        try(emit(context, literal->codepoints[i]));
+        try
+            (emit(context, literal->codepoints[i]));
     }
 
     return 0;
@@ -446,7 +449,8 @@ static int passgen_generate_special_markov(
         if(!next) {
             break;
         }
-        try(emit(context, next));
+        try
+            (emit(context, next));
         memmove(&window[0], &window[1], (level - 1) * sizeof(window[0]));
         window[level - 1] = next;
     }
@@ -490,7 +494,8 @@ static int passgen_generate_special_wordlist(
                 &cause);
         }
         for(size_t i = 0; &codepoints[i] < codepoints_pos; i++) {
-            try(emit(context, codepoints[i]));
+            try
+                (emit(context, codepoints[i]));
         }
     } while(decode_ret > PASSGEN_UTF8_SUCCESS);
 
@@ -546,20 +551,25 @@ static int passgen_generate_item(
     size_t reps = passgen_generate_repeat(context, &item->repeat);
 
     for(size_t i = 0; i < reps; i++) {
-        try(step(context));
+        try
+            (step(context));
 
         switch(item->kind) {
             case PASSGEN_PATTERN_SET:
-                try(passgen_generate_set(context, &item->data.set));
+                try
+                    (passgen_generate_set(context, &item->data.set));
                 break;
             case PASSGEN_PATTERN_LITERAL:
-                try(passgen_generate_literal(context, &item->data.literal));
+                try
+                    (passgen_generate_literal(context, &item->data.literal));
                 break;
             case PASSGEN_PATTERN_SPECIAL:
-                try(passgen_generate_special(context, &item->data.special));
+                try
+                    (passgen_generate_special(context, &item->data.special));
                 break;
             case PASSGEN_PATTERN_GROUP:
-                try(passgen_generate_group(context, &item->data.group));
+                try
+                    (passgen_generate_group(context, &item->data.group));
                 break;
             default:
                 // the parser does not make any other kinds of items.
@@ -576,7 +586,8 @@ static int passgen_generate_segment(
     for(size_t i = 0; i < segment->items.len; i++) {
         passgen_pattern_item *item = passgen_stack_get(&segment->items, i);
 
-        try(passgen_generate_item(context, item));
+        try
+            (passgen_generate_item(context, item));
     }
 
     return 0;
@@ -594,10 +605,10 @@ static int passgen_generate_group(
     // (such as `(abc)` or `({2}abc)`, and every pattern itself) has nothing to
     // choose from, so it takes no randomness. this makes `(abc)` the same as
     // `abc`, and a preset the same as its pattern.
-    size_t choice =
-        group->segments.len == 1
-            ? 0
-            : passgen_random_u64_max(context->env->random, group->multiplier_sum);
+    size_t choice = group->segments.len == 1 ? 0
+                                             : passgen_random_u64_max(
+                                                   context->env->random,
+                                                   group->multiplier_sum);
     size_t segment_index = 0;
     passgen_pattern_segment *segment =
         passgen_stack_get(&group->segments, segment_index);

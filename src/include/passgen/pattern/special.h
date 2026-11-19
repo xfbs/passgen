@@ -56,8 +56,9 @@ typedef struct {
 /// | Character | Kind | Description |
 /// | --- | --- | --- |
 /// | `p` | #PASSGEN_PATTERN_SPECIAL_PRESET | Generate the named preset |
-/// | `w` | #PASSGEN_PATTERN_SPECIAL_WORDLIST | Generate a random word from the named wordlist |
-/// | `m` | #PASSGEN_PATTERN_SPECIAL_MARKOV | Generate a random word using the markov chain parsed from the named wordlist |
+/// | `w` | #PASSGEN_PATTERN_SPECIAL_WORDLIST | Generate a random word from the
+/// named wordlist | | `m` | #PASSGEN_PATTERN_SPECIAL_MARKOV | Generate a random
+/// word using the markov chain parsed from the named wordlist |
 ///
 /// @memberof passgen_pattern_special
 /// @param special Special pattern to initialize
