@@ -551,6 +551,8 @@ int passgen_cli_run(passgen_cli_opts opts) {
             return ret;
         }
         passgen_env_random_set(opts.env, master);
+        // this copy of the options is only used for generating.
+        opts.random = master;
     }
 #endif
 
@@ -559,7 +561,7 @@ int passgen_cli_run(passgen_cli_opts opts) {
 
 #ifdef PASSGEN_MONOCYPHER
     if(master) {
-        passgen_env_random_set(opts.env, opts.random);
+        passgen_env_random_set(opts.env, NULL);
         passgen_random_free(master);
     }
 #endif
@@ -687,6 +689,22 @@ passgen_cli_generate_error(passgen_status status, passgen_error *error) {
     return PASSGEN_CLI_ERROR_GENERATE;
 }
 
+// Switches the source of randomness to the stream for the sequence with the
+// index, so that what each of them is does not depend on how much randomness
+// the ones before it used. Sources without streams (the system, a file) are
+// read from one after another, unless an offset was given, which is an error.
+static int passgen_cli_stream(passgen_cli_opts *opts, size_t index) {
+    if(!passgen_random_stream(opts->random, opts->offset + index) &&
+       opts->offset_given) {
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m: --offset needs a deterministic source "
+            "of randomness, such as --master\n");
+        return PASSGEN_CLI_ERROR_ILLEGAL_OFFSET;
+    }
+    return 0;
+}
+
 int passgen_cli_generate_normal(
     passgen_cli_opts opts,
     passgen_pattern *pattern) {
@@ -694,6 +712,12 @@ int passgen_cli_generate_normal(
     char sep = opts.null ? '\0' : '\n';
 
     for(size_t i = 0; i < opts.amount; ++i) {
+        int ret = passgen_cli_stream(&opts, i);
+        if(ret != 0) {
+            free(buffer.data);
+            return ret;
+        }
+
         double entropy;
         passgen_error error;
         buffer.len = 0;
@@ -736,6 +760,12 @@ int passgen_cli_generate_json(passgen_cli_opts opts, passgen_pattern *pattern) {
     int ret = passgen_cli_buffer_puts(&buffer, "[");
 
     for(size_t i = 0; ret == 0 && i < opts.amount; ++i) {
+        int stream = passgen_cli_stream(&opts, i);
+        if(stream != 0) {
+            free(buffer.data);
+            return stream;
+        }
+
         double entropy;
         ret = passgen_cli_buffer_puts(
             &buffer,
@@ -851,6 +881,8 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->configs = NULL;
     opts->configs_len = 0;
     opts->amount = 1;
+    opts->offset = 0;
+    opts->offset_given = false;
     opts->null = false;
     opts->json = false;
     opts->entropy = false;
@@ -981,16 +1013,18 @@ static int passgen_cli_presets_list(const passgen_cli_opts *opts) {
 #ifdef PASSGEN_MONOCYPHER
 #define PASSGEN_CLI_MASTER_OPTS "d:m:u:"
 
+#else
+#define PASSGEN_CLI_MASTER_OPTS ""
+#endif
+
 // options which only have a long form.
 enum {
-    PASSGEN_CLI_OPT_MASTER_SETUP = 256,
+    PASSGEN_CLI_OPT_OFFSET = 256,
+    PASSGEN_CLI_OPT_MASTER_SETUP,
     PASSGEN_CLI_OPT_MASTER_LEVEL,
     PASSGEN_CLI_OPT_MASTER_SEED,
     PASSGEN_CLI_OPT_MASTER_VERSION,
 };
-#else
-#define PASSGEN_CLI_MASTER_OPTS ""
-#endif
 
 int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     const char *short_opts = "a:c:p:P:w:r:S:ezhvjl" PASSGEN_CLI_MASTER_OPTS;
@@ -1006,6 +1040,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 
     static struct option long_opts[] = {
         {"amount", required_argument, NULL, 'a'},
+        {"offset", required_argument, NULL, PASSGEN_CLI_OPT_OFFSET},
         {"config", required_argument, NULL, 'c'},
         {"help", no_argument, NULL, 'h'},
         {"preset", required_argument, NULL, 'p'},
@@ -1097,6 +1132,23 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             case 'p':
                 opts->preset = optarg;
                 break;
+            case PASSGEN_CLI_OPT_OFFSET: {
+                char *end;
+                errno = 0;
+                unsigned long long offset = strtoull(optarg, &end, 10);
+                if(*optarg < '0' || *optarg > '9' || *end || errno ||
+                   offset > UINT64_MAX) {
+                    fprintf(
+                        stderr,
+                        "\033[1;31merror\033[0m: illegal offset entered "
+                        "(%s)\n",
+                        optarg);
+                    return PASSGEN_CLI_ERROR_ILLEGAL_OFFSET;
+                }
+                opts->offset = (uint64_t) offset;
+                opts->offset_given = true;
+                break;
+            }
             case 'S': {
                 char *end;
                 errno = 0;
@@ -1140,6 +1192,14 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                     PASSGEN_CLI_ERROR_UNRECOGNIZED,
                     argv[optind]);
         }
+    }
+
+    // the stream of the last sequence has to exist.
+    if(opts->amount - 1 > UINT64_MAX - opts->offset) {
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m: the offset is too large for the amount\n");
+        return PASSGEN_CLI_ERROR_ILLEGAL_OFFSET;
     }
 
     // a pattern, or a preset to take it from (which is looked up once the
@@ -1293,6 +1353,9 @@ void passgen_cli_usage(const char *executable) {
         "    -j, --json             Output as JSON\n"
         "    -l, --list             List the presets\n"
         PASSGEN_CLI_HELP_MASTER
+        "        --offset N         Start at the Nth of the sequences of a\n"
+        "                           deterministic source of randomness\n"
+        "                           (default: 0)\n"
         "    -p, --preset NAME      Use the pattern of a preset\n"
         "    -P, --define-preset NAME:PATTERN\n"
         "                           Define a preset\n"
@@ -1398,6 +1461,7 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
         case PASSGEN_CLI_ERROR_WORDLIST:
         case PASSGEN_CLI_ERROR_CONFIG:
         case PASSGEN_CLI_ERROR_MASTER:
+        case PASSGEN_CLI_ERROR_ILLEGAL_OFFSET:
             // what went wrong was printed by whoever noticed.
             break;
         case PASSGEN_CLI_ERROR_PRESET_NOT_FOUND:

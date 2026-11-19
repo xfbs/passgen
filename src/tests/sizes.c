@@ -59,6 +59,6 @@ test_result test_sizes_util(void) {
     assert_eq(sizeof(passgen_hashmap_context), 32);
     assert_eq(sizeof(passgen_hashmap_entry), 16);
     assert_eq(sizeof(passgen_stack), 48);
-    assert_eq(sizeof(passgen_random), 1024 + 5 * 8);
+    assert_eq(sizeof(passgen_random), 1024 + 6 * 8);
     return test_ok;
 }

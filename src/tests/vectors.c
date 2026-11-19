@@ -25,22 +25,26 @@ typedef struct {
 
 #define WORD(word)
 #define HASH(passphrase, level, seed, expected)
+#define STREAM(random, index, pattern, expected)
 #define VECTOR(random, pattern, expected) {random, pattern, expected},
 static const vector vectors[] = {
 #include "vectors.inc"
 };
 #undef WORD
 #undef HASH
+#undef STREAM
 #undef VECTOR
 
 #define WORD(word) word "\n"
 #define HASH(passphrase, level, seed, expected)
+#define STREAM(random, index, pattern, expected)
 #define VECTOR(random, pattern, expected) ""
 static const char wordlist[] =
 #include "vectors.inc"
     ;
 #undef WORD
 #undef HASH
+#undef STREAM
 #undef VECTOR
 
 #ifdef PASSGEN_MONOCYPHER
@@ -54,14 +58,36 @@ typedef struct {
 #define WORD(word)
 #define HASH(passphrase, level, seed, expected) \
     {passphrase, level, seed, expected},
+#define STREAM(random, index, pattern, expected)
 #define VECTOR(random, pattern, expected)
 static const hash_vector hashes[] = {
 #include "vectors.inc"
 };
 #undef WORD
 #undef HASH
+#undef STREAM
 #undef VECTOR
 #endif
+
+typedef struct {
+    const char *random;
+    uint64_t index;
+    const char *pattern;
+    const char *expected;
+} stream_vector;
+
+#define WORD(word)
+#define HASH(passphrase, level, seed, expected)
+#define STREAM(random, index, pattern, expected) \
+    {random, index, pattern, expected},
+#define VECTOR(random, pattern, expected)
+static const stream_vector streams[] = {
+#include "vectors.inc"
+};
+#undef WORD
+#undef HASH
+#undef STREAM
+#undef VECTOR
 
 /// Generates the output for a vector using the given randomness source,
 /// returns true if it is as expected.
@@ -226,3 +252,43 @@ test_result test_vectors_master_hash(void) {
     return test_ok;
 }
 #endif
+
+/// Every sequence is generated from its own stream, which the command-line
+/// tool uses for `-a` and `--offset`.
+test_result test_vectors_streams(void) {
+    size_t count = sizeof(streams) / sizeof(streams[0]);
+    assert(count > 0);
+    passgen_random *random = NULL;
+    const char *random_desc = NULL;
+    for(size_t i = 0; i < count; i++) {
+        // deriving a key from a master passphrase is slow on purpose, so the
+        // source is only opened again for another description.
+        if(!random || 0 != strcmp(random_desc, streams[i].random)) {
+            if(random) {
+                passgen_random_free(random);
+            }
+            random_desc = streams[i].random;
+            random = passgen_random_open(NULL, random_desc);
+#ifndef PASSGEN_MONOCYPHER
+            // only xorshift has streams without monocypher.
+            if(!random) {
+                continue;
+            }
+#endif
+            assert(random);
+        }
+
+        assert(passgen_random_stream(random, streams[i].index));
+        const vector check = {
+            streams[i].random,
+            streams[i].pattern,
+            streams[i].expected,
+        };
+        assert(vector_check(&check, random));
+    }
+    if(random) {
+        passgen_random_free(random);
+    }
+
+    return test_ok;
+}

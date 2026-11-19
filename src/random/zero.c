@@ -12,6 +12,12 @@ static size_t passgen_random_zero_read(void *context, void *dest, size_t size) {
     return size;
 }
 
+// All streams are zeroes as well.
+static void passgen_random_zero_stream(void *context, uint64_t index) {
+    (void) context;
+    (void) index;
+}
+
 static void passgen_random_zero_close(void *context) {
     (void) context;
 }
@@ -25,6 +31,7 @@ passgen_random *passgen_random_zero_open(passgen_random *random) {
     random->context = NULL;
     random->read = passgen_random_zero_read;
     random->close = passgen_random_zero_close;
+    random->stream = passgen_random_zero_stream;
     random->failed = false;
     passgen_random_reload(random);
     return random;

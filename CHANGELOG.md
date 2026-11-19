@@ -13,6 +13,10 @@ All passwords derived from a master passphrase change. Master passphrase mode
 derives a key from the master passphrase once, with more effort, and from it
 a key for the domain and the user. To get an old password back, use 0.4.0.
 
+With `--amount`, every sequence after the first one changes for deterministic
+sources of randomness: each is generated from its own stream, so that it does
+not depend on the ones before it.
+
 ### Added
 
 - `--config` (`-c`), to read a configuration file instead of the usual ones,
@@ -22,6 +26,9 @@ a key for the domain and the user. To get an old password back, use 0.4.0.
   deriving the key takes), a short hash, which catches a mistyped master
   passphrase, and optionally a seed. `--master-level`, `--master-seed` and
   `--master-version` set these without asking.
+- `--offset N`, to generate the Nth sequence of a deterministic source of
+  randomness (counting from 0), such as to change a password in master
+  passphrase mode.
 
 ### Changed
 

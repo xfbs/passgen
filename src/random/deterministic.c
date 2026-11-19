@@ -13,7 +13,10 @@
 
 typedef struct {
     uint8_t key[CHACHA20_KEY_SIZE];
+    /// The IV of the stream which is read.
     uint8_t iv[8];
+    /// The IV it was opened with, which is that of stream zero.
+    uint8_t base_iv[8];
     size_t offset;
 } passgen_random_chacha20_context;
 
@@ -61,6 +64,17 @@ passgen_random_chacha20_read(void *context_raw, void *dest, size_t size) {
     return size;
 }
 
+// The streams are the keystreams for other IVs: the IV as a 64 bit
+// little-endian number, XOR the index. This is the same as the Rust
+// implementation does.
+static void passgen_random_chacha20_stream(void *context_raw, uint64_t index) {
+    passgen_random_chacha20_context *context = context_raw;
+    for(size_t i = 0; i < sizeof(context->iv); i++) {
+        context->iv[i] = context->base_iv[i] ^ (uint8_t) (index >> (8 * i));
+    }
+    context->offset = 0;
+}
+
 static void passgen_random_chacha20_close(void *context_raw) {
     passgen_random_chacha20_context *context = context_raw;
     PASSGEN_CLEAR(context);
@@ -88,11 +102,13 @@ passgen_random *passgen_random_chacha20_open(
     memset(data, 0, sizeof(*data));
     memcpy(data->key, key, CHACHA20_KEY_SIZE);
     memcpy(data->iv, iv, 8);
+    memcpy(data->base_iv, iv, 8);
     data->offset = 0;
 
     random->context = data;
     random->close = passgen_random_chacha20_close;
     random->read = passgen_random_chacha20_read;
+    random->stream = passgen_random_chacha20_stream;
 
     random->failed = false;
     passgen_random_reload(random);

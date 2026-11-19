@@ -56,6 +56,17 @@ void passgen_random_reload(passgen_random *random) {
     random->pos = 0;
 }
 
+bool passgen_random_stream(passgen_random *random, uint64_t index) {
+    if(!random->stream) {
+        return false;
+    }
+
+    // what is buffered is from the stream it was in.
+    random->stream(random->context, index);
+    passgen_random_reload(random);
+    return true;
+}
+
 void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
     // more than fits into the buffer is read directly.
     if(!random->failed && bytes > sizeof(random->buffer)) {

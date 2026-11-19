@@ -84,6 +84,7 @@ passgen_random *passgen_random_system_open(passgen_random *random) {
     random->context = NULL;
     random->read = passgen_random_system_read;
     random->close = passgen_random_system_close;
+    random->stream = NULL;
     return passgen_random_start(random, allocated);
 #else
     // whoever opens it says why, if it cannot be opened.
@@ -114,5 +115,6 @@ passgen_random *passgen_random_file_open(passgen_random *random, FILE *file) {
     random->context = file;
     random->read = passgen_random_read_file;
     random->close = passgen_random_close_file;
+    random->stream = NULL;
     return passgen_random_start(random, allocated);
 }

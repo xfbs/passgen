@@ -72,6 +72,7 @@ fuzz_random_open(passgen_random *random, fuzz_random_context *context) {
     random->context = context;
     random->read = fuzz_random_read;
     random->close = fuzz_random_close;
+    random->stream = NULL;
     random->failed = false;
     passgen_random_reload(random);
 }

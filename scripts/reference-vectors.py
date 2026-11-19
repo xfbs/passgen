@@ -118,6 +118,8 @@ class ChaCha20:
 
     def __init__(self, key, iv):
         assert len(key) == 32 and len(iv) == 8
+        self.key = key
+        self.iv = iv
         # OpenSSL takes the counter and the nonce as one 16 byte value
         cipher = Cipher(algorithms.ChaCha20(key, bytes(8) + iv), mode=None)
         self.encryptor = cipher.encryptor()
@@ -125,12 +127,29 @@ class ChaCha20:
     def read(self, size):
         return self.encryptor.update(bytes(size))
 
+    def stream(self, index):
+        """The keystream for the IV, as a 64 bit little-endian number, XOR
+        the index."""
+        iv = int.from_bytes(self.iv, "little") ^ index
+        return ChaCha20(self.key, iv.to_bytes(8, "little"))
+
 
 class Xorshift:
     """The xorshift64 generator, output as little-endian 64 bit values."""
 
     def __init__(self, seed):
+        self.seed = seed
         self.state = seed
+
+    def stream(self, index):
+        """The generator with the seed XOR the index after the finalizer of
+        splitmix64, or 2^64 - 1 instead of zero."""
+        mask = (1 << 64) - 1
+        mix = (index * 0x9E3779B97F4A7C15) & mask
+        mix = ((mix ^ (mix >> 30)) * 0xBF58476D1CE4E5B9) & mask
+        mix = ((mix ^ (mix >> 27)) * 0x94D049BB133111EB) & mask
+        mix ^= mix >> 31
+        return Xorshift((self.seed ^ mix) or mask)
 
     def read(self, size):
         assert size % 8 == 0
@@ -331,9 +350,10 @@ def generate_item(random, item, wordlists):
     return output
 
 
-def generate(description, pattern, wordlists):
+def generate(description, pattern, wordlists, stream=0):
     segments, _ = parse_group(pattern, 0, True)
-    return generate_group(Random(open_source(description)), segments, wordlists)
+    source = open_source(description).stream(stream)
+    return generate_group(Random(source), segments, wordlists)
 
 
 # The wordlist which the tests define under the name `words`.
@@ -449,6 +469,25 @@ def vectors():
         yield source, pattern, generate(source, pattern, wordlists)
 
 
+# sources with streams, the indices of streams, and patterns, which generate
+# what would be generated for those indices with `-a` or `--offset`. stream
+# zero is the same as the vectors above.
+STREAMS = [
+    ("xorshift:1", [0, 1, 2, 3, 1000, 2**64 - 1]),
+    ("xorshift:18446744073709551615", [0, 1, 2]),
+    (
+        "chacha20:000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+        [0, 1, 2, 3, 1000, 2**64 - 1],
+    ),
+    (
+        "chacha20:000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f:FFFFFFFFFFFFFFFF",
+        [0, 1, 2],
+    ),
+    (master("master", "example.com", "user"), [0, 1, 2, 3]),
+]
+STREAM_PATTERNS = ["[a-z]{16}", "[a-z]{8}(-[a-z0-9]{0,8})?", "\\w{words}{1,3}"]
+
+
 # master passphrases, levels and seeds, and their hashes.
 HASHES = [
     ("master", 1, ""),
@@ -484,6 +523,7 @@ def main():
     print("// VECTOR(randomness source, pattern, expected output)")
     print("// WORD(word in the wordlist named `words`)")
     print("// HASH(master passphrase, level, seed in hex, expected hash in hex)")
+    print("// STREAM(randomness source, index of the stream, pattern, expected output)")
     print()
     for word in WORDS:
         print(f"WORD({c_string(word)})")
@@ -494,6 +534,14 @@ def main():
             f"HASH({c_string(passphrase)}, {level}, {c_string(seed)}, "
             f"{c_string(master_hash(key).hex())})"
         )
+    print()
+    for source, indices in STREAMS:
+        for index in indices:
+            for pattern in STREAM_PATTERNS:
+                expected = generate(source, pattern, {"words": WORDS}, index)
+                print(f"STREAM({c_string(source)}, UINT64_C({index}),")
+                print(f"       {c_string(pattern)},")
+                print(f"       {c_string(expected)})")
     print()
     for source, pattern, expected in vectors():
         print(f"VECTOR({c_string(source)},")

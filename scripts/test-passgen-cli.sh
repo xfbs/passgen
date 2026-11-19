@@ -180,6 +180,11 @@ if $passgen -r "chacha20:$key" "a" > /dev/null 2>&1; then
     # known answer, to notice when the derivation changes (which would change
     # everyone's passwords). this is from scripts/reference-vectors.py.
     test "$a" = "cwlrWj-PcuVGE-OlCunW"
+    # every sequence is generated from its own stream, which --offset starts
+    # at, and which is what the reference implementation says for them.
+    test "$($passgen -r "master:1:1:master::example.com:user" -a 3 -p apple2 | head -n 1)" = "$a"
+    test "$($passgen -r "master:1:1:master::example.com:user" -a 3 -p apple2 | sed -n 3p)" = \
+        "$($passgen -r "master:1:1:master::example.com:user" --offset 2 -p apple2)"
 
     test "$a" != "$($passgen -r "master:1:1:other::example.com:user" -p apple2)"
     test "$a" != "$($passgen -r "master:1:1:master::example.org:user" -p apple2)"
@@ -202,6 +207,8 @@ level = 1
 hash = "fd915731"'
     test "$(echo master | $passgen -c "$tmpdir/master.toml" -m main -d example.com -u user -p apple2)" = "$a"
     test "$(echo master | $passgen -c "$tmpdir/master.toml" --master main --domain example.com --user user -p apple2)" = "$a"
+    test "$(echo master | $passgen -c "$tmpdir/master.toml" -m main -d example.com -u user --offset 2 -p apple2)" = \
+        "$($passgen -r "master:1:1:master::example.com:user" --offset 2 -p apple2)"
     # without a terminal to ask at, the level is 2, and there is no seed.
     test "$(echo master | $passgen --master-setup main)" = '[master.main]
 version = 1
@@ -307,6 +314,30 @@ else
     printf '[master.main]\nversion = 1\nlevel = 1\n' > "$tmpdir/master.toml"
     test "$($passgen -c "$tmpdir/master.toml" a)" = "a"
 fi
+
+# every sequence of a deterministic source is generated from its own stream,
+# so that what each of them is does not depend on the ones before it.
+# --offset starts at another one than the first.
+all="$($passgen -r xorshift:1 -a 4 '[a-z]{8}(-[a-z0-9]{0,8})?')"
+test "$(echo "$all" | head -n 1)" = "$($passgen -r xorshift:1 '[a-z]{8}(-[a-z0-9]{0,8})?')"
+for i in 1 2 3; do
+    test "$(echo "$all" | sed -n "$((i + 1))p")" = "$($passgen -r xorshift:1 --offset $i '[a-z]{8}(-[a-z0-9]{0,8})?')"
+done
+test "$($passgen -r xorshift:1 --offset 2 -a 2 '[a-z]{8}(-[a-z0-9]{0,8})?')" = "$(echo "$all" | sed -n 3,4p)"
+# from scripts/reference-vectors.py.
+test "$($passgen -r xorshift:1 --offset 1000 '[a-z]{16}')" = "$(sed -n '/STREAM("xorshift:1", UINT64_C(1000),/{n;n;p;q}' "$(dirname "$0")/../src/tests/vectors.inc" | sed 's/^ *"\(.*\)")$/\1/')"
+test "$($passgen -r zero --offset 5 '[a-z]{4}')" = "aaaa"
+$passgen -r xorshift:1 --offset 18446744073709551615 a > /dev/null
+# sources without streams cannot start at another one (exit status 16), and
+# offsets have to be numbers, which the last sequence has to fit in.
+fails $passgen --offset 1 a
+fails $passgen -r "file:/dev/urandom" --offset 1 a
+fails $passgen -r xorshift:1 --offset x a
+fails $passgen -r xorshift:1 --offset -1 a
+fails $passgen -r xorshift:1 --offset 18446744073709551616 a
+fails $passgen -r xorshift:1 --offset 18446744073709551615 -a 2 a
+($passgen --offset 1 a >/dev/null 2>&1) || test "$?" = 16
+test "$(error_of $passgen --offset 1 a)" = "error: --offset needs a deterministic source of randomness, such as --master"
 
 # JSON output
 test "$($passgen -r zero --json "[a-z]{4}")" = '[{"output":"aaaa"}]'

@@ -1157,3 +1157,93 @@ test_result test_random_max_zero(void) {
     return test_ok;
 }
 #endif
+
+/// Every source with streams starts over at stream zero, and gives out
+/// something else in other streams, which does not depend on what was read
+/// before. Sources without streams are left as they are.
+test_result test_random_stream(void) {
+    const char *descs[] = {
+        "xorshift:1234",
+#ifdef PASSGEN_MONOCYPHER
+        ("chacha20:" KEY ":0123456789abcdef"),
+#endif
+    };
+    for(size_t i = 0; i < sizeof(descs) / sizeof(descs[0]); i++) {
+        passgen_random random;
+        assert(passgen_random_open(&random, descs[i]));
+        uint64_t first = passgen_random_u64(&random);
+        // more than a buffer, so that it is not only the buffer which is
+        // started over.
+        uint8_t skipped[2 * PASSGEN_RANDOM_BUFFER_LENGTH];
+        passgen_random_read(&random, skipped, sizeof(skipped));
+
+        assert(passgen_random_stream(&random, 0));
+        assert_eq(passgen_random_u64(&random), first);
+        assert(passgen_random_stream(&random, 1));
+        uint64_t second = passgen_random_u64(&random);
+        assert(second != first);
+        assert(passgen_random_stream(&random, UINT64_MAX));
+        assert(passgen_random_u64(&random) != second);
+        assert(passgen_random_stream(&random, 1));
+        assert_eq(passgen_random_u64(&random), second);
+        passgen_random_close(&random);
+    }
+
+#ifdef PASSGEN_MONOCYPHER
+    // stream i of ChaCha20 is the keystream for the IV XOR i, as a 64 bit
+    // little-endian number.
+    uint8_t key[32];
+    for(size_t i = 0; i < sizeof(key); i++) {
+        key[i] = (uint8_t) i;
+    }
+    const uint8_t iv[8] = {1, 2, 3, 4, 5, 6, 7, 8};
+    const uint8_t iv_stream[8] = {1 ^ 0x34, 2 ^ 0x12, 3, 4, 5, 6, 7, 8 ^ 0x80};
+    passgen_random streamed, expected;
+    assert(passgen_random_chacha20_open(&streamed, key, iv));
+    assert(passgen_random_stream(&streamed, UINT64_C(0x8000000000001234)));
+    assert(passgen_random_chacha20_open(&expected, key, iv_stream));
+    for(size_t i = 0; i < 200; i++) {
+        assert_eq(passgen_random_u64(&streamed), passgen_random_u64(&expected));
+    }
+    passgen_random_close(&streamed);
+    passgen_random_close(&expected);
+#endif
+
+    // a stream of xorshift whose state would be zero is 2^64 - 1 instead,
+    // which this seed is for stream one.
+    uint64_t mix = UINT64_C(0x9e3779b97f4a7c15);
+    mix = (mix ^ (mix >> 30)) * UINT64_C(0xbf58476d1ce4e5b9);
+    mix = (mix ^ (mix >> 27)) * UINT64_C(0x94d049bb133111eb);
+    mix ^= mix >> 31;
+    passgen_random xorshift, all_ones;
+    assert(passgen_random_xorshift_open(&xorshift, mix));
+    assert(passgen_random_stream(&xorshift, 1));
+    assert(passgen_random_xorshift_open(&all_ones, UINT64_MAX));
+    assert_eq(passgen_random_u64(&xorshift), passgen_random_u64(&all_ones));
+    passgen_random_close(&xorshift);
+    passgen_random_close(&all_ones);
+
+    // all streams of zero are zeroes.
+    passgen_random zero;
+    assert(passgen_random_zero_open(&zero));
+    assert(passgen_random_stream(&zero, 7));
+    assert_eq(passgen_random_u64(&zero), 0);
+    passgen_random_close(&zero);
+
+    // the system and files do not have streams, and are left as they are.
+    passgen_random system;
+    assert(passgen_random_system_open(&system));
+    assert(!passgen_random_stream(&system, 1));
+    passgen_random_close(&system);
+#ifndef _WIN32
+    passgen_random file;
+    assert(passgen_random_open(&file, "file:/dev/zero"));
+    size_t pos = file.pos;
+    (void) passgen_random_u8(&file);
+    assert(!passgen_random_stream(&file, 0));
+    assert_eq(file.pos, pos + 1);
+    passgen_random_close(&file);
+#endif
+
+    return test_ok;
+}

@@ -45,6 +45,7 @@ typedef enum {
     PASSGEN_CLI_ERROR_ILLEGAL_STEPS,
     PASSGEN_CLI_ERROR_CONFIG,
     PASSGEN_CLI_ERROR_MASTER,
+    PASSGEN_CLI_ERROR_ILLEGAL_OFFSET,
 
     PASSGEN_CLI_SHOW_HELP,
     PASSGEN_CLI_SHOW_VERSION,
@@ -81,6 +82,11 @@ typedef struct {
 typedef struct {
     /// How many passwords to generate.
     size_t amount;
+    /// Which stream of the source of randomness the first one is generated
+    /// from. The ones after it use the streams after it.
+    uint64_t offset;
+    /// Whether the offset was given, which needs a source with streams.
+    bool offset_given;
     /// The pattern to use when generating passwords.
     const char *pattern;
     /// The preset to use when generating passwords, which is looked up once

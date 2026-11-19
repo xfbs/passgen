@@ -34,6 +34,13 @@ extern "C" {
 ///   that the source has failed, and it is not asked again.
 typedef size_t passgen_random_read_func(void *context, void *dest, size_t size);
 
+/// Function which switches a source of randomness to one of its streams, see
+/// @ref passgen_random_stream.
+///
+/// @param context The context of the source
+/// @param index The index of the stream
+typedef void passgen_random_stream_func(void *context, uint64_t index);
+
 /// Function which closes a source of randomness, releasing its context.
 ///
 /// @param context The context of the source
@@ -89,6 +96,10 @@ typedef struct {
 
     /// Closes the source.
     passgen_random_close_func *close;
+
+    /// Switches the source to one of its streams, or NULL if it does not have
+    /// any.
+    passgen_random_stream_func *stream;
 
     /// Set once the source did not have as much data as was asked for. See
     /// ::passgen_random_failed.
@@ -357,12 +368,36 @@ PASSGEN_EXPORT void passgen_random_reload(passgen_random *random);
 /// @relatesalso passgen_random
 PASSGEN_EXPORT bool passgen_random_failed(const passgen_random *random);
 
+/// Switches a source of randomness to the start of one of its streams.
+///
+/// A deterministic source has a stream for every index, which are
+/// independent of each other, and stream zero is what it gives out after it
+/// is opened. This is so that every one of several sequences can be
+/// generated from its own stream, so that what each of them is does not
+/// depend on how much randomness the ones before it used. The command-line
+/// tool uses stream `i` for the `i`th sequence.
+///
+/// | Source | Stream |
+/// | --- | --- |
+/// | ChaCha20 (also from a master passphrase) | The keystream for the IV, read
+/// as a 64 bit little-endian number, XOR the index | | Xorshift | The generator
+/// with the seed XOR the index after the finalizer of splitmix64, or 2^64 - 1
+/// where that is zero | | Zero | Zeroes, as all of them | | System, file |
+/// There are none |
+///
+/// @relatesalso passgen_random
+/// @param random The source
+/// @param index The index of the stream
+/// @returns Whether the source has streams. If not, it is left as it is.
+PASSGEN_EXPORT bool
+passgen_random_stream(passgen_random *random, uint64_t index);
+
 #ifdef PASSGEN_MONOCYPHER
 /// Seeks to a position in the ChaCha20 stream, so that what is read next is
 /// what was read at that position. Seeking to zero starts over.
 ///
-/// This only works for sources opened with ::passgen_random_chacha20_open or
-/// ::passgen_random_chacha20_argon2_open. Anything else is left as it is.
+/// This only works for sources opened with ::passgen_random_chacha20_open (or
+/// ::passgen_master_random_open). Anything else is left as it is.
 ///
 /// @relatesalso passgen_random
 /// @param random The source

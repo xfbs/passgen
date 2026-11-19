@@ -8,6 +8,7 @@
 .Nm
 .Op Fl ejz
 .Op Fl a Ar amount
+.Op Fl -offset Ar offset
 .Op Fl P Ar name:pattern
 .Op Fl r Ar random
 .Op Fl S Ar steps
@@ -44,6 +45,9 @@ so that the same inputs always result in the same sequence.
 .It Fl a , Fl -amount Ar amount
 Generate this many sequences, one per line.
 Has to be at least one, which is the default.
+With a deterministic source of randomness, such as master passphrase mode,
+every sequence is generated from its own stream, see
+.Sx RANDOMNESS SOURCES .
 .It Fl c , Fl -config Ar path
 Read this configuration file, instead of the usual ones, see
 .Sx CONFIGURATION .
@@ -73,6 +77,17 @@ is given.
 List the presets with their patterns and exit.
 This includes the ones defined in the configuration, and by options, except
 for those whose names start with an underscore.
+.It Fl -offset Ar offset
+Generate from the streams of a deterministic source of randomness starting at
+this one, rather than at the first one, which is 0.
+So
+.Fl -offset Li 2
+generates what the third sequence of
+.Fl a Li 3
+is.
+In master passphrase mode, this can be used to change a passphrase, as each
+offset results in another one.
+The system and files do not have streams, so this cannot be used with them.
 .It Fl p , Fl -preset Ar name
 Use the pattern of the preset with this name, see
 .Sx PRESETS .
@@ -350,6 +365,24 @@ This is deterministic, and not secure.
 Only zeroes.
 This is deterministic, and not random at all.
 .El
+.Pp
+The deterministic sources have streams, numbered from 0 to 2^64-1, which are
+independent of each other.
+Every sequence is generated from its own stream: the first from stream 0 (or
+the one given with
+.Fl -offset ) ,
+the next from the one after it, and so on.
+So what a sequence is only depends on which one it is, and not on how much
+randomness the ones before it used.
+Stream 0 is what the source gives out as it is.
+For ChaCha20, stream
+.Ar n
+is the keystream for the initialization vector, read as a 64 bit
+little-endian number, XOR
+.Ar n .
+For xorshift, it is the generator with the seed XOR
+.Ar n
+after the finalizer of splitmix64, or 2^64-1 where that is zero.
 .Sh MASTER PASSPHRASE MODE
 In master passphrase mode, a key is derived from the master passphrase, which
 is then used to derive a key for the domain and the user.
@@ -547,6 +580,8 @@ A configuration file cannot be read, or is not valid.
 .It 15
 The master passphrase is not in the configuration, was not entered, or is
 not the right one.
+.It 16
+The offset is not valid, or the source of randomness does not have streams.
 .El
 .Pp
 If a source of randomness does not supply enough data,
