@@ -744,14 +744,6 @@ void passgen_cli_usage(const char *executable) {
         stderr,
         "Generate random sequences from a regex-like pattern.\n"
         "Usage: %s [OPTIONS] [PATTERN]\n\n"
-        "PATTERN is a regex-like string describing the password.\n"
-        "    a                  Literal: outputs character 'a'\n"
-        "    abc|def            Choice: outputs string 'abc' or 'def'\n"
-        "    [a-z0-9:]          Range: outputs a lowercase letter, number, or "
-        "':'\n"
-        "    (abc)              Group: outputs 'abc'\n"
-        "    a{2}               Repeat: outputs 'aa'\n"
-        "\n"
         "OPTIONS\n"
         "    -a, --amount       Amount of passwords to generate\n"
         PASSGEN_CLI_HELP_DOMAIN
@@ -775,13 +767,15 @@ void passgen_cli_usage(const char *executable) {
         "    -z, --null         Use NUL instead of newline to separate "
         "outputs\n"
         "\n"
-        "PRESETS\n"
-        "    apple1            Generate passwords like 'oKC-T37-Dew-Qyn'\n"
-        "    apple2            Generate passwords like "
-        "'mHXr4X-CiK4w6-hbjF7T'\n"
-        "    firefox           Generate passwords like 'aKTKyS9pPgAQ8Oz'\n"
-        "    uuid              Generate UUIDv4 like "
-        "0072ca58-5966-497c-8657-a59fca93bf25\n",
+        "PATTERN is a regex-like string describing the password.\n"
+        "    a                  Literal: outputs character 'a'\n"
+        "    [a-z0-9:]          Range: outputs a lowercase letter, number, or "
+        "':'\n"
+        "    (abc|def)          Group: outputs 'abc' or 'def'\n"
+        "    a{2}               Repeat: outputs 'aa'\n"
+        "    \\w{name}          Wordlists: pick random word\n"
+        "    \\m{name}          Markov: generate pronounceable word from wordlist\n"
+        ,
         executable);
 }
 
