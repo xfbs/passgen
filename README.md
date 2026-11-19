@@ -1,7 +1,7 @@
-# Passgen [![CI Pipelines](https://gitlab.com/passgen/passgen/badges/master/pipeline.svg)](https://gitlab.com/passgen/passgen/-/pipelines) [![Documentation](https://passgen.gitlab.io/passgen/badges/docs.svg)](https://passgen.gitlab.io/passgen/docs/index.html)
+# Passgen 
 
 Passgen is a tool to generate random sequences from a [regular
-expression](https://en.wikipedia.org/wiki/Regular_expression).  It has some
+expression](https://en.wikipedia.org/wiki/Regular_expression). It has some
 features that make it uniquely useful for generating secure passphrases, such
 as supporting choosing words from a wordlist, building a markov-chain from a
 wordlist to generate high-entropy, but pronounceable sequences, and being able
@@ -18,16 +18,18 @@ to measure the actual entropy of every sequence it generates.
 
 ## Features
 
-- Generates secure, random sequences using your system's cryptographic number generator
-  or a master passphrase.
-- Customizable to fit any password policy due to it's use of regular expressions.
-- Ability to measure the entropy of the generated sequences, to target passphrases to
-  any security level.
-- Can read wordlists to choose words at random (like [diceware](https://diceware.dmuth.org/)),
-  or create high-entropy but pronounceable phrases using a markov chain.
+- Generates secure, random sequences using your system's cryptographic number
+  generator or a master passphrase.
+- Customizable to fit any password policy due to it's use of regular
+  expressions.
+- Ability to measure the entropy of the generated sequences, to target
+  passphrases to any security level.
+- Can read wordlists to choose words at random (like
+  [diceware](https://diceware.dmuth.org/)), or create high-entropy but
+  pronounceable phrases using a markov chain.
 - Comes with some presets that offer good security.
-- Can be embedded into other applications (as a C shared library) or used programmatically
-  (using JSON output).
+- Can be embedded into other applications (as a C shared library) or used
+  programmatically (using JSON output).
 - Permissively licensed (MIT license).
 
 ## Examples
@@ -76,7 +78,7 @@ QjKV1q0DKZ8Pc2GM5ccQbYxXfwAbjECk
 
 Passgen supports reading in wordlists. You can use this to generate
 diceware-like passphrases, for example. Since it has full Unicode support, it
-can read wordlist for any language.  Here are some examples:
+can read wordlist for any language. Here are some examples:
 
 ```
 $ passgen --entropy --wordlist english:/usr/share/dict/words '\w{english}(-\w{english}){4}'
@@ -105,11 +107,11 @@ maltry-oblinkgo-Langkor-impularian's-vi
 Every time you run Passgen, it generates completely random output using your
 machine's source of secure randomness. But in some situations, you may want a
 more deterministic output, for example because you want to generate passphrases
-from a master passphrase.  For that reason, Passgen has some command-line
+from a master passphrase. For that reason, Passgen has some command-line
 options that you can use to change the source of randomness it uses. In this
 mode, Passgen will always generate the same passphrase when given the same
 master passphrase as input. This means that you only need to remember a single
-master passphrase, and you can generate any kind of passphrase from it.  Under
+master passphrase, and you can generate any kind of passphrase from it. Under
 the hood, it uses [Argon2](https://en.wikipedia.org/wiki/Argon2) to derive a
 key from your inputs, and the
 [ChaCha20](https://en.wikipedia.org/wiki/Salsa20#ChaCha_variant) stream cipher
@@ -122,8 +124,9 @@ $ passgen -m mymasterpass -d example.com -t username -p apple2
 
 ## Syntax
 
-The syntax of the Passgen format string is similar to that of regular expressions,
-but it has some additional features. These are the operations that Passgen understands:
+The syntax of the Passgen format string is similar to that of regular
+expressions, but it has some additional features. These are the operations that
+Passgen understands:
 
 | Syntax | Explanation |
 | --- | --- |
@@ -133,24 +136,30 @@ but it has some additional features. These are the operations that Passgen under
 | `\w{english}` | Word. Picks a random word from the wordlist with the name `english`. You can use the `-w name:/path/to/list` command-line option to load wordlists. You can load multiple wordlists. |
 | `\m{english}` | Markov-Chain. Generates a high-entropy, but pronounceable word by building a Markov-Chain of the wordlist `english`. This allows you to make a tradeoff between memorability and strength: words are easier to remember than completely random sequences. The Markov chain lets you generate random sequences of letters that follow the same probability distribution as the words in the wordlist, meaning that they are pronounceable and thus easier to remember. |
 
-This is only an overview, see the [documentation](https://passgen.io/docs/syntax/) for all of it.
+This is only an overview, see the
+[documentation](https://passgen.io/docs/syntax/) for all of it.
 
 ## Building
 
-In general, if you have all dependencies installed, doing the following should result in a working binary.
+In general, if you have all dependencies installed, doing the following should
+result in a working binary.
 
     $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
     $ cmake --build build
     $ cmake --install build
 
-See [Building](docs/building.md) for more information about building the project.
+See [Building](docs/building.md) for more information about building the
+project.
 
-You may also download a [release](https://github.com/xfbs/passgen/releases), or a signed nightly build from the [website](https://passgen.io/install/).
+You may also download a [release](https://github.com/xfbs/passgen/releases), or
+a signed nightly build from the [website](https://passgen.io/install/).
 
 ## Prior art
 
 * [pwgen](https://linux.die.net/man/1/pwgen).
-* [apg](https://linux.die.net/man/1/apg): generates random passwords, can either be generated such that they are pronounceable, or taken from a predefined list of symbols.
+* [apg](https://linux.die.net/man/1/apg): generates random passwords, can
+  either be generated such that they are pronounceable, or taken from a
+  predefined list of symbols.
 * [z-tokens](https://github.com/volution/z-tokens), has fixed presets.
 * [rpass](https://github.com/timkuijsten/rpass)
 * [LessPass](https://www.lesspass.com/#/)
