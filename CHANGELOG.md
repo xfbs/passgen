@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-19
+
 ### Passwords which change
 
 All passwords derived from a master passphrase (or from any deterministic
@@ -36,6 +38,8 @@ letters in a different order. To get an old password back, use 0.3.0.
   wordlist, and show where in the pattern it is used.
 - Markov chains need less memory, up to half as much for long ones, and much
   less for wordlists in scripts with many letters.
+- `--help` shows all of the pattern syntax, and the sources of randomness.
+- The library interface changed incompatibly.
 
 ### Removed
 
@@ -46,6 +50,8 @@ letters in a different order. To get an old password back, use 0.3.0.
 ### Fixed
 
 - A crash after the error for patterns with groups nested very deeply.
+- `--entropy` showing the entropy after the output it is for, rather than
+  before it, on a terminal.
 
 ## [0.3.0] - 2026-11-18
 
@@ -184,7 +190,8 @@ password back, use 0.2.0.
 
 - Initial release of project.
 
-[Unreleased]: https://github.com/xfbs/passgen/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/xfbs/passgen/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/xfbs/passgen/releases/tag/v0.4.0
 [0.3.0]: https://github.com/xfbs/passgen/releases/tag/v0.3.0
 [0.2.0]: https://github.com/xfbs/passgen/releases/tag/v0.2.0
 [0.1.1]: https://github.com/xfbs/passgen/releases/tag/v0.1.1
