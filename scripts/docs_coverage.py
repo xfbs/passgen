@@ -40,37 +40,12 @@ import os
 import sys
 import argparse
 import xml.etree.ElementTree as ET
-from xml.sax.saxutils import escape
 
 # Defaults
 ACCEPTABLE_COVERAGE = 80
 
 # Global
 ns = None
-
-def badge(left_text, right_text, right_color):
-    """A badge in the style of shields.io, as SVG. The width of the text is
-    estimated, and the text is stretched to fit it. This used to come from
-    pybadges, which does not work with Python 3.13 and later (it imports
-    imghdr, which was removed)."""
-    def width(text):
-        return 10 + 7 * len(text)
-
-    left, right = width(left_text), width(right_text)
-    total = left + right
-    left_text, right_text = escape(left_text), escape(right_text)
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{total}" height="20" role="img" aria-label="{left_text}: {right_text}">
-<title>{left_text}: {right_text}</title>
-<linearGradient id="s" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient>
-<clipPath id="r"><rect width="{total}" height="20" rx="3" fill="#fff"/></clipPath>
-<g clip-path="url(#r)"><rect width="{left}" height="20" fill="#555"/><rect x="{left}" width="{right}" height="20" fill="{right_color}"/><rect width="{total}" height="20" fill="url(#s)"/></g>
-<g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11">
-<text x="{left / 2}" y="14" textLength="{left - 10}">{left_text}</text>
-<text x="{left + right / 2}" y="14" textLength="{right - 10}">{right_text}</text>
-</g>
-</svg>
-"""
-
 
 def ERROR(*objs):
     print("ERROR: ", *objs, end='\n', file=sys.stderr)
@@ -206,7 +181,6 @@ def main():
     parser.add_argument ("--noerror",   action="store_true", help="Do not return error code after execution")
     parser.add_argument ("--threshold", action="store",      help="Min acceptable coverage percentage (Default: %s)"%(ACCEPTABLE_COVERAGE), default=ACCEPTABLE_COVERAGE, type=int)
     parser.add_argument("--excludedirs", nargs='+', help="List of directories to be excluded from coverage analysis", type=str, default=[])
-    parser.add_argument("--badge", action="store", help="Generate badge and save to path")
 
 
     global ns
@@ -219,11 +193,6 @@ def main():
 
     # Print report
     percentage = report (files, ns.excludedirs)
-
-    if ns.badge:
-        s = badge(left_text='docs', right_text="%s%%" %(round(percentage)), right_color='red')
-        with open(ns.badge, mode='w') as o:
-            o.write(s)
 
     if ns.noerror:
         return
