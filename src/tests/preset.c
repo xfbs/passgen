@@ -83,16 +83,16 @@ test_result test_preset_env(void) {
 test_result test_preset_generate(void) {
     passgen_env *env = passgen_env_new(NULL);
     assert(env);
-    assert(PASSGEN_OK == passgen_env_preset_add(env, ".segment", "[a-zA-Z0-9]{6}"));
+    assert(PASSGEN_OK == passgen_env_preset_add(env, "_segment", "[a-zA-Z0-9]{6}"));
     assert(
         PASSGEN_OK == passgen_env_preset_add(
                           env,
                           "apple",
-                          "(\\p{.segment}-){2}\\p{.segment}"));
+                          "(\\p{_segment}-){2}\\p{_segment}"));
     assert(PASSGEN_OK == passgen_env_preset_add(env, "choice", "a|b|c"));
 
     const char *cases[][2] = {
-        {"\\p{.segment}", "([a-zA-Z0-9]{6})"},
+        {"\\p{_segment}", "([a-zA-Z0-9]{6})"},
         {"\\p{apple}",
          "((([a-zA-Z0-9]{6})-){2}([a-zA-Z0-9]{6}))"},
         // the same as using the preset with `--preset`.

@@ -109,7 +109,7 @@ passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file);
 /// The pattern is not parsed right away, but when a pattern which uses it is
 /// resolved (see @ref passgen_resolve). Problems with it come up then.
 ///
-/// Names which start with a dot (such as `.segment`) are meant for parts of
+/// Names which start with an underscore (such as `_segment`) are meant for parts of
 /// other presets, rather than to be used on their own. That is up to whoever
 /// lists them, they work the same otherwise.
 ///

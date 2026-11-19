@@ -24,8 +24,8 @@ letters in a different order. To get an old password back, use 0.3.0.
   practically forever.
 - `\p{name}` uses a preset in a pattern, also in other presets, so that
   patterns can be built from parts. It used to generate nothing.
-- Presets whose names start with a dot are not shown by `--list`, for parts
-  of other presets.
+- Presets whose names start with an underscore are not shown by `--list`, for
+  parts of other presets.
 - `\m{name:2}` uses a Markov chain of that length (from 1 to 8, 3 without
   one). A pattern can use different lengths from the same wordlist.
 

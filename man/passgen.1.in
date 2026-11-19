@@ -60,7 +60,7 @@ is given.
 .It Fl l , Fl -list
 List the presets with their patterns and exit.
 This includes the ones defined in the configuration, and by options which
-come before this one, except for those whose names start with a dot.
+come before this one, except for those whose names start with an underscore.
 .It Fl p , Fl -preset Ar name
 Use the pattern of the preset with this name, see
 .Sx PRESETS .
@@ -221,12 +221,12 @@ or in other patterns as
 also in the patterns of other presets.
 This way, patterns can be built from parts, for example in the configuration:
 .Bd -literal -offset indent
-preset .segment:[a-zA-Z0-9]{6}
-preset mine:(\ep{.segment}-){2}\ep{.segment}
+preset _segment:[a-zA-Z0-9]{6}
+preset mine:(\ep{_segment}-){2}\ep{_segment}
 .Ed
 .Pp
-Presets whose names start with a dot are meant to be parts of others, and are
-not listed by
+Presets whose names start with an underscore are meant to be parts of others,
+and are not listed by
 .Fl -list .
 A preset cannot use itself, also not through other presets, and groups can
 only be nested 1024 deep in all.

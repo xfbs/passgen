@@ -491,10 +491,11 @@ static int passgen_cli_presets_collect(
     const char *pattern) {
     passgen_cli_listed_presets *list = user;
 
-    // presets whose names start with a dot are parts of other presets, which
-    // are not meant to be used on their own. like hidden files, they are not
-    // listed.
-    if(name[0] == '.') {
+    // presets whose names start with an underscore are parts of other
+    // presets, which are not meant to be used on their own, so they are not
+    // listed. (an underscore rather than a dot, which TOML keys cannot start
+    // with.)
+    if(name[0] == '_') {
         return 0;
     }
 
