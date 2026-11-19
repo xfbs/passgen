@@ -1,0 +1,5 @@
+# code by others, which is kept as it is upstream (see THIRD_PARTY.md).
+src/monocypher.c
+src/include/passgen/monocypher.h
+src/cli/tomlc17.c
+src/cli/tomlc17.h

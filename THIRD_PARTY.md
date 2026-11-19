@@ -13,6 +13,12 @@ licenses. The files have the full text of their license at the top.
 | [UTF-8 decoder](https://bjoern.hoehrmann.de/utf-8/decoder/dfa/), by Björn Höhrmann. | `src/util/utf8.c` | MIT |
 | UTF-8 encoder, by Ondřej Hruška. | `src/util/utf8.c` | MIT |
 
+## Only part of the command-line tool
+
+| Code | Files | License |
+| --- | --- | --- |
+| [tomlc17](https://github.com/cktan/tomlc17) release R261116, by CK Tan. Used to read the configuration file. | `src/cli/tomlc17.c`, `src/cli/tomlc17.h` | MIT |
+
 ## Only used when building
 
 These are not part of what is built.
