@@ -29,6 +29,9 @@ not depend on the ones before it.
 - `--offset N`, to generate the Nth sequence of a deterministic source of
   randomness (counting from 0), such as to change a password in master
   passphrase mode.
+- Logins in the configuration, as `[[login]]`, which say which master
+  passphrase, preset or pattern and offset a domain and user use, so that
+  `passgen -d DOMAIN -u USER` is enough.
 
 ### Changed
 

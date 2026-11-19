@@ -263,6 +263,70 @@ hash = "e1581cf7"'
     test "$(config_error '[master.main]\nversion = 1\nlevel = 1\ntoken = "x"\n')" = "error: in configuration \`bad.toml\`: (line 4) unknown key \`token\` in master passphrase \`main\`"
     test "$(config_error '[master]\nmain = "x"\n')" = "error: in configuration \`bad.toml\`: (line 2) master passphrase \`main\` has to be a table, or false"
 
+    # logins say which master passphrase, pattern and offset a domain and a
+    # user use, which then only need -d and -u.
+    cat "$tmpdir/master.toml" > "$tmpdir/logins.toml"
+    cat >> "$tmpdir/logins.toml" <<'TOML'
+
+[[login]]
+domain = "example.com"
+user = "user"
+preset = "apple2"
+
+[[login]]
+domain = "example.com"
+user = "admin"
+master = "main"
+pattern = '[a-z]{12}'
+offset = 2
+
+[[login]]
+domain = "example.org"
+preset = "uuid"
+TOML
+    logins="$tmpdir/logins.toml"
+    test "$(echo master | $passgen -c "$logins" -d example.com -u user)" = "$a"
+    test "$(echo master | $passgen -c "$logins" -d example.com -u admin)" = \
+        "$($passgen -r "master:1:1:master::example.com:admin" --offset 2 '[a-z]{12}')"
+    # with only one login for a domain, the user is not needed.
+    test "$(echo master | $passgen -c "$logins" -d example.org)" = \
+        "$($passgen -r "master:1:1:master::example.org:" -p uuid)"
+    # what is given on the command line takes precedence.
+    test "$(echo master | $passgen -c "$logins" -d example.com -u user '[0-9]{8}')" = \
+        "$($passgen -r "master:1:1:master::example.com:user" '[0-9]{8}')"
+    test "$(echo master | $passgen -c "$logins" -d example.com -u admin --offset 0)" = \
+        "$($passgen -r "master:1:1:master::example.com:admin" '[a-z]{12}')"
+    test "$(echo master | $passgen -c "$logins" -d example.com -u user -a 2 | tail -n 1)" = \
+        "$($passgen -r "master:1:1:master::example.com:user" --offset 1 -p apple2)"
+    # with a master passphrase, a domain without a login works as always.
+    test "$(echo master | $passgen -c "$logins" -m main -d example.com -u user -p apple2)" = "$a"
+    test "$(echo master | $passgen -c "$logins" -m main -d example.net -p apple2)" = \
+        "$($passgen -r "master:1:1:master::example.net:" -p apple2)"
+    # which login is meant has to be clear, and there has to be one.
+    test "$(echo master | error_of $passgen -c "$logins" -d example.com)" = "error: there is more than one login for \`example.com\`, choose one with --user: \`user\`, \`admin\`"
+    test "$(echo master | error_of $passgen -c "$logins" -d example.net)" = "error: there is no login for \`example.net\` in the configuration, give --master"
+    test "$(echo master | error_of $passgen -c "$logins" -d example.com -u nobody)" = "error: there is no login for \`example.com\` and user \`nobody\` in the configuration, give --master"
+    test "$(echo master | error_of $passgen -c "$logins" -m main -d example.net)" = "error: there is no login for \`example.net\` which says which pattern to use, give one"
+    (echo master | $passgen -c "$logins" -d example.net >/dev/null 2>&1) || test "$?" = 15
+    fails $passgen -c "$logins" -r zero -d example.com -u user
+    fails $passgen -c "$logins" -u user a
+    # without a master passphrase in it, a login uses the only one there is.
+    printf '[master.other]\nversion = 1\nlevel = 1\n' > "$tmpdir/second.toml"
+    test "$(echo master | error_of $passgen -c "$logins" -c "$tmpdir/second.toml" -d example.com -u user)" = "error: the login for \`example.com\` does not say which master passphrase it uses, and there is more than one, give --master"
+    test "$(echo master | $passgen -c "$logins" -c "$tmpdir/second.toml" -d example.com -u admin)" = \
+        "$($passgen -r "master:1:1:master::example.com:admin" --offset 2 '[a-z]{12}')"
+
+    # problems with logins in the configuration.
+    test "$(config_error '[[login]]\nuser = "a"\n')" = "error: in configuration \`bad.toml\`: (line 1) a login needs a domain"
+    test "$(config_error '[[login]]\ndomain = "a"\npreset = "x"\npattern = "y"\n')" = "error: in configuration \`bad.toml\`: (line 1) a login can have a preset or a pattern, not both"
+    test "$(config_error '[[login]]\ndomain = "a"\noffset = -1\n')" = "error: in configuration \`bad.toml\`: (line 3) the offset of a login has to be a number, from 0"
+    test "$(config_error '[[login]]\ndomain = 1\n')" = "error: in configuration \`bad.toml\`: (line 2) \`domain\` of a login has to be a string"
+    test "$(config_error '[[login]]\ndomain = "a"\ntoken = "b"\n')" = "error: in configuration \`bad.toml\`: (line 3) unknown key \`token\` in a login"
+    test "$(config_error '[login]\ndomain = "a"\n')" = "error: in configuration \`bad.toml\`: (line 1) \`login\` has to be an array of tables, as [[login]]"
+    test "$(config_error '[[login]]\ndomain = "a"\n[[login]]\ndomain = "a"\n')" = "error: in configuration \`bad.toml\`: (line 3) there is another login for \`a\` without a user, in \`$tmpdir/bad.toml\`"
+    printf '[[login]]\ndomain = "example.com"\nuser = "user"\n' > "$tmpdir/again.toml"
+    test "$(error_of $passgen -c "$logins" -c "$tmpdir/again.toml" a | sed "s|$tmpdir/||g")" = "error: in configuration \`again.toml\`: (line 1) there is another login for \`example.com\` and user \`user\`, in \`logins.toml\`"
+
     # it is a source of randomness itself, so giving another one is a
     # mistake, as are a domain or a user without a master passphrase, and
     # options for setting one up without doing so.
@@ -310,8 +374,8 @@ else
     fails $passgen -u user "a"
     fails $passgen --master-setup main
     test "$($passgen --help 2>&1 | grep -c -- '--master\|--domain\|--user' || true)" = 0
-    # a configuration with master passphrases is still read.
-    printf '[master.main]\nversion = 1\nlevel = 1\n' > "$tmpdir/master.toml"
+    # a configuration with master passphrases and logins is still read.
+    printf '[master.main]\nversion = 1\nlevel = 1\n[[login]]\ndomain = "example.com"\n' > "$tmpdir/master.toml"
     test "$($passgen -c "$tmpdir/master.toml" a)" = "a"
 fi
 

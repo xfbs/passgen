@@ -898,6 +898,8 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
 #endif
     opts->masters = NULL;
     opts->masters_len = 0;
+    opts->logins = NULL;
+    opts->logins_len = 0;
     opts->random = NULL;
     opts->env = passgen_env_new(NULL);
 
@@ -1237,9 +1239,15 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     }
 #endif
 
+    // a login for a domain can say which pattern to use.
+    bool login = false;
+#ifdef PASSGEN_MONOCYPHER
+    login = opts->master_domain != NULL;
+#endif
+
     // if no pattern or preset was given, show help, unless the presets are
     // to be listed, or a master passphrase is set up.
-    if(!opts->pattern && !opts->preset && !opts->list && !setup) {
+    if(!opts->pattern && !opts->preset && !opts->list && !setup && !login) {
         return PASSGEN_CLI_SHOW_HELP;
     }
 
@@ -1253,20 +1261,28 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             "--master and --random cannot be used together");
     }
 
-    // these don't do anything on their own. most likely, the master
-    // passphrase was forgotten.
-    if(!opts->master && (opts->master_domain || opts->master_user)) {
+    // a domain without a master passphrase is for the login with it, which
+    // says which one, so it cannot be used with another source of
+    // randomness either. a user without either does nothing on its own.
+    if(opts->master_domain && random_given) {
         return passgen_cli_bail(
             PASSGEN_CLI_ERROR_MASTER_CONFLICT,
-            "--domain and --user need --master");
+            "--domain is for master passphrase mode, which cannot be used "
+            "with --random");
+    }
+    if(!opts->master && !opts->master_domain && opts->master_user) {
+        return passgen_cli_bail(
+            PASSGEN_CLI_ERROR_MASTER_CONFLICT,
+            "--user needs --domain or --master");
     }
 
     // setting one up is something else than generating.
-    if(setup && (opts->master || opts->pattern || opts->preset || opts->list)) {
+    if(setup && (opts->master || opts->pattern || opts->preset || opts->list ||
+                 opts->master_domain || opts->master_user)) {
         return passgen_cli_bail(
             PASSGEN_CLI_ERROR_MASTER_CONFLICT,
-            "--master-setup cannot be used with a pattern, --preset, --list "
-            "or --master");
+            "--master-setup cannot be used with a pattern, --preset, --list, "
+            "--master, --domain or --user");
     }
     if(!setup && (opts->master_setup_level || opts->master_setup_seed ||
                   opts->master_setup_version)) {
@@ -1277,8 +1293,9 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     }
 
     // the source of randomness is opened once the master passphrase is
-    // entered, which is after the pattern is checked.
-    if(opts->master) {
+    // entered, which is after the pattern is checked. which master passphrase
+    // a login uses is known once the configuration is loaded.
+    if(opts->master || opts->master_domain) {
         return 0;
     }
 #else
@@ -1305,7 +1322,8 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 // clang-format off
 #ifdef PASSGEN_MONOCYPHER
 #define PASSGEN_CLI_HELP_DOMAIN \
-    "    -d, --domain DOMAIN    Domain for master passphrase mode\n"
+    "    -d, --domain DOMAIN    Domain for master passphrase mode, which uses\n" \
+    "                           its login in the configuration without -m\n"
 #define PASSGEN_CLI_HELP_MASTER                                               \
     "    -m, --master NAME      Derive the randomness from a master passphrase,\n" \
     "                           which is asked for\n"                          \
@@ -1485,6 +1503,17 @@ static void passgen_cli_master_free(passgen_cli_master *master) {
     memset(master, 0, sizeof(*master));
 }
 
+// Frees what a login from the configuration holds.
+static void passgen_cli_login_free(passgen_cli_login *login) {
+    free(login->domain);
+    free(login->user);
+    free(login->master);
+    free(login->preset);
+    free(login->pattern);
+    free(login->path);
+    memset(login, 0, sizeof(*login));
+}
+
 void passgen_cli_opts_free(passgen_cli_opts *opts) {
     passgen_env_free(opts->env);
     free(opts->definitions);
@@ -1493,6 +1522,10 @@ void passgen_cli_opts_free(passgen_cli_opts *opts) {
         passgen_cli_master_free(&opts->masters[i]);
     }
     free(opts->masters);
+    for(size_t i = 0; i < opts->logins_len; i++) {
+        passgen_cli_login_free(&opts->logins[i]);
+    }
+    free(opts->logins);
 
     // the environment only borrows the source of randomness.
     if(opts->random) {
@@ -1787,6 +1820,156 @@ static int passgen_cli_config_masters(
     return 0;
 }
 
+// Copies a string of a login into where it goes, if it is one. Returns 0, or
+// an error if it is not a string or there is no memory for it.
+static int passgen_cli_config_login_string(
+    const char *path,
+    const char *key,
+    toml_datum_t value,
+    char **string) {
+    if(value.type != TOML_STRING) {
+        return passgen_cli_config_error(
+            path,
+            &value,
+            "`%s` of a login has to be a string",
+            key);
+    }
+    free(*string);
+    *string = strdup(value.u.s);
+    if(!*string) {
+        return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+    }
+    return 0;
+}
+
+// Reads one login of a configuration file, which is a table.
+static int passgen_cli_config_login(
+    const char *path,
+    toml_datum_t table,
+    passgen_cli_login *login) {
+    for(int i = 0; i < table.u.tab.size; i++) {
+        const char *key = table.u.tab.key[i];
+        toml_datum_t value = table.u.tab.value[i];
+        char **string = NULL;
+        if(0 == strcmp(key, "domain")) {
+            string = &login->domain;
+        } else if(0 == strcmp(key, "user")) {
+            string = &login->user;
+        } else if(0 == strcmp(key, "master")) {
+            string = &login->master;
+        } else if(0 == strcmp(key, "preset")) {
+            string = &login->preset;
+        } else if(0 == strcmp(key, "pattern")) {
+            string = &login->pattern;
+        } else if(0 == strcmp(key, "offset")) {
+            if(value.type != TOML_INT64 || value.u.int64 < 0) {
+                return passgen_cli_config_error(
+                    path,
+                    &value,
+                    "the offset of a login has to be a number, from 0");
+            }
+            login->offset = (uint64_t) value.u.int64;
+            continue;
+        } else {
+            return passgen_cli_config_error(
+                path,
+                &value,
+                "unknown key `%s` in a login",
+                key);
+        }
+        try(passgen_cli_config_login_string(path, key, value, string));
+    }
+
+    if(!login->domain || !login->domain[0]) {
+        return passgen_cli_config_error(path, &table, "a login needs a domain");
+    }
+    if(login->preset && login->pattern) {
+        return passgen_cli_config_error(
+            path,
+            &table,
+            "a login can have a preset or a pattern, not both");
+    }
+    if(!login->user) {
+        login->user = strdup("");
+    }
+    login->path = strdup(path);
+    if(!login->user || !login->path) {
+        return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+    }
+    return 0;
+}
+
+// Adds the logins of a configuration file, which is an array of tables (as
+// `[[login]]`). A domain and a user can only have one login.
+static int passgen_cli_config_logins(
+    passgen_cli_opts *opts,
+    const char *path,
+    toml_datum_t array) {
+    if(array.type != TOML_ARRAY) {
+        return passgen_cli_config_error(
+            path,
+            &array,
+            "`login` has to be an array of tables, as [[login]]");
+    }
+
+    for(int i = 0; i < array.u.arr.size; i++) {
+        toml_datum_t table = array.u.arr.elem[i];
+        if(table.type != TOML_TABLE) {
+            return passgen_cli_config_error(
+                path,
+                &table,
+                "`login` has to be an array of tables, as [[login]]");
+        }
+
+        passgen_cli_login login;
+        memset(&login, 0, sizeof(login));
+        int ret = passgen_cli_config_login(path, table, &login);
+        if(ret != 0) {
+            passgen_cli_login_free(&login);
+            return ret;
+        }
+
+        for(size_t j = 0; j < opts->logins_len; j++) {
+            const passgen_cli_login *other = &opts->logins[j];
+            if(0 == strcmp(other->domain, login.domain) &&
+               0 == strcmp(other->user, login.user)) {
+                if(login.user[0]) {
+                    passgen_cli_config_error(
+                        path,
+                        &table,
+                        "there is another login for `%s` and user `%s`, in "
+                        "`%s`",
+                        login.domain,
+                        login.user,
+                        other->path);
+                } else {
+                    passgen_cli_config_error(
+                        path,
+                        &table,
+                        "there is another login for `%s` without a user, in "
+                        "`%s`",
+                        login.domain,
+                        other->path);
+                }
+                passgen_cli_login_free(&login);
+                return PASSGEN_CLI_ERROR_CONFIG;
+            }
+        }
+
+        passgen_cli_login *logins = realloc(
+            opts->logins,
+            (opts->logins_len + 1) * sizeof(passgen_cli_login));
+        if(!logins) {
+            passgen_cli_login_free(&login);
+            return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+        }
+        opts->logins = logins;
+        opts->logins[opts->logins_len++] = login;
+    }
+
+    return 0;
+}
+
 // Adds what a parsed configuration file defines.
 static int passgen_cli_config_apply(
     passgen_cli_opts *opts,
@@ -1799,6 +1982,11 @@ static int passgen_cli_config_apply(
         bool wordlists = 0 == strcmp(key, "wordlists");
         bool presets = 0 == strcmp(key, "presets");
         bool master = 0 == strcmp(key, "master");
+        bool login = 0 == strcmp(key, "login");
+        if(login) {
+            try(passgen_cli_config_logins(opts, path, value));
+            continue;
+        }
         if(!wordlists && !presets && !master) {
             return passgen_cli_config_error(
                 path,
@@ -1932,6 +2120,122 @@ int passgen_cli_opts_config(passgen_cli_opts *opts) {
     return passgen_cli_opts_config_user(opts);
 }
 
+#ifdef PASSGEN_MONOCYPHER
+// Finds the login for the domain (and user, if it is given), and fills in
+// what was not given on the command line: the master passphrase, the user,
+// the preset or pattern, and the offset.
+static int passgen_cli_login_apply(passgen_cli_opts *opts) {
+    const passgen_cli_login *found = NULL;
+    const passgen_cli_login *without_user = NULL;
+    size_t count = 0;
+    for(size_t i = 0; i < opts->logins_len; i++) {
+        const passgen_cli_login *login = &opts->logins[i];
+        if(0 != strcmp(login->domain, opts->master_domain)) {
+            continue;
+        }
+        if(opts->master_user && 0 != strcmp(login->user, opts->master_user)) {
+            continue;
+        }
+        found = login;
+        count += 1;
+        if(!login->user[0]) {
+            without_user = login;
+        }
+    }
+
+    // without a user, the login without one is meant, or else the only one.
+    if(without_user) {
+        found = without_user;
+    } else if(count > 1) {
+        // with a master passphrase, it is the domain without a user.
+        if(opts->master) {
+            return 0;
+        }
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m: there is more than one login for `%s`, "
+            "choose one with --user:",
+            opts->master_domain);
+        const char *separator = " ";
+        for(size_t i = 0; i < opts->logins_len; i++) {
+            if(0 == strcmp(opts->logins[i].domain, opts->master_domain)) {
+                fprintf(stderr, "%s`%s`", separator, opts->logins[i].user);
+                separator = ", ";
+            }
+        }
+        fprintf(stderr, "\n");
+        return PASSGEN_CLI_ERROR_MASTER;
+    }
+
+    if(!found) {
+        // with a master passphrase, a login is not needed.
+        if(opts->master) {
+            return 0;
+        }
+        if(opts->master_user) {
+            fprintf(
+                stderr,
+                "\033[1;31merror\033[0m: there is no login for `%s` and user "
+                "`%s` in the configuration, give --master\n",
+                opts->master_domain,
+                opts->master_user);
+        } else {
+            fprintf(
+                stderr,
+                "\033[1;31merror\033[0m: there is no login for `%s` in the "
+                "configuration, give --master\n",
+                opts->master_domain);
+        }
+        return PASSGEN_CLI_ERROR_MASTER;
+    }
+
+    if(!opts->master) {
+        opts->master = found->master;
+        // without one, it is the only one there is.
+        if(!opts->master && opts->masters_len == 1) {
+            opts->master = opts->masters[0].name;
+        }
+        if(!opts->master) {
+            fprintf(
+                stderr,
+                "\033[1;31merror\033[0m: the login for `%s` does not say which "
+                "master passphrase it uses, and there is %s, give --master\n",
+                opts->master_domain,
+                opts->masters_len ? "more than one" : "none");
+            return PASSGEN_CLI_ERROR_MASTER;
+        }
+    }
+    if(!opts->master_user) {
+        opts->master_user = found->user;
+    }
+    if(!opts->pattern && !opts->preset) {
+        opts->pattern = found->pattern;
+        opts->preset = found->preset;
+    }
+    if(!opts->offset_given) {
+        opts->offset = found->offset;
+    }
+
+    if(!opts->pattern && !opts->preset) {
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m: the login for `%s` has no preset or "
+            "pattern, give one\n",
+            opts->master_domain);
+        return PASSGEN_CLI_ERROR_MASTER;
+    }
+
+    // the stream of the last sequence has to exist.
+    if(opts->amount - 1 > UINT64_MAX - opts->offset) {
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m: the offset is too large for the amount\n");
+        return PASSGEN_CLI_ERROR_ILLEGAL_OFFSET;
+    }
+    return 0;
+}
+#endif
+
 int passgen_cli_opts_load(passgen_cli_opts *opts) {
     try(passgen_cli_opts_config(opts));
 
@@ -1945,6 +2249,21 @@ int passgen_cli_opts_load(passgen_cli_opts *opts) {
             try(passgen_cli_opts_wordlist(opts, definition->argument));
         }
     }
+
+#ifdef PASSGEN_MONOCYPHER
+    // a login fills in what was not given.
+    if(opts->master_domain) {
+        try(passgen_cli_login_apply(opts));
+        if(!opts->pattern && !opts->preset) {
+            fprintf(
+                stderr,
+                "\033[1;31merror\033[0m: there is no login for `%s` which says "
+                "which pattern to use, give one\n",
+                opts->master_domain);
+            return PASSGEN_CLI_ERROR_MASTER;
+        }
+    }
+#endif
 
     // listing the presets does not need a pattern.
     if(opts->preset && !opts->list) {

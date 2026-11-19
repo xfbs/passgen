@@ -142,6 +142,23 @@ master passphrase:
 eINh6m-RhafGJ-JgiKM0
 ```
 
+Which master passphrase, preset and offset an account uses can be stored as
+a login in the configuration, so that only the domain and the user have to be
+given:
+
+```toml
+[[login]]
+domain = "example.com"
+user = "username"
+preset = "apple2"
+```
+
+```
+$ passgen -d example.com -u username
+master passphrase:
+eINh6m-RhafGJ-JgiKM0
+```
+
 ## Syntax
 
 The syntax of the Passgen format string is similar to that of regular

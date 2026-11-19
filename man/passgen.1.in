@@ -16,6 +16,10 @@
 .Op Fl m Ar name Op Fl d Ar domain Op Fl u Ar user
 .Ar pattern | Fl p Ar preset
 .Nm
+.Fl d Ar domain
+.Op Fl u Ar user
+.Op Ar pattern | Fl p Ar preset
+.Nm
 .Fl l
 .Nm
 .Fl -master-setup Op Ar name
@@ -140,11 +144,13 @@ It is used as it is, so
 and
 .Ql Example.com
 result in different sequences.
-Optional.
+Without
+.Fl -master ,
+this uses the login for the domain in the configuration, see
+.Sx LOGINS .
 .It Fl u , Fl -user Ar user
 Who the sequence is for, typically the login on the website, when there is
 more than one for a domain.
-It can also be a counter, to change a passphrase.
 Optional.
 .It Fl -master-setup Op Ar name
 Set up a master passphrase, and print what the configuration needs to use it
@@ -462,6 +468,54 @@ one version of
 .Nm
 to the next.
 Changes to it are listed in the changelog.
+.Ss LOGINS
+Which master passphrase, pattern and offset a domain and a user use can be
+stored in the configuration as a login, so that only the domain and the user
+have to be given:
+.Bd -literal -offset indent
+[[login]]
+domain = "example.com"
+user = "me@example.org"
+master = "main"
+preset = "apple2"
+offset = 1
+.Ed
+.Pp
+Then
+.Ql passgen -d example.com -u me@example.org
+generates the same as
+.Ql passgen -m main -d example.com -u me@example.org --offset 1 -p apple2 .
+.Bl -tag -width Ds
+.It Li domain
+The domain.
+Required.
+.It Li user
+The user.
+Optional, the default is none.
+.It Li master
+The name of the master passphrase.
+Optional when there is only one.
+.It Li preset , Li pattern
+The preset or the pattern to use, one of them at most.
+Without either, one has to be given on the command line.
+.It Li offset
+Which stream to start at, as
+.Fl -offset .
+Changing it changes the passphrase, such as when the old one has to be
+replaced.
+Optional, the default is 0.
+.El
+.Pp
+A domain and a user can only have one login, also across configuration
+files.
+Without
+.Fl -user ,
+the login for the domain without a user is used, or else the only login for
+the domain.
+What is given on the command line takes precedence over what the login says.
+With
+.Fl -master ,
+a domain without a login works as it does without logins.
 .Sh CONFIGURATION
 On startup,
 .Nm
@@ -503,6 +557,10 @@ backslash.
 Setting a preset or a wordlist to
 .Li false
 removes it, also a predefined one.
+Master passphrases and logins are described in
+.Sx MASTER PASSPHRASE MODE
+and
+.Sx LOGINS .
 .Pp
 The source of randomness cannot be set in the configuration, so that it is
 always visible on the command line.
@@ -570,8 +628,8 @@ The definition of a wordlist is not valid.
 .It 12
 The options for master passphrase mode cannot be used this way: together with
 .Fl -random ,
-a domain or user without a master passphrase, or the options for setting one
-up without
+a user without a domain or a master passphrase, or the options for setting
+one up without
 .Fl -master-setup .
 .It 13
 The number of steps is not valid.
@@ -579,7 +637,8 @@ The number of steps is not valid.
 A configuration file cannot be read, or is not valid.
 .It 15
 The master passphrase is not in the configuration, was not entered, or is
-not the right one.
+not the right one, or there is no login (or more than one) for the domain and
+user.
 .It 16
 The offset is not valid, or the source of randomness does not have streams.
 .El
@@ -709,3 +768,6 @@ The strength of everything derived in master passphrase mode is limited by
 the strength of the master passphrase.
 Someone who gets hold of one derived passphrase can try to guess the master
 passphrase from it, and with it, all of the others.
+.Pp
+Logins in the configuration are not secret by themselves, but they list
+where you have accounts.

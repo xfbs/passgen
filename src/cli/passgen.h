@@ -78,6 +78,25 @@ typedef struct {
     size_t seed_size;
 } passgen_cli_master;
 
+/// A login which is defined in the configuration, as `[[login]]`: which master
+/// passphrase, preset or pattern and offset a domain and user use.
+typedef struct {
+    /// The domain.
+    char *domain;
+    /// The user, which may be empty.
+    char *user;
+    /// The name of the master passphrase, or NULL if there is only one.
+    char *master;
+    /// The preset to use, or NULL.
+    char *preset;
+    /// The pattern to use, or NULL.
+    char *pattern;
+    /// The offset.
+    uint64_t offset;
+    /// The configuration file which defines it.
+    char *path;
+} passgen_cli_login;
+
 /// Options parsed from the command line.
 typedef struct {
     /// How many passwords to generate.
@@ -134,6 +153,11 @@ typedef struct {
     passgen_cli_master *masters;
     /// How many master passphrases are defined in the configuration.
     size_t masters_len;
+    /// Logins defined in the configuration. These are read even without
+    /// master passphrase mode, so that the configuration is the same.
+    passgen_cli_login *logins;
+    /// How many logins are defined in the configuration.
+    size_t logins_len;
 
     /// Source of randomness to generate from. This is what the environment
     /// uses, but it is owned by the options.
