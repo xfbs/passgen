@@ -227,18 +227,22 @@ mkdir -p "$HOME/.config"
 echo "preset fromhome:uvw" > "$HOME/.config/passgen.conf"
 test "$(XDG_CONFIG_HOME= $passgen -p fromhome)" = "uvw"
 
-# depth limit
-$passgen -D 5 "((((a))))" | matches "a"
-fails $passgen -D 2 "((((a))))"
-
-# the default limit is 1024 (and counts the pattern itself as one level).
+# groups can be nested up to 1024 deep. more is an error in the pattern (exit
+# status 3), also for patterns nested so deeply that freeing them used to run
+# out of stack.
 function nested() {
     printf '(%.0s' $(seq "$1")
     printf a
     printf ')%.0s' $(seq "$1")
 }
-$passgen "$(nested 1023)" | matches "a"
-fails $passgen "$(nested 1024)"
+$passgen "$(nested 1024)" | matches "a"
+fails $passgen "$(nested 1025)"
+$passgen "$(nested 1025)" >/dev/null 2>&1 || test "$?" = 3
+fails $passgen "$(nested 50000)"
+$passgen "$(nested 50000)" >/dev/null 2>&1 || test "$?" = 3
+
+# --depth was removed, as the depth is limited when parsing.
+fails $passgen -D 5 "a"
 
 # step limit: every character of a set, run of literals, and group is a step,
 # and the default is a million.
@@ -268,7 +272,6 @@ fails $passgen "a[]{3}"
 fails $passgen -a 0 "a"
 fails $passgen -M 0 "a"
 fails $passgen -M 1000 "a"
-fails $passgen -D 0 "a"
 fails $passgen -p doesnotexist
 fails $passgen -P "nocolon" "a"
 fails $passgen -r nonsense "a"
@@ -316,7 +319,7 @@ test "$(error_of $passgen '\w{}')" = "error in pattern: expected a name in brace
 test "$(error_of $passgen '\w{undefined}')" = "error: wordlist not found: undefined"
 test "$(error_of $passgen '\m{undefined}')" = "error: wordlist not found: undefined"
 test "$(error_of $passgen -w "test:$tmpdir/empty.txt" '\w{test}')" = "error: wordlist is empty: test"
-test "$(error_of $passgen -D 2 '((((a))))')" = "error: nested too deeply"
+test "$(error_of $passgen "$(nested 1025)")" = "error in pattern: nested too deeply"
 test "$(error_of $passgen '{0}a')" = "error: nothing to choose from"
 test "$(error_of $passgen "(){999999999}")" = "error: takes too many steps"
 test "$(error_of $passgen -S 0 a)" = "error: illegal number of steps entered (0)"

@@ -71,7 +71,7 @@ typedef enum {
 ///
 /// The parser is built as a state machine, with a state stack representing
 /// what it is currently doing. This allows for introspection of the parser,
-/// limiting the depth (by limiting the stack size) and for giving useful error
+/// limiting how deeply groups are nested, and for giving useful error
 /// messages.
 typedef struct {
     /// Current parser state.
@@ -119,15 +119,20 @@ typedef struct {
     } data;
 } passgen_parser_state;
 
+/// How deeply groups may be nested in a pattern. Freeing and generating from
+/// a pattern recurses into its groups, so this is what keeps them from
+/// running out of stack.
+#define PASSGEN_PARSER_DEPTH_LIMIT 1024
+
 /// Represents a parser. Contains a parsing stack, as well as a pattern, which
 /// is dynamically built, and should not be used until the parsing is finalized.
 typedef struct passgen_parser {
     /// Current state stack of the parser.
     /// Contains #passgen_parser_state items.
     passgen_stack state;
-    /// Limit of parsing depth, which can be set after initializing the
-    /// parser. Parsing fails when groups are nested more deeply than this.
-    /// If set to zero, depth limiting is disabled.
+    /// How deeply groups may be nested, which is PASSGEN_PARSER_DEPTH_LIMIT
+    /// after initializing the parser. Parsing fails for groups which are
+    /// nested more deeply.
     size_t limit;
     /// The current, possibly incomplete parsed pattern.
     /// The parser does not own this and will not deallocate it.

@@ -141,7 +141,7 @@ passgen_parser_state *passgen_parser_state_push_special(
 passgen_status
 passgen_parser_init(passgen_parser *parser, passgen_pattern *pattern) {
     passgen_stack_init(&parser->state, sizeof(passgen_parser_state));
-    parser->limit = 0;
+    parser->limit = PASSGEN_PARSER_DEPTH_LIMIT;
     parser->pattern = pattern;
     passgen_pattern_init(pattern);
 
@@ -218,10 +218,6 @@ static inline passgen_status last_single_item_taint(
 
 int passgen_parse_token(passgen_parser *parser, passgen_token *token) {
     passgen_parser_state *state = passgen_parser_state_last(parser);
-
-    if(parser->limit && parser->state.len >= parser->limit) {
-        return PASSGEN_ERROR_DEPTH_LIMIT;
-    }
 
     switch(state->type) {
         case PASSGEN_PARSER_GROUP:
@@ -326,6 +322,12 @@ int passgen_parse_group(
                 passgen_stack_pop(&parser->state, NULL);
                 return 0;
             case '(':
+                // only groups can contain groups, so every state is the one
+                // of a group here, and the first is the pattern itself.
+                if(parser->state.len > parser->limit) {
+                    return PASSGEN_ERROR_DEPTH_LIMIT;
+                }
+
                 // we're supposed to read something in.
                 group = passgen_pattern_segment_new_group(
                     state->data.group.segment);

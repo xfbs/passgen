@@ -14,7 +14,6 @@ passgen_env *passgen_env_new(passgen_random *random) {
         return NULL;
     }
 
-    env->depth_limit = 1024;
     env->step_limit = 1000000;
     env->random = random;
     passgen_hashmap_init(&env->wordlists, &passgen_hashmap_context_utf8);
@@ -46,10 +45,6 @@ void passgen_env_free(passgen_env *env) {
 
 void passgen_env_random_set(passgen_env *env, passgen_random *random) {
     env->random = random;
-}
-
-void passgen_env_depth_limit_set(passgen_env *env, size_t depth_limit) {
-    env->depth_limit = depth_limit;
 }
 
 void passgen_env_step_limit_set(passgen_env *env, size_t step_limit) {

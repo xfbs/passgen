@@ -523,7 +523,7 @@ void passgen_cli_presets_list(const passgen_cli_opts *opts) {
 #endif
 
 int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
-    const char *short_opts = "a:p:P:w:r:D:S:M:ezhvjl" PASSGEN_CLI_MASTER_OPTS;
+    const char *short_opts = "a:p:P:w:r:S:M:ezhvjl" PASSGEN_CLI_MASTER_OPTS;
     const char *preset = NULL;
     // whether the randomness source was set on the command line, rather than
     // in the configuration.
@@ -533,7 +533,6 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
         {"amount", required_argument, NULL, 'a'},
         {"help", no_argument, NULL, 'h'},
         {"preset", required_argument, NULL, 'p'},
-        {"depth", required_argument, NULL, 'D'},
         {"steps", required_argument, NULL, 'S'},
         {"version", no_argument, NULL, 'v'},
         {"null", no_argument, NULL, 'z'},
@@ -581,13 +580,6 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 #endif
             case 'p':
                 preset = optarg;
-                break;
-            case 'D':
-                opt = atoi(optarg);
-                if(opt < 1) {
-                    return passgen_cli_bail(PASSGEN_CLI_ERROR_ILLEGAL_DEPTH, &opt);
-                }
-                passgen_env_depth_limit_set(opts->env, opt);
                 break;
             case 'S': {
                 char *end;
@@ -763,7 +755,6 @@ void passgen_cli_usage(const char *executable) {
         "OPTIONS\n"
         "    -a, --amount       Amount of passwords to generate\n"
         PASSGEN_CLI_HELP_DOMAIN
-        "    -D, --depth DEPTH  Maximum nesting depth of groups (default: 1024)\n"
         "    -e, --entropy      Compute entropy for each password in bits.\n"
         "    -h, --help         Show this help information\n"
         "    -j, --json         Output as JSON\n"
@@ -850,11 +841,7 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
                 "\033[1;31merror\033[0m: %s\n",
                 (const char *) data);
             break;
-        case PASSGEN_CLI_ERROR_ILLEGAL_DEPTH:
-            fprintf(
-                stderr,
-                "\033[1;31merror\033[0m: illegal depth entered (%i)\n",
-                *((const int *) data));
+        case PASSGEN_CLI_ERROR_UNUSED_11:
             break;
         case PASSGEN_CLI_ERROR_ILLEGAL_STEPS:
             fprintf(

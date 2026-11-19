@@ -152,6 +152,52 @@ test_result test_error_parse_success(void) {
     return test_ok;
 }
 
+// A pattern of depth groups nested in each other, around an `a`, or without
+// closing them. Has to be freed.
+static char *nested(size_t depth, bool closed) {
+    char *string = malloc(2 * depth + 2);
+    if(!string) {
+        abort();
+    }
+    memset(string, '(', depth);
+    string[depth] = 'a';
+    memset(&string[depth + 1], closed ? ')' : 'a', depth);
+    string[2 * depth + 1] = 0;
+    return string;
+}
+
+/// Groups can be nested 1024 deep. Patterns nested more deeply are an error,
+/// at the group which is one too many, however deep they are: freeing (and
+/// generating from) a pattern recurses into its groups, and would run out of
+/// stack if they were nested deeply enough.
+test_result test_error_parse_depth(void) {
+    passgen_pattern *pattern;
+    passgen_error error;
+
+    char *string = nested(1024, true);
+    assert(PASSGEN_OK == passgen_parse(&pattern, &error, string));
+    passgen_pattern_free(pattern);
+    free(string);
+
+    size_t depths[] = {1025, 2000, 100000, 1000000};
+    for(size_t i = 0; i < sizeof(depths) / sizeof(depths[0]); i++) {
+        for(int closed = 0; closed < 2; closed++) {
+            string = nested(depths[i], closed);
+            assert(
+                PASSGEN_ERROR_DEPTH_LIMIT ==
+                passgen_parse(&pattern, &error, string));
+            assert(pattern == NULL);
+            assert(error.kind == PASSGEN_ERROR_DEPTH_LIMIT);
+            assert(error.start.codepoint == 1024);
+            assert(error.end.codepoint == 1025);
+            passgen_error_free(&error);
+            free(string);
+        }
+    }
+
+    return test_ok;
+}
+
 /// Every status has a description of its own.
 test_result test_error_status_string(void) {
     for(int a = PASSGEN_OK; a <= PASSGEN_ERROR_ABORTED; a++) {
@@ -428,20 +474,6 @@ test_result test_error_generate(void) {
 
     // which is not a problem if it is never generated.
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "x({0}a){0}y"));
-    assert(
-        PASSGEN_OK ==
-        passgen_generate(pattern, env, &error, NULL, &count, count_callback));
-    passgen_pattern_free(pattern);
-
-    // nested more deeply than the limit
-    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "((a))"));
-    passgen_env_depth_limit_set(env, 2);
-    assert(
-        PASSGEN_ERROR_DEPTH_LIMIT ==
-        passgen_generate(pattern, env, &error, NULL, &count, count_callback));
-    assert(error.kind == PASSGEN_ERROR_DEPTH_LIMIT);
-    passgen_error_free(&error);
-    passgen_env_depth_limit_set(env, 3);
     assert(
         PASSGEN_OK ==
         passgen_generate(pattern, env, &error, NULL, &count, count_callback));

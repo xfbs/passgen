@@ -23,6 +23,11 @@ typedef struct passgen_pattern passgen_pattern;
 
 /// Parse a pattern.
 ///
+/// Groups may be nested up to 1024 deep. Apart from that, how large a pattern
+/// may be, and so how much memory parsing it takes, is only limited by the
+/// length of the string. How long generating from it may take is limited by
+/// the environment, see @ref passgen_env_step_limit_set.
+///
 /// @param pattern Where to store the pattern. If parsing succeeds, this is set
 ///   to a newly allocated pattern, which has to be freed with @ref
 ///   passgen_pattern_free when it is no longer needed. If parsing fails, it is

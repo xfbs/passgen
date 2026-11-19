@@ -24,7 +24,6 @@
 
 typedef struct {
     passgen_env *env;
-    size_t depth;
     // how many more steps may be taken.
     size_t steps;
     double *entropy;
@@ -104,20 +103,6 @@ static inline int emit(passgen_generate_context *context, uint32_t codepoint) {
     }
 
     return PASSGEN_OK;
-}
-
-// Recurse
-static inline int descend(passgen_generate_context *context) {
-    if(!context->depth) {
-        return fail(context, PASSGEN_ERROR_DEPTH_LIMIT);
-    }
-
-    context->depth -= 1;
-    return 0;
-}
-
-static inline void ascend(passgen_generate_context *context) {
-    context->depth += 1;
 }
 
 // Take a step, which is generating one item once. Every step does an amount
@@ -656,9 +641,6 @@ static int passgen_generate_segment(
 static int passgen_generate_group(
     passgen_generate_context *context,
     const passgen_pattern_group *group) {
-    // descend in depth
-    try(descend(context));
-
     // every segment of the group has a multiplier of zero.
     if(group->multiplier_sum == 0) {
         return fail(context, PASSGEN_ERROR_GROUP_EMPTY);
@@ -692,11 +674,7 @@ static int passgen_generate_group(
                              log2((double) segment->multiplier);
     }
 
-    try(passgen_generate_segment(context, segment));
-
-    ascend(context);
-
-    return 0;
+    return passgen_generate_segment(context, segment);
 }
 
 passgen_status passgen_generate(
@@ -714,7 +692,6 @@ passgen_status passgen_generate(
 
     passgen_generate_context context = {
         .env = env,
-        .depth = env->depth_limit,
         .steps = env->step_limit,
         .func = func,
         .data = data,

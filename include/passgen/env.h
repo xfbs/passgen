@@ -54,16 +54,6 @@ PASSGEN_EXPORT void passgen_env_free(passgen_env *env);
 /// @param random Source of randomness to generate from
 PASSGEN_EXPORT void passgen_env_random_set(passgen_env *env, passgen_random *random);
 
-/// Set how deeply the groups in a pattern may be nested when generating.
-/// Generating fails for patterns which are nested more deeply. The default is
-/// 1024.
-///
-/// @relatesalso passgen_env
-/// @param env Environment to change
-/// @param depth_limit How deeply groups may be nested. The pattern itself
-///   counts as a group, so with zero, nothing can be generated.
-PASSGEN_EXPORT void passgen_env_depth_limit_set(passgen_env *env, size_t depth_limit);
-
 /// Set how many steps generating from a pattern may take. Generating fails
 /// with @ref PASSGEN_ERROR_STEP_LIMIT for patterns which take more. The
 /// default is 1000000.

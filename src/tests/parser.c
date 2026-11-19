@@ -373,12 +373,13 @@ test_result test_parser_nested_groups(void) {
 
 test_result test_parser_depth_limit(void) {
     PREAMBLE();
-    parser.limit = 5;
+    // three groups may be nested, inside of the pattern itself.
+    parser.limit = 3;
     PARSE_CODEPOINT('(');
     PARSE_CODEPOINT('(');
     PARSE_CODEPOINT('(');
-    PARSE_CODEPOINT('(');
-    assert(0 != passgen_parse_token(&parser, &token));
+    assert(passgen_token_parse(&token_parser, &token, 1, '(') == PASSGEN_TOKEN_INIT);
+    assert(PASSGEN_ERROR_DEPTH_LIMIT == passgen_parse_token(&parser, &token));
 
     assert(0 != passgen_parse_finish(&parser));
     passgen_parser_free(&parser);

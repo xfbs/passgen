@@ -132,8 +132,6 @@ PASSGEN_EXPORT passgen_status passgen_generate_fill_json_utf8(
 ///   - @ref PASSGEN_ERROR_WORDLIST_NOT_FOUND, @ref PASSGEN_ERROR_WORDLIST_EMPTY
 ///     or @ref PASSGEN_ERROR_WORDLIST_READ, if there is a problem with a
 ///     wordlist which the pattern uses,
-///   - @ref PASSGEN_ERROR_DEPTH_LIMIT, if groups are nested more deeply than
-///     the depth limit of the environment,
 ///   - @ref PASSGEN_ERROR_STEP_LIMIT, if it takes more steps than the step
 ///     limit of the environment,
 ///   - @ref PASSGEN_ERROR_GROUP_EMPTY, if there is a group with nothing to

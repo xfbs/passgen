@@ -118,12 +118,7 @@ int main(void) {
     check(0 == passgen_generate(pattern, env, NULL, NULL, &codepoint_count, count));
     check(codepoint_count >= strlen("alpha-abcd"));
 
-    // with a depth limit of zero, nothing can be generated.
-    passgen_env_depth_limit_set(env, 0);
-    check(0 != passgen_generate(pattern, env, NULL, NULL, &codepoint_count, count));
-    passgen_env_depth_limit_set(env, 100);
-
-    // and with a step limit of one, neither can this.
+    // with a step limit of one, this cannot be generated.
     passgen_env_step_limit_set(env, 1);
     check(
         PASSGEN_ERROR_STEP_LIMIT ==
@@ -140,7 +135,6 @@ int main(void) {
     passgen_random *zero = passgen_random_open(NULL, "zero");
     check(zero != NULL);
     passgen_env_random_set(env, zero);
-    passgen_env_depth_limit_set(env, 100);
     passgen_generate_fill_utf8(
         pattern,
         env,

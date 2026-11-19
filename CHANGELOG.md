@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   steps makes patterns such as `(){999999999}` fail rather than run
   practically forever.
 
+### Removed
+
+- `-D`/`--depth`. Groups can be nested up to 1024 deep, which is now checked
+  when parsing.
+
+### Fixed
+
+- A crash after the error for patterns with groups nested very deeply.
+
 ## [0.3.0] - 2026-11-18
 
 ### Passwords which change

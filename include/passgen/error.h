@@ -78,7 +78,8 @@ typedef enum passgen_status {
     /// A wordlist is referred to without a name in braces following it, such
     /// as `\wabc`, `\w{abc` or `\w{}`.
     PASSGEN_ERROR_SPECIAL,
-    /// Groups are nested more deeply than the limit.
+    /// Groups are nested more than 1024 deep, such as in a pattern which
+    /// starts with 1025 opening parentheses.
     PASSGEN_ERROR_DEPTH_LIMIT,
     /// Generating takes more steps than the limit, such as `(a{1000}){1000}`
     /// with the default limit. See @ref passgen_env_step_limit_set.
