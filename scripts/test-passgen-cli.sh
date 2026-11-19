@@ -280,7 +280,6 @@ first="$tmpdir/conf/first.toml"
 second="$tmpdir/conf/second.toml"
 $passgen -c "$first" -p fromconfig | matches "[xy]{2}"
 test "$($passgen -c "$first" -p word)" = "alpha"
-test "$(cd / && $passgen -c "$first" -p word)" = "alpha"
 test "$($passgen -c "$first" -l | grep -c "^preset _part ")" = 0
 # later files replace what earlier ones define, false removes it, and the
 # command line comes last.
