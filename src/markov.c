@@ -22,31 +22,116 @@ static size_t markov_leaf_size(size_t len) {
     return sizeof(passgen_markov_leaf) + len * sizeof(passgen_markov_frequency);
 }
 
+// How many steps the search takes from its guess, before it goes on with a
+// binary search.
+#ifndef MARKOV_SEARCH_STEPS
+#define MARKOV_SEARCH_STEPS 8
+#endif
+
 // Finds where a codepoint is in a sorted list of them, or where it would go
 // to keep them sorted. Sets found to whether it is there.
-static size_t markov_search(
+//
+// The codepoints of a list are mostly runs of letters which follow each
+// other, such as `a` to `z`. So where a codepoint falls between the first and
+// the last one is a good guess for where it is, from which it is mostly
+// found in a few steps. A binary search takes more, with branches which are
+// hard to predict, and is slower for the lists which building a Markov chain
+// looks at most, of a few dozen codepoints.
+//
+// For lists where the guess is far off (such as letters and a single emoji),
+// it goes on with a binary search after a few steps, so that it is never
+// much slower than one. It is inlined, so that the stride is known.
+static inline size_t markov_search(
     const uint32_t *codepoints,
     size_t stride,
     size_t len,
     uint32_t codepoint,
     bool *found) {
-    size_t low = 0;
-    size_t high = len;
-    while(low < high) {
+#define AT(i) codepoints[(i) * stride]
+    *found = false;
+    if(len == 0) {
+        return 0;
+    }
+
+    // most lists start with the zero which ends words, which is far from the
+    // letters, so the guess starts from the one after it.
+    size_t low = AT(0) == 0 && codepoint != 0 && len > 1;
+    size_t high = len - 1;
+    if(codepoint <= AT(low)) {
+        *found = codepoint == AT(low);
+        return low;
+    }
+    if(codepoint >= AT(high)) {
+        *found = codepoint == AT(high);
+        return codepoint == AT(high) ? high : len;
+    }
+
+    // from here on, the codepoint at low is smaller and the one at high is
+    // larger than the one which is looked for, so it goes between them if it
+    // is not there. the guess is between them as well.
+    size_t index = low + (size_t) ((uint64_t) (codepoint - AT(low)) *
+                                   (high - low) / (AT(high) - AT(low)));
+    if(index <= low) {
+        index = low + 1;
+    }
+    if(index >= high) {
+        index = high - 1;
+    }
+
+    if(high - low > 1) {
+        uint32_t entry = AT(index);
+        if(entry == codepoint) {
+            *found = true;
+            return index;
+        }
+
+        // a few steps towards it.
+        if(entry > codepoint) {
+            high = index;
+            for(int i = 0; i < MARKOV_SEARCH_STEPS && high - low > 1; i++) {
+                entry = AT(high - 1);
+                if(entry < codepoint) {
+                    return high;
+                }
+                high -= 1;
+                if(entry == codepoint) {
+                    *found = true;
+                    return high;
+                }
+            }
+        } else {
+            low = index;
+            for(int i = 0; i < MARKOV_SEARCH_STEPS && high - low > 1; i++) {
+                entry = AT(low + 1);
+                if(entry > codepoint) {
+                    return low + 1;
+                }
+                low += 1;
+                if(entry == codepoint) {
+                    *found = true;
+                    return low;
+                }
+            }
+        }
+    }
+
+    // a binary search for the rest.
+    while(high - low > 1) {
         size_t middle = low + (high - low) / 2;
-        uint32_t entry = codepoints[middle * stride];
+        uint32_t entry = AT(middle);
         if(entry == codepoint) {
             *found = true;
             return middle;
         }
         if(entry < codepoint) {
-            low = middle + 1;
+            low = middle;
         } else {
             high = middle;
         }
     }
-    *found = false;
-    return low;
+
+    return high;
+#undef AT
 }
 
 // Finds a codepoint in a leaf, see markov_search().

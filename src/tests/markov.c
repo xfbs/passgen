@@ -372,3 +372,77 @@ test_result test_markov_generate(void) {
 
     return test_ok;
 }
+
+/// Whether a codepoint is in a list of them.
+static bool contains(const uint32_t *list, size_t len, uint32_t codepoint) {
+    for(size_t i = 0; i < len; i++) {
+        if(list[i] == codepoint) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/// Finding codepoints works for lists of any shape: dense runs, gaps, the
+/// zero which ends words, codepoints far from the others, and the limits.
+test_result test_markov_leaf_search_uneven(void) {
+    const uint32_t extra[] = {0, 1, '\'', '-', 0xE9, 0x4E00, 0x1F600, 0x10FFFF};
+    passgen_random rand;
+    passgen_random_xorshift_open(&rand, SEED);
+
+    for(size_t shape = 0; shape < 256; shape++) {
+        passgen_markov_leaf *leaf = passgen_markov_leaf_new();
+        assert(leaf);
+
+        // some of the letters, and the extra ones which the shape says.
+        uint32_t inserted[64];
+        size_t count = 0;
+        for(uint32_t c = 'a'; c <= 'z'; c++) {
+            if(passgen_random_u8(&rand) % 4) {
+                inserted[count++] = c;
+            }
+        }
+        for(size_t i = 0; i < 8; i++) {
+            if((shape >> i) & 1) {
+                inserted[count++] = extra[i];
+            }
+        }
+        // in any order, so that they go into the middle as well.
+        for(size_t i = count; i > 1; i--) {
+            size_t j = passgen_random_u64_max(&rand, i);
+            uint32_t swap = inserted[i - 1];
+            inserted[i - 1] = inserted[j];
+            inserted[j] = swap;
+        }
+        for(size_t i = 0; i < count; i++) {
+            leaf = passgen_markov_leaf_insert(leaf, inserted[i], 1);
+            assert(leaf);
+        }
+        assert_eq(leaf->len, count);
+
+        // every one which is there is found, and its neighbours are only
+        // found if they are there too.
+        for(size_t i = 0; i < count; i++) {
+            for(int offset = -1; offset <= 1; offset++) {
+                uint32_t codepoint = inserted[i] + offset;
+                if(inserted[i] == 0 && offset < 0) {
+                    continue;
+                }
+                uint32_t expected = contains(inserted, count, codepoint) ? 1 : 0;
+                assert_eq(passgen_markov_leaf_count(leaf, codepoint), expected);
+            }
+        }
+        assert_eq(passgen_markov_leaf_count(leaf, 0x10FFFE), 0);
+        assert_eq(passgen_markov_leaf_count(leaf, 'Z'), 0);
+
+        // and they are in order.
+        for(size_t i = 1; i < leaf->len; i++) {
+            assert(leaf->entries[i - 1].codepoint < leaf->entries[i].codepoint);
+        }
+
+        passgen_markov_leaf_free(leaf);
+    }
+
+    passgen_random_close(&rand);
+    return test_ok;
+}
