@@ -749,19 +749,24 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     return 0;
 }
 
-// the help for the options of master passphrase mode, which are only there
-// when building with monocypher.
+// the help for master passphrase mode, and for the sources of randomness
+// which it is built on, which are only there when building with monocypher.
 #ifdef PASSGEN_MONOCYPHER
 #define PASSGEN_CLI_HELP_DOMAIN \
-    "    -d, --domain DOMAIN  Domain to use (for master-passphrase mode)\n"
+    "    -d, --domain DOMAIN    Domain for master passphrase mode\n"
 #define PASSGEN_CLI_HELP_MASTER \
-    "    -m, --master PASS  Master passphrase to use\n"
+    "    -m, --master PASS      Derive the randomness from a master passphrase\n"
 #define PASSGEN_CLI_HELP_TOKEN \
-    "    -t, --token TOKEN  Token to use (for master-passphrase mode)\n"
+    "    -t, --token TOKEN      Token for master passphrase mode\n"
+#define PASSGEN_CLI_HELP_CHACHA20                                             \
+    "    chacha20:KEY[:IV]      ChaCha20, key and IV in hex (64 and 16 digits)\n" \
+    "    chacha20-argon2:PASS[:DOMAIN[:TOKEN]]\n"                              \
+    "                           What --master uses\n"
 #else
-#define PASSGEN_CLI_HELP_DOMAIN ""
-#define PASSGEN_CLI_HELP_MASTER ""
-#define PASSGEN_CLI_HELP_TOKEN ""
+#define PASSGEN_CLI_HELP_DOMAIN   ""
+#define PASSGEN_CLI_HELP_MASTER   ""
+#define PASSGEN_CLI_HELP_TOKEN    ""
+#define PASSGEN_CLI_HELP_CHACHA20 ""
 #endif
 
 void passgen_cli_usage(const char *executable) {
@@ -775,39 +780,51 @@ void passgen_cli_usage(const char *executable) {
     fprintf(
         stderr,
         "Generate random sequences from a regex-like pattern.\n"
-        "Usage: %s [OPTIONS] [PATTERN]\n\n"
-        "OPTIONS\n"
-        "    -a, --amount       Amount of passwords to generate\n"
-        PASSGEN_CLI_HELP_DOMAIN
-        "    -e, --entropy      Compute entropy for each password in bits.\n"
-        "    -h, --help         Show this help information\n"
-        "    -j, --json         Output as JSON\n"
-        "    -l, --list         List loaded presets\n"
-        PASSGEN_CLI_HELP_MASTER
-        "    -M, --markov-length LENGTH\n"
-        "                       Specify markov chain length for next wordlist\n"
-        "    -p, --preset NAME  Use the given preset\n"
-        "    -P, --define-preset NAME:PATTERN\n"
-        "                       Define a preset\n"
-        "    -r, --random RAND  Source of randomness to use\n"
-        "    -S, --steps STEPS  Maximum number of steps to generate (default: "
-        "1000000)\n"
-        PASSGEN_CLI_HELP_TOKEN
-        "    -v, --version      Show the version of this build\n"
-        "    -w, --wordlist NAME:PATH\n"
-        "                       Load wordlist NAME from PATH\n"
-        "    -z, --null         Use NUL instead of newline to separate "
-        "outputs\n"
         "\n"
-        "PATTERN is a regex-like string describing the password.\n"
-        "    a                  Literal: outputs character 'a'\n"
-        "    [a-z0-9:]          Range: outputs a lowercase letter, number, or "
-        "':'\n"
-        "    (abc|def)          Group: outputs 'abc' or 'def'\n"
-        "    a{2}               Repeat: outputs 'aa'\n"
-        "    \\w{name}          Wordlists: pick random word\n"
-        "    \\m{name}          Markov: generate pronounceable word from wordlist\n"
-        ,
+        "Usage: %s [OPTIONS] PATTERN\n"
+        "       %s [OPTIONS] -p PRESET\n"
+        "\n"
+        "OPTIONS\n"
+        "    -a, --amount N         Generate N sequences (default: 1)\n"
+        PASSGEN_CLI_HELP_DOMAIN
+        "    -e, --entropy          Show the entropy of every sequence, in bits\n"
+        "    -h, --help             Show this help\n"
+        "    -j, --json             Output as JSON\n"
+        "    -l, --list             List the presets\n"
+        PASSGEN_CLI_HELP_MASTER
+        "    -M, --markov-length N  Markov chain length for later wordlists (default: 3)\n"
+        "    -p, --preset NAME      Use the pattern of a preset\n"
+        "    -P, --define-preset NAME:PATTERN\n"
+        "                           Define a preset\n"
+        "    -r, --random SOURCE    Source of randomness (default: system)\n"
+        "    -S, --steps N          Limit on steps to generate (default: 1000000)\n"
+        PASSGEN_CLI_HELP_TOKEN
+        "    -v, --version          Show the version\n"
+        "    -w, --wordlist NAME:PATH\n"
+        "                           Load the wordlist NAME from PATH\n"
+        "    -z, --null             Separate outputs with NUL instead of newlines\n"
+        "\n"
+        "SOURCES OF RANDOMNESS\n"
+        "    system                 The secure one of the system (default)\n"
+        "    file:PATH              Read from a file\n"
+        PASSGEN_CLI_HELP_CHACHA20
+        "    xorshift:SEED          Xorshift, which is not secure\n"
+        "    zero                   Only zeroes, for testing\n"
+        "\n"
+        "PATTERN\n"
+        "    abc                    Literal: outputs 'abc'\n"
+        "    [a-z0-9:]              Set: a lowercase letter, a digit or ':'\n"
+        "    (abc|def)              Group: 'abc' or 'def'\n"
+        "    ({3}abc|def)           Weights: 'abc' is three times as likely\n"
+        "    a{3}, a{2,4}           Repetition: 'aaa', or two to four times 'a'\n"
+        "    a?                     Optional: 'a' or nothing\n"
+        "    \\w{name}               Word: a word from the wordlist\n"
+        "    \\m{name}               Markov: a pronounceable word from the wordlist\n"
+        "    \\p{name}               Preset: the pattern of the preset\n"
+        "    \\u{e4}                 A character, by its codepoint in hex\n"
+        "\n"
+        "See passgen(1) for more.\n",
+        executable,
         executable);
 }
 
