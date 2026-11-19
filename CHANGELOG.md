@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Passwords which change
+
+All passwords derived from a master passphrase (or from any deterministic
+source of randomness) change, also for the presets. Choices with only one
+option, such as groups with a single alternative (`(abc)`, and every pattern
+itself) and sets of a single character (`[a]`), no longer use randomness, so
+`(abc)` generates the same as `abc`. To get an old password back, use 0.3.0.
+
 ### Added
 
 - `-S`/`--steps` to limit how long generating takes. The default of a million

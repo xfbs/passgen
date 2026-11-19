@@ -236,8 +236,12 @@ def parse_set(pattern, pos):
 
 
 def generate_group(random, segments, wordlists):
-    # one of the segments is chosen, even if there is only one
-    segment = segments[random.below(len(segments))]
+    # one of the segments is chosen. if there is only one, that takes no
+    # randomness, as there is nothing to choose.
+    if len(segments) == 1:
+        segment = segments[0]
+    else:
+        segment = segments[random.below(len(segments))]
     return "".join(generate_item(random, item, wordlists) for item in segment)
 
 
@@ -267,7 +271,12 @@ def generate_item(random, item, wordlists):
                 for start, end in data
                 for codepoint in range(start, end + 1)
             )
-            output += chr(characters[random.below(len(characters))])
+            # a set of a single character (also when it is listed more
+            # than once) takes no randomness.
+            if len(set(characters)) == 1:
+                output += chr(characters[0])
+            else:
+                output += chr(characters[random.below(len(characters))])
     return output
 
 
@@ -352,6 +361,9 @@ PATTERNS = [
     # empty groups generate nothing, but are chosen from like any other, and
     # what follows them applies to them
     "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+    # groups with a single segment and sets of a single character have
+    # nothing to choose from, and take no randomness
+    "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
     # characters whose codepoints end in the same byte as characters which
     # have a meaning in patterns
     "(zażółć|gęślą|jaźń){3}[żśŻ]{4}",

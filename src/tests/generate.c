@@ -452,3 +452,72 @@ test_result test_generate_step_limit_default(void) {
 #undef SEED
 #undef PREAMBLE
 #undef POSTAMBLE
+
+/// Generates from the pattern with xorshift, and returns the next random
+/// number after it, to find out how much randomness it took.
+static uint64_t random_after(const char *string, char *output) {
+    passgen_random random;
+    passgen_random_open(&random, "xorshift:1234");
+    passgen_env *env = passgen_env_new(&random);
+    passgen_pattern *pattern;
+    passgen_error error;
+    uint64_t next = 0;
+    if(env && 0 == passgen_parse(&pattern, &error, string)) {
+        size_t length = 0;
+        if(0 == passgen_resolve(pattern, env, NULL)) {
+            passgen_generate_fill_utf8(
+                pattern,
+                env,
+                NULL,
+                NULL,
+                (uint8_t *) output,
+                63,
+                &length);
+        }
+        output[length] = 0;
+        passgen_pattern_free(pattern);
+        next = passgen_random_u64(&random);
+    }
+    passgen_env_free(env);
+    passgen_random_close(&random);
+    return next;
+}
+
+/// Groups with a single segment and sets of a single character have nothing
+/// to choose from, so they take no randomness, like a repetition with a fixed
+/// count. So `(abc)` generates the same as `abc`.
+test_result test_generate_single_choice(void) {
+    char output[64];
+    uint64_t untouched = random_after("", output);
+    assert_streq(output, "");
+
+    const char *patterns[] = {
+        "abc",
+        "(abc)",
+        "({2}abc)",
+        "((a)(b)){2}(c)",
+        "[a][bb][c-c]",
+        "a{3}",
+        "()",
+    };
+    const char *expected[] = {"abc", "abc", "abc", "ababc", "abc", "aaa", ""};
+    for(size_t i = 0; i < sizeof(patterns) / sizeof(patterns[0]); i++) {
+        assert_eq(random_after(patterns[i], output), untouched);
+        assert_streq(output, expected[i]);
+    }
+
+    // something to choose from takes randomness, also when the choices are
+    // equal.
+    const char *choices[] = {"(a|a)", "[ab]", "a{1,2}", "a?", "(|)"};
+    for(size_t i = 0; i < sizeof(choices) / sizeof(choices[0]); i++) {
+        assert_ne(random_after(choices[i], output), untouched);
+    }
+
+    // so these generate the same, from the same randomness.
+    char grouped[64];
+    random_after("([a-z]{8})-(x)[0-9]", grouped);
+    random_after("[a-z]{8}-x[0-9]", output);
+    assert_streq(grouped, output);
+
+    return test_ok;
+}

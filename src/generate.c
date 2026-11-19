@@ -367,7 +367,15 @@ static int passgen_generate_set(
     // compute number of possible choices
     size_t possible = set->choices_list[set->items.len - 1];
     passgen_assert(possible != 0);
-    size_t choice = passgen_random_u64_max(context->env->random, possible);
+
+    // a set of a single character (such as `[a]` or `[aa]`, which are merged
+    // into one range) has nothing to choose from, so it takes no randomness,
+    // like a repetition with a fixed count. the first choice is that
+    // character.
+    passgen_pattern_range *first = passgen_stack_get(&set->items, 0);
+    bool single = set->items.len == 1 && first->start == first->end;
+    size_t choice =
+        single ? 0 : passgen_random_u64_max(context->env->random, possible);
 
     // locate the range of the choice: the first one whose cumulative number
     // of choices is larger than it.
@@ -505,9 +513,8 @@ static int passgen_generate_special(
             return passgen_generate_special_wordlist(context, special);
         case PASSGEN_PATTERN_SPECIAL_PRESET:
             // a preset is generated like a group, which makes \p{name} the
-            // same as the pattern of the preset in parentheses. note that
-            // choosing from a group takes randomness even if there is only
-            // one choice, so this is not the same as the pattern on its own.
+            // same as the pattern of the preset in parentheses, and so the
+            // same as the pattern on its own (as with --preset).
             return passgen_generate_group(
                 context,
                 &special->preset->pattern.group);
@@ -580,9 +587,14 @@ static int passgen_generate_group(
         return fail(context, PASSGEN_ERROR_GROUP_EMPTY);
     }
 
-    // choose random segment from segments
+    // choose random segment from segments. a group with a single segment
+    // (such as `(abc)` or `({2}abc)`, and every pattern itself) has nothing to
+    // choose from, so it takes no randomness. this makes `(abc)` the same as
+    // `abc`, and a preset the same as its pattern.
     size_t choice =
-        passgen_random_u64_max(context->env->random, group->multiplier_sum);
+        group->segments.len == 1
+            ? 0
+            : passgen_random_u64_max(context->env->random, group->multiplier_sum);
     size_t segment_index = 0;
     passgen_pattern_segment *segment =
         passgen_stack_get(&group->segments, segment_index);

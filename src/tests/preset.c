@@ -78,8 +78,8 @@ test_result test_preset_env(void) {
     return test_ok;
 }
 
-/// A preset is generated like its pattern in parentheses, also when presets
-/// use other presets.
+/// A preset generates the same as its pattern, on its own or in parentheses,
+/// also when presets use other presets.
 test_result test_preset_generate(void) {
     passgen_env *env = passgen_env_new(NULL);
     assert(env);
@@ -95,6 +95,9 @@ test_result test_preset_generate(void) {
         {"\\p{.segment}", "([a-zA-Z0-9]{6})"},
         {"\\p{apple}",
          "((([a-zA-Z0-9]{6})-){2}([a-zA-Z0-9]{6}))"},
+        // the same as using the preset with `--preset`.
+        {"\\p{apple}", "([a-zA-Z0-9]{6}-){2}[a-zA-Z0-9]{6}"},
+        {"\\p{choice}", "a|b|c"},
         {"x\\p{apple}{2}y",
          "x((([a-zA-Z0-9]{6})-){2}([a-zA-Z0-9]{6})){2}y"},
         // the choice stays inside of the preset.

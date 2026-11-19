@@ -125,19 +125,19 @@ test "$($passgen -r zero "[a-z]{8}")" = "aaaaaaaa"
 while read -r preset expected; do
     test "$($passgen -r xorshift:1234 -p "$preset")" = "$expected"
 done << EOF
-apple1 3t8-jsO-2Mo-COm
-apple2 3t8Qjs-w2MoCO-mGr6ix
-uuid b378ad68-a262-4c80-856c-b0cc9fe064be
-edge 27OM1KAME5fEfAD
-firefox x3t8QjsOw2MoCOm
-proquint16 gupik
-proquint32 gupik-fosab
-proquint48 gupik-fosab-kabas
-proquint64 gupik-fosab-kabas-vahuv
-proquint80 gupik-fosab-kabas-vahuv-kuhif
-proquint96 gupik-fosab-kabas-vahuv-kuhif-kufaf
-proquint112 gupik-fosab-kabas-vahuv-kuhif-kufaf-zazut
-proquint128 gupik-fosab-kabas-vahuv-kuhif-kufaf-zazut-gaboz
+apple1 Rx3-t8Q-jsO-w2M
+apple2 Rx3t8Q-jsOw2M-oCOmGr
+uuid bb378ad6-8a26-42c8-8056-cb0cc9fe064b
+edge P27OM1KAME5fEfA
+firefox Rx3t8QjsOw2MoCO
+proquint16 rugum
+proquint32 rugum-pikap
+proquint48 rugum-pikap-fofam
+proquint64 rugum-pikap-fofam-bajos
+proquint80 rugum-pikap-fofam-bajos-rasan
+proquint96 rugum-pikap-fofam-bajos-rasan-zoboh
+proquint112 rugum-pikap-fofam-bajos-rasan-zoboh-rokik
+proquint128 rugum-pikap-fofam-bajos-rasan-zoboh-rokik-zohif
 EOF
 test "$($passgen --list | wc -l)" -eq 13
 
@@ -153,7 +153,7 @@ if $passgen -r "chacha20:$key" "a" > /dev/null 2>&1; then
 
     # known answer, to notice when the derivation changes (which would change
     # everyone's passwords).
-    test "$a" = "ZKYX4F-p3hvOg-dGx2es"
+    test "$a" = "4pZKYX-4Fxp3h-vOgdGx"
 
     # a randomness source from the configuration does not get in the way
     echo "random zero" > "$XDG_CONFIG_HOME/passgen.conf"
