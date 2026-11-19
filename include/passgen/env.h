@@ -6,6 +6,7 @@
 #include <passgen/export.h>
 
 #include <passgen/random.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 
@@ -118,6 +119,28 @@ PASSGEN_EXPORT passgen_status passgen_env_wordlist_add_path(
     const char *name,
     const char *path);
 
+/// Finds the path of a wordlist, which was added with @ref
+/// passgen_env_wordlist_add_path.
+///
+/// @relatesalso passgen_env
+/// @param env Environment to look in
+/// @param name Name of the wordlist
+/// @returns The path of the wordlist, which is valid until the wordlist is
+///   replaced or removed, or the environment is freed. NULL if there is no
+///   wordlist with this name, or it was added as a file.
+PASSGEN_EXPORT const char *
+passgen_env_wordlist_path(const passgen_env *env, const char *name);
+
+/// Removes a wordlist, so that patterns can no longer use it, as if it was
+/// never added. Patterns which use it fail to resolve, with @ref
+/// PASSGEN_ERROR_WORDLIST_NOT_FOUND.
+///
+/// @relatesalso passgen_env
+/// @param env Environment to remove the wordlist from
+/// @param name Name of the wordlist
+/// @returns Whether there was a wordlist with this name
+PASSGEN_EXPORT bool passgen_env_wordlist_remove(passgen_env *env, const char *name);
+
 /// Adds a preset, which is a named pattern. Patterns can use it as
 /// `\p{name}`, also other presets, so that patterns can be built from parts.
 /// If there is a preset with this name already, it is replaced.
@@ -136,6 +159,16 @@ PASSGEN_EXPORT passgen_status passgen_env_wordlist_add_path(
 /// @returns @ref PASSGEN_OK or @ref PASSGEN_ERROR_OUT_OF_MEMORY
 PASSGEN_EXPORT passgen_status
 passgen_env_preset_add(passgen_env *env, const char *name, const char *pattern);
+
+/// Removes a preset, so that patterns can no longer use it, as if it was never
+/// added. Patterns which use it fail to resolve, with @ref
+/// PASSGEN_ERROR_PRESET_NOT_FOUND.
+///
+/// @relatesalso passgen_env
+/// @param env Environment to remove the preset from
+/// @param name Name of the preset
+/// @returns Whether there was a preset with this name
+PASSGEN_EXPORT bool passgen_env_preset_remove(passgen_env *env, const char *name);
 
 /// Finds the pattern of a preset.
 ///

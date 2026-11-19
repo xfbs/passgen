@@ -39,6 +39,13 @@ so that the same inputs always result in the same sequence.
 .It Fl a , Fl -amount Ar amount
 Generate this many sequences, one per line.
 Has to be at least one, which is the default.
+.It Fl c , Fl -config Ar path
+Read this configuration file, instead of the usual ones, see
+.Sx CONFIGURATION .
+Can be given more than once, to read several, in order.
+Unlike the usual ones, it has to exist.
+To read none, use
+.Pa /dev/null .
 .It Fl e , Fl -entropy
 Compute the entropy of every generated sequence, in bits.
 This measures how much randomness went into the sequence: for an entropy of
@@ -59,8 +66,8 @@ if
 is given.
 .It Fl l , Fl -list
 List the presets with their patterns and exit.
-This includes the ones defined in the configuration, and by options which
-come before this one, except for those whose names start with an underscore.
+This includes the ones defined in the configuration, and by options, except
+for those whose names start with an underscore.
 .It Fl p , Fl -preset Ar name
 Use the pattern of the preset with this name, see
 .Sx PRESETS .
@@ -222,8 +229,9 @@ or in other patterns as
 also in the patterns of other presets.
 This way, patterns can be built from parts, for example in the configuration:
 .Bd -literal -offset indent
-preset _segment:[a-zA-Z0-9]{6}
-preset mine:(\ep{_segment}-){2}\ep{_segment}
+[presets]
+_segment = '[a-zA-Z0-9]{6}'
+mine = '(\ep{_segment}-){2}\ep{_segment}'
 .Ed
 .Pp
 Presets whose names start with an underscore are meant to be parts of others,
@@ -325,8 +333,6 @@ wordlist.
 Master passphrase mode cannot be used together with
 .Fl -random ,
 as it is a source of randomness itself.
-It takes precedence over a source of randomness which is set in the
-configuration.
 .Pp
 Before version 1.0.0, what is generated for the same inputs may change from
 one version of
@@ -336,32 +342,59 @@ Changes to it are listed in the changelog.
 .Sh CONFIGURATION
 On startup,
 .Nm
-reads the configuration files listed in
-.Sx FILES ,
-if they exist.
-Options on the command line come after the configuration.
+reads configuration files, which define presets and wordlists.
+These are the ones listed in
+.Sx FILES
+which exist, in that order, unless others are given with
+.Fl -config
+or
+.Ev PASSGEN_CONFIG .
+Each can replace or remove what the ones before it define, and options on
+the command line come last.
 The format of these files is not stable yet, and may change in a future
 version.
 .Pp
-Every line of a configuration file is one of the following.
-Empty lines, and lines which start with
-.Ql # ,
-are ignored.
-.Bl -tag -width Ds
-.It Li preset Ar name:pattern
-Define a preset, like
-.Fl -define-preset .
-.It Li wordlist Ar name:path
-Load a wordlist, like
+They are written in TOML, for example:
+.Bd -literal -offset indent
+[wordlists]
+english = "/usr/share/dict/words"
+eff = "eff-large.txt"
+
+[presets]
+_segment = '[a-zA-Z0-9]{6}'
+mine = '(\ep{_segment}-){2}\ep{_segment}'
+apple1 = false
+.Ed
+.Pp
+The table
+.Li wordlists
+defines wordlists by their paths, like
 .Fl -wordlist .
-.It Li random Ar random
-Set the source of randomness, like
-.Fl -random .
-.El
+A relative path is relative to the directory of the configuration file.
+The table
+.Li presets
+defines presets, like
+.Fl -define-preset .
+Their patterns are best written in single quotes, where a backslash is just a
+backslash.
+Setting a preset or a wordlist to
+.Li false
+removes it, also a predefined one.
+.Pp
+The source of randomness cannot be set in the configuration, so that it is
+always visible on the command line.
+Anything else in a configuration file, and a file which is not valid TOML, is
+an error.
 .Sh ENVIRONMENT
 .Bl -tag -width Ds
+.It Ev PASSGEN_CONFIG
+Configuration files to read instead of the ones in
+.Sx FILES ,
+separated by colons.
+Those which do not exist are skipped.
+When it is set but empty, none are read.
 .It Ev XDG_CONFIG_HOME
-Where to look for the configuration file of the user.
+Where to look for the configuration of the user.
 Defaults to
 .Pa ~/.config .
 .It Ev HOME
@@ -369,10 +402,14 @@ The home directory of the user.
 .El
 .Sh FILES
 .Bl -tag -width Ds
-.It Pa /etc/passgen.conf
+.It Pa @CMAKE_INSTALL_PREFIX@/share/passgen/config.toml
+Configuration which is installed along with
+.Nm ,
+which defines the wordlists installed next to it.
+.It Pa @CMAKE_INSTALL_FULL_SYSCONFDIR@/passgen/config.toml
 Configuration for all users.
-.It Pa $XDG_CONFIG_HOME/passgen.conf , ~/.config/passgen.conf
-Configuration of the user, which is read after the one for all users.
+.It Pa $XDG_CONFIG_HOME/passgen/config.toml , ~/.config/passgen/config.toml
+Configuration of the user.
 .El
 .Sh EXIT STATUS
 .Nm
@@ -413,6 +450,8 @@ The options for master passphrase mode cannot be used this way: together with
 or a domain or token without a master passphrase.
 .It 13
 The number of steps is not valid.
+.It 14
+A configuration file cannot be read, or is not valid.
 .El
 .Pp
 If a source of randomness does not supply enough data,

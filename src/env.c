@@ -126,6 +126,29 @@ passgen_status passgen_env_wordlist_add_path(
     return wordlist_insert(env, name, wordlist);
 }
 
+const char *passgen_env_wordlist_path(const passgen_env *env, const char *name) {
+    passgen_hashmap_entry *entry =
+        passgen_hashmap_lookup(&env->wordlists, name);
+    if(!entry) {
+        return NULL;
+    }
+
+    const passgen_wordlist *wordlist = entry->value;
+    return wordlist->path;
+}
+
+bool passgen_env_wordlist_remove(passgen_env *env, const char *name) {
+    passgen_hashmap_entry old = passgen_hashmap_remove(&env->wordlists, name);
+    if(!old.key) {
+        return false;
+    }
+    wordlist_entry_free(NULL, &old);
+
+    // patterns which were resolved before may point to it.
+    env->version += 1;
+    return true;
+}
+
 passgen_status
 passgen_env_preset_add(passgen_env *env, const char *name, const char *pattern) {
     char *name_copy = passgen_alloc_string(name);
@@ -159,6 +182,19 @@ passgen_env_preset_add(passgen_env *env, const char *name, const char *pattern) 
     env->version += 1;
 
     return PASSGEN_OK;
+}
+
+bool passgen_env_preset_remove(passgen_env *env, const char *name) {
+    passgen_hashmap_entry old = passgen_hashmap_remove(&env->presets, name);
+    if(!old.key) {
+        return false;
+    }
+    preset_entry_free(NULL, &old);
+
+    // patterns which were resolved before may point to it, or to a preset
+    // which uses it.
+    env->version += 1;
+    return true;
 }
 
 const char *passgen_env_preset_get(const passgen_env *env, const char *name) {

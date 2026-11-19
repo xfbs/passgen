@@ -20,11 +20,23 @@ tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 export HOME="$tmpdir/home"
 export XDG_CONFIG_HOME="$tmpdir/config"
-unset XDG_CONFIG_PATH
-mkdir -p "$HOME" "$XDG_CONFIG_HOME"
+mkdir -p "$HOME" "$XDG_CONFIG_HOME/passgen"
+# this also keeps out the configuration of the system. the tests for where
+# the configuration is looked for unset it.
+export PASSGEN_CONFIG=
 
 function matches() {
     grep -E "^$1$"
+}
+
+# errors say what is wrong. the colors are left out for comparing.
+function error_of() {
+    "$@" 2>&1 >/dev/null | sed $'s/\033\\[[0-9;]*m//g' | head -n 1
+}
+
+# all of what is printed as the error.
+function error_lines() {
+    "$@" 2>&1 >/dev/null | sed $'s/\033\\[[0-9;]*m//g' || true
 }
 
 # things that should fail, and not print anything to standard output
@@ -164,11 +176,6 @@ if $passgen -r "chacha20:$key" "a" > /dev/null 2>&1; then
     # everyone's passwords).
     test "$a" = "4pZKYX-4Fxp3h-vOgdGx"
 
-    # a randomness source from the configuration does not get in the way
-    echo "random zero" > "$XDG_CONFIG_HOME/passgen.conf"
-    test "$a" = "$($passgen -m master -d example.com -t user -p apple2)"
-    rm "$XDG_CONFIG_HOME/passgen.conf"
-
     # but giving one on the command line is a mistake, as are a domain or a
     # token without a master passphrase
     fails $passgen -m master -r zero "a"
@@ -231,14 +238,8 @@ $passgen -w "test:$tmpdir/words.txt" '\m{test:1}-\m{test:8}-\m{test}' | matches 
 # a chain as long as the words only generates them.
 $passgen -a 5 -w "test:$tmpdir/words.txt" '\m{test:8}' | matches "(alpha|bravo|charlie)"
 
-# user-defined presets and configuration file
+# user-defined presets
 test "$($passgen -P "mine:abc" -p mine)" = "abc"
-echo "preset fromconfig:xyz" > "$XDG_CONFIG_HOME/passgen.conf"
-test "$($passgen -p fromconfig)" = "xyz"
-rm "$XDG_CONFIG_HOME/passgen.conf"
-mkdir -p "$HOME/.config"
-echo "preset fromhome:uvw" > "$HOME/.config/passgen.conf"
-test "$(XDG_CONFIG_HOME= $passgen -p fromhome)" = "uvw"
 
 # presets can use other presets, so that they can be built from parts. those
 # whose names start with an underscore are not listed, but work the same
@@ -253,11 +254,87 @@ test "$($passgen "${fragments[@]}" -l | grep -c '^preset joined ')" = 1
 $passgen '\p{apple1}' | matches "([a-zA-Z0-9]{3}-){3}[a-zA-Z0-9]{3}"
 # a preset is the same as its pattern in parentheses.
 test "$($passgen -r xorshift:1 '\p{uuid}')" = "$($passgen -r xorshift:1 "($($passgen -l | sed -n 's/^preset uuid //p'))")"
-# also from the configuration file, where the order does not matter, as they
-# are only used once all of them are defined.
-printf 'preset fromconfig:\\p{_part}\\p{_part}\npreset _part:[xy]\n' > "$XDG_CONFIG_HOME/passgen.conf"
-$passgen -p fromconfig | matches "[xy]{2}"
-rm "$XDG_CONFIG_HOME/passgen.conf"
+
+# configuration files, which define presets and wordlists. wordlists are found
+# relative to the file.
+mkdir -p "$tmpdir/conf/lists"
+printf 'alpha\n' > "$tmpdir/conf/lists/words.txt"
+cat > "$tmpdir/conf/first.toml" <<'TOML'
+[wordlists]
+words = "lists/words.txt"
+missing = "lists/missing.txt"
+
+[presets]
+# the order does not matter, presets are only used once all are defined.
+fromconfig = '\p{_part}\p{_part}'
+_part = '[xy]'
+word = '\w{words}'
+replaced = 'first'
+apple1 = false
+TOML
+cat > "$tmpdir/conf/second.toml" <<'TOML'
+[presets]
+replaced = 'second'
+TOML
+first="$tmpdir/conf/first.toml"
+second="$tmpdir/conf/second.toml"
+$passgen -c "$first" -p fromconfig | matches "[xy]{2}"
+test "$($passgen -c "$first" -p word)" = "alpha"
+test "$(cd / && $passgen -c "$first" -p word)" = "alpha"
+test "$($passgen -c "$first" -l | grep -c "^preset _part ")" = 0
+# later files replace what earlier ones define, false removes it, and the
+# command line comes last.
+test "$($passgen -c "$first" -p replaced)" = "first"
+test "$($passgen -c "$first" -c "$second" -p replaced)" = "second"
+test "$($passgen -c "$second" -c "$first" -p replaced)" = "first"
+test "$($passgen -P replaced:cli -c "$first" -p replaced)" = "cli"
+test "$($passgen -c "$first" -l | grep -c '^preset apple1 ')" = 0
+fails $passgen -c "$first" -p apple1
+test "$($passgen -c "$first" -P 'apple1:back' -p apple1)" = "back"
+# a wordlist which does not exist is fine until it is used, and then the error
+# says where it is.
+test "$($passgen -c "$first" a)" = "a"
+fails $passgen -c "$first" '\w{missing}'
+test "$(error_lines $passgen -c "$first" '\w{missing}' | tail -n 1)" = "wordlist missing: $tmpdir/conf/lists/missing.txt"
+# --config replaces the usual configuration, so /dev/null means none.
+test "$($passgen -c /dev/null -l | grep -c '^preset apple1 ')" = 1
+
+# PASSGEN_CONFIG is a list of files, like $PATH, of which those which do not
+# exist are skipped. otherwise, the configuration of the user is read, from
+# $XDG_CONFIG_HOME or else ~/.config.
+test "$(PASSGEN_CONFIG="$first:$tmpdir/nonexistent::$second" $passgen -p replaced)" = "second"
+fails env PASSGEN_CONFIG="$first" $passgen -c "$second" -p word
+cp "$second" "$XDG_CONFIG_HOME/passgen/config.toml"
+test "$(env -u PASSGEN_CONFIG $passgen -p replaced)" = "second"
+fails $passgen -p replaced
+rm "$XDG_CONFIG_HOME/passgen/config.toml"
+mkdir -p "$HOME/.config/passgen"
+cp "$second" "$HOME/.config/passgen/config.toml"
+test "$(env -u PASSGEN_CONFIG XDG_CONFIG_HOME= $passgen -p replaced)" = "second"
+rm -r "$HOME/.config/passgen"
+
+# problems with a configuration file are errors (exit status 14), which say
+# where they are.
+function config_error() {
+    printf "$1" > "$tmpdir/bad.toml"
+    fails $passgen -c "$tmpdir/bad.toml" a
+    $passgen -c "$tmpdir/bad.toml" a >/dev/null 2>&1 || test "$?" = 14
+    error_of $passgen -c "$tmpdir/bad.toml" a | sed "s|$tmpdir/||"
+}
+test "$(config_error '[presets]\nx = \n')" = "error: in configuration \`bad.toml\`: (line 2) missing value"
+test "$(config_error 'random = "system"\n')" = "error: in configuration \`bad.toml\`: (line 1) unknown key \`random\`"
+test "$(config_error '[preset]\nx = "a"\n')" = "error: in configuration \`bad.toml\`: (line 1) unknown key \`preset\`"
+test "$(config_error 'presets = "a"\n')" = "error: in configuration \`bad.toml\`: (line 1) \`presets\` has to be a table"
+test "$(config_error '[presets]\nx = true\n')" = "error: in configuration \`bad.toml\`: (line 2) preset \`x\` has to be a pattern, or false"
+test "$(config_error '[presets]\n\nx = 1\n')" = "error: in configuration \`bad.toml\`: (line 3) preset \`x\` has to be a pattern, or false"
+test "$(config_error '[wordlists]\nx = []\n')" = "error: in configuration \`bad.toml\`: (line 2) wordlist \`x\` has to be a path, or false"
+test "$(config_error '[presets]\nx = "\xff"\n')" = "error: in configuration \`bad.toml\`: invalid UTF8 char on line 2"
+# one given with --config has to exist, the others do not.
+fails $passgen -c "$tmpdir/nonexistent.toml" a
+test "$(error_of $passgen -c "$tmpdir/nonexistent.toml" a | sed "s|$tmpdir/||")" = "error: in configuration \`nonexistent.toml\`: No such file or directory"
+cp "$tmpdir/bad.toml" "$XDG_CONFIG_HOME/passgen/config.toml"
+fails env -u PASSGEN_CONFIG $passgen a
+rm "$XDG_CONFIG_HOME/passgen/config.toml"
 
 # groups can be nested up to 1024 deep. more is an error in the pattern (exit
 # status 3), also for patterns nested so deeply that freeing them used to run
@@ -323,16 +400,6 @@ fails $passgen --nonexistent-option
 fails $passgen "a" "b"
 fails $passgen -p apple1 "a"
 
-# errors say what is wrong. the colors are left out for comparing.
-function error_of() {
-    "$@" 2>&1 >/dev/null | sed $'s/\033\\[[0-9;]*m//g' | head -n 1
-}
-
-# all of what is printed as the error.
-function error_lines() {
-    "$@" 2>&1 >/dev/null | sed $'s/\033\\[[0-9;]*m//g' || true
-}
-
 test "$(error_of $passgen '[]')" = "error in pattern: set is empty"
 test "$(error_of $passgen '(abc')" = "error in pattern: group is not closed"
 test "$(error_of $passgen 'a{5,2}')" = "error in pattern: invalid repetition"
@@ -345,9 +412,8 @@ test "$(error_of $passgen -r "chacha20:secretkey" a)" = "error: cannot use rando
 test "$(error_of $passgen -r "chacha20-argon2:$(printf 'x%.0s' $(seq 200))" a)" = "error: cannot use randomness source 'chacha20-argon2:...'"
 test "$(error_of $passgen -r "chacha:secretkey" a)" = "error: cannot use randomness source 'chacha:...'"
 test "$(error_lines $passgen -r "chacha20:secretkey" a | grep -c secretkey)" = 0
-echo "random chacha20:secretkey" > "$XDG_CONFIG_HOME/passgen.conf"
-test "$(error_lines $passgen a | grep -c secretkey)" = 0
-rm "$XDG_CONFIG_HOME/passgen.conf"
+printf 'random = "chacha20:secretkey"\n' > "$tmpdir/random.toml"
+test "$(error_lines $passgen -c "$tmpdir/random.toml" a | grep -c secretkey)" = 0
 # sources without secrets are printed in full.
 test "$(error_of $passgen -r "file:/nonexistent" a)" = "error: cannot use randomness source 'file:/nonexistent'"
 test "$(error_of $passgen -r "xorshift:0" a)" = "error: cannot use randomness source 'xorshift:0'"
@@ -400,6 +466,9 @@ fi
 head -c 1500 /dev/zero > "$tmpdir/short.bin"
 head -c 100 /dev/zero > "$tmpdir/tiny.bin"
 test "$($passgen -r "file:$tmpdir/short.bin" '[a-z]{8}')" = "aaaaaaaa"
+# reading from a character device, which the C library checks for being a
+# terminal (and which the seccomp filter used to kill passgen for).
+$passgen -r file:/dev/urandom '[a-z]{8}' | matches "[a-z]{8}"
 test "$(error_of $passgen -r "file:$tmpdir/short.bin" '[a-z]{200}')" = "error: source of randomness ran out"
 test -z "$($passgen -r "file:$tmpdir/short.bin" '[a-z]{200}' 2>/dev/null || true)"
 test -z "$($passgen -j -r "file:$tmpdir/short.bin" '[a-z]{200}' 2>/dev/null || true)"

@@ -42,10 +42,21 @@ typedef enum {
     PASSGEN_CLI_ERROR_UNUSED_11,
     PASSGEN_CLI_ERROR_MASTER_CONFLICT,
     PASSGEN_CLI_ERROR_ILLEGAL_STEPS,
+    PASSGEN_CLI_ERROR_CONFIG,
 
     PASSGEN_CLI_SHOW_HELP,
     PASSGEN_CLI_SHOW_VERSION,
 } passgen_cli_error;
+
+/// A preset or a wordlist which is defined on the command line. These are
+/// added after the configuration is loaded, so that they replace what it
+/// defines.
+typedef struct {
+    /// The option it was given with: `P` for a preset, `w` for a wordlist.
+    char option;
+    /// Its argument, as `name:pattern` or `name:path`.
+    const char *argument;
+} passgen_cli_definition;
 
 /// Options parsed from the command line.
 typedef struct {
@@ -53,6 +64,20 @@ typedef struct {
     size_t amount;
     /// The pattern to use when generating passwords.
     const char *pattern;
+    /// The preset to use when generating passwords, which is looked up once
+    /// the configuration is loaded.
+    const char *preset;
+    /// List the presets, instead of generating.
+    bool list;
+    /// Presets and wordlists defined on the command line, in order.
+    passgen_cli_definition *definitions;
+    /// How many presets and wordlists were defined on the command line.
+    size_t definitions_len;
+    /// Configuration files given on the command line, which are loaded
+    /// instead of the usual ones.
+    const char **configs;
+    /// How many configuration files were given on the command line.
+    size_t configs_len;
     /// Separate output with null characters.
     bool null;
     /// Output as JSON.
@@ -88,20 +113,21 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input);
 /// Parse a randomness definition, like `system` or `xorshift:2342322`
 int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random);
 
-/// Load system and user config into options
+/// Load the configuration files: the ones given with `--config`, or else
+/// the ones in `PASSGEN_CONFIG`, or else the usual ones.
 int passgen_cli_opts_config(passgen_cli_opts *opts);
 
-/// Load system config into options, if it exists
-int passgen_cli_opts_config_system(passgen_cli_opts *opts);
+/// Load a configuration file. One which does not exist is skipped, unless it
+/// is required.
+int passgen_cli_opts_config_file(
+    passgen_cli_opts *opts,
+    const char *path,
+    bool required);
 
-/// Load user config into options, if it exists
-int passgen_cli_opts_config_user(passgen_cli_opts *opts);
-
-/// Load configuration options from file
-int passgen_cli_opts_config_load(passgen_cli_opts *opts, FILE *file);
-
-/// Load configuration options from string
-int passgen_cli_opts_config_parse(passgen_cli_opts *opts, char *data);
+/// Load the configuration, add the presets and wordlists from the command
+/// line, and find the preset to use. This is done after parsing the options,
+/// which say which configuration to load.
+int passgen_cli_opts_load(passgen_cli_opts *opts);
 
 /// Print usage (help text) using @p executable as the name of the program.
 ///

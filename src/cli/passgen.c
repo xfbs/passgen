@@ -1,9 +1,11 @@
 #include "passgen.h"
+#include "tomlc17.h"
 
 #include <assert.h>
 #include <errno.h>
 #include <getopt.h>
 #include <math.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -114,9 +116,33 @@ static void passgen_cli_pattern_error(
         snprintf(prefix, sizeof(prefix), "preset %s: ", current->detail);
         passgen_cli_pattern_mark(prefix, preset, current->cause);
     }
+
+    // a wordlist which could not be read is found by its name, to say which
+    // file it is. it may be in a preset.
+    for(const passgen_error *current = error; current;
+        current = current->cause) {
+        if(current->kind != PASSGEN_ERROR_WORDLIST_READ) {
+            continue;
+        }
+
+        const char *path = passgen_env_wordlist_path(env, current->detail);
+        if(path) {
+            fprintf(
+                stderr,
+                "\033[1;33mwordlist %s: \033[0m%s\n",
+                current->detail,
+                path);
+        }
+    }
 }
 
+static int passgen_cli_presets_list(const passgen_cli_opts *opts);
+
 int passgen_cli_run(passgen_cli_opts opts) {
+    if(opts.list) {
+        return passgen_cli_presets_list(&opts);
+    }
+
     passgen_pattern *pattern;
     passgen_error error;
     if(PASSGEN_OK != passgen_parse(&pattern, &error, opts.pattern)) {
@@ -418,6 +444,12 @@ int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
 
 void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->pattern = NULL;
+    opts->preset = NULL;
+    opts->list = false;
+    opts->definitions = NULL;
+    opts->definitions_len = 0;
+    opts->configs = NULL;
+    opts->configs_len = 0;
     opts->amount = 1;
     opts->null = false;
     opts->json = false;
@@ -548,14 +580,20 @@ static int passgen_cli_presets_list(const passgen_cli_opts *opts) {
 #endif
 
 int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
-    const char *short_opts = "a:p:P:w:r:S:ezhvjl" PASSGEN_CLI_MASTER_OPTS;
-    const char *preset = NULL;
-    // whether the randomness source was set on the command line, rather than
-    // in the configuration.
+    const char *short_opts = "a:c:p:P:w:r:S:ezhvjl" PASSGEN_CLI_MASTER_OPTS;
+    // whether the randomness source was set on the command line.
     bool random_given = false;
+
+    // there cannot be more of these than there are arguments.
+    opts->definitions = calloc(argc, sizeof(passgen_cli_definition));
+    opts->configs = calloc(argc, sizeof(const char *));
+    if(!opts->definitions || !opts->configs) {
+        return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+    }
 
     static struct option long_opts[] = {
         {"amount", required_argument, NULL, 'a'},
+        {"config", required_argument, NULL, 'c'},
         {"help", no_argument, NULL, 'h'},
         {"preset", required_argument, NULL, 'p'},
         {"steps", required_argument, NULL, 'S'},
@@ -602,8 +640,11 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 opts->master_token = optarg;
                 break;
 #endif
+            case 'c':
+                opts->configs[opts->configs_len++] = optarg;
+                break;
             case 'p':
-                preset = optarg;
+                opts->preset = optarg;
                 break;
             case 'S': {
                 char *end;
@@ -625,16 +666,17 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             case 'v':
                 return PASSGEN_CLI_SHOW_VERSION;
             case 'l':
-                exit(passgen_cli_presets_list(opts));
+                opts->list = true;
+                break;
             case 'w':
-                try(passgen_cli_opts_wordlist(opts, optarg));
+            case 'P':
+                // added once the configuration is loaded.
+                opts->definitions[opts->definitions_len++] =
+                    (passgen_cli_definition){opt, optarg};
                 break;
             case 'r':
                 try(passgen_cli_opts_random(opts, optarg));
                 random_given = true;
-                break;
-            case 'P':
-                try(passgen_cli_opts_preset(opts, optarg));
                 break;
             case 'j':
                 opts->json = true;
@@ -647,22 +689,10 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
         }
     }
 
-    // can't have both a preset and a format at the same time.
-    if(preset && opts->pattern) {
-        return passgen_cli_bail(PASSGEN_CLI_ERROR_MULTIPLE_FORMATS, opts->pattern);
-    }
-
-    // if a preset was given, parse it.
-    if(preset) {
-        opts->pattern = passgen_env_preset_get(opts->env, preset);
-        if(!opts->pattern) {
-            return passgen_cli_bail(PASSGEN_CLI_ERROR_PRESET_NOT_FOUND, preset);
-        }
-    }
-
-    // parse a given format, making sure we don't have multiple."
+    // a pattern, or a preset to take it from (which is looked up once the
+    // configuration is loaded), but not both.
     if(optind < argc) {
-        if(opts->pattern || (argc - optind) > 1) {
+        if(opts->preset || (argc - optind) > 1) {
             return passgen_cli_bail(
                 PASSGEN_CLI_ERROR_MULTIPLE_FORMATS,
                 argv[optind]);
@@ -671,8 +701,9 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
         }
     }
 
-    // if no format or preset was given, show help.
-    if(!opts->pattern) {
+    // if no pattern or preset was given, show help, unless the presets are
+    // to be listed.
+    if(!opts->pattern && !opts->preset && !opts->list) {
         return PASSGEN_CLI_SHOW_HELP;
     }
 
@@ -695,12 +726,6 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     }
 
     if(opts->master_passphrase) {
-        // this takes precedence over a randomness source which was set in
-        // the configuration.
-        if(opts->random) {
-            passgen_random_free(opts->random);
-        }
-
         opts->random = passgen_random_chacha20_argon2_open(
             NULL,
             opts->master_passphrase,
@@ -767,6 +792,7 @@ void passgen_cli_usage(const char *executable) {
         "\n"
         "OPTIONS\n"
         "    -a, --amount N         Generate N sequences (default: 1)\n"
+        "    -c, --config PATH      Read this configuration, not the usual ones\n"
         PASSGEN_CLI_HELP_DOMAIN
         "    -e, --entropy          Show the entropy of every sequence, in bits\n"
         "    -h, --help             Show this help\n"
@@ -874,6 +900,8 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
             fprintf(stderr, "\033[1;31merror\033[0m: out of memory\n");
             break;
         case PASSGEN_CLI_ERROR_WORDLIST:
+        case PASSGEN_CLI_ERROR_CONFIG:
+            // what went wrong was printed by whoever noticed.
             break;
         case PASSGEN_CLI_ERROR_PRESET_NOT_FOUND:
             fprintf(
@@ -891,6 +919,8 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
 
 void passgen_cli_opts_free(passgen_cli_opts *opts) {
     passgen_env_free(opts->env);
+    free(opts->definitions);
+    free(opts->configs);
 
     // the environment only borrows the source of randomness.
     if(opts->random) {
@@ -898,133 +928,278 @@ void passgen_cli_opts_free(passgen_cli_opts *opts) {
     }
 }
 
-int passgen_cli_opts_config_load(passgen_cli_opts *opts, FILE *file) {
-    // read the whole file, however large it is.
-    size_t capacity = 4096;
-    size_t length = 0;
-    char *config = malloc(capacity);
-    if(!config) {
-        return PASSGEN_CLI_ERROR_ALLOC;
-    }
+// where the configuration which is installed along with passgen is, and the
+// one for the whole system. these are set when building, according to where
+// it is installed.
+#ifndef PASSGEN_CLI_CONFIG_DATA
+#define PASSGEN_CLI_CONFIG_DATA "/usr/share/passgen/config.toml"
+#endif
+#ifndef PASSGEN_CLI_CONFIG_SYSTEM
+#define PASSGEN_CLI_CONFIG_SYSTEM "/etc/passgen/config.toml"
+#endif
 
-    while(true) {
-        // always leaves room for the NUL terminator
-        length += fread(&config[length], 1, capacity - length - 1, file);
-        if(length < capacity - 1) {
-            break;
+// Prints an error about a configuration file, which says where in it the
+// problem is, if it is about something in particular.
+static int passgen_cli_config_error(
+    const char *path,
+    const toml_datum_t *datum,
+    const char *format,
+    ...) {
+    fprintf(stderr, "\033[1;31merror\033[0m: in configuration `%s`: ", path);
+    if(datum && datum->lineno) {
+        fprintf(stderr, "(line %d) ", datum->lineno);
+    }
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fprintf(stderr, "\n");
+    return PASSGEN_CLI_ERROR_CONFIG;
+}
+
+// Adds the wordlists of a configuration file. A relative path is relative to
+// the directory of the configuration file.
+static int passgen_cli_config_wordlists(
+    passgen_cli_opts *opts,
+    const char *path,
+    toml_datum_t table) {
+    // how much of the path of the configuration file is its directory,
+    // including the slash.
+    const char *slash = strrchr(path, '/');
+    size_t directory_len = slash ? (size_t) (slash - path) + 1 : 0;
+
+    for(int i = 0; i < table.u.tab.size; i++) {
+        const char *name = table.u.tab.key[i];
+        toml_datum_t value = table.u.tab.value[i];
+
+        if(value.type == TOML_BOOLEAN && !value.u.boolean) {
+            passgen_env_wordlist_remove(opts->env, name);
+            continue;
+        }
+        if(value.type != TOML_STRING) {
+            return passgen_cli_config_error(
+                path,
+                &value,
+                "wordlist `%s` has to be a path, or false",
+                name);
         }
 
-        capacity *= 2;
-        char *new_config = realloc(config, capacity);
-        if(!new_config) {
-            free(config);
-            return PASSGEN_CLI_ERROR_ALLOC;
+        const char *wordlist = value.u.s;
+        size_t prefix = wordlist[0] == '/' ? 0 : directory_len;
+        size_t length = prefix + strlen(wordlist) + 1;
+        char *full = malloc(length);
+        if(!full) {
+            return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
         }
-        config = new_config;
+        memcpy(full, path, prefix);
+        strcpy(&full[prefix], wordlist);
+
+        passgen_status status =
+            passgen_env_wordlist_add_path(opts->env, name, full);
+        free(full);
+        if(status != PASSGEN_OK) {
+            return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+        }
     }
 
-    config[length] = 0;
-    int ret = passgen_cli_opts_config_parse(opts, config);
-    free(config);
+    return 0;
+}
+
+// Adds the presets of a configuration file.
+static int passgen_cli_config_presets(
+    passgen_cli_opts *opts,
+    const char *path,
+    toml_datum_t table) {
+    for(int i = 0; i < table.u.tab.size; i++) {
+        const char *name = table.u.tab.key[i];
+        toml_datum_t value = table.u.tab.value[i];
+
+        if(value.type == TOML_BOOLEAN && !value.u.boolean) {
+            passgen_env_preset_remove(opts->env, name);
+            continue;
+        }
+        if(value.type != TOML_STRING) {
+            return passgen_cli_config_error(
+                path,
+                &value,
+                "preset `%s` has to be a pattern, or false",
+                name);
+        }
+
+        if(PASSGEN_OK != passgen_env_preset_add(opts->env, name, value.u.s)) {
+            return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+        }
+    }
+
+    return 0;
+}
+
+// Adds what a parsed configuration file defines.
+static int passgen_cli_config_apply(
+    passgen_cli_opts *opts,
+    const char *path,
+    toml_datum_t top) {
+    for(int i = 0; i < top.u.tab.size; i++) {
+        const char *key = top.u.tab.key[i];
+        toml_datum_t value = top.u.tab.value[i];
+
+        bool wordlists = 0 == strcmp(key, "wordlists");
+        bool presets = 0 == strcmp(key, "presets");
+        if(!wordlists && !presets) {
+            return passgen_cli_config_error(
+                path,
+                &value,
+                "unknown key `%s`",
+                key);
+        }
+        if(value.type != TOML_TABLE) {
+            return passgen_cli_config_error(
+                path,
+                &value,
+                "`%s` has to be a table",
+                key);
+        }
+
+        if(wordlists) {
+            try(passgen_cli_config_wordlists(opts, path, value));
+        } else {
+            try(passgen_cli_config_presets(opts, path, value));
+        }
+    }
+
+    return 0;
+}
+
+int passgen_cli_opts_config_file(
+    passgen_cli_opts *opts,
+    const char *path,
+    bool required) {
+    errno = 0;
+    FILE *file = fopen(path, "r");
+    if(!file) {
+        // one which does not exist is fine, unless it was asked for.
+        if(!required && (errno == ENOENT || errno == ENOTDIR)) {
+            return 0;
+        }
+        return passgen_cli_config_error(path, NULL, "%s", strerror(errno));
+    }
+
+    // TOML has to be valid UTF-8.
+    toml_option_t option = toml_default_option();
+    option.check_utf8 = true;
+    toml_set_option(option);
+
+    toml_result_t result = toml_parse_file(file);
+    fclose(file);
+
+    int ret = 0;
+    if(!result.ok) {
+        ret = passgen_cli_config_error(path, NULL, "%s", result.errmsg);
+    } else {
+        ret = passgen_cli_config_apply(opts, path, result.toptab);
+    }
+
+    toml_free(result);
     return ret;
 }
 
-int passgen_cli_opts_config_parse(passgen_cli_opts *opts, char *data) {
-    // TODO: this code is a mess.
-    for(size_t pos = 0; data[pos]; pos++) {
-        if(data[pos] == '#') {
-            // skip this line, it's a comment
-            while(data[pos] && data[pos] != '\n') pos++;
-            continue;
-        }
-        if(data[pos] == '\n') {
-            // skip this newline
-            continue;
-        }
-        if(0 == strprefix("random", &data[pos])) {
-            pos += 6;
-            while(data[pos] && (data[pos] == ' ' || data[pos] == '\t')) pos++;
-            size_t length = 0;
-            while(data[pos + length] && data[pos + length] != '\n') length++;
-            data[pos + length] = 0;
-            passgen_cli_opts_random(opts, &data[pos]);
-            pos += length;
-            continue;
-        }
-        if(0 == strprefix("wordlist", &data[pos])) {
-            pos += 8;
-            while(data[pos] && (data[pos] == ' ' || data[pos] == '\t')) pos++;
-            size_t length = 0;
-            while(data[pos + length] && data[pos + length] != '\n') length++;
-            data[pos + length] = 0;
-            passgen_cli_opts_wordlist(opts, &data[pos]);
-            pos += length;
-            continue;
-        }
-        if(0 == strprefix("preset", &data[pos])) {
-            pos += 6;
-            while(data[pos] && (data[pos] == ' ' || data[pos] == '\t')) pos++;
-            size_t length = 0;
-            while(data[pos + length] && data[pos + length] != '\n') length++;
-            data[pos + length] = 0;
-            passgen_cli_opts_preset(opts, &data[pos]);
-            pos += length;
-            continue;
-        }
-    }
-    return 0;
-}
-
-int passgen_cli_opts_config(passgen_cli_opts *opts) {
-    try(passgen_cli_opts_config_system(opts));
-    try(passgen_cli_opts_config_user(opts));
-    return 0;
-}
-
-int passgen_cli_opts_config_system(passgen_cli_opts *opts) {
-    FILE *file = fopen("/etc/passgen.conf", "r");
-    if(file) {
-        int ret = passgen_cli_opts_config_load(opts, file);
-        fclose(file);
-        return ret;
-    } else {
-        return 0;
-    }
-}
-
-int passgen_cli_opts_config_user(passgen_cli_opts *opts) {
-    // $XDG_CONFIG_HOME is what the XDG base directory specification defines,
-    // $XDG_CONFIG_PATH is what earlier versions of passgen looked at.
+// Loads the configuration of the user, which is in $XDG_CONFIG_HOME, or else
+// in ~/.config. If neither is set, there is none.
+static int passgen_cli_opts_config_user(passgen_cli_opts *opts) {
     const char *dir = getenv("XDG_CONFIG_HOME");
-    if(!dir || !*dir) {
-        dir = getenv("XDG_CONFIG_PATH");
-    }
-
-    const char *suffix = "/passgen.conf";
+    const char *suffix = "/passgen/config.toml";
     if(!dir || !*dir) {
         dir = getenv("HOME");
-        suffix = "/.config/passgen.conf";
-        if(!dir) {
-            fprintf(stderr, "warning: cannot locate home directory\n");
+        suffix = "/.config/passgen/config.toml";
+        if(!dir || !*dir) {
             return 0;
         }
     }
 
-    size_t config_path_len = strlen(dir) + strlen(suffix) + 1;
-    char *config_path = malloc(config_path_len);
-    if(!config_path) {
-        return PASSGEN_CLI_ERROR_ALLOC;
+    size_t length = strlen(dir) + strlen(suffix) + 1;
+    char *path = malloc(length);
+    if(!path) {
+        return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
     }
-    snprintf(config_path, config_path_len, "%s%s", dir, suffix);
-    FILE *file = fopen(config_path, "r");
-    free(config_path);
-    if(file) {
-        int ret = passgen_cli_opts_config_load(opts, file);
-        fclose(file);
-        return ret;
-    } else {
+    snprintf(path, length, "%s%s", dir, suffix);
+    int ret = passgen_cli_opts_config_file(opts, path, false);
+    free(path);
+    return ret;
+}
+
+// Loads the configuration files in a list which is separated by colons, like
+// $PATH. Empty entries are skipped, as are files which do not exist.
+static int passgen_cli_opts_config_list(passgen_cli_opts *opts, const char *list) {
+    char *copy = malloc(strlen(list) + 1);
+    if(!copy) {
+        return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+    }
+    strcpy(copy, list);
+
+    int ret = 0;
+    char *path = copy;
+    while(ret == 0 && path) {
+        char *colon = strchr(path, ':');
+        if(colon) {
+            *colon = 0;
+        }
+        if(*path) {
+            ret = passgen_cli_opts_config_file(opts, path, false);
+        }
+        path = colon ? colon + 1 : NULL;
+    }
+
+    free(copy);
+    return ret;
+}
+
+int passgen_cli_opts_config(passgen_cli_opts *opts) {
+    // the ones which are given with --config have to exist.
+    if(opts->configs_len) {
+        for(size_t i = 0; i < opts->configs_len; i++) {
+            try(passgen_cli_opts_config_file(opts, opts->configs[i], true));
+        }
         return 0;
     }
+
+    // set to nothing, this loads none.
+    const char *list = getenv("PASSGEN_CONFIG");
+    if(list) {
+        return passgen_cli_opts_config_list(opts, list);
+    }
+
+    // what is installed along with passgen, what is set for the system, and
+    // then what the user set, each of which can replace what came before.
+    try(passgen_cli_opts_config_file(opts, PASSGEN_CLI_CONFIG_DATA, false));
+    try(passgen_cli_opts_config_file(opts, PASSGEN_CLI_CONFIG_SYSTEM, false));
+    return passgen_cli_opts_config_user(opts);
+}
+
+int passgen_cli_opts_load(passgen_cli_opts *opts) {
+    try(passgen_cli_opts_config(opts));
+
+    // what is defined on the command line replaces what the configuration
+    // defines.
+    for(size_t i = 0; i < opts->definitions_len; i++) {
+        const passgen_cli_definition *definition = &opts->definitions[i];
+        if(definition->option == 'P') {
+            try(passgen_cli_opts_preset(opts, definition->argument));
+        } else {
+            try(passgen_cli_opts_wordlist(opts, definition->argument));
+        }
+    }
+
+    // listing the presets does not need a pattern.
+    if(opts->preset && !opts->list) {
+        opts->pattern = passgen_env_preset_get(opts->env, opts->preset);
+        if(!opts->pattern) {
+            return passgen_cli_bail(
+                PASSGEN_CLI_ERROR_PRESET_NOT_FOUND,
+                opts->preset);
+        }
+    }
+
+    return 0;
 }
 
 #ifdef PASSGEN_SECCOMP
@@ -1177,29 +1352,26 @@ void passgen_cli_seccomp_init(void) {
         SCMP_CMP(0, SCMP_CMP_EQ, 1),
         SCMP_CMP(1, SCMP_CMP_EQ, TIOCGWINSZ));
 
-    // allow checking whether stdout or stderr are a terminal (which only
-    // reads its settings). the C library does this before writing to them
-    // when they are a character device, such as /dev/null, to decide how to
-    // buffer: without this, `passgen a > /dev/null` was killed. newer
-    // versions of glibc use TCGETS2 on some architectures.
-    for(int fd = 1; fd <= 2; fd++) {
-        seccomp_rule_add(
-            ctx,
-            SCMP_ACT_ALLOW,
-            SCMP_SYS(ioctl),
-            2,
-            SCMP_CMP(0, SCMP_CMP_EQ, fd),
-            SCMP_CMP(1, SCMP_CMP_EQ, TCGETS));
+    // allow checking whether a file is a terminal (which only reads its
+    // settings). the C library does this when it starts reading from or
+    // writing to a character device, such as /dev/null or /dev/urandom, to
+    // decide how to buffer: without this, `passgen a > /dev/null` and
+    // `passgen -r file:/dev/urandom a` were killed. newer versions of glibc
+    // use TCGETS2 on some architectures.
+    seccomp_rule_add(
+        ctx,
+        SCMP_ACT_ALLOW,
+        SCMP_SYS(ioctl),
+        1,
+        SCMP_CMP(1, SCMP_CMP_EQ, TCGETS));
 #ifdef TCGETS2
-        seccomp_rule_add(
-            ctx,
-            SCMP_ACT_ALLOW,
-            SCMP_SYS(ioctl),
-            2,
-            SCMP_CMP(0, SCMP_CMP_EQ, fd),
-            SCMP_CMP(1, SCMP_CMP_EQ, TCGETS2));
+    seccomp_rule_add(
+        ctx,
+        SCMP_ACT_ALLOW,
+        SCMP_SYS(ioctl),
+        1,
+        SCMP_CMP(1, SCMP_CMP_EQ, TCGETS2));
 #endif
-    }
 
     // apply rules
     seccomp_load(ctx);

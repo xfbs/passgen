@@ -121,6 +121,10 @@ else()
     set(PASSGEN_INSTALL_LIBDIR "${CMAKE_INSTALL_LIBDIR}")
 endif()
 
+# the other directories, such as where the configuration of the system is
+# (which is /etc for the prefix /usr).
+include(GNUInstallDirs)
+
 # the command-line tool and the pkg-config file find the library relative to
 # where they are, so that they work wherever they are installed or unpacked.
 file(RELATIVE_PATH PASSGEN_BIN_TO_LIBDIR

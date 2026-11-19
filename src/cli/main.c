@@ -59,15 +59,7 @@ int main(int argc, char *argv[]) {
         return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
     }
 
-    // load values from a config file (located at /etc/passgen.conf, or
-    // $HOME/.config/passgen.conf).
-    ret = passgen_cli_opts_config(&opts);
-    if(ret != PASSGEN_CLI_ERROR_NONE) {
-        passgen_cli_opts_free(&opts);
-        return ret;
-    }
-
-    // parse CLI options, which override the previously loaded configuration.
+    // parse the options, which say which configuration to load.
     ret = passgen_cli_opts_parse(&opts, argc, argv);
     if(ret == PASSGEN_CLI_SHOW_HELP) {
         passgen_cli_usage(argv[0]);
@@ -78,6 +70,14 @@ int main(int argc, char *argv[]) {
         passgen_cli_opts_free(&opts);
         return 0;
     } else if(ret != PASSGEN_CLI_ERROR_NONE) {
+        passgen_cli_opts_free(&opts);
+        return ret;
+    }
+
+    // load the configuration, and then what the options define, which
+    // replaces what it defines.
+    ret = passgen_cli_opts_load(&opts);
+    if(ret != PASSGEN_CLI_ERROR_NONE) {
         passgen_cli_opts_free(&opts);
         return ret;
     }

@@ -1,0 +1,22 @@
+# Configuration for passgen, which is installed along with it. The
+# configuration for the system (/etc/passgen/config.toml) and that of the user
+# (~/.config/passgen/config.toml) can replace what this defines, or remove it
+# by setting it to false. See passgen(1).
+#
+# Note that this format is not stable yet, and may change in a future version.
+
+# eff wordlists, sourced from https://www.eff.org/dice. these are installed
+# next to this file if they were downloaded with scripts/fetch-wordlists.sh
+# before building. a wordlist is only read when it is used, so these are not
+# a problem if they are not there.
+[wordlists]
+eff-large = "eff-large.txt"
+eff-short-1 = "eff-short-1.txt"
+eff-short-2 = "eff-short-2.txt"
+
+[presets]
+# six words from the large eff wordlist, as recommended by the eff
+eff = '\w{eff-large}(-\w{eff-large}){5}'
+
+# six pronounceable words, generated from the large eff wordlist
+eff-markov = '\m{eff-large}(-\m{eff-large}){5}'

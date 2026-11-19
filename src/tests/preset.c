@@ -377,3 +377,98 @@ test_result test_preset_replace(void) {
     passgen_random_close(&random);
     return test_ok;
 }
+
+/// A preset can be removed, as if it was never added.
+test_result test_preset_remove(void) {
+    passgen_random random;
+    assert(passgen_random_open(&random, "zero"));
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+    assert(PASSGEN_OK == passgen_env_preset_add(env, "word", "abc"));
+    assert(PASSGEN_OK == passgen_env_preset_add(env, "outer", "\\p{word}"));
+
+    passgen_pattern *pattern;
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\p{outer}"));
+    assert_eq(PASSGEN_OK, passgen_resolve(pattern, env, NULL));
+
+    // removing one which does not exist changes nothing.
+    assert(!passgen_env_preset_remove(env, "unknown"));
+    uint8_t output[16];
+    size_t length = 0;
+    assert_eq(
+        PASSGEN_OK,
+        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 15, &length));
+
+    // the pattern uses it through another preset, so it has to be resolved
+    // again, which then fails.
+    assert(passgen_env_preset_remove(env, "word"));
+    assert(passgen_env_preset_get(env, "word") == NULL);
+    assert_eq(
+        PASSGEN_ERROR_INVALID_ARGUMENT,
+        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 15, &length));
+    passgen_error error;
+    assert_eq(
+        PASSGEN_ERROR_PRESET_INVALID,
+        passgen_resolve(pattern, env, &error));
+    assert(error.cause);
+    assert_eq(error.cause->kind, PASSGEN_ERROR_PRESET_NOT_FOUND);
+    assert_streq(error.cause->detail, "word");
+    passgen_error_free(&error);
+
+    // it can be added again.
+    assert(!passgen_env_preset_remove(env, "word"));
+    assert(PASSGEN_OK == passgen_env_preset_add(env, "word", "xyz"));
+    assert_eq(PASSGEN_OK, passgen_resolve(pattern, env, NULL));
+    assert_eq(
+        PASSGEN_OK,
+        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 15, &length));
+    output[length] = 0;
+    assert_streq((char *) output, "xyz");
+
+    size_t count = 0;
+    assert(0 == passgen_env_preset_foreach(env, &count, count_presets));
+    assert_eq(count, 2);
+
+    passgen_pattern_free(pattern);
+    passgen_env_free(env);
+    passgen_random_close(&random);
+    return test_ok;
+}
+
+/// A wordlist can be removed, as if it was never added.
+test_result test_preset_wordlist_remove(void) {
+    passgen_random random;
+    assert(passgen_random_open(&random, "zero"));
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+
+    FILE *file = tmpfile();
+    assert(file);
+    assert(5 == fwrite("word\n", 1, 5, file));
+    assert(PASSGEN_OK == passgen_env_wordlist_add(env, "words", file));
+
+    passgen_pattern *pattern;
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\w{words}"));
+    assert_eq(PASSGEN_OK, passgen_resolve(pattern, env, NULL));
+
+    assert(!passgen_env_wordlist_remove(env, "unknown"));
+    assert(passgen_env_wordlist_remove(env, "words"));
+    assert(!passgen_env_wordlist_remove(env, "words"));
+
+    uint8_t output[16];
+    size_t length = 0;
+    assert_eq(
+        PASSGEN_ERROR_INVALID_ARGUMENT,
+        passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 15, &length));
+    passgen_error error;
+    assert_eq(
+        PASSGEN_ERROR_WORDLIST_NOT_FOUND,
+        passgen_resolve(pattern, env, &error));
+    assert_streq(error.detail, "words");
+    passgen_error_free(&error);
+
+    passgen_pattern_free(pattern);
+    passgen_env_free(env);
+    passgen_random_close(&random);
+    return test_ok;
+}

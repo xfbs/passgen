@@ -1,8 +1,9 @@
-# FIXME: install to /etc/passgen.conf
-#install(
-#    FILES passgen.conf
-#    DESTINATION etc/
-#    COMPONENT data)
+# the configuration which is installed along with passgen. it defines the
+# wordlists next to it, by relative paths.
+install(
+    FILES config.toml
+    DESTINATION share/passgen
+    COMPONENT data)
 
 # wordlists are not part of the repository, they are downloaded by
 # scripts/fetch-wordlists.sh.

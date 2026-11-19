@@ -27,6 +27,12 @@ endif()
 # the command-line interface only uses the public interface of the library.
 passgen_target_defaults(passgen-cli PUBLIC_ONLY)
 
+# where the configuration is, which is installed along with passgen, and the
+# one for the whole system (which is /etc for the prefix /usr).
+target_compile_definitions(passgen-cli PRIVATE
+    PASSGEN_CLI_CONFIG_DATA="${CMAKE_INSTALL_PREFIX}/share/passgen/config.toml"
+    PASSGEN_CLI_CONFIG_SYSTEM="${CMAKE_INSTALL_FULL_SYSCONFDIR}/passgen/config.toml")
+
 # lock memory, if turned on
 if(PASSGEN_MLOCK)
     target_compile_definitions(passgen-cli PRIVATE PASSGEN_MLOCK)

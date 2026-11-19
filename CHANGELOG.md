@@ -7,10 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `--config` (`-c`), to read a configuration file instead of the usual ones,
+  and `PASSGEN_CONFIG`, a list of them.
+
 ### Changed
 
+- The configuration is in TOML, with the tables `wordlists` and `presets`, and
+  a relative path of a wordlist is relative to the file. It is read from
+  `/usr/share/passgen/config.toml` (which is installed), then
+  `/etc/passgen/config.toml`, then `~/.config/passgen/config.toml`, each of
+  which can replace or remove (with `false`) what the ones before define.
+- The source of randomness can no longer be set in the configuration.
+- Problems with the configuration are errors, with the exit status 14.
 - A wordlist is only opened when a pattern uses it, so one which does not
-  exist is only an error then.
+  exist is only an error then, which says where it is.
+
+### Fixed
+
+- Builds with seccomp being killed when reading from a character device, such
+  as with `-r file:/dev/urandom`.
 
 ## [0.4.0] - 2026-11-19
 
