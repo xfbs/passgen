@@ -327,6 +327,35 @@ TOML
     printf '[[login]]\ndomain = "example.com"\nuser = "user"\n' > "$tmpdir/again.toml"
     test "$(error_of $passgen -c "$logins" -c "$tmpdir/again.toml" a | sed "s|$tmpdir/||g")" = "error: in configuration \`again.toml\`: (line 1) there is another login for \`example.com\` and user \`user\`, in \`logins.toml\`"
 
+    # wordlists can be checked to have the hash they are meant to have, as
+    # b2sum prints it, or any start of it.
+    mkdir -p "$tmpdir/conf/lists"
+    printf 'alpha\nbravo\ncharlie\n' > "$tmpdir/conf/lists/hashed.txt"
+    hash="69aef28a24eff680a03c73da91b961d4e77455aadb6fad1ac7d423d8d1a094f7391598b8136078ba96d55ac17aedd11e6031a9be7c53413c517f5b22210891da"
+    cat > "$tmpdir/conf/hashed.toml" <<TOML
+[wordlists]
+full = { path = "lists/hashed.txt", hash = "$hash" }
+short = { path = "lists/hashed.txt", hash = "69AEF28A" }
+wrong = { path = "lists/hashed.txt", hash = "69aef28b" }
+
+[wordlists.table]
+path = "lists/hashed.txt"
+hash = "69aef28a24"
+TOML
+    hashed="$tmpdir/conf/hashed.toml"
+    for name in full short table; do
+        $passgen -c "$hashed" "\\w{$name}" | matches "(alpha|bravo|charlie)"
+    done
+    $passgen -c "$hashed" a | matches a
+    fails $passgen -c "$hashed" '\w{wrong}'
+    test "$(error_lines $passgen -c "$hashed" '\w{wrong}' | head -n 2)" = "error in pattern: wordlist could not be read: wrong
+caused by: does not have the expected hash"
+    printf 'alpha\nbravo\n' > "$tmpdir/conf/lists/hashed.txt"
+    fails $passgen -c "$hashed" '\w{full}'
+    test "$(config_error '[wordlists]\nx = { path = "a", hash = "xyz" }\n')" = "error: in configuration \`bad.toml\`: (line 2) the hash of wordlist \`x\` has to be 1 to 128 hex digits, as b2sum prints it"
+    test "$(config_error '[wordlists]\nx = { hash = "ab" }\n')" = "error: in configuration \`bad.toml\`: (line 2) wordlist \`x\` has to be a path, a table with a path (and a hash), or false"
+    test "$(config_error '[wordlists]\nx = { path = "a", size = 1 }\n')" = "error: in configuration \`bad.toml\`: (line 2) wordlist \`x\` can only have a path and a hash, which are strings"
+
     # it is a source of randomness itself, so giving another one is a
     # mistake, as are a domain or a user without a master passphrase, and
     # options for setting one up without doing so.
@@ -374,6 +403,8 @@ else
     fails $passgen -u user "a"
     fails $passgen --master-setup main
     test "$($passgen --help 2>&1 | grep -c -- '--master\|--domain\|--user' || true)" = 0
+    # hashes of wordlists cannot be checked.
+    test "$(config_error '[wordlists]\nx = { path = "a", hash = "ab" }\n')" = "error: in configuration \`bad.toml\`: (line 2) checking the hash of wordlist \`x\` needs Monocypher, which this is built without"
     # a configuration with master passphrases and logins is still read.
     printf '[master.main]\nversion = 1\nlevel = 1\n[[login]]\ndomain = "example.com"\n' > "$tmpdir/master.toml"
     test "$($passgen -c "$tmpdir/master.toml" a)" = "a"
@@ -509,7 +540,7 @@ test "$(config_error '[preset]\nx = "a"\n')" = "error: in configuration \`bad.to
 test "$(config_error 'presets = "a"\n')" = "error: in configuration \`bad.toml\`: (line 1) \`presets\` has to be a table"
 test "$(config_error '[presets]\nx = true\n')" = "error: in configuration \`bad.toml\`: (line 2) preset \`x\` has to be a pattern, or false"
 test "$(config_error '[presets]\n\nx = 1\n')" = "error: in configuration \`bad.toml\`: (line 3) preset \`x\` has to be a pattern, or false"
-test "$(config_error '[wordlists]\nx = []\n')" = "error: in configuration \`bad.toml\`: (line 2) wordlist \`x\` has to be a path, or false"
+test "$(config_error '[wordlists]\nx = []\n')" = "error: in configuration \`bad.toml\`: (line 2) wordlist \`x\` has to be a path, a table with a path (and a hash), or false"
 test "$(config_error '[presets]\nx = "\xff"\n')" = "error: in configuration \`bad.toml\`: invalid UTF8 char on line 2"
 # one given with --config has to exist, the others do not.
 fails $passgen -c "$tmpdir/nonexistent.toml" a

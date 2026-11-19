@@ -72,6 +72,8 @@ const char *passgen_status_string(passgen_status status) {
             return "output does not fit into the buffer";
         case PASSGEN_ERROR_ABORTED:
             return "stopped";
+        case PASSGEN_ERROR_HASH:
+            return "does not have the expected hash";
     }
 
     // not a status.

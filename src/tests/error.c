@@ -205,13 +205,13 @@ test_result test_error_parse_depth(void) {
 
 /// Every status has a description of its own.
 test_result test_error_status_string(void) {
-    for(int a = PASSGEN_OK; a <= PASSGEN_ERROR_ABORTED; a++) {
+    for(int a = PASSGEN_OK; a <= PASSGEN_ERROR_HASH; a++) {
         const char *string = passgen_status_string((passgen_status) a);
         assert(string != NULL);
         assert(strlen(string) > 0);
         assert(0 != strcmp(string, "unknown error"));
 
-        for(int b = a + 1; b <= PASSGEN_ERROR_ABORTED; b++) {
+        for(int b = a + 1; b <= PASSGEN_ERROR_HASH; b++) {
             assert(
                 0 != strcmp(string, passgen_status_string((passgen_status) b)));
         }
@@ -913,8 +913,11 @@ test_result test_error_wordlist_path(void) {
     // a wordlist is only opened when a pattern uses it, so one which does
     // not exist is fine until then.
     assert(
-        PASSGEN_OK ==
-        passgen_env_wordlist_add_path(env, "missing", "/nonexistent/words"));
+        PASSGEN_OK == passgen_env_wordlist_add_path(
+                          env,
+                          "missing",
+                          "/nonexistent/words",
+                          NULL));
     passgen_pattern *pattern;
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "abc"));
     assert(PASSGEN_OK == passgen_resolve(pattern, env, NULL));
@@ -942,7 +945,8 @@ test_result test_error_wordlist_path(void) {
     assert(fd >= 0);
     assert(5 == write(fd, "word\n", 5));
     close(fd);
-    assert(PASSGEN_OK == passgen_env_wordlist_add_path(env, "words", path));
+    assert(
+        PASSGEN_OK == passgen_env_wordlist_add_path(env, "words", path, NULL));
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\w{words}"));
     assert(PASSGEN_OK == passgen_resolve(pattern, env, NULL));
     unlink(path);
@@ -964,7 +968,13 @@ test_result test_error_wordlist_path(void) {
 
     passgen_env_free(env);
 
-    // adding it fails cleanly when there is no memory, at any point.
+    // adding it fails cleanly when there is no memory, at any point, also
+    // for the hash.
+#ifdef PASSGEN_MONOCYPHER
+    const char *hash = "AB";
+#else
+    const char *hash = NULL;
+#endif
     bool done = false;
     for(size_t fail_at = 0; !done; fail_at++) {
         test_allocator allocator;
@@ -974,7 +984,8 @@ test_result test_error_wordlist_path(void) {
             passgen_status status = passgen_env_wordlist_add_path(
                 env,
                 "words",
-                "/nonexistent/words");
+                "/nonexistent/words",
+                hash);
             done = status == PASSGEN_OK;
             if(!done) {
                 assert_eq(status, PASSGEN_ERROR_OUT_OF_MEMORY);
@@ -986,6 +997,93 @@ test_result test_error_wordlist_path(void) {
     }
 
     passgen_random_close(&random);
+
+    return test_ok;
+}
+
+/// A wordlist can be checked to have the hash it is meant to have (BLAKE2b
+/// with 64 bytes, as b2sum prints it), any start of it.
+test_result test_error_wordlist_hash(void) {
+    // b2sum of the file.
+    const char *full =
+        "eae19bac64d6ed69009f95ec5a1a5520285824424898443a3244f57c6998466f"
+        "83526a43163eb4ce1e723512412cfdae83d5c078469ae5ec42d275ae0546ebde";
+    char path[] = "/tmp/passgen-test-XXXXXX";
+    int fd = mkstemp(path);
+    assert(fd >= 0);
+    assert(5 == write(fd, "word\n", 5));
+    close(fd);
+
+    passgen_random random;
+    assert(passgen_random_open(&random, "zero"));
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+
+#ifdef PASSGEN_MONOCYPHER
+    const char *valid[] = {full, "eae19bac", "EAE19BAC64D6", "e"};
+    for(size_t i = 0; i < sizeof(valid) / sizeof(valid[0]); i++) {
+        assert(
+            PASSGEN_OK ==
+            passgen_env_wordlist_add_path(env, "words", path, valid[i]));
+        passgen_pattern *pattern;
+        assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\w{words}"));
+        assert_eq(PASSGEN_OK, passgen_resolve(pattern, env, NULL));
+        passgen_pattern_free(pattern);
+    }
+
+    // another hash fails every time the wordlist is used, as would a file
+    // which was changed.
+    const char *wrong[] = {
+        "eae19bad",
+        "0",
+        "eae19bac64d6ed69009f95ec5a1a5520285824424898443a3244f57c6998466f83526a"
+        "43163eb4ce1e723512412cfdae83d5c078469ae5ec42d275ae0546ebdf"};
+    for(size_t i = 0; i < sizeof(wrong) / sizeof(wrong[0]); i++) {
+        assert(
+            PASSGEN_OK ==
+            passgen_env_wordlist_add_path(env, "words", path, wrong[i]));
+        for(size_t j = 0; j < 2; j++) {
+            passgen_pattern *pattern;
+            passgen_error error;
+            assert(
+                PASSGEN_OK ==
+                passgen_parse(&pattern, NULL, j ? "\\m{words}" : "\\w{words}"));
+            assert_eq(
+                PASSGEN_ERROR_WORDLIST_READ,
+                passgen_resolve(pattern, env, &error));
+            assert_streq(error.detail, "words");
+            assert(error.cause);
+            assert_eq(error.cause->kind, PASSGEN_ERROR_HASH);
+            passgen_error_free(&error);
+            passgen_pattern_free(pattern);
+        }
+    }
+#endif
+
+    // hashes which are not hex digits, or longer than all of them, are not
+    // valid, and without monocypher, there are no hashes at all.
+    char longer[130];
+    memcpy(longer, full, 128);
+    strcpy(&longer[128], "0");
+    const char *invalid[] = {
+        "",
+        "xyz",
+        "eae19bac ",
+        longer,
+#ifndef PASSGEN_MONOCYPHER
+        full,
+#endif
+    };
+    for(size_t i = 0; i < sizeof(invalid) / sizeof(invalid[0]); i++) {
+        assert_eq(
+            PASSGEN_ERROR_INVALID_ARGUMENT,
+            passgen_env_wordlist_add_path(env, "other", path, invalid[i]));
+    }
+    assert(passgen_env_wordlist_path(env, "other") == NULL);
+
+    passgen_env_free(env);
+    passgen_random_close(&random);
+    unlink(path);
 
     return test_ok;
 }

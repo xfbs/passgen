@@ -548,6 +548,26 @@ The table
 defines wordlists by their paths, like
 .Fl -wordlist .
 A relative path is relative to the directory of the configuration file.
+A wordlist can also be a table with its
+.Li path
+and the
+.Li hash
+of the file, which it then has to have:
+.Bd -literal -offset indent
+[wordlists]
+eff = { path = "eff-large.txt", hash = "8cc9e1a3257ee992" }
+.Ed
+.Pp
+This is BLAKE2b, as
+.Xr b2sum 1
+prints it, or any start of it.
+As what is generated from a wordlist depends on all of it, this makes sure
+that a passphrase does not change because the wordlist did, which is an error
+instead.
+Checking it needs Monocypher, which
+.Nm
+is usually built with.
+.Pp
 The table
 .Li presets
 defines presets, like

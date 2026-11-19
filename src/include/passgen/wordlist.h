@@ -7,6 +7,9 @@
 #include <passgen/error.h>
 #include <stdio.h>
 
+/// Length of the hash of the file of a wordlist (BLAKE2b), in bytes.
+#define PASSGEN_WORDLIST_HASH_SIZE 64
+
 /// Data structure used to keep wordlists.
 typedef struct passgen_wordlist {
     /// Wordlist is parsed.
@@ -25,6 +28,11 @@ typedef struct passgen_wordlist {
     /// Path of the file of the wordlist, which it is opened from when it is
     /// first read, or NULL if it was given a file. Owned by the wordlist.
     char *path;
+
+    /// The start of the hash which the file has to have (BLAKE2b with 64
+    /// bytes), in lowercase hex, or NULL if it is not checked. Owned by the
+    /// wordlist.
+    char *hash;
 
     /// Entire wordlist
     char *data;
@@ -68,7 +76,13 @@ void passgen_wordlist_init(passgen_wordlist *wordlist, FILE *file);
 /// @memberof passgen_wordlist
 /// @param path Path of the file, allocated with @ref passgen_alloc_string.
 ///   The wordlist takes ownership of it.
-void passgen_wordlist_init_path(passgen_wordlist *wordlist, char *path);
+/// @param hash The start of the hash the file has to have, in lowercase hex,
+///   allocated with @ref passgen_alloc_string, or NULL. The wordlist takes
+///   ownership of it.
+void passgen_wordlist_init_path(
+    passgen_wordlist *wordlist,
+    char *path,
+    char *hash);
 
 /// Load words from wordlist, and close the file. If the wordlist only has
 /// the path of its file, it is opened first.

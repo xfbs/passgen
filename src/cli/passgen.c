@@ -839,7 +839,7 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
 
     // the file is only opened when a pattern uses the wordlist.
     passgen_status status =
-        passgen_env_wordlist_add_path(opt->env, name, colon + 1);
+        passgen_env_wordlist_add_path(opt->env, name, colon + 1, NULL);
     free(name);
 
     return status == PASSGEN_OK ? 0 : PASSGEN_CLI_ERROR_ALLOC;
@@ -1566,6 +1566,21 @@ static int passgen_cli_config_error(
     return PASSGEN_CLI_ERROR_CONFIG;
 }
 
+// Whether a string is only hex digits, of which there are at least one and at
+// most max.
+static bool passgen_cli_hex(const char *string, size_t max) {
+    size_t length = strlen(string);
+    if(length < 1 || length > max) {
+        return false;
+    }
+    for(size_t i = 0; i < length; i++) {
+        if(!strchr("0123456789abcdefABCDEF", string[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 // Adds the wordlists of a configuration file. A relative path is relative to
 // the directory of the configuration file.
 static int passgen_cli_config_wordlists(
@@ -1585,15 +1600,58 @@ static int passgen_cli_config_wordlists(
             passgen_env_wordlist_remove(opts->env, name);
             continue;
         }
-        if(value.type != TOML_STRING) {
+        // a path, or a table with the path and the hash of the file.
+        const char *wordlist = NULL;
+        const char *hash = NULL;
+        if(value.type == TOML_STRING) {
+            wordlist = value.u.s;
+        } else if(value.type == TOML_TABLE) {
+            for(int j = 0; j < value.u.tab.size; j++) {
+                const char *key = value.u.tab.key[j];
+                toml_datum_t field = value.u.tab.value[j];
+                if(0 == strcmp(key, "path") && field.type == TOML_STRING) {
+                    wordlist = field.u.s;
+                } else if(
+                    0 == strcmp(key, "hash") && field.type == TOML_STRING) {
+                    hash = field.u.s;
+                } else {
+                    return passgen_cli_config_error(
+                        path,
+                        &field,
+                        "wordlist `%s` can only have a path and a hash, which "
+                        "are strings",
+                        name);
+                }
+            }
+        }
+        if(!wordlist) {
             return passgen_cli_config_error(
                 path,
                 &value,
-                "wordlist `%s` has to be a path, or false",
+                "wordlist `%s` has to be a path, a table with a path (and a "
+                "hash), or false",
                 name);
         }
+        if(hash) {
+#ifdef PASSGEN_MONOCYPHER
+            if(!passgen_cli_hex(hash, 128)) {
+                return passgen_cli_config_error(
+                    path,
+                    &value,
+                    "the hash of wordlist `%s` has to be 1 to 128 hex digits, "
+                    "as b2sum prints it",
+                    name);
+            }
+#else
+            return passgen_cli_config_error(
+                path,
+                &value,
+                "checking the hash of wordlist `%s` needs Monocypher, which "
+                "this is built without",
+                name);
+#endif
+        }
 
-        const char *wordlist = value.u.s;
         size_t prefix = wordlist[0] == '/' ? 0 : directory_len;
         size_t length = prefix + strlen(wordlist) + 1;
         char *full = malloc(length);
@@ -1604,7 +1662,7 @@ static int passgen_cli_config_wordlists(
         strcpy(&full[prefix], wordlist);
 
         passgen_status status =
-            passgen_env_wordlist_add_path(opts->env, name, full);
+            passgen_env_wordlist_add_path(opts->env, name, full, hash);
         free(full);
         if(status != PASSGEN_OK) {
             return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
@@ -1652,21 +1710,6 @@ passgen_cli_master_find(const passgen_cli_opts *opts, const char *name) {
         }
     }
     return NULL;
-}
-
-// Whether a string is only hex digits, of which there are at least one and at
-// most max.
-static bool passgen_cli_hex(const char *string, size_t max) {
-    size_t length = strlen(string);
-    if(length < 1 || length > max) {
-        return false;
-    }
-    for(size_t i = 0; i < length; i++) {
-        if(!strchr("0123456789abcdefABCDEF", string[i])) {
-            return false;
-        }
-    }
-    return true;
 }
 
 // Reads one master passphrase of a configuration file, which is a table.

@@ -25,6 +25,7 @@ void passgen_wordlist_init(passgen_wordlist *wordlist, FILE *file) {
     wordlist->parsed_markov = 0;
     wordlist->file = file;
     wordlist->path = NULL;
+    wordlist->hash = NULL;
     wordlist->should_close_file = true;
     wordlist->data = NULL;
     wordlist->size = 0;
@@ -36,9 +37,40 @@ void passgen_wordlist_init(passgen_wordlist *wordlist, FILE *file) {
     }
 }
 
-void passgen_wordlist_init_path(passgen_wordlist *wordlist, char *path) {
+void passgen_wordlist_init_path(
+    passgen_wordlist *wordlist,
+    char *path,
+    char *hash) {
     passgen_wordlist_init(wordlist, NULL);
     wordlist->path = path;
+    wordlist->hash = hash;
+}
+
+// Checks that what was read has the hash it has to have, if any.
+static passgen_status
+wordlist_hash_check(passgen_wordlist *wordlist, passgen_error *error) {
+    if(!wordlist->hash) {
+        return PASSGEN_OK;
+    }
+#ifdef PASSGEN_MONOCYPHER
+    uint8_t hash[PASSGEN_WORDLIST_HASH_SIZE];
+    passgen_blake2b(
+        hash,
+        sizeof(hash),
+        (const uint8_t *) wordlist->data,
+        wordlist->size);
+    for(size_t i = 0; wordlist->hash[i]; i++) {
+        uint8_t byte = hash[i / 2];
+        char digit = "0123456789abcdef"[i % 2 ? byte & 15 : byte >> 4];
+        if(digit != wordlist->hash[i]) {
+            return passgen_error_set(error, PASSGEN_ERROR_HASH);
+        }
+    }
+    return PASSGEN_OK;
+#else
+    // it cannot be added with a hash then.
+    return passgen_error_set(error, PASSGEN_ERROR_INTERNAL);
+#endif
 }
 
 passgen_status
@@ -56,6 +88,9 @@ passgen_wordlist_parse(passgen_wordlist *wordlist, passgen_error *error) {
     }
 
     passgen_status status = passgen_wordlist_read(wordlist, error);
+    if(status == PASSGEN_OK) {
+        status = wordlist_hash_check(wordlist, error);
+    }
     if(status == PASSGEN_OK) {
         status = passgen_wordlist_scan(wordlist, error);
     }
@@ -281,6 +316,7 @@ void passgen_wordlist_free(passgen_wordlist *wordlist) {
         fclose(wordlist->file);
     }
     passgen_free_string(wordlist->path);
+    passgen_free_string(wordlist->hash);
 
     PASSGEN_CLEAR(wordlist);
 }

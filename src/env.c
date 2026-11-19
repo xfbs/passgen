@@ -110,18 +110,54 @@ passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file) {
     return wordlist_insert(env, name, wordlist);
 }
 
+// Whether the start of a hash is valid: at least one and at most all of the
+// hex digits of BLAKE2b with 64 bytes.
+static bool wordlist_hash_valid(const char *hash) {
+    size_t length = strlen(hash);
+    if(length < 1 || length > 2 * PASSGEN_WORDLIST_HASH_SIZE) {
+        return false;
+    }
+    for(size_t i = 0; i < length; i++) {
+        if(!strchr("0123456789abcdefABCDEF", hash[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
 passgen_status passgen_env_wordlist_add_path(
     passgen_env *env,
     const char *name,
-    const char *path) {
+    const char *path,
+    const char *hash) {
+    if(hash) {
+#ifdef PASSGEN_MONOCYPHER
+        if(!wordlist_hash_valid(hash)) {
+            return PASSGEN_ERROR_INVALID_ARGUMENT;
+        }
+#else
+        // there is nothing to check it with.
+        (void) wordlist_hash_valid;
+        return PASSGEN_ERROR_INVALID_ARGUMENT;
+#endif
+    }
+
     char *path_copy = passgen_alloc_string(path);
+    char *hash_copy = hash ? passgen_alloc_string(hash) : NULL;
     passgen_wordlist *wordlist = passgen_alloc(sizeof(passgen_wordlist));
-    if(!path_copy || !wordlist) {
+    if(!path_copy || (hash && !hash_copy) || !wordlist) {
         passgen_free_string(path_copy);
+        passgen_free_string(hash_copy);
         passgen_free(wordlist, sizeof(passgen_wordlist));
         return PASSGEN_ERROR_OUT_OF_MEMORY;
     }
-    passgen_wordlist_init_path(wordlist, path_copy);
+    // it is compared in lowercase.
+    for(char *c = hash_copy; c && *c; c++) {
+        if(*c >= 'A' && *c <= 'F') {
+            *c = (char) (*c - 'A' + 'a');
+        }
+    }
+    passgen_wordlist_init_path(wordlist, path_copy, hash_copy);
 
     return wordlist_insert(env, name, wordlist);
 }

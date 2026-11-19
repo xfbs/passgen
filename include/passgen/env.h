@@ -105,6 +105,11 @@ passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file);
 /// which uses the wordlist is resolved, so one which does not exist is only
 /// a problem if it is used.
 ///
+/// It can be checked to be the file it is meant to be, with its hash: then
+/// a file with other contents is not used, as what is generated from it would
+/// be different. The hash is BLAKE2b with 64 bytes, of all of the file, as
+/// `b2sum` prints it, which needs Monocypher.
+///
 /// @relatesalso passgen_env
 /// @param env Environment to add the wordlist to
 /// @param name Name of the wordlist, as a NUL-terminated string. It is
@@ -112,14 +117,21 @@ passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file);
 /// @param path Path of the file to read the wordlist from, with one word per
 ///   line, as a NUL-terminated string. It is copied, and opened as it is,
 ///   so a relative path is relative to the working directory at the time.
-/// @returns @ref PASSGEN_OK or @ref PASSGEN_ERROR_OUT_OF_MEMORY. A file which
-///   cannot be opened or read is not noticed here, but when resolving a
+/// @param hash The start of the hash of the file, in hex (in either case),
+///   at least one digit and at most all 128 of them, as a NUL-terminated
+///   string. NULL to not check it.
+/// @returns @ref PASSGEN_OK, @ref PASSGEN_ERROR_INVALID_ARGUMENT if the hash
+///   is not valid or the library is built without Monocypher, or
+///   @ref PASSGEN_ERROR_OUT_OF_MEMORY. A file which cannot be opened or read,
+///   or does not have the hash, is not noticed here, but when resolving a
 ///   pattern which uses it, which then fails with @ref
-///   PASSGEN_ERROR_WORDLIST_READ.
+///   PASSGEN_ERROR_WORDLIST_READ (with @ref PASSGEN_ERROR_HASH as the cause
+///   for the hash).
 PASSGEN_EXPORT passgen_status passgen_env_wordlist_add_path(
     passgen_env *env,
     const char *name,
-    const char *path);
+    const char *path,
+    const char *hash);
 
 /// Finds the path of a wordlist, which was added with @ref
 /// passgen_env_wordlist_add_path.

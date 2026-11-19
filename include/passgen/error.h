@@ -122,6 +122,9 @@ typedef enum passgen_status {
     PASSGEN_ERROR_BUFFER_TOO_SMALL,
     /// The callback which is given what is generated asked to stop.
     PASSGEN_ERROR_ABORTED,
+    /// A file does not have the hash it is expected to have, such as a
+    /// wordlist (see @ref passgen_env_wordlist_add_path).
+    PASSGEN_ERROR_HASH,
 } passgen_status;
 
 /// A position in a pattern. Both count from zero.
