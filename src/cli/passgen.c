@@ -283,13 +283,15 @@ int passgen_cli_generate_normal(
             fprintf(stderr, "entropy: %.2lf bits\n", entropy);
         }
 
-        if(i != 0) {
-            fputc(sep, stdout);
-        }
+        // the separator (or the newline after the last one) follows right
+        // away, and it is written out before the entropy of the next one goes
+        // to standard error, which is not buffered. otherwise they would come
+        // out of order where both go to the same place, such as a terminal.
         fwrite(buffer.data, 1, buffer.len, stdout);
+        fputc(i + 1 < opts.amount ? sep : '\n', stdout);
+        fflush(stdout);
     }
 
-    fputc('\n', stdout);
     free(buffer.data);
 
     return 0;

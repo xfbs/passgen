@@ -108,6 +108,15 @@ $passgen -l
 test "$($passgen "a{1000}" | tr -d '\n' | wc -c)" -eq 1000
 test "$($passgen -a 3 "[a-z]{500}" | wc -l)" -eq 3
 
+# outputs are separated by newlines (or NUL bytes), with a newline after the
+# last one.
+test "$($passgen -a 3 a | od -An -c | tr -d ' ')" = 'a\na\na\n'
+test "$($passgen -z -a 3 a | od -An -c | tr -d ' ')" = 'a\0a\0a\n'
+
+# the entropy of every output comes before it, also where both go to the same
+# place. through a pipe, standard output is buffered, standard error is not.
+test "$($passgen -e -a 3 '[ab]' 2>&1 | sed 's/^[ab]$/x/')" = "$(printf 'entropy: 1.00 bits\nx\nentropy: 1.00 bits\nx\nentropy: 1.00 bits\nx')"
+
 # large outputs work when only little memory may be locked. the subshell keeps
 # the limit from applying to the rest of the tests, and this is skipped where
 # the limit cannot be set to this value. it takes more than the default
