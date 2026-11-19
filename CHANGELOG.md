@@ -12,13 +12,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `-S`/`--steps` to limit how long generating takes. The default of a million
   steps makes patterns such as `(){999999999}` fail rather than run
   practically forever.
+- `\p{name}` uses a preset in a pattern, also in other presets, so that
+  patterns can be built from parts. It used to generate nothing.
+- Presets whose names start with a dot are not shown by `--list`, for parts
+  of other presets.
 
 ### Changed
 
 - Problems with wordlists (missing, empty or unreadable) are found before
   anything is generated, also when the pattern would not have used the
   wordlist, and show where in the pattern it is used.
-- `\p{name}` is an error, instead of generating nothing.
 
 ### Removed
 

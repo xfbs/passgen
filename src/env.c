@@ -1,4 +1,5 @@
 #include "passgen/pattern/env.h"
+#include "passgen/pattern/preset.h"
 #include "passgen/config.h"
 #include "passgen/util/alloc.h"
 #include "passgen/util/clear.h"
@@ -31,6 +32,14 @@ static int wordlist_entry_free(void *user, passgen_hashmap_entry *entry) {
     return 0;
 }
 
+static int preset_entry_free(void *user, passgen_hashmap_entry *entry) {
+    (void) user;
+    passgen_free_string((char *) entry->key);
+    passgen_preset_free(entry->value);
+    passgen_free(entry->value, sizeof(passgen_preset));
+    return 0;
+}
+
 void passgen_env_free(passgen_env *env) {
     if(!env) {
         return;
@@ -38,6 +47,7 @@ void passgen_env_free(passgen_env *env) {
 
     passgen_hashmap_foreach(&env->wordlists, NULL, wordlist_entry_free);
     passgen_hashmap_free(&env->wordlists);
+    passgen_hashmap_foreach(&env->presets, NULL, preset_entry_free);
     passgen_hashmap_free(&env->presets);
 
     PASSGEN_CLEAR(env);
@@ -97,4 +107,71 @@ passgen_status passgen_env_wordlist_add(
     }
 
     return PASSGEN_OK;
+}
+
+passgen_status
+passgen_env_preset_add(passgen_env *env, const char *name, const char *pattern) {
+    char *name_copy = passgen_alloc_string(name);
+    char *pattern_copy = passgen_alloc_string(pattern);
+    passgen_preset *preset = passgen_alloc(sizeof(passgen_preset));
+    if(!name_copy || !pattern_copy || !preset) {
+        passgen_free_string(name_copy);
+        passgen_free_string(pattern_copy);
+        passgen_free(preset, sizeof(passgen_preset));
+        return PASSGEN_ERROR_OUT_OF_MEMORY;
+    }
+
+    passgen_preset_init(preset, pattern_copy);
+
+    // if a preset with this name was already defined, the new one replaces
+    // it.
+    passgen_hashmap_entry old;
+    if(PASSGEN_OK !=
+       passgen_hashmap_insert(&env->presets, name_copy, preset, &old)) {
+        passgen_preset_free(preset);
+        passgen_free(preset, sizeof(passgen_preset));
+        passgen_free_string(name_copy);
+        return PASSGEN_ERROR_OUT_OF_MEMORY;
+    }
+    if(old.key) {
+        preset_entry_free(NULL, &old);
+    }
+
+    // patterns which were resolved before may point to a preset which this
+    // replaced, or one which uses it.
+    env->version += 1;
+
+    return PASSGEN_OK;
+}
+
+const char *passgen_env_preset_get(const passgen_env *env, const char *name) {
+    passgen_hashmap_entry *entry = passgen_hashmap_lookup(&env->presets, name);
+    if(!entry) {
+        return NULL;
+    }
+
+    const passgen_preset *preset = entry->value;
+    return preset->value;
+}
+
+typedef struct {
+    void *user;
+    passgen_env_preset_cb *func;
+} preset_foreach_context;
+
+static int preset_foreach_entry(void *user, passgen_hashmap_entry *entry) {
+    preset_foreach_context *context = user;
+    const passgen_preset *preset = entry->value;
+    return context->func(context->user, entry->key, preset->value);
+}
+
+int passgen_env_preset_foreach(
+    const passgen_env *env,
+    void *user,
+    passgen_env_preset_cb *func) {
+    preset_foreach_context context = {user, func};
+    return passgen_hashmap_foreach(
+        &env->presets,
+        &context,
+        preset_foreach_entry);
 }

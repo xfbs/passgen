@@ -17,6 +17,7 @@ set(TEST_LIST
     "literal.c"
     "markov.c"
     "parser.c"
+    "preset.c"
     "random.c"
     "regression.c"
     "siphash.c"

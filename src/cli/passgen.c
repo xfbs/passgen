@@ -58,31 +58,61 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
     return 0;
 }
 
+/// Prints a pattern, and marks a part of it.
+static void passgen_cli_pattern_mark(
+    const char *prefix,
+    const char *pattern,
+    const passgen_error *error) {
+    fprintf(stderr, "\033[1;33m%s\033[0m%s\n", prefix, pattern);
+
+    // this lines up as long as every character is as wide as the others,
+    // which is not the case for all of them. it is good enough to find the
+    // place.
+    for(size_t i = 0; i < strlen(prefix) + error->start.codepoint; i++) {
+        fputc(' ', stderr);
+    }
+
+    // errors at the end of the pattern, where something is missing, don't
+    // have a length.
+    size_t length = error->end.codepoint - error->start.codepoint;
+    fprintf(stderr, "\033[1;31m");
+    for(size_t i = 0; i < (length ? length : 1); i++) {
+        fputc('^', stderr);
+    }
+    fprintf(stderr, "\033[0m\n");
+}
+
 /// Prints what is wrong with a pattern, and marks where in the pattern it is.
-static void
-passgen_cli_pattern_error(const passgen_error *error, const char *pattern) {
+/// For problems in the presets which it uses, it marks where in their
+/// patterns they are, too.
+static void passgen_cli_pattern_error(
+    const passgen_error *error,
+    const char *pattern,
+    const passgen_env *env) {
     fprintf(stderr, "\033[1;31merror\033[0m in pattern: ");
     passgen_error_print(error, stderr);
 
     if(error->has_position) {
-        const char *prefix = "pattern: ";
-        fprintf(stderr, "\033[1;33m%s\033[0m%s\n", prefix, pattern);
+        passgen_cli_pattern_mark("pattern: ", pattern, error);
+    }
 
-        // this lines up as long as every character is as wide as the others,
-        // which is not the case for all of them. it is good enough to find
-        // the place.
-        for(size_t i = 0; i < strlen(prefix) + error->start.codepoint; i++) {
-            fputc(' ', stderr);
+    // what caused a problem with a preset is in its pattern, which is found by
+    // its name.
+    for(const passgen_error *current = error; current->cause;
+        current = current->cause) {
+        if(current->kind != PASSGEN_ERROR_PRESET_INVALID ||
+           !current->cause->has_position) {
+            continue;
         }
 
-        // errors at the end of the pattern, where something is missing,
-        // don't have a length.
-        size_t length = error->end.codepoint - error->start.codepoint;
-        fprintf(stderr, "\033[1;31m");
-        for(size_t i = 0; i < (length ? length : 1); i++) {
-            fputc('^', stderr);
+        const char *preset = passgen_env_preset_get(env, current->detail);
+        if(!preset) {
+            continue;
         }
-        fprintf(stderr, "\033[0m\n");
+
+        char prefix[sizeof(current->detail) + 16];
+        snprintf(prefix, sizeof(prefix), "preset %s: ", current->detail);
+        passgen_cli_pattern_mark(prefix, preset, current->cause);
     }
 }
 
@@ -90,7 +120,7 @@ int passgen_cli_run(passgen_cli_opts opts) {
     passgen_pattern *pattern;
     passgen_error error;
     if(PASSGEN_OK != passgen_parse(&pattern, &error, opts.pattern)) {
-        passgen_cli_pattern_error(&error, opts.pattern);
+        passgen_cli_pattern_error(&error, opts.pattern, opts.env);
         passgen_error_free(&error);
         return PASSGEN_CLI_ERROR_PATTERN_PARSE;
     }
@@ -98,7 +128,7 @@ int passgen_cli_run(passgen_cli_opts opts) {
     // this reads the wordlists which the pattern uses, so problems with them
     // come up before anything is generated, and point to where they are used.
     if(PASSGEN_OK != passgen_resolve(pattern, opts.env, &error)) {
-        passgen_cli_pattern_error(&error, opts.pattern);
+        passgen_cli_pattern_error(&error, opts.pattern, opts.env);
         passgen_error_free(&error);
         passgen_pattern_free(pattern);
         return PASSGEN_CLI_ERROR_GENERATE;
@@ -367,102 +397,31 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
     return status == PASSGEN_OK ? 0 : PASSGEN_CLI_ERROR_ALLOC;
 }
 
-/// Finds where a preset with the name is, or where it would go to keep them
-/// sorted. Sets `found` to whether it is there.
-static size_t passgen_cli_presets_find(
-    const passgen_cli_presets *presets,
-    const char *name,
-    bool *found) {
-    size_t low = 0;
-    size_t high = presets->count;
-    while(low < high) {
-        size_t middle = low + (high - low) / 2;
-        int order = strcmp(presets->items[middle].name, name);
-        if(order == 0) {
-            *found = true;
-            return middle;
-        }
-        if(order < 0) {
-            low = middle + 1;
-        } else {
-            high = middle;
-        }
-    }
-    *found = false;
-    return low;
-}
-
-/// Defines a preset, which takes over the allocation of the name (which the
-/// pattern points into). A preset with the same name is replaced. Returns
-/// nonzero if there is no memory for it, the name is not taken over then.
-static int passgen_cli_presets_set(
-    passgen_cli_presets *presets,
-    char *name,
-    const char *pattern) {
-    bool found;
-    size_t index = passgen_cli_presets_find(presets, name, &found);
-    if(found) {
-        free(presets->items[index].name);
-        presets->items[index].name = name;
-        presets->items[index].pattern = pattern;
-        return 0;
-    }
-
-    if(presets->count == presets->capacity) {
-        size_t capacity = presets->capacity ? presets->capacity * 2 : 16;
-        passgen_cli_preset *items =
-            realloc(presets->items, capacity * sizeof(*items));
-        if(!items) {
-            return -1;
-        }
-        presets->items = items;
-        presets->capacity = capacity;
-    }
-
-    memmove(
-        &presets->items[index + 1],
-        &presets->items[index],
-        (presets->count - index) * sizeof(presets->items[0]));
-    presets->items[index].name = name;
-    presets->items[index].pattern = pattern;
-    presets->count += 1;
-    return 0;
-}
-
-/// Returns the pattern of the preset with the name, or NULL if there is none.
-static const char *
-passgen_cli_presets_get(const passgen_cli_presets *presets, const char *name) {
-    bool found;
-    size_t index = passgen_cli_presets_find(presets, name, &found);
-    return found ? presets->items[index].pattern : NULL;
-}
-
 int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
-    size_t arg_len = strlen(arg);
-    char *arg_copy = malloc(arg_len + 1);
-    if(!arg_copy) {
-        return PASSGEN_CLI_ERROR_ALLOC;
-    }
-    memcpy(arg_copy, arg, arg_len + 1);
-    char *colon = strstr(arg_copy, ":");
+    const char *colon = strchr(arg, ':');
     if(!colon) {
         fprintf(
             stderr,
             "\033[1;31merror\033[0m: expected NAME:PATTERN for preset "
             "definition `%s`\n",
             arg);
-        free(arg_copy);
         return PASSGEN_CLI_ERROR_PRESET_NOT_FOUND;
     }
-    *colon = 0;
 
-    // the name and the pattern share a single allocation, which is owned by
-    // the presets.
-    if(0 != passgen_cli_presets_set(&opts->presets, arg_copy, colon + 1)) {
-        free(arg_copy);
+    size_t offset = colon - arg;
+    char *name = malloc(offset + 1);
+    if(!name) {
         return PASSGEN_CLI_ERROR_ALLOC;
     }
-    return 0;
+    memcpy(name, arg, offset);
+    name[offset] = 0;
+
+    // the environment copies the name and the pattern. the pattern is only
+    // parsed once something uses it.
+    passgen_status status = passgen_env_preset_add(opts->env, name, colon + 1);
+    free(name);
+
+    return status == PASSGEN_OK ? 0 : PASSGEN_CLI_ERROR_ALLOC;
 }
 
 void passgen_cli_opts_init(passgen_cli_opts *opts) {
@@ -477,7 +436,6 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->master_domain = NULL;
     opts->master_token = NULL;
 #endif
-    opts->presets = (passgen_cli_presets){0};
     opts->random = NULL;
     opts->env = passgen_env_new(NULL);
 
@@ -513,14 +471,80 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     }
 }
 
-void passgen_cli_presets_list(const passgen_cli_opts *opts) {
-    // these are sorted by name.
-    for(size_t i = 0; i < opts->presets.count; i++) {
-        printf(
-            "preset %s %s\n",
-            opts->presets.items[i].name,
-            opts->presets.items[i].pattern);
+/// A preset, for listing them.
+typedef struct {
+    const char *name;
+    const char *pattern;
+} passgen_cli_listed_preset;
+
+/// The presets which are listed, which grows as they are collected.
+typedef struct {
+    passgen_cli_listed_preset *items;
+    size_t count;
+    size_t capacity;
+} passgen_cli_listed_presets;
+
+static int passgen_cli_presets_collect(
+    void *user,
+    const char *name,
+    const char *pattern) {
+    passgen_cli_listed_presets *list = user;
+
+    // presets whose names start with a dot are parts of other presets, which
+    // are not meant to be used on their own. like hidden files, they are not
+    // listed.
+    if(name[0] == '.') {
+        return 0;
     }
+
+    if(list->count == list->capacity) {
+        size_t capacity = list->capacity ? list->capacity * 2 : 16;
+        passgen_cli_listed_preset *items =
+            realloc(list->items, capacity * sizeof(*items));
+        if(!items) {
+            return -1;
+        }
+        list->items = items;
+        list->capacity = capacity;
+    }
+
+    list->items[list->count].name = name;
+    list->items[list->count].pattern = pattern;
+    list->count += 1;
+    return 0;
+}
+
+static int passgen_cli_presets_compare(const void *lhs, const void *rhs) {
+    const passgen_cli_listed_preset *a = lhs;
+    const passgen_cli_listed_preset *b = rhs;
+    return strcmp(a->name, b->name);
+}
+
+static int passgen_cli_presets_list(const passgen_cli_opts *opts) {
+    passgen_cli_listed_presets list = {0};
+    if(0 != passgen_env_preset_foreach(
+                opts->env,
+                &list,
+                passgen_cli_presets_collect)) {
+        free(list.items);
+        return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+    }
+
+    // they are kept in no particular order, but listed by name.
+    if(list.count) {
+        qsort(
+            list.items,
+            list.count,
+            sizeof(list.items[0]),
+            passgen_cli_presets_compare);
+    }
+
+    for(size_t i = 0; i < list.count; i++) {
+        printf("preset %s %s\n", list.items[i].name, list.items[i].pattern);
+    }
+
+    free(list.items);
+    return 0;
 }
 
 // the options for master passphrase mode only exist when it does, which is
@@ -610,8 +634,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             case 'v':
                 return PASSGEN_CLI_SHOW_VERSION;
             case 'l':
-                passgen_cli_presets_list(opts);
-                exit(0);
+                exit(passgen_cli_presets_list(opts));
             case 'w':
                 try(passgen_cli_opts_wordlist(opts, optarg));
                 break;
@@ -650,7 +673,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 
     // if a preset was given, parse it.
     if(preset) {
-        opts->pattern = passgen_cli_presets_get(&opts->presets, preset);
+        opts->pattern = passgen_env_preset_get(opts->env, preset);
         if(!opts->pattern) {
             return passgen_cli_bail(PASSGEN_CLI_ERROR_PRESET_NOT_FOUND, preset);
         }
@@ -875,11 +898,6 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
 }
 
 void passgen_cli_opts_free(passgen_cli_opts *opts) {
-    // this frees the patterns too, as they share an allocation.
-    for(size_t i = 0; i < opts->presets.count; i++) {
-        free(opts->presets.items[i].name);
-    }
-    free(opts->presets.items);
     passgen_env_free(opts->env);
 
     // the environment only borrows the source of randomness.

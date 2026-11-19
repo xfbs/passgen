@@ -95,9 +95,18 @@ typedef enum passgen_status {
     /// words that are not valid UTF-8. The detail of the error is its name,
     /// and its cause is why.
     PASSGEN_ERROR_WORDLIST_READ,
-    /// The pattern uses a preset, such as `\p{name}`, which is not supported
-    /// yet. The detail of the error is its name.
-    PASSGEN_ERROR_PRESET,
+    /// The pattern uses a preset, such as `\p{name}`, which is not in the
+    /// environment. The detail of the error is its name.
+    PASSGEN_ERROR_PRESET_NOT_FOUND,
+    /// The pattern uses a preset which cannot be used, because its pattern
+    /// is not valid, or something which it uses cannot be. The detail of the
+    /// error is its name, and its cause is why. The position of the cause is
+    /// in the pattern of the preset.
+    PASSGEN_ERROR_PRESET_INVALID,
+    /// The pattern uses a preset which uses itself, also through other
+    /// presets, so that it would never end. The detail of the error is its
+    /// name.
+    PASSGEN_ERROR_PRESET_CYCLE,
     /// All of the segments of a group have a multiplier of zero, such as
     /// `{0}a`, so there is nothing to choose from.
     PASSGEN_ERROR_GROUP_EMPTY,

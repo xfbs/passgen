@@ -31,7 +31,7 @@ Generating takes three things:
    mode derives one from a passphrase instead
    (@ref passgen_random_chacha20_argon2_open).
 3. **An environment,** a @ref passgen_env, which has the source of randomness
-   and the wordlists which patterns can use.
+   and the wordlists and presets which patterns can use.
 
 Before generating, the pattern is resolved with the environment
 (@ref passgen_resolve). This reads the wordlists which the pattern uses, and

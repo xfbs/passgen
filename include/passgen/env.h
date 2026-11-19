@@ -37,7 +37,7 @@ typedef struct passgen_env passgen_env;
 /// @returns The environment, or NULL if it could not be allocated.
 PASSGEN_EXPORT passgen_env *passgen_env_new(passgen_random *random);
 
-/// Free an environment, along with its wordlists. This does not close the
+/// Free an environment, along with its wordlists and presets. This does not close the
 /// source of randomness.
 ///
 /// @relatesalso passgen_env
@@ -77,7 +77,8 @@ PASSGEN_EXPORT void passgen_env_step_limit_set(passgen_env *env, size_t step_lim
 /// Adds a wordlist, which patterns can then refer to by its name. If there is
 /// a wordlist with this name already, it is replaced.
 ///
-/// The wordlist is not read right away, but when it is first used. So the
+/// The wordlist is not read right away, but when a pattern which uses it is
+/// resolved (see @ref passgen_resolve). So the
 /// environment takes ownership of the file: it is closed once it was read, or
 /// when the environment is freed. This is also the case if adding the wordlist
 /// fails.
@@ -93,13 +94,65 @@ PASSGEN_EXPORT void passgen_env_step_limit_set(passgen_env *env, size_t step_lim
 /// @returns @ref PASSGEN_OK, @ref PASSGEN_ERROR_OUT_OF_MEMORY, or
 ///   @ref PASSGEN_ERROR_INVALID_ARGUMENT if the length of the Markov chain is
 ///   not between 1 and 255. A file which cannot be read is not noticed here,
-///   but when generating, which then fails with
+///   but when resolving a pattern which uses it, which then fails with
 ///   @ref PASSGEN_ERROR_WORDLIST_READ.
 PASSGEN_EXPORT passgen_status passgen_env_wordlist_add(
     passgen_env *env,
     const char *name,
     FILE *file,
     size_t markov_length);
+
+/// Adds a preset, which is a named pattern. Patterns can use it as
+/// `\p{name}`, also other presets, so that patterns can be built from parts.
+/// If there is a preset with this name already, it is replaced.
+///
+/// The pattern is not parsed right away, but when a pattern which uses it is
+/// resolved (see @ref passgen_resolve). Problems with it come up then.
+///
+/// Names which start with a dot (such as `.segment`) are meant for parts of
+/// other presets, rather than to be used on their own. That is up to whoever
+/// lists them, they work the same otherwise.
+///
+/// @relatesalso passgen_env
+/// @param env Environment to add the preset to
+/// @param name Name of the preset, as a NUL-terminated string. It is copied.
+/// @param pattern The pattern, as a NUL-terminated string. It is copied.
+/// @returns @ref PASSGEN_OK or @ref PASSGEN_ERROR_OUT_OF_MEMORY
+PASSGEN_EXPORT passgen_status
+passgen_env_preset_add(passgen_env *env, const char *name, const char *pattern);
+
+/// Finds the pattern of a preset.
+///
+/// @relatesalso passgen_env
+/// @param env Environment to look in
+/// @param name Name of the preset
+/// @returns The pattern of the preset, which is valid until the preset is
+///   replaced or the environment is freed, or NULL if there is no preset with
+///   this name.
+PASSGEN_EXPORT const char *
+passgen_env_preset_get(const passgen_env *env, const char *name);
+
+/// Callback for @ref passgen_env_preset_foreach.
+///
+/// @param user What was passed to @ref passgen_env_preset_foreach as it is
+/// @param name Name of the preset
+/// @param pattern The pattern of the preset
+/// @returns Zero to go on, anything else to stop
+typedef int
+passgen_env_preset_cb(void *user, const char *name, const char *pattern);
+
+/// Calls a function for every preset, in no particular order.
+///
+/// @relatesalso passgen_env
+/// @param env Environment with the presets
+/// @param user Passed to the function as it is
+/// @param func Called for every preset
+/// @returns Zero, or what the function returned if it was not zero, which
+///   stops it.
+PASSGEN_EXPORT int passgen_env_preset_foreach(
+    const passgen_env *env,
+    void *user,
+    passgen_env_preset_cb *func);
 
 #ifdef __cplusplus
 }

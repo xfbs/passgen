@@ -61,7 +61,7 @@ is given.
 .It Fl l , Fl -list
 List the presets with their patterns and exit.
 This includes the ones defined in the configuration, and by options which
-come before this one.
+come before this one, except for those whose names start with a dot.
 .It Fl M , Fl -markov-length Ar length
 Set the length of the Markov chain for the wordlists which are loaded by the
 following
@@ -183,10 +183,16 @@ resembles the words in the wordlist
 .Ar name .
 These words are pronounceable, but mostly not real words, and their length is
 not fixed.
+.It Li \ep{name}
+Preset: outputs what the pattern of the preset
+.Ar name
+generates, as if it were in parentheses, see
+.Sx PRESETS .
 .El
 .Pp
-Generating fails if a pattern uses a wordlist which was not loaded, or which
-is empty.
+It is an error if a pattern uses a wordlist which was not loaded, or which is
+empty, or a preset which is not defined.
+This is checked before anything is generated.
 .Pp
 The following escape sequences can be used:
 .Bl -tag -width Ds
@@ -211,6 +217,26 @@ this way.
 .Pp
 Any other character after a backslash is an error.
 .Sh PRESETS
+A preset is a pattern with a name.
+It can be used on its own with
+.Fl -preset ,
+or in other patterns as
+.Li \ep{name} ,
+also in the patterns of other presets.
+This way, patterns can be built from parts, for example in the configuration:
+.Bd -literal -offset indent
+preset .segment:[a-zA-Z0-9]{6}
+preset mine:(\ep{.segment}-){2}\ep{.segment}
+.Ed
+.Pp
+Presets whose names start with a dot are meant to be parts of others, and are
+not listed by
+.Fl -list .
+A preset cannot use itself, also not through other presets, and groups can
+only be nested 1024 deep in all.
+A preset is only parsed when it is used, so one which is not valid is not an
+error until then.
+.Pp
 These presets are predefined, more can be defined with
 .Fl -define-preset
 or in the configuration.

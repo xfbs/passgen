@@ -20,22 +20,6 @@
         }                    \
     } while(0)
 
-/// A preset, which is a name for a pattern.
-typedef struct {
-    /// The name, followed by its NUL byte and the pattern, in a single
-    /// allocation which this owns.
-    char *name;
-    /// The pattern, which points into the allocation of the name.
-    const char *pattern;
-} passgen_cli_preset;
-
-/// The presets, sorted by their names.
-typedef struct {
-    passgen_cli_preset *items;
-    size_t count;
-    size_t capacity;
-} passgen_cli_presets;
-
 /// The kinds of errors that cause the binary to exit early and with a nonzero
 /// return code. These are the exit statuses of the command-line tool, so they
 /// should not be reordered. They are not the errors of the library, which are
@@ -85,8 +69,6 @@ typedef struct {
     const char *master_token;
 #endif
 
-    /// Presets to choose from.
-    passgen_cli_presets presets;
     /// Source of randomness to generate from. This is what the environment
     /// uses, but it is owned by the options.
     passgen_random *random;

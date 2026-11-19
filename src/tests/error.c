@@ -474,17 +474,17 @@ test_result test_error_generate(void) {
     passgen_error_free(&error);
     passgen_pattern_free(pattern);
 
-    // presets are not supported in patterns yet. the first problem in the
-    // pattern is the one which is reported.
+    // a preset which is not there. the first problem in the pattern is the
+    // one which is reported.
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "(a|\\p{name})\\w{missing}"));
-    assert(PASSGEN_ERROR_PRESET == passgen_resolve(pattern, env, &error));
+    assert(PASSGEN_ERROR_PRESET_NOT_FOUND == passgen_resolve(pattern, env, &error));
     assert_streq(error.detail, "name");
     assert(error.start.codepoint == 3);
     assert(error.end.codepoint == 11);
     passgen_error_free(&error);
 
     // the error is not needed to find out what went wrong.
-    assert(PASSGEN_ERROR_PRESET == passgen_resolve(pattern, env, NULL));
+    assert(PASSGEN_ERROR_PRESET_NOT_FOUND == passgen_resolve(pattern, env, NULL));
     passgen_pattern_free(pattern);
 
     // a group in which every segment has a multiplier of zero, also when it

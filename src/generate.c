@@ -7,6 +7,7 @@
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/literal.h"
 #include "passgen/pattern/pattern.h"
+#include "passgen/pattern/preset.h"
 #include "passgen/pattern/range.h"
 #include "passgen/pattern/repeat.h"
 #include "passgen/pattern/segment.h"
@@ -492,7 +493,7 @@ static int passgen_generate_special_wordlist(
 static int passgen_generate_special(
     passgen_generate_context *context,
     const passgen_pattern_special *special) {
-    // resolving fails for presets, and for wordlists it cannot find.
+    // resolving fails for wordlists and presets which it cannot find.
     if(!special->wordlist) {
         return fail(context, PASSGEN_ERROR_INTERNAL);
     }
@@ -502,6 +503,14 @@ static int passgen_generate_special(
             return passgen_generate_special_markov(context, special);
         case PASSGEN_PATTERN_SPECIAL_WORDLIST:
             return passgen_generate_special_wordlist(context, special);
+        case PASSGEN_PATTERN_SPECIAL_PRESET:
+            // a preset is generated like a group, which makes \p{name} the
+            // same as the pattern of the preset in parentheses. note that
+            // choosing from a group takes randomness even if there is only
+            // one choice, so this is not the same as the pattern on its own.
+            return passgen_generate_group(
+                context,
+                &special->preset->pattern.group);
         default:
             return fail(context, PASSGEN_ERROR_INTERNAL);
     }

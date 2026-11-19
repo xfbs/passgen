@@ -227,6 +227,24 @@ mkdir -p "$HOME/.config"
 echo "preset fromhome:uvw" > "$HOME/.config/passgen.conf"
 test "$(XDG_CONFIG_HOME= $passgen -p fromhome)" = "uvw"
 
+# presets can use other presets, so that they can be built from parts. those
+# whose names start with a dot are not listed, but work the same otherwise.
+fragments=(-P '.segment:[a-z]{6}' -P 'joined:(\p{.segment}-){2}\p{.segment}')
+$passgen "${fragments[@]}" '\p{joined}' | matches "[a-z]{6}-[a-z]{6}-[a-z]{6}"
+$passgen "${fragments[@]}" -p joined | matches "[a-z]{6}-[a-z]{6}-[a-z]{6}"
+$passgen "${fragments[@]}" -p .segment | matches "[a-z]{6}"
+$passgen "${fragments[@]}" 'x\p{.segment}{2}' | matches "x[a-z]{12}"
+test "$($passgen "${fragments[@]}" -l | grep -c segment)" = 1
+test "$($passgen "${fragments[@]}" -l | grep -c '^preset joined ')" = 1
+$passgen '\p{apple1}' | matches "([a-zA-Z0-9]{3}-){3}[a-zA-Z0-9]{3}"
+# a preset is the same as its pattern in parentheses.
+test "$($passgen -r xorshift:1 '\p{uuid}')" = "$($passgen -r xorshift:1 "($($passgen -l | sed -n 's/^preset uuid //p'))")"
+# also from the configuration file, where the order does not matter, as they
+# are only used once all of them are defined.
+printf 'preset fromconfig:\\p{.part}\\p{.part}\npreset .part:[xy]\n' > "$XDG_CONFIG_HOME/passgen.conf"
+$passgen -p fromconfig | matches "[xy]{2}"
+rm "$XDG_CONFIG_HOME/passgen.conf"
+
 # groups can be nested up to 1024 deep. more is an error in the pattern (exit
 # status 3), also for patterns nested so deeply that freeing them used to run
 # out of stack.
@@ -319,8 +337,23 @@ test "$(error_of $passgen '\w{}')" = "error in pattern: expected a name in brace
 test "$(error_of $passgen '\w{undefined}')" = "error in pattern: wordlist not found: undefined"
 test "$(error_of $passgen '\m{undefined}')" = "error in pattern: wordlist not found: undefined"
 test "$(error_of $passgen -w "test:$tmpdir/empty.txt" '\w{test}')" = "error in pattern: wordlist is empty: test"
-test "$(error_of $passgen 'a\p{name}')" = "error in pattern: presets in patterns are not supported yet: name"
+test "$(error_of $passgen 'a\p{name}')" = "error in pattern: preset not found: name"
 fails $passgen 'a\p{name}'
+fails $passgen -P 'a:\p{a}' 'x\p{a}'
+fails $passgen -P 'a:\p{b}' -P 'b:(\p{a})' -p a
+test "$(error_of $passgen -P 'a:x\p{a}?' '\p{a}')" = "error in pattern: preset cannot be used: a"
+test "$(error_lines $passgen -P 'a:x\p{a}?' '\p{a}' | sed -n 2p)" = "caused by: preset uses itself: a"
+# a problem in a preset is marked in the pattern of the preset as well.
+output="$(error_lines $passgen -P '.part:[a-z' -P 'outer:ab\p{.part}' 'x\p{outer}')"
+test "$(echo "$output" | sed -n 1p)" = "error in pattern: preset cannot be used: outer"
+test "$(echo "$output" | sed -n 2p)" = "caused by: preset cannot be used: .part"
+test "$(echo "$output" | sed -n 3p)" = "caused by: set is not closed"
+test "$(echo "$output" | sed -n 6p)" = "preset outer: ab\p{.part}"
+test "$(echo "$output" | sed -n 7p)" = "                ^^^^^^^^^"
+test "$(echo "$output" | sed -n 8p)" = "preset .part: [a-z"
+test "$(echo "$output" | sed -n 9p)" = "                  ^"
+# presets which are broken don't matter unless they are used.
+$passgen -P 'broken:[' -P 'fine:abc' -p fine | matches abc
 
 # problems with wordlists point to where they are used, and come up before
 # anything is generated (so also when it is not used in the end).

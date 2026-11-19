@@ -33,17 +33,20 @@ typedef int passgen_generate_cb(void *data, uint32_t codepoint);
 
 /// Gets a pattern ready to be generated with an environment: finds the
 /// wordlists which it uses, and reads them (and makes Markov chains from
-/// them, for `\m{name}`). Wordlists which it does not use are not read.
+/// them, for `\m{name}`), and finds the presets which it uses (`\p{name}`),
+/// and parses and resolves them in turn. Wordlists and presets which it does
+/// not use are not read or parsed.
 ///
 /// This is where everything which a pattern needs from outside of it is
 /// checked, so that problems come up before anything is generated. After
 /// this, the pattern can be generated with the environment as often as
-/// needed. If a wordlist is added to the environment (see @ref
-/// passgen_env_wordlist_add), which may replace one that the pattern uses,
-/// the pattern has to be resolved again.
+/// needed. If a wordlist or a preset is added to the environment (see @ref
+/// passgen_env_wordlist_add and @ref passgen_env_preset_add), which may
+/// replace one that the pattern uses, the pattern has to be resolved again.
 ///
 /// @param pattern A pattern which was parsed successfully
 /// @param env The environment to generate it with, which has the wordlists
+///   and presets
 /// @param error If resolving fails, this is set to what went wrong, with the
 ///   position of what it is about in the pattern. It then has to be released
 ///   with @ref passgen_error_free. May be NULL.
@@ -54,8 +57,16 @@ typedef int passgen_generate_cb(void *data, uint32_t codepoint);
 ///   - @ref PASSGEN_ERROR_WORDLIST_READ, if a wordlist cannot be read,
 ///   - @ref PASSGEN_ERROR_WORDLIST_EMPTY, if a wordlist does not have any
 ///     words,
-///   - @ref PASSGEN_ERROR_PRESET, if it uses a preset (`\p{name}`), which is
-///     not supported yet.
+///   - @ref PASSGEN_ERROR_PRESET_NOT_FOUND, if a preset (`\p{name}`) is not
+///     in the environment,
+///   - @ref PASSGEN_ERROR_PRESET_INVALID, if a preset cannot be used, because
+///     its pattern is not valid or something it uses cannot be resolved (the
+///     cause says what, with a position in the pattern of the preset),
+///   - @ref PASSGEN_ERROR_PRESET_CYCLE, if a preset uses itself, also through
+///     other presets,
+///   - @ref PASSGEN_ERROR_DEPTH_LIMIT, if groups are nested more than 1024
+///     deep in all, through the presets that it uses. This is about the
+///     preset in the pattern through which it is too deep.
 PASSGEN_EXPORT passgen_status passgen_resolve(
     passgen_pattern *pattern,
     passgen_env *env,
@@ -165,7 +176,7 @@ PASSGEN_EXPORT passgen_status passgen_generate_fill_json_utf8(
 /// @param func Called for every codepoint which is generated
 /// @returns @ref PASSGEN_OK on success, and otherwise why generating failed:
 ///   - @ref PASSGEN_ERROR_INVALID_ARGUMENT, if the pattern was not resolved
-///     with this environment, or a wordlist was added to it since,
+///     with this environment, or a wordlist or preset was added to it since,
 ///   - @ref PASSGEN_ERROR_STEP_LIMIT, if it takes more steps than the step
 ///     limit of the environment,
 ///   - @ref PASSGEN_ERROR_GROUP_EMPTY, if there is a group with nothing to

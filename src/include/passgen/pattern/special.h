@@ -34,9 +34,14 @@ typedef struct {
     passgen_error_offset start;
     /// Where in the pattern this ends, following the closing brace.
     passgen_error_offset end;
-    /// The wordlist which this uses, once the pattern is resolved (see @ref
-    /// passgen_resolve). It belongs to the environment. NULL for presets.
-    struct passgen_wordlist *wordlist;
+    /// What this uses, once the pattern is resolved (see @ref
+    /// passgen_resolve). It belongs to the environment.
+    union {
+        /// The wordlist, for `\w{name}` and `\m{name}`.
+        struct passgen_wordlist *wordlist;
+        /// The preset, for `\p{name}`.
+        struct passgen_preset *preset;
+    };
 } passgen_pattern_special;
 
 /// Initialise a pattern special with the given char.

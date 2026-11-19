@@ -54,8 +54,12 @@ const char *passgen_status_string(passgen_status status) {
             return "wordlist is empty";
         case PASSGEN_ERROR_WORDLIST_READ:
             return "wordlist could not be read";
-        case PASSGEN_ERROR_PRESET:
-            return "presets in patterns are not supported yet";
+        case PASSGEN_ERROR_PRESET_NOT_FOUND:
+            return "preset not found";
+        case PASSGEN_ERROR_PRESET_INVALID:
+            return "preset cannot be used";
+        case PASSGEN_ERROR_PRESET_CYCLE:
+            return "preset uses itself";
         case PASSGEN_ERROR_GROUP_EMPTY:
             return "nothing to choose from";
         case PASSGEN_ERROR_RANDOM:
