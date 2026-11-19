@@ -250,6 +250,14 @@ typedef struct {
     size_t second;
 } chosen_key;
 
+// GCC (from version 16, at -O3) guesses that calls through the hash function
+// of other contexts in this file may be to this one, as it is the only one
+// that is stored, and inlines it for that case. it then warns about reading a
+// chosen_key from the strings which test_hashmap_context_utf8 hashes, in code
+// which never runs. not inlining it avoids that.
+#if defined(__GNUC__)
+__attribute__((noinline))
+#endif
 static uint64_t
 chosen_hash(const passgen_hashmap *map, const void *key, bool first) {
     (void) map;

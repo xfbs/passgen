@@ -57,44 +57,34 @@ void passgen_random_reload(passgen_random *random) {
 }
 
 void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
-    if(random->failed) {
-        memset(data, 0, bytes);
-        return;
-    }
-
-    if(bytes <= sizeof(random->buffer)) {
-        // maximum bytes we can have right now
-        size_t left = sizeof(random->buffer) - random->pos;
-
-        if(bytes < left) {
-            // if we have enough, just copy it over.
-            memcpy(data, &random->buffer[random->pos], bytes);
-            random->pos += bytes;
-        } else {
-            // if we don't have enough, copy over whatever we have and
-            // reload.
-            memcpy(data, &random->buffer[random->pos], left);
-            passgen_random_reload(random);
-
-            // if there's more to be read, recurse.
-            if(bytes != left) {
-                passgen_random_read(
-                    random,
-                    (uint8_t *) data + left,
-                    bytes - left);
-            }
-
-            // if reloading failed, none of this is to be used.
-            if(random->failed) {
-                memset(data, 0, bytes);
-            }
-        }
-    } else {
+    // more than fits into the buffer is read directly.
+    if(!random->failed && bytes > sizeof(random->buffer)) {
         size_t ret = random->read(random->context, data, bytes);
         if(ret != bytes) {
             passgen_random_fail(random);
-            memset(data, 0, bytes);
         }
+    } else {
+        // otherwise it comes from the buffer, which is reloaded as soon as
+        // all of it was used.
+        uint8_t *output = data;
+        size_t remaining = bytes;
+        while(remaining && !random->failed) {
+            size_t left = sizeof(random->buffer) - random->pos;
+            size_t count = remaining < left ? remaining : left;
+            memcpy(output, &random->buffer[random->pos], count);
+            random->pos += count;
+            output += count;
+            remaining -= count;
+
+            if(random->pos == sizeof(random->buffer)) {
+                passgen_random_reload(random);
+            }
+        }
+    }
+
+    // if the source failed (now or before), none of this is to be used.
+    if(random->failed) {
+        memset(data, 0, bytes);
     }
 }
 

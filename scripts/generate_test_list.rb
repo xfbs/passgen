@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
 
 TEST_REGEX = /(test_result test_([^ ]+)\(.*\))/
-IFDEF_REGEX = /(#ifdef|#ifndef|#else|#endif)/
+# preprocessor conditionals around tests are copied over, so that the list
+# only has the tests which are compiled. all of them are, so that they stay
+# balanced.
+IFDEF_REGEX = /^\s*#\s*(if|ifdef|ifndef|elif|else|endif)\b/
 
 outfile = File.open(ARGV.shift, "w")
 inputs = ARGV
