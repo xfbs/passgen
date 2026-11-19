@@ -195,15 +195,20 @@ if $passgen -r "chacha20:$key" "a" > /dev/null 2>&1; then
 
     # a master passphrase is set up for the configuration, and then used by
     # its name. it is read from standard input, which is not a terminal here.
-    echo master | $passgen --master-setup main --level 1 > "$tmpdir/master.toml"
+    echo master | $passgen --master-setup main --master-level 1 --master-version 1 > "$tmpdir/master.toml"
     test "$(cat "$tmpdir/master.toml")" = '[master.main]
 version = 1
 level = 1
 hash = "fd915731"'
     test "$(echo master | $passgen -c "$tmpdir/master.toml" -m main -d example.com -u user -p apple2)" = "$a"
     test "$(echo master | $passgen -c "$tmpdir/master.toml" --master main --domain example.com --user user -p apple2)" = "$a"
+    # without a terminal to ask at, the level is 2, and there is no seed.
+    test "$(echo master | $passgen --master-setup main)" = '[master.main]
+version = 1
+level = 2
+hash = "e1581cf7"'
     # names which are not bare keys are quoted.
-    test "$(echo master | $passgen --master-setup 'my "key"' --level 1 | head -n 1)" = '[master."my \"key\""]'
+    test "$(echo master | $passgen --master-setup 'my "key"' --master-level 1 | head -n 1)" = '[master."my \"key\""]'
 
     # the hash tells a wrong master passphrase apart, which is an error (exit
     # status 15), as are a missing one and one which is not configured.
@@ -227,7 +232,7 @@ hash = "fd915731"'
     fails sh -c "echo master | $passgen -c $tmpdir/master.toml -c $tmpdir/master3.toml -m main a"
 
     # with a seed, it is the same as with the seed in the description.
-    echo master | $passgen --master-setup main --level 1 --seed > "$tmpdir/seeded.toml"
+    echo master | $passgen --master-setup main --master-level 1 --master-seed > "$tmpdir/seeded.toml"
     seed="$(sed -n 's/^seed = "\(.*\)"$/\1/p' "$tmpdir/seeded.toml")"
     test "${#seed}" = 32
     test "$(echo master | $passgen -c "$tmpdir/seeded.toml" -m main -d example.com -u user -p apple2)" = \
@@ -250,10 +255,14 @@ hash = "fd915731"'
     fails $passgen -c "$tmpdir/master.toml" -r zero -m main "a"
     fails $passgen -d example.com "a"
     fails $passgen -u user "a"
+    fails $passgen --master-level 2 "a"
+    fails $passgen --master-seed "a"
+    fails $passgen --master-version 1 "a"
+    fails sh -c "echo master | $passgen --master-setup main a"
+    fails sh -c "echo master | $passgen --master-setup main --master-level 4"
+    fails sh -c "echo master | $passgen --master-setup main --master-version 2"
     fails $passgen --level 2 "a"
     fails $passgen --seed "a"
-    fails sh -c "echo master | $passgen --master-setup main a"
-    fails sh -c "echo master | $passgen --master-setup main --level 4"
     fails sh -c "echo master | $passgen --master-setup main -m main"
 
     # deriving the key needs more memory than may commonly be locked

@@ -32,3 +32,13 @@ bool passgen_cli_prompt_interactive(void);
 /// @param size Size of the buffer, including the NUL terminator
 passgen_cli_prompt_status
 passgen_cli_prompt_secret(const char *prompt, char *buffer, size_t size);
+
+/// Asks something which is not a secret, at the terminal: shows the prompt on
+/// standard error, and reads a line from standard input, without the newline
+/// at its end.
+///
+/// @param prompt What to show before reading
+/// @param buffer Where to store it, as a NUL-terminated string
+/// @param size Size of the buffer, including the NUL terminator
+passgen_cli_prompt_status
+passgen_cli_prompt_line(const char *prompt, char *buffer, size_t size);

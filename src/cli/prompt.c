@@ -16,6 +16,37 @@ static void prompt_restore(int signal) {
     _exit(128 + signal);
 }
 
+// Reads a line from standard input, one byte at a time, without the newline
+// (or CRLF) at its end. Sets any to whether there was anything to read, and
+// too_long to whether it did not fit, in which case the rest of the line is
+// skipped.
+static void
+prompt_read_line(char *buffer, size_t size, bool *any, bool *too_long) {
+    size_t length = 0;
+    *any = false;
+    *too_long = false;
+    while(true) {
+        char c;
+        ssize_t count = read(STDIN_FILENO, &c, 1);
+        if(count != 1 || c == '\n') {
+            *any = *any || count == 1;
+            break;
+        }
+        *any = true;
+        if(length + 1 < size) {
+            buffer[length++] = c;
+        } else {
+            *too_long = true;
+        }
+        c = 0;
+    }
+
+    if(length && buffer[length - 1] == '\r') {
+        length--;
+    }
+    buffer[length] = 0;
+}
+
 bool passgen_cli_prompt_interactive(void) {
     return isatty(STDIN_FILENO);
 }
@@ -49,30 +80,8 @@ passgen_cli_prompt_secret(const char *prompt, char *buffer, size_t size) {
         }
     }
 
-    size_t length = 0;
-    bool too_long = false;
-    bool any = false;
-    while(true) {
-        char c;
-        ssize_t count = read(STDIN_FILENO, &c, 1);
-        if(count != 1 || c == '\n') {
-            any = any || count == 1;
-            break;
-        }
-        any = true;
-        if(length + 1 < size) {
-            buffer[length++] = c;
-        } else {
-            too_long = true;
-        }
-        c = 0;
-    }
-
-    // a line which ends in CRLF.
-    if(length && buffer[length - 1] == '\r') {
-        length--;
-    }
-    buffer[length] = 0;
+    bool any = false, too_long = false;
+    prompt_read_line(buffer, size, &any, &too_long);
 
     if(terminal) {
         tcsetattr(STDIN_FILENO, TCSAFLUSH, &prompt_saved);
@@ -85,6 +94,23 @@ passgen_cli_prompt_secret(const char *prompt, char *buffer, size_t size) {
     }
     if(too_long) {
         memset(buffer, 0, size);
+        return PASSGEN_CLI_PROMPT_TOO_LONG;
+    }
+    return PASSGEN_CLI_PROMPT_OK;
+}
+
+passgen_cli_prompt_status
+passgen_cli_prompt_line(const char *prompt, char *buffer, size_t size) {
+    fprintf(stderr, "%s", prompt);
+    fflush(stderr);
+
+    bool any = false, too_long = false;
+    prompt_read_line(buffer, size, &any, &too_long);
+    if(!any) {
+        return PASSGEN_CLI_PROMPT_EOF;
+    }
+    if(too_long) {
+        buffer[0] = 0;
         return PASSGEN_CLI_PROMPT_TOO_LONG;
     }
     return PASSGEN_CLI_PROMPT_OK;

@@ -303,13 +303,91 @@ static int passgen_cli_toml_key(const char *key) {
 
 // Asks for a master passphrase (twice, at a terminal), and prints what the
 // configuration needs to use it.
+// Asks which level to use, at the terminal. Returns 0 or an error.
+static int passgen_cli_master_ask_level(unsigned *level) {
+    fprintf(
+        stderr,
+        "The level is how much effort deriving the key from the master\n"
+        "passphrase takes, which is how much effort guessing it takes:\n"
+        "  1: 64 MiB of memory, fastest\n"
+        "  2: 256 MiB of memory (default)\n"
+        "  3: 1 GiB of memory, strongest\n");
+    while(true) {
+        char answer[16];
+        passgen_cli_prompt_status status =
+            passgen_cli_prompt_line("level [2]: ", answer, sizeof(answer));
+        if(status == PASSGEN_CLI_PROMPT_EOF) {
+            fprintf(stderr, "\n");
+            return PASSGEN_CLI_ERROR_MASTER;
+        }
+        if(status == PASSGEN_CLI_PROMPT_OK && !answer[0]) {
+            *level = PASSGEN_MASTER_LEVEL_DEFAULT;
+            return 0;
+        }
+        if(status == PASSGEN_CLI_PROMPT_OK && answer[0] >= '1' &&
+           answer[0] <= '0' + PASSGEN_MASTER_LEVEL_MAX && !answer[1]) {
+            *level = (unsigned) (answer[0] - '0');
+            return 0;
+        }
+        fprintf(stderr, "The level is 1, 2 or 3.\n");
+    }
+}
+
+// Asks whether to generate a seed, at the terminal. Returns 0 or an error.
+static int passgen_cli_master_ask_seed(bool *seed) {
+    fprintf(
+        stderr,
+        "A seed is stored in the configuration, and needed along with the\n"
+        "master passphrase, so that it alone is not enough to derive "
+        "anything.\n"
+        "Without the configuration, nothing can be derived again.\n");
+    while(true) {
+        char answer[16];
+        passgen_cli_prompt_status status = passgen_cli_prompt_line(
+            "generate a seed? [y/N]: ",
+            answer,
+            sizeof(answer));
+        if(status == PASSGEN_CLI_PROMPT_EOF) {
+            fprintf(stderr, "\n");
+            return PASSGEN_CLI_ERROR_MASTER;
+        }
+        if(status == PASSGEN_CLI_PROMPT_OK) {
+            if(!answer[0] || 0 == strcmp(answer, "n") ||
+               0 == strcmp(answer, "N") || 0 == strcmp(answer, "no")) {
+                *seed = false;
+                return 0;
+            }
+            if(0 == strcmp(answer, "y") || 0 == strcmp(answer, "Y") ||
+               0 == strcmp(answer, "yes")) {
+                *seed = true;
+                return 0;
+            }
+        }
+        fprintf(stderr, "Answer y or n.\n");
+    }
+}
+
 static int passgen_cli_master_setup(const passgen_cli_opts *opts) {
-    unsigned level = opts->master_setup_level ? opts->master_setup_level
-                                              : PASSGEN_MASTER_LEVEL_DEFAULT;
+    // what is not given as an option is asked for at a terminal, and is the
+    // default otherwise.
+    bool interactive = passgen_cli_prompt_interactive();
+    unsigned level = opts->master_setup_level;
+    if(!level && interactive) {
+        try
+            (passgen_cli_master_ask_level(&level));
+    }
+    if(!level) {
+        level = PASSGEN_MASTER_LEVEL_DEFAULT;
+    }
+    bool generate_seed = opts->master_setup_seed;
+    if(!generate_seed && interactive) {
+        try
+            (passgen_cli_master_ask_seed(&generate_seed));
+    }
 
     uint8_t seed[16];
     size_t seed_size = 0;
-    if(opts->master_setup_seed) {
+    if(generate_seed) {
         passgen_random_read(opts->random, seed, sizeof(seed));
         if(passgen_random_failed(opts->random)) {
             return passgen_cli_bail(PASSGEN_CLI_ERROR_RANDOM_ALLOC, NULL);
@@ -731,6 +809,7 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->master_setup = NULL;
     opts->master_setup_level = 0;
     opts->master_setup_seed = false;
+    opts->master_setup_version = false;
 #endif
     opts->masters = NULL;
     opts->masters_len = 0;
@@ -852,8 +931,9 @@ static int passgen_cli_presets_list(const passgen_cli_opts *opts) {
 // options which only have a long form.
 enum {
     PASSGEN_CLI_OPT_MASTER_SETUP = 256,
-    PASSGEN_CLI_OPT_LEVEL,
-    PASSGEN_CLI_OPT_SEED,
+    PASSGEN_CLI_OPT_MASTER_LEVEL,
+    PASSGEN_CLI_OPT_MASTER_SEED,
+    PASSGEN_CLI_OPT_MASTER_VERSION,
 };
 #else
 #define PASSGEN_CLI_MASTER_OPTS ""
@@ -890,8 +970,12 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
         {"domain", required_argument, NULL, 'd'},
         {"user", required_argument, NULL, 'u'},
         {"master-setup", required_argument, NULL, PASSGEN_CLI_OPT_MASTER_SETUP},
-        {"level", required_argument, NULL, PASSGEN_CLI_OPT_LEVEL},
-        {"seed", no_argument, NULL, PASSGEN_CLI_OPT_SEED},
+        {"master-level", required_argument, NULL, PASSGEN_CLI_OPT_MASTER_LEVEL},
+        {"master-seed", no_argument, NULL, PASSGEN_CLI_OPT_MASTER_SEED},
+        {"master-version",
+         required_argument,
+         NULL,
+         PASSGEN_CLI_OPT_MASTER_VERSION},
 #endif
         {NULL, no_argument, NULL, 0}};
 
@@ -927,17 +1011,28 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             case PASSGEN_CLI_OPT_MASTER_SETUP:
                 opts->master_setup = optarg;
                 break;
-            case PASSGEN_CLI_OPT_LEVEL:
+            case PASSGEN_CLI_OPT_MASTER_LEVEL:
                 if(optarg[0] < '1' ||
                    optarg[0] > '0' + PASSGEN_MASTER_LEVEL_MAX || optarg[1]) {
                     return passgen_cli_bail(
                         PASSGEN_CLI_ERROR_MASTER_CONFLICT,
-                        "--level has to be from 1 to 3");
+                        "--master-level has to be from 1 to 3");
                 }
                 opts->master_setup_level = (unsigned) (optarg[0] - '0');
                 break;
-            case PASSGEN_CLI_OPT_SEED:
+            case PASSGEN_CLI_OPT_MASTER_SEED:
                 opts->master_setup_seed = true;
+                break;
+            case PASSGEN_CLI_OPT_MASTER_VERSION:
+                // there is only one, but saying which one is used means that
+                // a script keeps setting up the same, also once there are
+                // more.
+                if(0 != strcmp(optarg, "1")) {
+                    return passgen_cli_bail(
+                        PASSGEN_CLI_ERROR_MASTER_CONFLICT,
+                        "--master-version has to be 1");
+                }
+                opts->master_setup_version = true;
                 break;
 #endif
             case 'c':
@@ -1039,10 +1134,12 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
             "--master-setup cannot be used with a pattern, --preset, --list "
             "or --master");
     }
-    if(!setup && (opts->master_setup_level || opts->master_setup_seed)) {
+    if(!setup && (opts->master_setup_level || opts->master_setup_seed ||
+                  opts->master_setup_version)) {
         return passgen_cli_bail(
             PASSGEN_CLI_ERROR_MASTER_CONFLICT,
-            "--level and --seed need --master-setup");
+            "--master-level, --master-seed and --master-version need "
+            "--master-setup");
     }
 
     // the source of randomness is opened once the master passphrase is
@@ -1080,8 +1177,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     "                           which is asked for\n"                          \
     "        --master-setup NAME\n"                                            \
     "                           Set up a master passphrase for the\n"         \
-    "                           configuration, with --level (1 to 3,\n"       \
-    "                           default: 2), and --seed to generate a seed\n"
+    "                           configuration, asking how\n"
 #define PASSGEN_CLI_HELP_USER \
     "    -u, --user USER        User (login) for master passphrase mode\n"
 #define PASSGEN_CLI_HELP_CHACHA20                                             \

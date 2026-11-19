@@ -18,8 +18,9 @@
 .Fl l
 .Nm
 .Fl -master-setup Ar name
-.Op Fl -level Ar level
-.Op Fl -seed
+.Op Fl -master-level Ar level
+.Op Fl -master-seed
+.Op Fl -master-version Ar version
 .Nm
 .Fl h | v
 .Sh DESCRIPTION
@@ -131,16 +132,25 @@ more than one for a domain.
 It can also be a counter, to change a passphrase.
 Optional.
 .It Fl -master-setup Ar name
-Ask for a master passphrase, twice when reading it from a terminal, and print
-what the configuration needs to use it as
+Set up a master passphrase, and print what the configuration needs to use it
+as
 .Ar name ,
 which can be appended to it.
-.It Fl -level Ar level
+At a terminal, this asks for the level and whether to generate a seed, unless
+they are given with the options below, and for the master passphrase twice.
+Otherwise, the master passphrase is read as a line from standard input, and
+the level and the seed are the defaults, unless they are given.
+.It Fl -master-level Ar level
 How much effort deriving a key from the master passphrase that is set up
 takes, from 1 to 3.
 The default is 2.
-.It Fl -seed
+.It Fl -master-seed
 Generate a seed for the master passphrase that is set up.
+By default, there is none.
+.It Fl -master-version Ar version
+How keys are derived from the master passphrase that is set up.
+This can only be 1, which is the default, but giving it means that a script
+keeps setting up the same once there are more.
 .El
 .Pp
 .Sh PATTERNS
@@ -598,6 +608,16 @@ Set up a master passphrase, and derive a passphrase for an account from it.
 This always results in the same passphrase:
 .Bd -literal -offset indent
 $ passgen --master-setup main >> ~/.config/passgen/config.toml
+The level is how much effort deriving the key from the master
+passphrase takes, which is how much effort guessing it takes:
+  1: 64 MiB of memory, fastest
+  2: 256 MiB of memory (default)
+  3: 1 GiB of memory, strongest
+level [2]:
+A seed is stored in the configuration, and needed along with the
+master passphrase, so that it alone is not enough to derive anything.
+Without the configuration, nothing can be derived again.
+generate a seed? [y/N]:
 master passphrase:
 master passphrase again:
 $ passgen -m main -d example.com -u username -p apple2

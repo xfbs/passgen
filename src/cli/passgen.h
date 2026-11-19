@@ -117,6 +117,9 @@ typedef struct {
     unsigned master_setup_level;
     /// Whether to generate a seed for the master passphrase to set up.
     bool master_setup_seed;
+    /// Whether the version of the master passphrase to set up was given,
+    /// which can only be the latest one.
+    bool master_setup_version;
 #endif
     /// Master passphrases defined in the configuration. These are read even
     /// without master passphrase mode, so that the configuration is the same.

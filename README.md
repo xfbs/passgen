@@ -121,6 +121,10 @@ by its name, and asked for:
 
 ```
 $ passgen --master-setup main >> ~/.config/passgen/config.toml
+...
+level [2]:
+...
+generate a seed? [y/N]:
 master passphrase:
 master passphrase again:
 $ passgen -m main -d example.com -u username -p apple2
