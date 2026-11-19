@@ -1,4 +1,5 @@
 #include "passgen/parser/parser.h"
+#include "passgen/markov.h"
 #include "passgen/config.h"
 
 #include <stdbool.h>
@@ -135,6 +136,8 @@ passgen_parser_state *passgen_parser_state_push_special(
     }
     state->type = PASSGEN_PARSER_SPECIAL;
     state->data.special.special = special;
+    state->data.special.length = false;
+    state->data.special.digits = false;
     return state;
 }
 
@@ -646,22 +649,62 @@ int passgen_parse_special_name(
     passgen_parser_state *state) {
     (void) parser;
 
+    passgen_pattern_special *special = state->data.special.special;
+
     if(token->codepoint == '}') {
         // there has to be a name, as in `\w{name}`.
-        if(state->data.special.special->parameters_len == 0) {
+        if(special->parameters_len == 0) {
             return PASSGEN_ERROR_SPECIAL;
         }
+        // and a length after a colon, which is not zero.
+        if(state->data.special.length &&
+           (!state->data.special.digits || special->markov_length == 0)) {
+            return PASSGEN_ERROR_MARKOV_LENGTH;
+        }
         // the closing brace is one byte long.
-        state->data.special.special->end = (passgen_error_offset){
+        special->end = (passgen_error_offset){
             token->offset + 1,
             token->byte_offset + 1,
         };
         passgen_stack_pop(&parser->state, NULL);
-    } else {
-        try(passgen_pattern_special_push(
-            state->data.special.special,
-            token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT));
+        return 0;
     }
+
+    // the length of a Markov chain, as in `\m{english:3}`, which is only
+    // digits, so that there is one way to write it.
+    if(state->data.special.length) {
+        if(token->codepoint < '0' || token->codepoint > '9') {
+            return PASSGEN_ERROR_MARKOV_LENGTH;
+        }
+        size_t length = 10 * (size_t) (state->data.special.digits
+                                           ? special->markov_length
+                                           : 0) +
+                        (token->codepoint - '0');
+        if(length > PASSGEN_MARKOV_LENGTH_MAX) {
+            return PASSGEN_ERROR_MARKOV_LENGTH;
+        }
+        special->markov_length = length;
+        state->data.special.digits = true;
+        return 0;
+    }
+
+    // a colon ends the name, and only Markov chains take what follows it. an
+    // escaped one is part of the name.
+    if(token->codepoint == ':') {
+        if(special->parameters_len == 0) {
+            return PASSGEN_ERROR_SPECIAL;
+        }
+        if(special->kind != PASSGEN_PATTERN_SPECIAL_MARKOV) {
+            return PASSGEN_ERROR_SPECIAL_PARAMETER;
+        }
+        state->data.special.length = true;
+        state->data.special.digits = false;
+        return 0;
+    }
+
+    try(passgen_pattern_special_push(
+        special,
+        token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT));
 
     return 0;
 }

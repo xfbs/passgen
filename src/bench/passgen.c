@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 
     passgen_wordlist patterns;
     // the file is closed by this.
-    passgen_wordlist_load(&patterns, NULL, patterns_file, 3);
+    passgen_wordlist_load(&patterns, NULL, patterns_file);
 
     // double unicode_time;
     // double tokenize_time;

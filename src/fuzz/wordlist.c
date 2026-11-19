@@ -16,9 +16,11 @@ static void run(const uint8_t *data, size_t size) {
     data += 1;
     size -= 1;
 
+    char string[32];
+    snprintf(string, sizeof(string), "\\w{w}-\\m{w:%zu}{3}", markov_length);
     passgen_pattern *pattern;
     passgen_error error;
-    int parsed = passgen_parse(&pattern, &error, "\\w{w}-\\m{w}{3}");
+    int parsed = passgen_parse(&pattern, &error, string);
     if(parsed != 0) {
         // this only fails when an allocation does.
         if(parsed != PASSGEN_ERROR_OUT_OF_MEMORY) {
@@ -38,7 +40,7 @@ static void run(const uint8_t *data, size_t size) {
         FILE *file = fmemopen((void *) data, size, "r");
         if(env && file) {
             // this closes the file, also if it fails.
-            passgen_env_wordlist_add(env, "w", file, markov_length);
+            passgen_env_wordlist_add(env, "w", file);
             passgen_resolve(pattern, env, NULL);
 
             double entropy;

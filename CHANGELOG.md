@@ -14,8 +14,8 @@ source of randomness) change, also for the presets. Choices with only one
 option no longer use randomness: groups with a single alternative (`(abc)`,
 and every pattern itself), sets of a single character (`[a]`), wordlists with
 a single word, and letters of Markov chains which only one letter can follow.
-So `(abc)` generates the same as `abc`. To get an old password back, use
-0.3.0.
+So `(abc)` generates the same as `abc`. Markov chains also choose between
+letters in a different order. To get an old password back, use 0.3.0.
 
 ### Added
 
@@ -26,17 +26,22 @@ So `(abc)` generates the same as `abc`. To get an old password back, use
   patterns can be built from parts. It used to generate nothing.
 - Presets whose names start with a dot are not shown by `--list`, for parts
   of other presets.
+- `\m{name:2}` uses a Markov chain of that length (from 1 to 8, 3 without
+  one). A pattern can use different lengths from the same wordlist.
 
 ### Changed
 
 - Problems with wordlists (missing, empty or unreadable) are found before
   anything is generated, also when the pattern would not have used the
   wordlist, and show where in the pattern it is used.
+- Markov chains need less memory, up to half as much for long ones, and much
+  less for wordlists in scripts with many letters.
 
 ### Removed
 
 - `-D`/`--depth`. Groups can be nested up to 1024 deep, which is now checked
   when parsing.
+- `-M`/`--markov-length`, which is part of the pattern now: `\m{name:2}`.
 
 ### Fixed
 

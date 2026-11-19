@@ -416,7 +416,7 @@ test_result test_error_generate(void) {
     // an empty wordlist
     FILE *file = tmpfile();
     assert(file);
-    assert(0 == passgen_env_wordlist_add(env, "empty", file, 2));
+    assert(0 == passgen_env_wordlist_add(env, "empty", file));
 
     passgen_pattern *pattern;
     passgen_error error;
@@ -753,7 +753,7 @@ test_result test_error_wordlist_read(void) {
     close(fds[1]);
     FILE *file = fdopen(fds[0], "r");
     assert(file);
-    assert(PASSGEN_OK == passgen_env_wordlist_add(env, "piped", file, 2));
+    assert(PASSGEN_OK == passgen_env_wordlist_add(env, "piped", file));
 
     const char *patterns[] = {"\\w{piped}", "\\m{piped}", "\\w{piped}"};
     for(size_t i = 0; i < 3; i++) {
@@ -797,7 +797,7 @@ test_result test_error_wordlist_load(void) {
 
     passgen_wordlist wordlist;
     passgen_error error;
-    assert(PASSGEN_ERROR_IO == passgen_wordlist_load(&wordlist, &error, file, 3));
+    assert(PASSGEN_ERROR_IO == passgen_wordlist_load(&wordlist, &error, file));
     assert(error.kind == PASSGEN_ERROR_IO);
     assert(error.detail[0] != 0);
     assert(!wordlist.parsed);
@@ -823,44 +823,58 @@ test_result test_error_wordlist_markov_length(void) {
     passgen_env *env = passgen_env_new(&random);
     assert(env);
 
-    const size_t invalid[] = {0, 256, SIZE_MAX};
+    FILE *file = tmpfile();
+    assert(file);
+    fputs("alpha\nbravo\n", file);
+    assert(PASSGEN_OK == passgen_env_wordlist_add(env, "words", file));
+
+    // every length can be used, also together, from the same wordlist.
+    passgen_pattern *pattern;
+    assert(
+        PASSGEN_OK ==
+        passgen_parse(
+            &pattern,
+            NULL,
+            "\\m{words:1}\\m{words:2}\\m{words}\\m{words:4}\\m{words:5}"
+            "\\m{words:6}\\m{words:7}\\m{words:8}"));
+    assert(0 == passgen_resolve(pattern, env, NULL));
+    uint8_t output[256];
+    size_t length = 0;
+    assert(
+        PASSGEN_OK == passgen_generate_fill_utf8(
+                          pattern,
+                          env,
+                          NULL,
+                          NULL,
+                          output,
+                          sizeof(output),
+                          &length));
+    assert(length > 0);
+    passgen_pattern_free(pattern);
+
+    // a length which is not from 1 to 8 is an error in the pattern, at the
+    // first character of it which makes it so. zero is only known to be
+    // invalid once the length ends.
+    const char *invalid[][2] = {
+        {"\\m{words:0}", "          ^"},
+        {"\\m{words:9}", "         ^"},
+        {"\\m{words:10}", "          ^"},
+        {"\\m{words:}", "         ^"},
+        {"\\m{words:x}", "         ^"},
+        {"\\m{words:2:3}", "          ^"},
+        {"\\m{words:-1}", "         ^"},
+    };
     for(size_t i = 0; i < sizeof(invalid) / sizeof(invalid[0]); i++) {
-        FILE *file = tmpfile();
-        assert(file);
+        passgen_error error;
         assert(
-            PASSGEN_ERROR_INVALID_ARGUMENT ==
-            passgen_env_wordlist_add(env, "words", file, invalid[i]));
-    }
-
-    // the shortest and the longest work, and generate from the words.
-    const size_t valid[] = {1, 255};
-    for(size_t i = 0; i < sizeof(valid) / sizeof(valid[0]); i++) {
-        FILE *file = tmpfile();
-        assert(file);
-        fputs("alpha\nbravo\n", file);
-        assert(PASSGEN_OK == passgen_env_wordlist_add(env, "words", file, valid[i]));
-
-        passgen_pattern *pattern;
-        assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\m{words}"));
-        uint8_t output[64];
-        size_t length = 0;
-        assert(0 == passgen_resolve(pattern, env, NULL));
-        assert(
-            PASSGEN_OK == passgen_generate_fill_utf8(
-                              pattern,
-                              env,
-                              NULL,
-                              NULL,
-                              output,
-                              sizeof(output),
-                              &length));
-        assert(length > 0);
-        passgen_pattern_free(pattern);
+            PASSGEN_ERROR_MARKOV_LENGTH ==
+            passgen_parse(&pattern, &error, invalid[i][0]));
+        assert_eq(error.start.codepoint, strlen(invalid[i][1]) - 1);
     }
 
     assert_streq(
-        passgen_status_string(PASSGEN_ERROR_INVALID_ARGUMENT),
-        "invalid argument");
+        passgen_status_string(PASSGEN_ERROR_MARKOV_LENGTH),
+        "length of a Markov chain must be a number from 1 to 8");
 
     passgen_env_free(env);
     passgen_random_close(&random);
@@ -879,7 +893,7 @@ test_result test_error_wordlist_utf8(void) {
     FILE *file = tmpfile();
     assert(file);
     fputs("\xff\xfe\n", file);
-    assert(PASSGEN_OK == passgen_env_wordlist_add(env, "broken", file, 2));
+    assert(PASSGEN_OK == passgen_env_wordlist_add(env, "broken", file));
 
     passgen_pattern *pattern;
     passgen_error error;
@@ -1037,7 +1051,7 @@ test_result test_error_wordlist_out_of_memory(void) {
         assert(env);
         FILE *file = wordlist_file();
         assert(file);
-        assert(PASSGEN_OK == passgen_env_wordlist_add(env, "words", file, 3));
+        assert(PASSGEN_OK == passgen_env_wordlist_add(env, "words", file));
         assert(0 == passgen_resolve(pattern, env, NULL));
         assert(
             PASSGEN_OK == passgen_generate_fill_utf8(
@@ -1074,7 +1088,7 @@ test_result test_error_wordlist_out_of_memory(void) {
             passgen_env *env = passgen_env_new(&random);
             if(env) {
                 // this closes the file, whether it works or not.
-                status = passgen_env_wordlist_add(env, "words", file, 3);
+                status = passgen_env_wordlist_add(env, "words", file);
             } else {
                 fclose(file);
             }

@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
         // the environment takes over the file, and reads it when the pattern
         // is resolved. the 3 is the length of the Markov chain, for
         // \m{words}.
-        if(passgen_env_wordlist_add(env, "words", file, 3) != PASSGEN_OK) {
+        if(passgen_env_wordlist_add(env, "words", file) != PASSGEN_OK) {
             fprintf(stderr, "error: out of memory\n");
             goto free_env;
         }

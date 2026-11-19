@@ -27,6 +27,9 @@ typedef struct {
     int32_t parameters_len;
     /// Capacity of the parameters string.
     int32_t parameters_cap;
+    /// Length of the Markov chain, for `\m{name:length}`. It is @ref
+    /// PASSGEN_MARKOV_LENGTH_DEFAULT if the pattern does not say.
+    uint8_t markov_length;
     /// Parameters string, UTF-8 encoded.
     char *parameters;
     /// Where in the pattern this is, from the backslash to the closing

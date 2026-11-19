@@ -78,7 +78,7 @@ int main(void) {
     FILE *file = tmpfile();
     check(file != NULL);
     fputs("alpha\nbravo\ncharlie\n", file);
-    check(0 == passgen_env_wordlist_add(env, "words", file, 3));
+    check(0 == passgen_env_wordlist_add(env, "words", file));
 
     double entropy = 0;
     check(PASSGEN_OK == passgen_resolve(pattern, env, NULL));

@@ -216,7 +216,11 @@ printf 'alpha\nbravo\ncharlie\n' > "$tmpdir/words.txt"
 $passgen -w "test:$tmpdir/words.txt" '\w{test}' | matches "(alpha|bravo|charlie)"
 $passgen -w "test:$tmpdir/words.txt" '\w{test}(-\w{test}){3}' | matches "[a-z]+(-[a-z]+){3}"
 $passgen -w "test:$tmpdir/words.txt" '\m{test}' | matches "[a-z]+"
-$passgen -w "test:$tmpdir/words.txt" -M 2 '\m{test}' | matches "[a-z]+"
+$passgen -w "test:$tmpdir/words.txt" '\m{test:2}' | matches "[a-z]+"
+# chains of every length can be used together, from the same wordlist.
+$passgen -w "test:$tmpdir/words.txt" '\m{test:1}-\m{test:8}-\m{test}' | matches "[a-z]+-[a-z]+-[a-z]+"
+# a chain as long as the words only generates them.
+$passgen -a 5 -w "test:$tmpdir/words.txt" '\m{test:8}' | matches "(alpha|bravo|charlie)"
 
 # user-defined presets and configuration file
 test "$($passgen -P "mine:abc" -p mine)" = "abc"
@@ -288,8 +292,10 @@ fails $passgen "{}a|b"
 $passgen "a{,3}" | matches "a{0,3}"
 fails $passgen "a[]{3}"
 fails $passgen -a 0 "a"
-fails $passgen -M 0 "a"
-fails $passgen -M 1000 "a"
+fails $passgen -M 2 "a"
+for length in 0 9 10 "" x -1 "2:3"; do
+    fails $passgen -w "test:$tmpdir/words.txt" "\\m{test:$length}"
+done
 fails $passgen -p doesnotexist
 fails $passgen -P "nocolon" "a"
 fails $passgen -r nonsense "a"
@@ -334,6 +340,9 @@ rm "$XDG_CONFIG_HOME/passgen.conf"
 test "$(error_of $passgen -r "file:/nonexistent" a)" = "error: cannot use randomness source 'file:/nonexistent'"
 test "$(error_of $passgen -r "xorshift:0" a)" = "error: cannot use randomness source 'xorshift:0'"
 test "$(error_of $passgen '\w{}')" = "error in pattern: expected a name in braces"
+test "$(error_of $passgen '\m{test:9}')" = "error in pattern: length of a Markov chain must be a number from 1 to 8"
+test "$(error_of $passgen '\w{test:2}')" = "error in pattern: only a Markov chain takes a parameter"
+test "$(error_of $passgen '\p{apple1:2}')" = "error in pattern: only a Markov chain takes a parameter"
 test "$(error_of $passgen '\w{undefined}')" = "error in pattern: wordlist not found: undefined"
 test "$(error_of $passgen '\m{undefined}')" = "error in pattern: wordlist not found: undefined"
 test "$(error_of $passgen -w "test:$tmpdir/empty.txt" '\w{test}')" = "error in pattern: wordlist is empty: test"

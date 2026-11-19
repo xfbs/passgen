@@ -62,19 +62,8 @@ void passgen_env_step_limit_set(passgen_env *env, size_t step_limit) {
     env->step_limit = step_limit;
 }
 
-passgen_status passgen_env_wordlist_add(
-    passgen_env *env,
-    const char *name,
-    FILE *file,
-    size_t markov_length) {
-    // a Markov chain looks at between one and 255 codepoints (it keeps the
-    // length in a byte).
-    if(markov_length < 1 || markov_length > UINT8_MAX) {
-        // the file is ours to close, whether this works or not.
-        fclose(file);
-        return PASSGEN_ERROR_INVALID_ARGUMENT;
-    }
-
+passgen_status
+passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file) {
     char *name_copy = passgen_alloc_string(name);
     passgen_wordlist *wordlist = passgen_alloc(sizeof(passgen_wordlist));
     if(!name_copy || !wordlist) {
@@ -85,7 +74,7 @@ passgen_status passgen_env_wordlist_add(
         return PASSGEN_ERROR_OUT_OF_MEMORY;
     }
 
-    passgen_wordlist_init(wordlist, file, markov_length);
+    passgen_wordlist_init(wordlist, file);
 
     // patterns which were resolved before may point to a wordlist which this
     // replaces, so they have to be resolved again.

@@ -1197,3 +1197,79 @@ test_result test_parser_parse_random_unicode(void) {
 
     return test_ok;
 }
+
+/// Parses a pattern which is a single special, and returns its name and the
+/// length of its Markov chain. Returns the status of parsing.
+static passgen_status parse_special(
+    const char *string,
+    char *name,
+    size_t name_size,
+    size_t *length) {
+    passgen_pattern pattern;
+    passgen_error error;
+    passgen_status status = passgen_pattern_parse(&pattern, &error, string);
+    if(status != PASSGEN_OK) {
+        passgen_pattern_deinit(&pattern);
+        return status;
+    }
+    passgen_pattern_segment *segment =
+        passgen_pattern_group_segment_get(&pattern.group, 0);
+    passgen_pattern_item *item = passgen_pattern_segment_get_item(segment, 0);
+    snprintf(name, name_size, "%s", item->data.special.parameters);
+    *length = item->data.special.markov_length;
+    passgen_pattern_deinit(&pattern);
+    return PASSGEN_OK;
+}
+
+/// The length of a Markov chain can be given after a colon, as in
+/// `\m{english:2}`, which is three if it is not.
+test_result test_parser_markov_length(void) {
+    char name[32];
+    size_t length;
+
+    assert_eq(PASSGEN_OK, parse_special("\\m{english}", name, sizeof(name), &length));
+    assert_streq(name, "english");
+    assert_eq(length, 3);
+
+    assert_eq(PASSGEN_OK, parse_special("\\m{english:1}", name, sizeof(name), &length));
+    assert_streq(name, "english");
+    assert_eq(length, 1);
+
+    assert_eq(PASSGEN_OK, parse_special("\\m{english:8}", name, sizeof(name), &length));
+    assert_eq(length, 8);
+
+    // leading zeroes are fine.
+    assert_eq(PASSGEN_OK, parse_special("\\m{english:02}", name, sizeof(name), &length));
+    assert_eq(length, 2);
+
+    // an escaped colon is part of the name.
+    assert_eq(PASSGEN_OK, parse_special("\\m{a\\:b:2}", name, sizeof(name), &length));
+    assert_streq(name, "a:b");
+    assert_eq(length, 2);
+    assert_eq(PASSGEN_OK, parse_special("\\m{a\\:2}", name, sizeof(name), &length));
+    assert_streq(name, "a:2");
+    assert_eq(length, 3);
+    assert_eq(PASSGEN_OK, parse_special("\\w{a\\:b}", name, sizeof(name), &length));
+    assert_streq(name, "a:b");
+
+    // modifiers come after the braces, as before.
+    assert_eq(PASSGEN_OK, parse_special("\\m{english:2}{3}?", name, sizeof(name), &length));
+    assert_eq(length, 2);
+
+    // there has to be a name before the colon.
+    assert_eq(PASSGEN_ERROR_SPECIAL, parse_special("\\m{:2}", name, sizeof(name), &length));
+    // and the braces have to be closed, as for a name without a length.
+    assert_eq(
+        PASSGEN_ERROR_SPECIAL,
+        parse_special("\\m{english:2", name, sizeof(name), &length));
+
+    // only Markov chains have a length.
+    assert_eq(
+        PASSGEN_ERROR_SPECIAL_PARAMETER,
+        parse_special("\\w{english:2}", name, sizeof(name), &length));
+    assert_eq(
+        PASSGEN_ERROR_SPECIAL_PARAMETER,
+        parse_special("\\p{apple:2}", name, sizeof(name), &length));
+
+    return test_ok;
+}

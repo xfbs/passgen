@@ -12,12 +12,9 @@
 #define ALLOC_INITIAL  256
 #define ALLOC_INCREASE 2
 
-void passgen_wordlist_init(
-    passgen_wordlist *wordlist,
-    FILE *file,
-    size_t markov_length) {
+void passgen_wordlist_init(passgen_wordlist *wordlist, FILE *file) {
     wordlist->parsed = false;
-    wordlist->parsed_markov = false;
+    wordlist->parsed_markov = 0;
     wordlist->file = file;
     wordlist->should_close_file = true;
     wordlist->data = NULL;
@@ -25,7 +22,9 @@ void passgen_wordlist_init(
     wordlist->words = NULL;
     wordlist->capacity = 0;
     wordlist->count = 0;
-    passgen_markov_init(&wordlist->markov, markov_length);
+    for(size_t i = 0; i < PASSGEN_MARKOV_LENGTH_MAX; i++) {
+        passgen_markov_init(&wordlist->markov[i], i + 1);
+    }
 }
 
 passgen_status
@@ -61,10 +60,18 @@ passgen_wordlist_parse(passgen_wordlist *wordlist, passgen_error *error) {
     return PASSGEN_OK;
 }
 
-passgen_status
-passgen_wordlist_parse_markov(passgen_wordlist *wordlist, passgen_error *error) {
+passgen_status passgen_wordlist_parse_markov(
+    passgen_wordlist *wordlist,
+    size_t length,
+    passgen_error *error) {
     passgen_assert(wordlist->parsed);
-    passgen_assert(!wordlist->parsed_markov);
+    passgen_require(length >= 1 && length <= PASSGEN_MARKOV_LENGTH_MAX);
+
+    uint8_t bit = 1 << (length - 1);
+    if(wordlist->parsed_markov & bit) {
+        return PASSGEN_OK;
+    }
+    passgen_markov *markov = passgen_wordlist_markov(wordlist, length);
 
     // a word can never decode to more codepoints than it has bytes, so size
     // the buffer for the longest word in the list.
@@ -103,7 +110,7 @@ passgen_wordlist_parse_markov(passgen_wordlist *wordlist, passgen_error *error) 
 
         // add word to markov chain
         status = passgen_markov_add(
-            &wordlist->markov,
+            markov,
             unicode_buffer,
             unicode_buffer_pos - &unicode_buffer[0],
             1);
@@ -114,13 +121,12 @@ passgen_wordlist_parse_markov(passgen_wordlist *wordlist, passgen_error *error) 
     if(status != PASSGEN_OK) {
         // a chain with only some of the words in it would be generated from
         // as if nothing happened. it starts over when this is tried again.
-        size_t level = wordlist->markov.level;
-        passgen_markov_free(&wordlist->markov);
-        passgen_markov_init(&wordlist->markov, level);
+        passgen_markov_free(markov);
+        passgen_markov_init(markov, length);
         return passgen_error_set(error, status);
     }
 
-    wordlist->parsed_markov = true;
+    wordlist->parsed_markov |= bit;
 
     return PASSGEN_OK;
 }
@@ -128,14 +134,9 @@ passgen_wordlist_parse_markov(passgen_wordlist *wordlist, passgen_error *error) 
 passgen_status passgen_wordlist_load(
     passgen_wordlist *wordlist,
     passgen_error *error,
-    FILE *file,
-    size_t markov_length) {
-    passgen_wordlist_init(wordlist, file, markov_length);
-    passgen_status status = passgen_wordlist_parse(wordlist, error);
-    if(status == PASSGEN_OK) {
-        status = passgen_wordlist_parse_markov(wordlist, error);
-    }
-    return status;
+    FILE *file) {
+    passgen_wordlist_init(wordlist, file);
+    return passgen_wordlist_parse(wordlist, error);
 }
 
 // Fails because of the file, with what the system has to say about it.
@@ -253,7 +254,9 @@ passgen_wordlist_random(passgen_wordlist *wordlist, passgen_random *random) {
 }
 
 void passgen_wordlist_free(passgen_wordlist *wordlist) {
-    passgen_markov_free(&wordlist->markov);
+    for(size_t i = 0; i < PASSGEN_MARKOV_LENGTH_MAX; i++) {
+        passgen_markov_free(&wordlist->markov[i]);
+    }
 
     passgen_free(wordlist->words, wordlist->capacity * sizeof(char *));
     passgen_free(wordlist->data, wordlist->size + 1);

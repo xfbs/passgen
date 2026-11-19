@@ -178,7 +178,7 @@ test_result test_preset_errors(void) {
     FILE *file = tmpfile();
     assert(file);
     fputs("word\n", file);
-    assert(PASSGEN_OK == passgen_env_wordlist_add(env, "words", file, 2));
+    assert(PASSGEN_OK == passgen_env_wordlist_add(env, "words", file));
     assert_eq(PASSGEN_OK, passgen_resolve(pattern, env, NULL));
     passgen_pattern_free(pattern);
 

@@ -77,8 +77,11 @@ static int resolve_wordlist(
         status = passgen_wordlist_parse(wordlist, &cause);
     }
 
-    if(status == PASSGEN_OK && markov && !wordlist->parsed_markov) {
-        status = passgen_wordlist_parse_markov(wordlist, &cause);
+    if(status == PASSGEN_OK && markov) {
+        status = passgen_wordlist_parse_markov(
+            wordlist,
+            special->markov_length,
+            &cause);
     }
 
     if(status != PASSGEN_OK) {
@@ -92,7 +95,8 @@ static int resolve_wordlist(
     // nothing can be picked from an empty wordlist, and an empty Markov chain
     // cannot generate anything.
     size_t count =
-        markov ? wordlist->markov.count : passgen_wordlist_count(wordlist);
+        markov ? passgen_wordlist_markov(wordlist, special->markov_length)->count
+               : passgen_wordlist_count(wordlist);
     if(count == 0) {
         return fail_special(context, PASSGEN_ERROR_WORDLIST_EMPTY, special);
     }

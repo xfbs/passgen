@@ -44,7 +44,7 @@ static void run(const uint8_t *data, size_t size) {
             FILE *file = fmemopen((void *) wordlist, strlen(wordlist), "r");
             if(env && file) {
                 // this closes the file, also if it fails.
-                passgen_env_wordlist_add(env, "w", file, 2);
+                passgen_env_wordlist_add(env, "w", file);
             } else if(file) {
                 fclose(file);
             }

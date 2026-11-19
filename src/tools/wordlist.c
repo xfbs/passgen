@@ -13,7 +13,7 @@ void load(passgen_wordlist *wordlist, const char *filename) {
     passgen_assert(file);
 
     // the file is closed by this.
-    passgen_wordlist_load(wordlist, NULL, file, 3);
+    passgen_wordlist_load(wordlist, NULL, file);
 }
 
 void dump(const char **args, size_t args_len) {

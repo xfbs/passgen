@@ -8,7 +8,6 @@
 .Nm
 .Op Fl ejz
 .Op Fl a Ar amount
-.Op Fl M Ar length
 .Op Fl P Ar name:pattern
 .Op Fl r Ar random
 .Op Fl S Ar steps
@@ -62,16 +61,6 @@ is given.
 List the presets with their patterns and exit.
 This includes the ones defined in the configuration, and by options which
 come before this one, except for those whose names start with a dot.
-.It Fl M , Fl -markov-length Ar length
-Set the length of the Markov chain for the wordlists which are loaded by the
-following
-.Fl -wordlist
-options.
-This is how many of the previous letters are taken into account when choosing
-the next one.
-Has to be between 1 and 255, the default is 3.
-Longer chains generate words which are closer to those in the wordlist, but
-have less entropy and need more memory.
 .It Fl p , Fl -preset Ar name
 Use the pattern of the preset with this name, see
 .Sx PRESETS .
@@ -183,6 +172,13 @@ resembles the words in the wordlist
 .Ar name .
 These words are pronounceable, but mostly not real words, and their length is
 not fixed.
+.It Li \em{name:length}
+The same, with a Markov chain of the given length, from 1 to 8.
+This is how many of the previous letters are taken into account when choosing
+the next one, which is 3 without a length.
+Longer chains generate words which are closer to those in the wordlist, but
+have less entropy and need more memory.
+A pattern can use chains of different lengths from the same wordlist.
 .It Li \ep{name}
 Preset: outputs what the pattern of the preset
 .Ar name
@@ -396,8 +392,6 @@ The message shows where in the pattern the error is.
 Out of memory.
 .It 5
 The amount is not valid.
-.It 6
-The length of the Markov chain is not valid.
 .It 7
 An option was not recognized.
 If the pattern starts with a dash, put

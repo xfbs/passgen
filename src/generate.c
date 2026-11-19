@@ -428,14 +428,15 @@ static int passgen_generate_special_markov(
     passgen_generate_context *context,
     const passgen_pattern_special *special) {
     // resolving made sure that the Markov chain is there and not empty.
-    passgen_markov *markov = &special->wordlist->markov;
+    passgen_markov *markov =
+        passgen_wordlist_markov(special->wordlist, special->markov_length);
 
     // sliding window of the previous `level` codepoints (initially all zero,
     // which marks the start of a word), plus one slot for the next codepoint.
     // generated words have no upper bound on their length, so they are emitted
     // as they are generated rather than collected in a fixed-size buffer.
     size_t level = markov->level;
-    uint32_t window[UINT8_MAX + 1] = {0};
+    uint32_t window[PASSGEN_MARKOV_LENGTH_MAX + 1] = {0};
     while(true) {
         uint32_t next = passgen_markov_generate(
             markov,

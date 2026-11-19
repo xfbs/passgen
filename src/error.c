@@ -44,6 +44,10 @@ const char *passgen_status_string(passgen_status status) {
             return "nothing to make optional";
         case PASSGEN_ERROR_SPECIAL:
             return "expected a name in braces";
+        case PASSGEN_ERROR_MARKOV_LENGTH:
+            return "length of a Markov chain must be a number from 1 to 8";
+        case PASSGEN_ERROR_SPECIAL_PARAMETER:
+            return "only a Markov chain takes a parameter";
         case PASSGEN_ERROR_DEPTH_LIMIT:
             return "nested too deeply";
         case PASSGEN_ERROR_STEP_LIMIT:

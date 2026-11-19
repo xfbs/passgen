@@ -20,6 +20,15 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/// Length of the Markov chain for `\m{name}` in a pattern, when it does not
+/// say which it wants (as in `\m{name:2}`).
+#define PASSGEN_MARKOV_LENGTH_DEFAULT 3
+
+/// Longest Markov chain that a pattern can ask for. The memory that a chain
+/// needs grows with its length, and beyond the length of the words, it can
+/// only generate the words of the wordlist.
+#define PASSGEN_MARKOV_LENGTH_MAX 8
+
 /// A codepoint which followed a prefix, and how often.
 typedef struct {
     /// The codepoint, or zero for the end of the word.

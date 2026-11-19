@@ -106,6 +106,11 @@ typedef struct {
         struct {
             /// Current pattern special
             passgen_pattern_special *special;
+            /// Whether the name is done, and what follows is the length of
+            /// the Markov chain, after a colon.
+            bool length;
+            /// Whether there are digits of the length.
+            bool digits;
         } special;
         /// Data for #PASSGEN_PARSER_MULTIPLIER type.
         struct {

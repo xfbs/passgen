@@ -55,7 +55,7 @@ static bool vector_check(const vector *vector, passgen_random *random) {
         return false;
     }
 
-    bool okay = (0 == passgen_env_wordlist_add(env, "words", file, 3));
+    bool okay = (0 == passgen_env_wordlist_add(env, "words", file));
 
     passgen_pattern *pattern = NULL;
     passgen_error error;

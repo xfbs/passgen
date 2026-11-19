@@ -31,7 +31,9 @@ typedef enum {
     PASSGEN_CLI_ERROR_PATTERN_PARSE,
     PASSGEN_CLI_ERROR_ALLOC,
     PASSGEN_CLI_ERROR_ILLEGAL_AMOUNT,
-    PASSGEN_CLI_ERROR_ILLEGAL_MARKOV_LENGTH,
+    // was an invalid --markov-length, which no longer exists. the length is
+    // part of the pattern now, as in \m{name:2}.
+    PASSGEN_CLI_ERROR_UNUSED_6,
     PASSGEN_CLI_ERROR_UNRECOGNIZED,
     PASSGEN_CLI_ERROR_PRESET_NOT_FOUND,
     PASSGEN_CLI_ERROR_GENERATE,
@@ -57,8 +59,6 @@ typedef struct {
     bool json;
     /// Collect entropy
     bool entropy;
-    /// Length of markov chain
-    size_t markov_length;
 
 #ifdef PASSGEN_MONOCYPHER
     /// Master passphrase to use for master-passphrase mode

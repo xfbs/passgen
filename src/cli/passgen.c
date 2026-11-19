@@ -391,7 +391,7 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
 
     // the name is copied, and the file is closed, whether this works or not.
     passgen_status status =
-        passgen_env_wordlist_add(opt->env, name, file, opt->markov_length);
+        passgen_env_wordlist_add(opt->env, name, file);
     free(name);
 
     return status == PASSGEN_OK ? 0 : PASSGEN_CLI_ERROR_ALLOC;
@@ -429,7 +429,6 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->amount = 1;
     opts->null = false;
     opts->json = false;
-    opts->markov_length = 3;
     opts->entropy = false;
 #ifdef PASSGEN_MONOCYPHER
     opts->master_passphrase = NULL;
@@ -556,7 +555,7 @@ static int passgen_cli_presets_list(const passgen_cli_opts *opts) {
 #endif
 
 int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
-    const char *short_opts = "a:p:P:w:r:S:M:ezhvjl" PASSGEN_CLI_MASTER_OPTS;
+    const char *short_opts = "a:p:P:w:r:S:ezhvjl" PASSGEN_CLI_MASTER_OPTS;
     const char *preset = NULL;
     // whether the randomness source was set on the command line, rather than
     // in the configuration.
@@ -575,7 +574,6 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
         {"list", no_argument, NULL, 'l'},
         {"define-preset", required_argument, NULL, 'P'},
         {"json", no_argument, NULL, 'j'},
-        {"markov-length", required_argument, NULL, 'M'},
 #ifdef PASSGEN_MONOCYPHER
         {"master", required_argument, NULL, 'm'},
         {"domain", required_argument, NULL, 'd'},
@@ -637,16 +635,6 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 exit(passgen_cli_presets_list(opts));
             case 'w':
                 try(passgen_cli_opts_wordlist(opts, optarg));
-                break;
-            case 'M':
-                opt = atoi(optarg);
-                // the markov chain stores its level in a single byte.
-                if(opt < 1 || opt > UINT8_MAX) {
-                    return passgen_cli_bail(
-                        PASSGEN_CLI_ERROR_ILLEGAL_MARKOV_LENGTH,
-                        &opt);
-                }
-                opts->markov_length = opt;
                 break;
             case 'r':
                 try(passgen_cli_opts_random(opts, optarg));
@@ -792,7 +780,6 @@ void passgen_cli_usage(const char *executable) {
         "    -j, --json             Output as JSON\n"
         "    -l, --list             List the presets\n"
         PASSGEN_CLI_HELP_MASTER
-        "    -M, --markov-length N  Markov chain length for later wordlists (default: 3)\n"
         "    -p, --preset NAME      Use the pattern of a preset\n"
         "    -P, --define-preset NAME:PATTERN\n"
         "                           Define a preset\n"
@@ -820,6 +807,8 @@ void passgen_cli_usage(const char *executable) {
         "    a?                     Optional: 'a' or nothing\n"
         "    \\w{name}               Word: a word from the wordlist\n"
         "    \\m{name}               Markov: a pronounceable word from the wordlist\n"
+        "    \\m{name:2}             The same, with a chain of length 2 (1 to 8,\n"
+        "                           default: 3)\n"
         "    \\p{name}               Preset: the pattern of the preset\n"
         "    \\u{e4}                 A character, by its codepoint in hex\n"
         "\n"
@@ -867,13 +856,6 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
             fprintf(
                 stderr,
                 "\033[1;31merror\033[0m: illegal amount entered (%i)\n",
-                *((const int *) data));
-            break;
-        case PASSGEN_CLI_ERROR_ILLEGAL_MARKOV_LENGTH:
-            fprintf(
-                stderr,
-                "\033[1;31merror\033[0m: illegal markov chain length entered "
-                "(%i)\n",
                 *((const int *) data));
             break;
         case PASSGEN_CLI_ERROR_UNRECOGNIZED:

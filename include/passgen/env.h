@@ -87,20 +87,20 @@ PASSGEN_EXPORT void passgen_env_step_limit_set(passgen_env *env, size_t step_lim
 /// @param env Environment to add the wordlist to
 /// @param name Name of the wordlist, as a NUL-terminated string. It is
 ///   copied.
+/// Markov chains are built from it as patterns need them, of the length that
+/// they ask for (as in `\m{name:2}`).
+///
+/// @relatesalso passgen_env
+/// @param env Environment to add the wordlist to
+/// @param name Name of the wordlist, as a NUL-terminated string. It is
+///   copied.
 /// @param file File to read the wordlist from, with one word per line. It has
 ///   to be seekable.
-/// @param markov_length Length of the Markov chain to build from the
-///   wordlist when it is used with one, between 1 and 255
-/// @returns @ref PASSGEN_OK, @ref PASSGEN_ERROR_OUT_OF_MEMORY, or
-///   @ref PASSGEN_ERROR_INVALID_ARGUMENT if the length of the Markov chain is
-///   not between 1 and 255. A file which cannot be read is not noticed here,
-///   but when resolving a pattern which uses it, which then fails with
-///   @ref PASSGEN_ERROR_WORDLIST_READ.
-PASSGEN_EXPORT passgen_status passgen_env_wordlist_add(
-    passgen_env *env,
-    const char *name,
-    FILE *file,
-    size_t markov_length);
+/// @returns @ref PASSGEN_OK or @ref PASSGEN_ERROR_OUT_OF_MEMORY. A file which
+///   cannot be read is not noticed here, but when resolving a pattern which
+///   uses it, which then fails with @ref PASSGEN_ERROR_WORDLIST_READ.
+PASSGEN_EXPORT passgen_status
+passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file);
 
 /// Adds a preset, which is a named pattern. Patterns can use it as
 /// `\p{name}`, also other presets, so that patterns can be built from parts.

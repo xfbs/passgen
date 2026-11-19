@@ -470,7 +470,7 @@ random_after_words(const char *string, const char *words, char *output) {
             return 0;
         }
         fputs(words, file);
-        passgen_env_wordlist_add(env, "words", file, 2);
+        passgen_env_wordlist_add(env, "words", file);
     }
     passgen_pattern *pattern;
     passgen_error error;
@@ -563,7 +563,7 @@ test_result test_generate_single_word(void) {
     FILE *file = tmpfile();
     assert(file);
     fputs("only\n", file);
-    assert(0 == passgen_env_wordlist_add(env, "words", file, 2));
+    assert(0 == passgen_env_wordlist_add(env, "words", file));
     passgen_pattern *pattern;
     passgen_error error;
     assert(0 == passgen_parse(&pattern, &error, "\\w{words}\\m{words}"));

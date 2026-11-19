@@ -789,8 +789,7 @@ static passgen_env *wordlist_env(
     passgen_random **random,
     const char *random_desc,
     char *data,
-    size_t len,
-    size_t level) {
+    size_t len) {
     // fmemopen() with an empty buffer is not portable, so use an empty file
     // in that case.
     FILE *file = len ? fmemopen(data, len, "r") : tmpfile();
@@ -809,7 +808,7 @@ static passgen_env *wordlist_env(
     }
 
     // this closes the file if it fails.
-    if(0 != passgen_env_wordlist_add(env, "list", file, level)) {
+    if(0 != passgen_env_wordlist_add(env, "list", file)) {
         passgen_env_free(env);
         passgen_random_free(*random);
         return NULL;
@@ -827,7 +826,7 @@ test_result test_regression_wordlist_empty(void) {
     passgen_env *env;
     size_t count = 0;
 
-    env = wordlist_env(&random, "zero", NULL, 0, 3);
+    env = wordlist_env(&random, "zero", NULL, 0);
     assert(env);
     assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
     assert(0 != passgen_resolve(pattern, env, NULL));
@@ -886,7 +885,7 @@ test_result test_regression_wordlist_long_words(void) {
     memset(data, 'a', word_len);
     data[word_len] = '\n';
 
-    env = wordlist_env(&random, "xorshift:1234", data, word_len + 1, 1);
+    env = wordlist_env(&random, "xorshift:1234", data, word_len + 1);
     assert(env);
 
     size_t count = 0;
@@ -900,7 +899,7 @@ test_result test_regression_wordlist_long_words(void) {
     // another a, so these words get long: on average 600 codepoints.
     count = 0;
     double entropy = 0;
-    assert(0 == passgen_parse(&pattern, &error, "\\m{list}{100}"));
+    assert(0 == passgen_parse(&pattern, &error, "\\m{list:1}{100}"));
     assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
         0 ==
@@ -925,12 +924,12 @@ test_result test_regression_wordlist_redefine(void) {
     char first[] = "first\n";
     char second[] = "second\n";
 
-    env = wordlist_env(&random, "zero", first, strlen(first), 3);
+    env = wordlist_env(&random, "zero", first, strlen(first));
     assert(env);
 
     FILE *file = fmemopen(second, strlen(second), "r");
     assert(file);
-    assert(0 == passgen_env_wordlist_add(env, "list", file, 3));
+    assert(0 == passgen_env_wordlist_add(env, "list", file));
 
     uint8_t buffer[32] = {0};
     assert(0 == passgen_parse(&pattern, &error, "\\w{list}"));
