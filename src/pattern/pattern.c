@@ -6,6 +6,8 @@
 
 void passgen_pattern_init(passgen_pattern *pattern) {
     passgen_pattern_group_init(&pattern->group);
+    pattern->env = NULL;
+    pattern->env_version = 0;
 }
 
 void passgen_pattern_deinit(passgen_pattern *pattern) {

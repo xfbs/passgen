@@ -65,13 +65,12 @@ int main(void) {
     passgen_env *env = passgen_env_new(&random);
     check(env != NULL);
 
-    // without the wordlist, this cannot be generated.
+    // without the wordlist, this cannot be resolved, and so not generated.
     uint8_t output[64];
     size_t length = 0;
     check(
         PASSGEN_ERROR_WORDLIST_NOT_FOUND ==
-        passgen_generate_fill_utf8(pattern, env, &error, NULL, output, 63, &length));
-    check(length == 0);
+        passgen_resolve(pattern, env, &error));
     check(error.kind == PASSGEN_ERROR_WORDLIST_NOT_FOUND);
     check(0 == strcmp(error.detail, "words"));
     passgen_error_free(&error);
@@ -82,6 +81,7 @@ int main(void) {
     check(0 == passgen_env_wordlist_add(env, "words", file, 3));
 
     double entropy = 0;
+    check(PASSGEN_OK == passgen_resolve(pattern, env, NULL));
     passgen_generate_fill_utf8(
         pattern,
         env,

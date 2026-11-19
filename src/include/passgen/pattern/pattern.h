@@ -16,6 +16,13 @@
 struct passgen_pattern {
     /// Items in this pattern.
     passgen_pattern_group group;
+    /// The environment which the pattern was resolved with (see @ref
+    /// passgen_resolve), or NULL if it was not. It can only be generated
+    /// with this one.
+    const passgen_env *env;
+    /// The version of the environment when it was resolved. If wordlists are
+    /// added to it after that, the pattern has to be resolved again.
+    size_t env_version;
 };
 
 /// Initialize this pattern.

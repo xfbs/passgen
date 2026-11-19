@@ -18,7 +18,7 @@ double entropy(const char *p) {
     passgen_random_open(&random, NULL);
     passgen_env *env = passgen_env_new(&random);
     double entropy = NAN;
-    if(env) {
+    if(env && PASSGEN_OK == passgen_resolve(pattern, env, NULL)) {
         size_t length = 0;
         passgen_generate_fill_utf8(
             pattern,

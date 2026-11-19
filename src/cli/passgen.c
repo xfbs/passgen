@@ -95,6 +95,15 @@ int passgen_cli_run(passgen_cli_opts opts) {
         return PASSGEN_CLI_ERROR_PATTERN_PARSE;
     }
 
+    // this reads the wordlists which the pattern uses, so problems with them
+    // come up before anything is generated, and point to where they are used.
+    if(PASSGEN_OK != passgen_resolve(pattern, opts.env, &error)) {
+        passgen_cli_pattern_error(&error, opts.pattern);
+        passgen_error_free(&error);
+        passgen_pattern_free(pattern);
+        return PASSGEN_CLI_ERROR_GENERATE;
+    }
+
     int ret = passgen_cli_generate(opts, pattern);
     passgen_pattern_free(pattern);
     return ret;

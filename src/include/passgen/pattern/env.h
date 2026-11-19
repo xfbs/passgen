@@ -20,6 +20,9 @@ struct passgen_env {
     passgen_hashmap wordlists;
     /// Presets that are loaded
     passgen_hashmap presets;
+    /// Changes whenever a wordlist is added, which may replace (and free) one
+    /// that a resolved pattern points to.
+    size_t version;
     /// Source of randomness. This is not owned by the environment.
     passgen_random *random;
 };

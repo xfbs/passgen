@@ -16,6 +16,7 @@ passgen_env *passgen_env_new(passgen_random *random) {
 
     env->step_limit = 1000000;
     env->random = random;
+    env->version = 0;
     passgen_hashmap_init(&env->wordlists, &passgen_hashmap_context_utf8);
     passgen_hashmap_init(&env->presets, &passgen_hashmap_context_utf8);
 
@@ -75,6 +76,10 @@ passgen_status passgen_env_wordlist_add(
     }
 
     passgen_wordlist_init(wordlist, file, markov_length);
+
+    // patterns which were resolved before may point to a wordlist which this
+    // replaces, so they have to be resolved again.
+    env->version += 1;
 
     // if a wordlist with this name was already defined, the new one replaces
     // it.

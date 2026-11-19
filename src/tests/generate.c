@@ -46,6 +46,7 @@
                                                                            \
         assert(token_parser_state == PASSGEN_TOKEN_INIT);                  \
         assert(0 == passgen_parse_finish(&parser));                        \
+        assert(0 == passgen_resolve(parser.pattern, env, NULL));           \
         size_t len = 0;                                                    \
         passgen_generate_fill_unicode(                                     \
             parser.pattern,                                                \
@@ -145,6 +146,7 @@ generates_exactly(const char *pattern_string, const char *const *expected) {
     bool seen[64] = {false};
     size_t seen_count = 0;
     bool okay = expected_len <= 64;
+    okay = okay && PASSGEN_OK == passgen_resolve(pattern, env, NULL);
 
     // with the most outputs we test for (27 of them), the chance of not
     // seeing all of them in this many tries is negligible. and as the seed is
@@ -209,6 +211,7 @@ static bool generates_weighted(
 
     uint64_t counts[16] = {0};
     bool okay = env && outputs_len >= 2 && outputs_len <= 16;
+    okay = okay && PASSGEN_OK == passgen_resolve(pattern, env, NULL);
     for(size_t i = 0; okay && i < 60000; i++) {
         uint8_t output[64];
         size_t len = 0;
@@ -399,7 +402,10 @@ static int generate_steps(const char *string, size_t step_limit) {
         passgen_env_step_limit_set(env, step_limit);
     }
 
-    int ret = passgen_generate(pattern, env, NULL, NULL, NULL, dummy_callback);
+    int ret = passgen_resolve(pattern, env, NULL);
+    if(ret == PASSGEN_OK) {
+        ret = passgen_generate(pattern, env, NULL, NULL, NULL, dummy_callback);
+    }
 
     passgen_pattern_free(pattern);
     passgen_env_free(env);

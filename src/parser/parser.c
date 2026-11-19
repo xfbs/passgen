@@ -280,6 +280,11 @@ int passgen_parse_group(
                     return PASSGEN_ERROR_OUT_OF_MEMORY;
                 }
                 passgen_pattern_special_init(special, codepoint);
+                // the token starts at the backslash.
+                special->start = (passgen_error_offset){
+                    token->offset,
+                    token->byte_offset,
+                };
                 if(!passgen_parser_state_push_special(parser, special)) {
                     return PASSGEN_ERROR_OUT_OF_MEMORY;
                 }
@@ -646,6 +651,11 @@ int passgen_parse_special_name(
         if(state->data.special.special->parameters_len == 0) {
             return PASSGEN_ERROR_SPECIAL;
         }
+        // the closing brace is one byte long.
+        state->data.special.special->end = (passgen_error_offset){
+            token->offset + 1,
+            token->byte_offset + 1,
+        };
         passgen_stack_pop(&parser->state, NULL);
     } else {
         try(passgen_pattern_special_push(

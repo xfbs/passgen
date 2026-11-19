@@ -4,7 +4,8 @@
 ///
 /// Generating takes a pattern (see @ref passgen_parse) and an environment
 /// (see @ref passgen_env_new), which has the source of randomness and the
-/// wordlists. What is generated can be written into a buffer, as codepoints
+/// wordlists. The pattern has to be resolved with the environment first (see
+/// @ref passgen_resolve), which reads the wordlists it uses. What is generated can be written into a buffer, as codepoints
 /// or as UTF-8, or be passed to a callback one codepoint at a time.
 ///
 /// If generating fails, whatever was written or passed on so far is not
@@ -30,10 +31,41 @@ extern "C" {
 ///   with @ref PASSGEN_ERROR_ABORTED.
 typedef int passgen_generate_cb(void *data, uint32_t codepoint);
 
+/// Gets a pattern ready to be generated with an environment: finds the
+/// wordlists which it uses, and reads them (and makes Markov chains from
+/// them, for `\m{name}`). Wordlists which it does not use are not read.
+///
+/// This is where everything which a pattern needs from outside of it is
+/// checked, so that problems come up before anything is generated. After
+/// this, the pattern can be generated with the environment as often as
+/// needed. If a wordlist is added to the environment (see @ref
+/// passgen_env_wordlist_add), which may replace one that the pattern uses,
+/// the pattern has to be resolved again.
+///
+/// @param pattern A pattern which was parsed successfully
+/// @param env The environment to generate it with, which has the wordlists
+/// @param error If resolving fails, this is set to what went wrong, with the
+///   position of what it is about in the pattern. It then has to be released
+///   with @ref passgen_error_free. May be NULL.
+/// @returns @ref PASSGEN_OK on success, and otherwise why it failed, which is
+///   about the first thing in the pattern which has a problem:
+///   - @ref PASSGEN_ERROR_WORDLIST_NOT_FOUND, if a wordlist is not in the
+///     environment,
+///   - @ref PASSGEN_ERROR_WORDLIST_READ, if a wordlist cannot be read,
+///   - @ref PASSGEN_ERROR_WORDLIST_EMPTY, if a wordlist does not have any
+///     words,
+///   - @ref PASSGEN_ERROR_PRESET, if it uses a preset (`\p{name}`), which is
+///     not supported yet.
+PASSGEN_EXPORT passgen_status passgen_resolve(
+    passgen_pattern *pattern,
+    passgen_env *env,
+    passgen_error *error);
+
 /// Generates from a pattern into a buffer of codepoints. This does not
 /// terminate it with a zero.
 ///
-/// @param pattern A pattern which was parsed successfully
+/// @param pattern A pattern which was resolved with the environment (see @ref
+///   passgen_resolve)
 /// @param env The environment, which has the source of randomness and the
 ///   wordlists
 /// @param error If generating fails, this is set to what went wrong. It then
@@ -59,7 +91,8 @@ PASSGEN_EXPORT passgen_status passgen_generate_fill_unicode(
 /// Generates from a pattern into a buffer, encoded as UTF-8. This does not
 /// terminate it with a NUL byte, so leave room for one if it is needed.
 ///
-/// @param pattern A pattern which was parsed successfully
+/// @param pattern A pattern which was resolved with the environment (see @ref
+///   passgen_resolve)
 /// @param env The environment, which has the source of randomness and the
 ///   wordlists
 /// @param error If generating fails, this is set to what went wrong. It then
@@ -87,7 +120,8 @@ PASSGEN_EXPORT passgen_status passgen_generate_fill_utf8(
 /// escaped. The quotes around the string are not written. This does not
 /// terminate it with a NUL byte, so leave room for one if it is needed.
 ///
-/// @param pattern A pattern which was parsed successfully
+/// @param pattern A pattern which was resolved with the environment (see @ref
+///   passgen_resolve)
 /// @param env The environment, which has the source of randomness and the
 ///   wordlists
 /// @param error If generating fails, this is set to what went wrong. It then
@@ -114,7 +148,8 @@ PASSGEN_EXPORT passgen_status passgen_generate_fill_json_utf8(
 /// generated. This is what the other functions for generating are built on,
 /// and the only one for output which does not have a size limit.
 ///
-/// @param pattern A pattern which was parsed successfully
+/// @param pattern A pattern which was resolved with the environment (see @ref
+///   passgen_resolve)
 /// @param env The environment, which has the source of randomness and the
 ///   wordlists
 /// @param error If generating fails, this is set to what went wrong. It then
@@ -129,9 +164,8 @@ PASSGEN_EXPORT passgen_status passgen_generate_fill_json_utf8(
 /// @param data Passed to the callback as it is
 /// @param func Called for every codepoint which is generated
 /// @returns @ref PASSGEN_OK on success, and otherwise why generating failed:
-///   - @ref PASSGEN_ERROR_WORDLIST_NOT_FOUND, @ref PASSGEN_ERROR_WORDLIST_EMPTY
-///     or @ref PASSGEN_ERROR_WORDLIST_READ, if there is a problem with a
-///     wordlist which the pattern uses,
+///   - @ref PASSGEN_ERROR_INVALID_ARGUMENT, if the pattern was not resolved
+///     with this environment, or a wordlist was added to it since,
 ///   - @ref PASSGEN_ERROR_STEP_LIMIT, if it takes more steps than the step
 ///     limit of the environment,
 ///   - @ref PASSGEN_ERROR_GROUP_EMPTY, if there is a group with nothing to

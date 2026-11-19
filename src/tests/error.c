@@ -422,41 +422,69 @@ test_result test_error_generate(void) {
     passgen_error error;
     size_t count = 0;
 
-    // a wordlist which is not there, as a word and as a markov chain
-    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "ab\\w{missing}"));
+    // a wordlist which is not there, as a word and as a markov chain. this
+    // comes up when resolving, and points to where it is used.
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "ab\\w{missing}c"));
     assert(
         PASSGEN_ERROR_WORDLIST_NOT_FOUND ==
-        passgen_generate(pattern, env, &error, NULL, &count, count_callback));
+        passgen_resolve(pattern, env, &error));
     assert(error.kind == PASSGEN_ERROR_WORDLIST_NOT_FOUND);
-    assert(!error.has_position);
+    assert(error.has_position);
+    assert(error.start.codepoint == 2);
+    assert(error.start.byte == 2);
+    assert(error.end.codepoint == 13);
+    assert(error.end.byte == 13);
     assert_streq(error.detail, "missing");
     assert(error.cause == NULL);
     passgen_error_free(&error);
+
+    // a pattern which could not be resolved cannot be generated.
+    assert(
+        PASSGEN_ERROR_INVALID_ARGUMENT ==
+        passgen_generate(pattern, env, &error, NULL, &count, count_callback));
+    passgen_error_free(&error);
     passgen_pattern_free(pattern);
 
-    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\m{missing}"));
+    // positions count codepoints and bytes, which differ for this.
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\xc3\xa4\xc3\xa4\\m{missing}"));
     assert(
         PASSGEN_ERROR_WORDLIST_NOT_FOUND ==
-        passgen_generate(pattern, env, &error, NULL, &count, count_callback));
+        passgen_resolve(pattern, env, &error));
     assert_streq(error.detail, "missing");
+    assert(error.start.codepoint == 2);
+    assert(error.start.byte == 4);
+    assert(error.end.codepoint == 13);
+    assert(error.end.byte == 15);
     passgen_error_free(&error);
     passgen_pattern_free(pattern);
 
     // a wordlist which is empty
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\w{empty}"));
     assert(
-        PASSGEN_ERROR_WORDLIST_EMPTY ==
-        passgen_generate(pattern, env, &error, NULL, &count, count_callback));
+        PASSGEN_ERROR_WORDLIST_EMPTY == passgen_resolve(pattern, env, &error));
     assert_streq(error.detail, "empty");
+    assert(error.has_position);
     passgen_error_free(&error);
     passgen_pattern_free(pattern);
 
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\m{empty}"));
     assert(
-        PASSGEN_ERROR_WORDLIST_EMPTY ==
-        passgen_generate(pattern, env, &error, NULL, &count, count_callback));
+        PASSGEN_ERROR_WORDLIST_EMPTY == passgen_resolve(pattern, env, &error));
     assert_streq(error.detail, "empty");
     passgen_error_free(&error);
+    passgen_pattern_free(pattern);
+
+    // presets are not supported in patterns yet. the first problem in the
+    // pattern is the one which is reported.
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "(a|\\p{name})\\w{missing}"));
+    assert(PASSGEN_ERROR_PRESET == passgen_resolve(pattern, env, &error));
+    assert_streq(error.detail, "name");
+    assert(error.start.codepoint == 3);
+    assert(error.end.codepoint == 11);
+    passgen_error_free(&error);
+
+    // the error is not needed to find out what went wrong.
+    assert(PASSGEN_ERROR_PRESET == passgen_resolve(pattern, env, NULL));
     passgen_pattern_free(pattern);
 
     // a group in which every segment has a multiplier of zero, also when it
@@ -464,6 +492,7 @@ test_result test_error_generate(void) {
     const char *empty_groups[] = {"{0}a", "x({0}a)y", "x({0}a|{0}b)"};
     for(size_t i = 0; i < 3; i++) {
         assert(PASSGEN_OK == passgen_parse(&pattern, NULL, empty_groups[i]));
+        assert(0 == passgen_resolve(pattern, env, NULL));
         assert(
             PASSGEN_ERROR_GROUP_EMPTY ==
             passgen_generate(pattern, env, &error, NULL, &count, count_callback));
@@ -474,6 +503,7 @@ test_result test_error_generate(void) {
 
     // which is not a problem if it is never generated.
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "x({0}a){0}y"));
+    assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
         PASSGEN_OK ==
         passgen_generate(pattern, env, &error, NULL, &count, count_callback));
@@ -482,6 +512,7 @@ test_result test_error_generate(void) {
     // taking more steps than the limit
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "(a){5}"));
     passgen_env_step_limit_set(env, 9);
+    assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
         PASSGEN_ERROR_STEP_LIMIT ==
         passgen_generate(pattern, env, &error, NULL, &count, count_callback));
@@ -496,6 +527,7 @@ test_result test_error_generate(void) {
     // the callback asking to stop
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "abcdef"));
     size_t remaining = 3;
+    assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
         PASSGEN_ERROR_ABORTED ==
         passgen_generate(pattern, env, &error, NULL, &remaining, stopping_callback));
@@ -542,6 +574,7 @@ test_result test_error_generate(void) {
     // nothing being generated
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, ""));
     written = 99;
+    assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
         PASSGEN_OK ==
         passgen_generate_fill_utf8(pattern, env, &error, NULL, utf8, 0, &written));
@@ -590,6 +623,7 @@ test_result test_error_generate_random(void) {
 
     // every character takes eight bytes, so this is fine.
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "[a-z]{100}"));
+    assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
         PASSGEN_OK ==
         passgen_generate_fill_utf8(pattern, env, &error, NULL, output, 512, &written));
@@ -599,6 +633,7 @@ test_result test_error_generate_random(void) {
 
     // this needs more than there is.
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "[a-z]{300}"));
+    assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
         PASSGEN_ERROR_RANDOM ==
         passgen_generate_fill_utf8(pattern, env, &error, NULL, output, 512, &written));
@@ -612,6 +647,7 @@ test_result test_error_generate_random(void) {
     // it stays that way, even for choices which do not result in output, and
     // only gives out zeroes.
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "(a?){0,3}"));
+    assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
         PASSGEN_ERROR_RANDOM ==
         passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 512, &written));
@@ -628,6 +664,7 @@ test_result test_error_generate_random(void) {
     // a pattern which does not need any randomness fails as well: the source
     // is not to be trusted.
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "abc"));
+    assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
         PASSGEN_ERROR_RANDOM ==
         passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, 512, &written));
@@ -700,14 +737,8 @@ test_result test_error_random_file_short(void) {
     return test_ok;
 }
 
-static int ignore_callback(void *data, uint32_t codepoint) {
-    (void) data;
-    (void) codepoint;
-    return 0;
-}
-
 #ifndef _WIN32
-/// A wordlist which cannot be read fails generating, with the reason as the
+/// A wordlist which cannot be read fails resolving, with the reason as the
 /// cause of the error. It fails in the same way when tried again.
 test_result test_error_wordlist_read(void) {
     passgen_random random;
@@ -731,9 +762,12 @@ test_result test_error_wordlist_read(void) {
         assert(PASSGEN_OK == passgen_parse(&pattern, NULL, patterns[i]));
         assert(
             PASSGEN_ERROR_WORDLIST_READ ==
-            passgen_generate(pattern, env, &error, NULL, NULL, ignore_callback));
+            passgen_resolve(pattern, env, &error));
         assert(error.kind == PASSGEN_ERROR_WORDLIST_READ);
         assert_streq(error.detail, "piped");
+        assert(error.has_position);
+        assert(error.start.codepoint == 0);
+        assert(error.end.codepoint == 9);
         assert(error.cause);
         assert(error.cause->kind == PASSGEN_ERROR_IO);
         assert(error.cause->detail[0] != 0);
@@ -742,8 +776,7 @@ test_result test_error_wordlist_read(void) {
 
         // without an error to fill in, the cause is not leaked.
         assert(
-            PASSGEN_ERROR_WORDLIST_READ ==
-            passgen_generate(pattern, env, NULL, NULL, NULL, ignore_callback));
+            PASSGEN_ERROR_WORDLIST_READ == passgen_resolve(pattern, env, NULL));
         passgen_pattern_free(pattern);
     }
 
@@ -811,6 +844,7 @@ test_result test_error_wordlist_markov_length(void) {
         assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\m{words}"));
         uint8_t output[64];
         size_t length = 0;
+        assert(0 == passgen_resolve(pattern, env, NULL));
         assert(
             PASSGEN_OK == passgen_generate_fill_utf8(
                               pattern,
@@ -850,9 +884,11 @@ test_result test_error_wordlist_utf8(void) {
     passgen_pattern *pattern;
     passgen_error error;
     assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\w{broken}"));
+    assert(PASSGEN_OK == passgen_resolve(pattern, env, NULL));
+    size_t count = 0;
     assert(
         PASSGEN_ERROR_WORDLIST_READ ==
-        passgen_generate(pattern, env, &error, NULL, NULL, ignore_callback));
+        passgen_generate(pattern, env, &error, NULL, &count, count_callback));
     assert_streq(error.detail, "broken");
     assert(error.cause);
     assert(error.cause->kind == PASSGEN_ERROR_UTF8);
@@ -874,10 +910,10 @@ static size_t generate_fixed(passgen_pattern *pattern, uint8_t *output, size_t s
     }
     passgen_env *env = passgen_env_new(&random);
     size_t written = 0;
-    if(env) {
+    if(env && PASSGEN_OK == passgen_resolve(pattern, env, NULL)) {
         passgen_generate_fill_utf8(pattern, env, NULL, NULL, output, size, &written);
-        passgen_env_free(env);
     }
+    passgen_env_free(env);
     passgen_random_close(&random);
     return written;
 }
@@ -1002,6 +1038,7 @@ test_result test_error_wordlist_out_of_memory(void) {
         FILE *file = wordlist_file();
         assert(file);
         assert(PASSGEN_OK == passgen_env_wordlist_add(env, "words", file, 3));
+        assert(0 == passgen_resolve(pattern, env, NULL));
         assert(
             PASSGEN_OK == passgen_generate_fill_utf8(
                               pattern,
@@ -1046,14 +1083,19 @@ test_result test_error_wordlist_out_of_memory(void) {
                 uint8_t output[4096];
                 size_t output_len = 0;
                 passgen_error error;
-                status = passgen_generate_fill_utf8(
-                    pattern,
-                    env,
-                    &error,
-                    NULL,
-                    output,
-                    sizeof(output),
-                    &output_len);
+                // reading the wordlist (and building its Markov chain) is
+                // where memory is allocated.
+                status = passgen_resolve(pattern, env, &error);
+                if(status == PASSGEN_OK) {
+                    status = passgen_generate_fill_utf8(
+                        pattern,
+                        env,
+                        &error,
+                        NULL,
+                        output,
+                        sizeof(output),
+                        &output_len);
+                }
 
                 if(status == PASSGEN_OK) {
                     // with one allocation failing, it may be one which is not
@@ -1076,6 +1118,7 @@ test_result test_error_wordlist_out_of_memory(void) {
                     allocator.fail_at = TEST_ALLOCATOR_NEVER;
                     passgen_env_random_set(env, &again);
                     output_len = 0;
+                    assert(PASSGEN_OK == passgen_resolve(pattern, env, NULL));
                     assert(
                         PASSGEN_OK == passgen_generate_fill_utf8(
                                           pattern,

@@ -77,12 +77,21 @@ int main(int argc, char *argv[]) {
         }
 
         // the environment takes over the file, and reads it when the pattern
-        // first uses it. the 3 is the length of the Markov chain, for
+        // is resolved. the 3 is the length of the Markov chain, for
         // \m{words}.
         if(passgen_env_wordlist_add(env, "words", file, 3) != PASSGEN_OK) {
             fprintf(stderr, "error: out of memory\n");
             goto free_env;
         }
+    }
+
+    // this reads the wordlists which the pattern uses, and fails if it uses
+    // one which is not there. it is done once, however often the pattern is
+    // generated afterwards.
+    if(passgen_resolve(pattern, env, &error) != PASSGEN_OK) {
+        print_error(&error, string);
+        passgen_error_free(&error);
+        goto free_env;
     }
 
     // what is generated is UTF-8. one byte is left for terminating it.

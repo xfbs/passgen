@@ -15,6 +15,9 @@ void passgen_pattern_special_init(
     special->parameters_len = 0;
     special->parameters_cap = 0;
     special->parameters = NULL;
+    special->start = (passgen_error_offset){0, 0};
+    special->end = (passgen_error_offset){0, 0};
+    special->wordlist = NULL;
 
     switch(kind) {
         case 'm':

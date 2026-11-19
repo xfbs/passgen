@@ -1,7 +1,6 @@
 #include "passgen/generate.h"
 
 #include "passgen/assert.h"
-#include "passgen/container/hashmap.h"
 #include "passgen/container/stack.h"
 #include "passgen/markov.h"
 #include "passgen/pattern/env.h"
@@ -38,16 +37,6 @@ static inline int fail(passgen_generate_context *context, passgen_status kind) {
     return passgen_error_set(context->error, kind);
 }
 
-// Fail because of something to do with a wordlist, which is named.
-static inline int fail_wordlist(
-    passgen_generate_context *context,
-    passgen_status kind,
-    const char *name) {
-    passgen_error_set(context->error, kind);
-    passgen_error_detail_set(context->error, name);
-    return kind;
-}
-
 // Fail because of something to do with a wordlist, which was caused by
 // another error. The cause is moved into the error.
 static inline int fail_wordlist_cause(
@@ -58,36 +47,6 @@ static inline int fail_wordlist_cause(
     passgen_error_wrap(context->error, kind, cause);
     passgen_error_detail_set(context->error, name);
     return kind;
-}
-
-// Wordlists are read when they are first used, which is here. The same goes
-// for the Markov chains made from them.
-static int load_wordlist(
-    passgen_generate_context *context,
-    passgen_wordlist *wordlist,
-    const char *name,
-    bool markov) {
-    passgen_error cause;
-    passgen_error_init(&cause);
-    passgen_status status = PASSGEN_OK;
-
-    if(!wordlist->parsed) {
-        status = passgen_wordlist_parse(wordlist, &cause);
-    }
-
-    if(status == PASSGEN_OK && markov && !wordlist->parsed_markov) {
-        status = passgen_wordlist_parse_markov(wordlist, &cause);
-    }
-
-    if(status != PASSGEN_OK) {
-        return fail_wordlist_cause(
-            context,
-            PASSGEN_ERROR_WORDLIST_READ,
-            name,
-            &cause);
-    }
-
-    return PASSGEN_OK;
 }
 
 // Emit a character
@@ -457,20 +416,8 @@ static int passgen_generate_literal(
 static int passgen_generate_special_markov(
     passgen_generate_context *context,
     const passgen_pattern_special *special) {
-    const char *name = special->parameters;
-    passgen_hashmap_entry *entry =
-        passgen_hashmap_lookup(&context->env->wordlists, name);
-    if(!entry) {
-        return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_NOT_FOUND, name);
-    }
-    passgen_wordlist *wordlist = entry->value;
-    try(load_wordlist(context, wordlist, name, true));
-    passgen_markov *markov = &wordlist->markov;
-
-    // an empty markov chain (from an empty wordlist) cannot generate anything.
-    if(markov->count == 0) {
-        return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_EMPTY, name);
-    }
+    // resolving made sure that the Markov chain is there and not empty.
+    passgen_markov *markov = &special->wordlist->markov;
 
     // sliding window of the previous `level` codepoints (initially all zero,
     // which marks the start of a word), plus one slot for the next codepoint.
@@ -498,19 +445,9 @@ static int passgen_generate_special_markov(
 static int passgen_generate_special_wordlist(
     passgen_generate_context *context,
     const passgen_pattern_special *special) {
+    // resolving made sure that the wordlist is read and not empty.
+    passgen_wordlist *wordlist = special->wordlist;
     const char *name = special->parameters;
-    passgen_hashmap_entry *entry =
-        passgen_hashmap_lookup(&context->env->wordlists, name);
-    if(!entry) {
-        return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_NOT_FOUND, name);
-    }
-    passgen_wordlist *wordlist = entry->value;
-    try(load_wordlist(context, wordlist, name, false));
-
-    // cannot pick a word from an empty wordlist.
-    if(passgen_wordlist_count(wordlist) == 0) {
-        return fail_wordlist(context, PASSGEN_ERROR_WORDLIST_EMPTY, name);
-    }
 
     // pick word at random
     const char *word = passgen_wordlist_random(wordlist, context->env->random);
@@ -552,21 +489,11 @@ static int passgen_generate_special_wordlist(
     return 0;
 }
 
-static int passgen_generate_special_preset(
-    passgen_generate_context *context,
-    const passgen_pattern_special *special) {
-    (void) context;
-    (void) special;
-    // TODO: implement
-    return 0;
-}
-
 static int passgen_generate_special(
     passgen_generate_context *context,
     const passgen_pattern_special *special) {
-    // the parser does not let through a wordlist without a name (as in
-    // `\w{}`), but a pattern which was built by hand may have one.
-    if(!special->parameters) {
+    // resolving fails for presets, and for wordlists it cannot find.
+    if(!special->wordlist) {
         return fail(context, PASSGEN_ERROR_INTERNAL);
     }
 
@@ -575,8 +502,6 @@ static int passgen_generate_special(
             return passgen_generate_special_markov(context, special);
         case PASSGEN_PATTERN_SPECIAL_WORDLIST:
             return passgen_generate_special_wordlist(context, special);
-        case PASSGEN_PATTERN_SPECIAL_PRESET:
-            return passgen_generate_special_preset(context, special);
         default:
             return fail(context, PASSGEN_ERROR_INTERNAL);
     }
@@ -688,6 +613,12 @@ passgen_status passgen_generate(
     // initialize it.
     if(entropy) {
         *entropy = 0.0;
+    }
+
+    // the pattern points to wordlists of the environment it was resolved
+    // with, which may have been replaced since.
+    if(pattern->env != env || pattern->env_version != env->version) {
+        return passgen_error_set(error, PASSGEN_ERROR_INVALID_ARGUMENT);
     }
 
     passgen_generate_context context = {

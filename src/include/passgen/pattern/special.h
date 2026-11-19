@@ -29,6 +29,14 @@ typedef struct {
     int32_t parameters_cap;
     /// Parameters string, UTF-8 encoded.
     char *parameters;
+    /// Where in the pattern this is, from the backslash to the closing
+    /// brace, for errors about it.
+    passgen_error_offset start;
+    /// Where in the pattern this ends, following the closing brace.
+    passgen_error_offset end;
+    /// The wordlist which this uses, once the pattern is resolved (see @ref
+    /// passgen_resolve). It belongs to the environment. NULL for presets.
+    struct passgen_wordlist *wordlist;
 } passgen_pattern_special;
 
 /// Initialise a pattern special with the given char.

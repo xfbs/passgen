@@ -38,6 +38,7 @@ int main() {
 
     uint8_t output[16];
     size_t length = 0;
+    check(PASSGEN_OK == passgen_resolve(pattern, env, nullptr));
     check(
         PASSGEN_OK == passgen_generate_fill_utf8(
                           pattern,

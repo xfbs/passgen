@@ -34,15 +34,15 @@ test_result test_sizes_tokenizer(void) {
 }
 
 test_result test_sizes_pattern(void) {
-    assert_eq(sizeof(passgen_pattern), 56);
+    assert_eq(sizeof(passgen_pattern), 72);
     assert_eq(sizeof(passgen_pattern_repeat), 16);
     assert_eq(sizeof(passgen_pattern_group), 56);
     assert_eq(sizeof(passgen_pattern_segment), 56);
-    assert_eq(sizeof(passgen_pattern_item), 88);
+    assert_eq(sizeof(passgen_pattern_item), 96);
     assert_eq(sizeof(passgen_pattern_range), 16);
     assert_eq(sizeof(passgen_pattern_literal), 32);
     assert_eq(sizeof(passgen_pattern_set), 56);
-    assert_eq(sizeof(passgen_pattern_special), 24);
+    assert_eq(sizeof(passgen_pattern_special), 64);
     return test_ok;
 }
 

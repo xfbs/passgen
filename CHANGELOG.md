@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   steps makes patterns such as `(){999999999}` fail rather than run
   practically forever.
 
+### Changed
+
+- Problems with wordlists (missing, empty or unreadable) are found before
+  anything is generated, also when the pattern would not have used the
+  wordlist, and show where in the pattern it is used.
+- `\p{name}` is an error, instead of generating nothing.
+
 ### Removed
 
 - `-D`/`--depth`. Groups can be nested up to 1024 deep, which is now checked

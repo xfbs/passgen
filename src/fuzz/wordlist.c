@@ -39,6 +39,7 @@ static void run(const uint8_t *data, size_t size) {
         if(env && file) {
             // this closes the file, also if it fails.
             passgen_env_wordlist_add(env, "w", file, markov_length);
+            passgen_resolve(pattern, env, NULL);
 
             double entropy;
             size_t budget = FUZZ_OUTPUT_BUDGET;

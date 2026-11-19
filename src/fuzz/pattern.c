@@ -52,6 +52,10 @@ static void run(const uint8_t *data, size_t size) {
             if(env) {
                 passgen_env_step_limit_set(env, FUZZ_STEP_LIMIT);
 
+                // generating a pattern which could not be resolved fails
+                // early, which is worth trying too.
+                passgen_resolve(pattern, env, NULL);
+
                 // with and without computing the entropy.
                 double entropy;
                 size_t budget = FUZZ_OUTPUT_BUDGET;

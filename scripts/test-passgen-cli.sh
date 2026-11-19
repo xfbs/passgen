@@ -316,9 +316,16 @@ rm "$XDG_CONFIG_HOME/passgen.conf"
 test "$(error_of $passgen -r "file:/nonexistent" a)" = "error: cannot use randomness source 'file:/nonexistent'"
 test "$(error_of $passgen -r "xorshift:0" a)" = "error: cannot use randomness source 'xorshift:0'"
 test "$(error_of $passgen '\w{}')" = "error in pattern: expected a name in braces"
-test "$(error_of $passgen '\w{undefined}')" = "error: wordlist not found: undefined"
-test "$(error_of $passgen '\m{undefined}')" = "error: wordlist not found: undefined"
-test "$(error_of $passgen -w "test:$tmpdir/empty.txt" '\w{test}')" = "error: wordlist is empty: test"
+test "$(error_of $passgen '\w{undefined}')" = "error in pattern: wordlist not found: undefined"
+test "$(error_of $passgen '\m{undefined}')" = "error in pattern: wordlist not found: undefined"
+test "$(error_of $passgen -w "test:$tmpdir/empty.txt" '\w{test}')" = "error in pattern: wordlist is empty: test"
+test "$(error_of $passgen 'a\p{name}')" = "error in pattern: presets in patterns are not supported yet: name"
+fails $passgen 'a\p{name}'
+
+# problems with wordlists point to where they are used, and come up before
+# anything is generated (so also when it is not used in the end).
+test "$(error_lines $passgen 'ab\w{undefined}c' | sed -n 3p)" = "           ^^^^^^^^^^^^^"
+test -z "$($passgen -a 3 'a(b|\w{undefined}){0}' 2>/dev/null)"
 test "$(error_of $passgen "$(nested 1025)")" = "error in pattern: nested too deeply"
 test "$(error_of $passgen '{0}a')" = "error: nothing to choose from"
 test "$(error_of $passgen "(){999999999}")" = "error: takes too many steps"
@@ -327,7 +334,7 @@ test "$(error_of $passgen -S 0 a)" = "error: illegal number of steps entered (0)
 # a wordlist which cannot be read (a pipe cannot be rewound) says why.
 if [ -e /dev/stdin ]; then
     output="$(echo word | error_lines $passgen -w test:/dev/stdin '\w{test}')"
-    test "$(echo "$output" | sed -n 1p)" = "error: wordlist could not be read: test"
+    test "$(echo "$output" | sed -n 1p)" = "error in pattern: wordlist could not be read: test"
     echo "$output" | sed -n 2p | grep -q "^caused by: cannot read file: "
     echo word | fails $passgen -w test:/dev/stdin '\m{test}'
 fi

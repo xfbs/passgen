@@ -33,8 +33,11 @@ Generating takes three things:
 3. **An environment,** a @ref passgen_env, which has the source of randomness
    and the wordlists which patterns can use.
 
-With those, one of the functions in @ref generate.h generates from the
-pattern, into a buffer or one codepoint at a time.
+Before generating, the pattern is resolved with the environment
+(@ref passgen_resolve). This reads the wordlists which the pattern uses, and
+fails if one is missing, so that problems come up before anything is
+generated. After that, one of the functions in @ref generate.h generates from
+the pattern, into a buffer or one codepoint at a time, as often as needed.
 
 ## Example
 
@@ -60,6 +63,9 @@ library that this documentation is for.
   wordlists, and copies their names.
 - Functions do not hold on to strings or buffers which they are given, apart
   from the files of wordlists.
+- A resolved pattern refers to the wordlists of its environment, so it can
+  only be generated with that environment. Adding a wordlist to it means
+  resolving the pattern again.
 
 ### Errors
 

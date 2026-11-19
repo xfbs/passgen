@@ -60,6 +60,7 @@ static bool vector_check(const vector *vector, passgen_random *random) {
     passgen_pattern *pattern = NULL;
     passgen_error error;
     okay = okay && (0 == passgen_parse(&pattern, &error, vector->pattern));
+    okay = okay && (0 == passgen_resolve(pattern, env, NULL));
 
     if(okay) {
         // none of the vectors are longer than this

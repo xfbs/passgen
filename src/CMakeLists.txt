@@ -27,6 +27,7 @@ set(SOURCE_LIST
     "random/system.c"
     "random/xorshift.c"
     "random/zero.c"
+    "resolve.c"
     "util/siphash.c"
     "util/utf8.c"
     "wordlist.c"
