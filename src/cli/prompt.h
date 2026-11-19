@@ -19,6 +19,10 @@ typedef enum {
 /// for one twice, to make sure it was typed correctly.
 bool passgen_cli_prompt_interactive(void);
 
+/// Whether standard output is a terminal, rather than a file which what is
+/// printed ends up in.
+bool passgen_cli_prompt_output_terminal(void);
+
 /// Reads a secret, such as a master passphrase. When standard input is a
 /// terminal, the prompt is shown on standard error, and what is typed is not
 /// shown. Otherwise, a line is read from standard input, without a prompt.

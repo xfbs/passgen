@@ -51,6 +51,10 @@ bool passgen_cli_prompt_interactive(void) {
     return isatty(STDIN_FILENO);
 }
 
+bool passgen_cli_prompt_output_terminal(void) {
+    return isatty(STDOUT_FILENO);
+}
+
 passgen_cli_prompt_status
 passgen_cli_prompt_secret(const char *prompt, char *buffer, size_t size) {
     bool terminal = passgen_cli_prompt_interactive();

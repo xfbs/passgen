@@ -111,7 +111,9 @@ typedef struct {
     const char *master_domain;
     /// User for master passphrase mode.
     const char *master_user;
-    /// Name of a master passphrase to set up, instead of generating.
+    /// Whether to set up a master passphrase, instead of generating.
+    bool master_setup_given;
+    /// Name of the master passphrase to set up, or NULL to ask for it.
     const char *master_setup;
     /// Level of the master passphrase to set up.
     unsigned master_setup_level;

@@ -284,7 +284,7 @@ int passgen_parse_group(
                 }
                 passgen_pattern_special_init(special, codepoint);
                 // the token starts at the backslash.
-                special->start = (passgen_error_offset) {
+                special->start = (passgen_error_offset){
                     token->offset,
                     token->byte_offset,
                 };
@@ -363,8 +363,7 @@ int passgen_parse_group(
                 return 0;
             }
             case '{':
-                try
-                    (last_single_item_taint(state->data.group.segment, &item));
+                try(last_single_item_taint(state->data.group.segment, &item));
                 // without an item, this is the multiplier of the segment.
                 if(item) {
                     if(!passgen_parser_state_push_repeat(
@@ -390,8 +389,7 @@ int passgen_parse_group(
                     return 0;
                 }
             case '?':
-                try
-                    (last_single_item_taint(state->data.group.segment, &item));
+                try(last_single_item_taint(state->data.group.segment, &item));
                 if(item) {
                     item->maybe = true;
                     return 0;
@@ -464,8 +462,7 @@ int passgen_parse_set(
         }
 
         // sort and merge the ranges, and compute the list of choices.
-        try
-            (passgen_pattern_set_finish(set));
+        try(passgen_pattern_set_finish(set));
 
         passgen_stack_pop(&parser->state, NULL);
         return 0;
@@ -483,8 +480,7 @@ int passgen_parse_set(
     }
 
     uint32_t codepoint;
-    try
-        (passgen_parse_set_codepoint(token, &codepoint));
+    try(passgen_parse_set_codepoint(token, &codepoint));
 
     passgen_pattern_range *range = passgen_pattern_set_range_append(set);
     if(!range) {
@@ -513,8 +509,7 @@ int passgen_parse_set_range(
     // marker for escaped characters as part of the codepoint, resulting in a
     // range which is far too large.
     uint32_t codepoint;
-    try
-        (passgen_parse_set_codepoint(token, &codepoint));
+    try(passgen_parse_set_codepoint(token, &codepoint));
 
     if(codepoint < state->data.set.range->start) {
         return PASSGEN_ERROR_SET_RANGE;
@@ -670,7 +665,7 @@ int passgen_parse_special_name(
             return PASSGEN_ERROR_MARKOV_LENGTH;
         }
         // the closing brace is one byte long.
-        special->end = (passgen_error_offset) {
+        special->end = (passgen_error_offset){
             token->offset + 1,
             token->byte_offset + 1,
         };
@@ -710,10 +705,9 @@ int passgen_parse_special_name(
         return 0;
     }
 
-    try
-        (passgen_pattern_special_push(
-            special,
-            token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT));
+    try(passgen_pattern_special_push(
+        special,
+        token->codepoint & ~PASSGEN_TOKEN_ESCAPED_BIT));
 
     return 0;
 }

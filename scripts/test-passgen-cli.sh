@@ -207,6 +207,13 @@ hash = "fd915731"'
 version = 1
 level = 2
 hash = "e1581cf7"'
+    # the name can also be given as --master-setup=name, and is main if it is
+    # not given (and there is no terminal to ask at).
+    test "$(echo master | $passgen --master-setup=other --master-level 1 | head -n 1)" = '[master.other]'
+    test "$(echo master | $passgen --master-setup --master-level 1 | head -n 1)" = '[master.main]'
+    fails sh -c "echo master | $passgen --master-setup= --master-level 1"
+    fails sh -c "echo master | $passgen --master-setup=main --master-level 1 extra"
+    fails sh -c "echo master | $passgen --master-setup \"\$(printf 'a\tb')\" --master-level 1"
     # names which are not bare keys are quoted.
     test "$(echo master | $passgen --master-setup 'my "key"' --master-level 1 | head -n 1)" = '[master."my \"key\""]'
 
@@ -233,6 +240,7 @@ hash = "e1581cf7"'
 
     # with a seed, it is the same as with the seed in the description.
     echo master | $passgen --master-setup main --master-level 1 --master-seed > "$tmpdir/seeded.toml"
+    grep -q '^# keep this safe, and back it up$' "$tmpdir/seeded.toml"
     seed="$(sed -n 's/^seed = "\(.*\)"$/\1/p' "$tmpdir/seeded.toml")"
     test "${#seed}" = 32
     test "$(echo master | $passgen -c "$tmpdir/seeded.toml" -m main -d example.com -u user -p apple2)" = \

@@ -77,8 +77,8 @@ int passgen_pattern_set_finish(passgen_pattern_set *set) {
     for(size_t i = 0; i < set->items.len; i++) {
         passgen_pattern_range *range = passgen_stack_get(&set->items, i);
         // codepoints are at most 0x10ffff, so this cannot overflow.
-        events[2 * i] = (set_event) {range->start, 1};
-        events[2 * i + 1] = (set_event) {range->end + 1, -1};
+        events[2 * i] = (set_event){range->start, 1};
+        events[2 * i + 1] = (set_event){range->end + 1, -1};
     }
     qsort(events, count, sizeof(set_event), set_event_compare);
 

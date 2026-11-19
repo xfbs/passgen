@@ -206,7 +206,7 @@ static inline void fuzz_run(
         hash = (hash ^ data[i]) * UINT64_C(0x100000001b3);
     }
 
-    allocator = (fuzz_allocator) {
+    allocator = (fuzz_allocator){
         .fail_at = (size_t) (hash % requests),
         .fail_count = (hash >> 63) ? 1 : SIZE_MAX,
     };

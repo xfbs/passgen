@@ -420,8 +420,7 @@ static int passgen_generate_literal(
     passgen_assert(literal->count < 8);
 
     for(size_t i = 0; i < literal->count; i++) {
-        try
-            (emit(context, literal->codepoints[i]));
+        try(emit(context, literal->codepoints[i]));
     }
 
     return 0;
@@ -449,8 +448,7 @@ static int passgen_generate_special_markov(
         if(!next) {
             break;
         }
-        try
-            (emit(context, next));
+        try(emit(context, next));
         memmove(&window[0], &window[1], (level - 1) * sizeof(window[0]));
         window[level - 1] = next;
     }
@@ -494,8 +492,7 @@ static int passgen_generate_special_wordlist(
                 &cause);
         }
         for(size_t i = 0; &codepoints[i] < codepoints_pos; i++) {
-            try
-                (emit(context, codepoints[i]));
+            try(emit(context, codepoints[i]));
         }
     } while(decode_ret > PASSGEN_UTF8_SUCCESS);
 
@@ -551,25 +548,20 @@ static int passgen_generate_item(
     size_t reps = passgen_generate_repeat(context, &item->repeat);
 
     for(size_t i = 0; i < reps; i++) {
-        try
-            (step(context));
+        try(step(context));
 
         switch(item->kind) {
             case PASSGEN_PATTERN_SET:
-                try
-                    (passgen_generate_set(context, &item->data.set));
+                try(passgen_generate_set(context, &item->data.set));
                 break;
             case PASSGEN_PATTERN_LITERAL:
-                try
-                    (passgen_generate_literal(context, &item->data.literal));
+                try(passgen_generate_literal(context, &item->data.literal));
                 break;
             case PASSGEN_PATTERN_SPECIAL:
-                try
-                    (passgen_generate_special(context, &item->data.special));
+                try(passgen_generate_special(context, &item->data.special));
                 break;
             case PASSGEN_PATTERN_GROUP:
-                try
-                    (passgen_generate_group(context, &item->data.group));
+                try(passgen_generate_group(context, &item->data.group));
                 break;
             default:
                 // the parser does not make any other kinds of items.
@@ -586,8 +578,7 @@ static int passgen_generate_segment(
     for(size_t i = 0; i < segment->items.len; i++) {
         passgen_pattern_item *item = passgen_stack_get(&segment->items, i);
 
-        try
-            (passgen_generate_item(context, item));
+        try(passgen_generate_item(context, item));
     }
 
     return 0;

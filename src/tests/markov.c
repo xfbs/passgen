@@ -128,7 +128,7 @@ test_result test_markov_add(void) {
     passgen_markov_init(&markov, 2);
 
     // this should have added 00a and 0a0 into the chain.
-    passgen_markov_add(&markov, (const uint32_t[]) {'a'}, 1, 1);
+    passgen_markov_add(&markov, (const uint32_t[]){'a'}, 1, 1);
 
     leaf = leaf_of(&markov, 0, 0);
     assert(leaf);
@@ -141,7 +141,7 @@ test_result test_markov_add(void) {
     assert_eq(passgen_markov_leaf_count(leaf, 0), 1);
 
     // this should have added 00l, 0la, la0, each with a weight of 2.
-    passgen_markov_add(&markov, (const uint32_t[]) {'l', 'a'}, 2, 2);
+    passgen_markov_add(&markov, (const uint32_t[]){'l', 'a'}, 2, 2);
 
     leaf = leaf_of(&markov, 0, 0);
     assert(leaf);
@@ -158,12 +158,12 @@ test_result test_markov_add(void) {
     assert_eq(leaf->total_count, 2);
     assert_eq(passgen_markov_leaf_count(leaf, 0), 2);
 
-    passgen_markov_add(&markov, (const uint32_t[]) {'l', 'e'}, 2, 1);
-    passgen_markov_add(&markov, (const uint32_t[]) {'t', 'h', 'e'}, 3, 1);
-    passgen_markov_add(&markov, (const uint32_t[]) {'p', 'a', 'r', 't'}, 4, 1);
+    passgen_markov_add(&markov, (const uint32_t[]){'l', 'e'}, 2, 1);
+    passgen_markov_add(&markov, (const uint32_t[]){'t', 'h', 'e'}, 3, 1);
+    passgen_markov_add(&markov, (const uint32_t[]){'p', 'a', 'r', 't'}, 4, 1);
     passgen_markov_add(
         &markov,
-        (const uint32_t[]) {'p', 'h', 'o', 'n', 'e'},
+        (const uint32_t[]){'p', 'h', 'o', 'n', 'e'},
         5,
         1);
 

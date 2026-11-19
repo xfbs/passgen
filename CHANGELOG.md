@@ -18,7 +18,7 @@ a key for the domain and the user. To get an old password back, use 0.4.0.
 - `--config` (`-c`), to read a configuration file instead of the usual ones,
   and `PASSGEN_CONFIG`, a list of them.
 - Master passphrases are set up in the configuration, as `[master.NAME]`, with
-  `--master-setup NAME`, which asks how. They have a level (how much effort
+  `--master-setup [NAME]`, which asks how. They have a level (how much effort
   deriving the key takes), a short hash, which catches a mistyped master
   passphrase, and optionally a seed. `--master-level`, `--master-seed` and
   `--master-version` set these without asking.

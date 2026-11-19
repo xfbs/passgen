@@ -184,7 +184,7 @@ generates_exactly(const char *pattern_string, const char *const *expected) {
     return okay && seen_count == expected_len;
 }
 
-#define EXPECTED(...) ((const char *const[]) {__VA_ARGS__, NULL})
+#define EXPECTED(...) ((const char *const[]){__VA_ARGS__, NULL})
 
 /// Whether a pattern generates each of the outputs (the list is terminated by
 /// NULL) as often as their weights say, and nothing else.
@@ -245,7 +245,7 @@ static bool generates_weighted(
     return okay && chi_squared_fits(outputs_len, counts, weights);
 }
 
-#define WEIGHTS(...) ((const double[]) {__VA_ARGS__})
+#define WEIGHTS(...) ((const double[]){__VA_ARGS__})
 
 /// What is generated comes up as often as the pattern says: characters which
 /// are listed more than once in a set, choices with multipliers, optional

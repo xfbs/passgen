@@ -21,7 +21,7 @@ IndentCaseLabels: 'true'
 IndentWidth: 4
 IndentWrappedFunctionNames: 'false'
 KeepEmptyLinesAtTheStartOfBlocks: 'false'
-Language: Cpp
+Language: C
 PointerAlignment: Right
 ReflowComments: 'true'
 SortIncludes: 'true'

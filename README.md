@@ -115,16 +115,26 @@ passphrase, and the
 [ChaCha20](https://en.wikipedia.org/wiki/Salsa20#ChaCha_variant) stream cipher
 as a pseudorandom number generator using the derived key.
 
-A master passphrase is set up once, which adds how to derive keys from it (and
-a short hash of it, which catches typos) to the configuration. Then it is used
+A master passphrase is set up once, with `passgen --master-setup`, which asks
+a few questions, explaining what they mean, and prints what to add to the
+configuration (with a short hash of it, which catches typos). Then it is used
 by its name, and asked for:
 
 ```
 $ passgen --master-setup main >> ~/.config/passgen/config.toml
-...
+How hard should it be to crack? Higher is harder, but slower.
+  1: fast (64 MiB of memory)
+  2: recommended (256 MiB of memory)
+  3: strongest (1 GiB of memory)
 level [2]:
-...
-generate a seed? [y/N]:
+
+Use a seed? Without one, the master passphrase alone generates
+your passphrases, on any computer. With one, the seed is needed
+too: keep it safe, and back it up.
+use a seed? [y/N]:
+
+Choose a strong master passphrase. It is not stored, and cannot
+be recovered.
 master passphrase:
 master passphrase again:
 $ passgen -m main -d example.com -u username -p apple2

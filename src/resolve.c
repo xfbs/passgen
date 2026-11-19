@@ -262,12 +262,11 @@ static int resolve_group(
             passgen_stack_get(&group->segments, i);
         for(size_t j = 0; j < segment->items.len; j++) {
             size_t item_depth = 0;
-            try
-                (resolve_item(
-                    context,
-                    passgen_stack_get(&segment->items, j),
-                    level,
-                    &item_depth));
+            try(resolve_item(
+                context,
+                passgen_stack_get(&segment->items, j),
+                level,
+                &item_depth));
             if(item_depth > deepest) {
                 deepest = item_depth;
             }

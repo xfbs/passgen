@@ -162,7 +162,7 @@ passgen_status passgen_hashmap_insert(
     void *value,
     passgen_hashmap_entry *previous) {
     if(previous) {
-        *previous = (passgen_hashmap_entry) {NULL, NULL};
+        *previous = (passgen_hashmap_entry){NULL, NULL};
     }
 
     // if the key is there already, it is replaced. this has to be checked in
@@ -224,7 +224,7 @@ passgen_hashmap_remove(passgen_hashmap *map, const void *key) {
         }
     }
 
-    return (passgen_hashmap_entry) {NULL, NULL};
+    return (passgen_hashmap_entry){NULL, NULL};
 }
 
 passgen_hashmap_entry *
