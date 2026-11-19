@@ -241,6 +241,13 @@ passgen_wordlist_random(passgen_wordlist *wordlist, passgen_random *random) {
     if(!wordlist->parsed || wordlist->count == 0) {
         return NULL;
     }
+    // with a single word, there is nothing to choose from, so this takes no
+    // randomness. words which are in the wordlist more than once are not
+    // noticed, they are separate choices.
+    if(wordlist->count == 1) {
+        return wordlist->words[0];
+    }
+
     size_t index = passgen_random_u64_max(random, wordlist->count);
     return wordlist->words[index];
 }

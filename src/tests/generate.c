@@ -454,11 +454,24 @@ test_result test_generate_step_limit_default(void) {
 #undef POSTAMBLE
 
 /// Generates from the pattern with xorshift, and returns the next random
-/// number after it, to find out how much randomness it took.
-static uint64_t random_after(const char *string, char *output) {
+/// number after it, to find out how much randomness it took. The pattern can
+/// use the words, as the wordlist `words`, if they are not NULL.
+static uint64_t
+random_after_words(const char *string, const char *words, char *output) {
     passgen_random random;
     passgen_random_open(&random, "xorshift:1234");
     passgen_env *env = passgen_env_new(&random);
+    output[0] = 0;
+    if(env && words) {
+        FILE *file = tmpfile();
+        if(!file) {
+            passgen_env_free(env);
+            passgen_random_close(&random);
+            return 0;
+        }
+        fputs(words, file);
+        passgen_env_wordlist_add(env, "words", file, 2);
+    }
     passgen_pattern *pattern;
     passgen_error error;
     uint64_t next = 0;
@@ -481,6 +494,10 @@ static uint64_t random_after(const char *string, char *output) {
     passgen_env_free(env);
     passgen_random_close(&random);
     return next;
+}
+
+static uint64_t random_after(const char *string, char *output) {
+    return random_after_words(string, NULL, output);
 }
 
 /// Groups with a single segment and sets of a single character have nothing
@@ -518,6 +535,46 @@ test_result test_generate_single_choice(void) {
     random_after("([a-z]{8})-(x)[0-9]", grouped);
     random_after("[a-z]{8}-x[0-9]", output);
     assert_streq(grouped, output);
+
+    return test_ok;
+}
+
+/// The same goes for wordlists with a single word, and for Markov chains
+/// where only one codepoint can follow, which is all of them for a wordlist
+/// of a single word.
+test_result test_generate_single_word(void) {
+    char output[64];
+    uint64_t untouched = random_after("", output);
+
+    assert_eq(random_after_words("\\w{words}", "only\n", output), untouched);
+    assert_streq(output, "only");
+    assert_eq(random_after_words("\\m{words}", "only\n", output), untouched);
+    assert_streq(output, "only");
+
+    // with more than one, there is something to choose.
+    assert_ne(random_after_words("\\w{words}", "one\ntwo\n", output), untouched);
+    assert_ne(random_after_words("\\m{words}", "ab\nac\n", output), untouched);
+
+    // the entropy of what has only one option is zero.
+    passgen_random random;
+    passgen_random_open(&random, "xorshift:1234");
+    passgen_env *env = passgen_env_new(&random);
+    assert(env);
+    FILE *file = tmpfile();
+    assert(file);
+    fputs("only\n", file);
+    assert(0 == passgen_env_wordlist_add(env, "words", file, 2));
+    passgen_pattern *pattern;
+    passgen_error error;
+    assert(0 == passgen_parse(&pattern, &error, "\\w{words}\\m{words}"));
+    assert(0 == passgen_resolve(pattern, env, NULL));
+    double entropy = -1;
+    uint8_t buffer[64];
+    assert(0 == passgen_generate_fill_utf8(pattern, env, NULL, &entropy, buffer, 63, NULL));
+    assert(entropy == 0);
+    passgen_pattern_free(pattern);
+    passgen_env_free(env);
+    passgen_random_close(&random);
 
     return test_ok;
 }

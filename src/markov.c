@@ -406,6 +406,24 @@ uint32_t passgen_markov_generate(
         *entropy += log2((double) leaf->total_count);
     }
 
+    // with only one codepoint which can follow (however often it was seen),
+    // there is nothing to choose from, so this takes no randomness. the
+    // entropy of that is zero.
+    size_t options = 0;
+    size_t only = 0;
+    for(size_t i = 0; i < leaf->capacity && options < 2; i++) {
+        if(passgen_markov_leaf_count_raw(leaf, i)) {
+            options += 1;
+            only = i;
+        }
+    }
+    if(options == 1) {
+        if(entropy) {
+            *entropy -= log2((double) leaf->total_count);
+        }
+        return passgen_markov_leaf_codepoint_raw(leaf, only);
+    }
+
     size_t choice = passgen_random_u64_max(random, leaf->total_count);
     for(size_t i = 0; i < leaf->capacity; i++) {
         uint32_t count = passgen_markov_leaf_count_raw(leaf, i);

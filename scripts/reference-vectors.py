@@ -260,7 +260,12 @@ def generate_item(random, item, wordlists):
             output += generate_group(random, data, wordlists)
         elif kind == "wordlist":
             words = wordlists[data]
-            output += words[random.below(len(words))]
+            # a single word takes no randomness, as there is nothing to
+            # choose from.
+            if len(words) == 1:
+                output += words[0]
+            else:
+                output += words[random.below(len(words))]
         elif kind == "set":
             # every character, as many times as it is listed, in the order
             # of the codepoints. this is what the sorted and merged ranges of
