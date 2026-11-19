@@ -11,7 +11,9 @@
 #include <passgen/generate.h>
 #include <passgen/passgen.h>
 #include <passgen/env.h>
+#include <passgen/master.h>
 #include <passgen/random.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -22,20 +24,44 @@ typedef struct {
 } vector;
 
 #define WORD(word)
+#define HASH(passphrase, level, seed, expected)
 #define VECTOR(random, pattern, expected) {random, pattern, expected},
 static const vector vectors[] = {
 #include "vectors.inc"
 };
 #undef WORD
+#undef HASH
 #undef VECTOR
 
 #define WORD(word)                        word "\n"
+#define HASH(passphrase, level, seed, expected)
 #define VECTOR(random, pattern, expected) ""
 static const char wordlist[] =
 #include "vectors.inc"
     ;
 #undef WORD
+#undef HASH
 #undef VECTOR
+
+#ifdef PASSGEN_MONOCYPHER
+typedef struct {
+    const char *passphrase;
+    unsigned level;
+    const char *seed;
+    const char *expected;
+} hash_vector;
+
+#define WORD(word)
+#define HASH(passphrase, level, seed, expected) \
+    {passphrase, level, seed, expected},
+#define VECTOR(random, pattern, expected)
+static const hash_vector hashes[] = {
+#include "vectors.inc"
+};
+#undef WORD
+#undef HASH
+#undef VECTOR
+#endif
 
 /// Generates the output for a vector using the given randomness source,
 /// returns true if it is as expected.
@@ -116,7 +142,8 @@ static bool vectors_check(const char *prefix) {
         bool reuse = false;
 #ifdef PASSGEN_MONOCYPHER
         reuse = random && 0 == strcmp(random_desc, vectors[i].random) &&
-                0 == strncmp(random_desc, "chacha20", strlen("chacha20"));
+                (0 == strncmp(random_desc, "chacha20:", 9) ||
+                 0 == strncmp(random_desc, "master:", 7));
         if(reuse) {
             passgen_random_chacha20_seek(random, 0);
         }
@@ -155,7 +182,46 @@ test_result test_vectors_chacha20(void) {
 }
 
 test_result test_vectors_master_passphrase(void) {
-    assert(vectors_check("chacha20-argon2:"));
+    assert(vectors_check("master:"));
+
+    return test_ok;
+}
+
+// Decodes hex digits into bytes, returns how many there are.
+static size_t hex_bytes(const char *hex, uint8_t *bytes) {
+    size_t size = strlen(hex) / 2;
+    for(size_t i = 0; i < size; i++) {
+        unsigned value;
+        sscanf(&hex[2 * i], "%2x", &value);
+        bytes[i] = (uint8_t) value;
+    }
+    return size;
+}
+
+test_result test_vectors_master_hash(void) {
+    size_t count = sizeof(hashes) / sizeof(hashes[0]);
+    assert(count > 0);
+    for(size_t i = 0; i < count; i++) {
+        uint8_t seed[PASSGEN_MASTER_SEED_MAX];
+        size_t seed_size = hex_bytes(hashes[i].seed, seed);
+        uint8_t expected[PASSGEN_MASTER_HASH_SIZE];
+        assert_eq(hex_bytes(hashes[i].expected, expected), sizeof(expected));
+
+        passgen_master master;
+        assert_eq(
+            PASSGEN_OK,
+            passgen_master_derive(
+                &master,
+                1,
+                hashes[i].level,
+                hashes[i].passphrase,
+                seed,
+                seed_size));
+        uint8_t hash[PASSGEN_MASTER_HASH_SIZE];
+        passgen_master_hash(&master, hash);
+        passgen_master_wipe(&master);
+        assert(0 == memcmp(hash, expected, sizeof(hash)));
+    }
 
     return test_ok;
 }

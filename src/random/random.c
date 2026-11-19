@@ -89,20 +89,32 @@ void passgen_random_read(passgen_random *random, void *data, size_t bytes) {
 }
 
 #ifdef PASSGEN_MONOCYPHER
-// Copies the part of a description up to the next colon (or its end) into a
-// string, and moves past it. Returns false if it does not fit.
-static bool desc_string(const char **pos, char *string, size_t size) {
-    const char *end = strchr(*pos, ':');
-    if(!end) {
-        end = *pos + strlen(*pos);
+// Copies a field of a description, up to the next colon (or its end), into a
+// string, and moves to the next field (past the colon). In it, `\:` is a
+// colon and `\\` a backslash, and any other backslash is not valid. Sets
+// last to whether it was the last field. Returns false if the field is not
+// valid, or it does not fit, with the NUL terminator.
+static bool desc_field(const char **pos, char *string, size_t size, bool *last) {
+    const char *current = *pos;
+    size_t length = 0;
+    while(*current && *current != ':') {
+        char c = *current;
+        if(c == '\\') {
+            current++;
+            if(*current != ':' && *current != '\\') {
+                return false;
+            }
+            c = *current;
+        }
+        if(length + 1 >= size) {
+            return false;
+        }
+        string[length++] = c;
+        current++;
     }
-    size_t length = (size_t) (end - *pos);
-    if(length >= size) {
-        return false;
-    }
-    memcpy(string, *pos, length);
     string[length] = 0;
-    *pos = *end ? end + 1 : end;
+    *last = !*current;
+    *pos = *current ? current + 1 : current;
     return true;
 }
 #endif
@@ -145,7 +157,7 @@ static const struct {
     {"file:", false, PASSGEN_RANDOM_DESC_FILE},
     {"xorshift:", false, PASSGEN_RANDOM_DESC_XORSHIFT},
     {"chacha20:", false, PASSGEN_RANDOM_DESC_CHACHA20},
-    {"chacha20-argon2:", false, PASSGEN_RANDOM_DESC_CHACHA20_ARGON2},
+    {"master:", false, PASSGEN_RANDOM_DESC_MASTER},
 };
 
 /// Finds out which kind of source a description is for, from how it starts,
@@ -187,11 +199,82 @@ bool passgen_random_desc_secret(const char *string) {
         case PASSGEN_RANDOM_DESC_XORSHIFT:
             return false;
         case PASSGEN_RANDOM_DESC_CHACHA20:
-        case PASSGEN_RANDOM_DESC_CHACHA20_ARGON2:
+        case PASSGEN_RANDOM_DESC_MASTER:
             return true;
     }
     return true;
 }
+
+#ifdef PASSGEN_MONOCYPHER
+// Parses a number of one to three digits, without leading zeroes.
+static bool desc_number(const char *string, unsigned *number) {
+    size_t length = strlen(string);
+    if(length < 1 || length > 3 || (length > 1 && string[0] == '0')) {
+        return false;
+    }
+    *number = 0;
+    for(size_t i = 0; i < length; i++) {
+        if(string[i] < '0' || string[i] > '9') {
+            return false;
+        }
+        *number = *number * 10 + (unsigned) (string[i] - '0');
+    }
+    return true;
+}
+
+// Parses what follows `master:`. All six fields have to be there, which
+// may be empty except for the version and the level.
+static bool random_desc_master(passgen_random_desc *desc, const char *params) {
+    char field[2 * PASSGEN_MASTER_SEED_MAX + 1];
+    const char *pos = params;
+    bool last = false;
+
+    // the version and the level, which have to be known.
+    if(!desc_field(&pos, field, sizeof(field), &last) || last ||
+       !desc_number(field, &desc->data.master.version)) {
+        return false;
+    }
+    if(!desc_field(&pos, field, sizeof(field), &last) || last ||
+       !desc_number(field, &desc->data.master.level)) {
+        return false;
+    }
+    passgen_master_cost cost;
+    if(!passgen_master_level(
+           desc->data.master.version,
+           desc->data.master.level,
+           &cost)) {
+        return false;
+    }
+
+    size_t size = PASSGEN_RANDOM_DESC_STRING_MAX + 1;
+    if(!desc_field(&pos, desc->data.master.passphrase, size, &last) || last) {
+        return false;
+    }
+
+    // the seed, in hex, which may be empty.
+    if(!desc_field(&pos, field, sizeof(field), &last) || last) {
+        return false;
+    }
+    size_t digits = strlen(field);
+    if(digits % 2 ||
+       !hex_decode(field, desc->data.master.seed, digits / 2)) {
+        passgen_wipe(field, sizeof(field));
+        return false;
+    }
+    desc->data.master.seed_size = digits / 2;
+    passgen_wipe(field, sizeof(field));
+
+    // the user is the last field. a colon after it would be the start of
+    // another one, which there is not.
+    if(!desc_field(&pos, desc->data.master.domain, size, &last) || last ||
+       !desc_field(&pos, desc->data.master.user, size, &last) || !last) {
+        return false;
+    }
+
+    desc->data.master.cost = NULL;
+    return true;
+}
+#endif
 
 bool passgen_random_desc_parse(passgen_random_desc *desc, const char *string) {
     memset(desc, 0, sizeof(*desc));
@@ -267,28 +350,14 @@ bool passgen_random_desc_parse(passgen_random_desc *desc, const char *string) {
 #endif
         }
 
-        // use chacha20 with a key derived from a master passphrase
-        case PASSGEN_RANDOM_DESC_CHACHA20_ARGON2: {
+        // use chacha20 with a key derived from a master passphrase, as
+        // master:<version>:<level>:<passphrase>:<seed>:<domain>:<user>.
+        case PASSGEN_RANDOM_DESC_MASTER: {
 #ifdef PASSGEN_MONOCYPHER
-            // one colon before the master passphrase is skipped, so that
-            // `chacha20-argon2::x` has the master passphrase `x`. this is how
-            // it always was, and changing it would change what is derived
-            // from it.
-            const char *pos = params;
-            if(*pos == ':') {
-                pos++;
-            }
-            char *passphrase = desc->data.chacha20_argon2.passphrase;
-            char *domain = desc->data.chacha20_argon2.domain;
-            char *token = desc->data.chacha20_argon2.token;
-            size_t size = PASSGEN_RANDOM_DESC_STRING_MAX + 1;
-            if(!desc_string(&pos, passphrase, size) ||
-               !desc_string(&pos, domain, size) ||
-               !desc_string(&pos, token, size)) {
+            if(!random_desc_master(desc, params)) {
                 PASSGEN_CLEAR(desc);
                 return false;
             }
-            desc->data.chacha20_argon2.params = NULL;
             break;
 #else
             return false;
@@ -299,6 +368,45 @@ bool passgen_random_desc_parse(passgen_random_desc *desc, const char *string) {
     desc->kind = kind;
     return true;
 }
+
+#ifdef PASSGEN_MONOCYPHER
+// Derives the master key of a description, and opens the source for its
+// domain and user.
+static passgen_random *random_desc_master_open(
+    passgen_random *random,
+    const passgen_random_desc *desc) {
+    passgen_master master;
+    passgen_status status;
+    if(desc->data.master.cost) {
+        status = passgen_master_derive_cost(
+            &master,
+            desc->data.master.version,
+            desc->data.master.cost,
+            desc->data.master.passphrase,
+            desc->data.master.seed,
+            desc->data.master.seed_size);
+    } else {
+        status = passgen_master_derive(
+            &master,
+            desc->data.master.version,
+            desc->data.master.level,
+            desc->data.master.passphrase,
+            desc->data.master.seed,
+            desc->data.master.seed_size);
+    }
+    if(status != PASSGEN_OK) {
+        return NULL;
+    }
+
+    random = passgen_master_random_open(
+        random,
+        &master,
+        desc->data.master.domain,
+        desc->data.master.user);
+    passgen_master_wipe(&master);
+    return random;
+}
+#endif
 
 passgen_random *passgen_random_desc_open(
     passgen_random *random,
@@ -320,16 +428,11 @@ passgen_random *passgen_random_desc_open(
                 random,
                 desc->data.chacha20.key,
                 desc->data.chacha20.iv);
-        case PASSGEN_RANDOM_DESC_CHACHA20_ARGON2:
-            return passgen_random_chacha20_argon2_open(
-                random,
-                desc->data.chacha20_argon2.passphrase,
-                desc->data.chacha20_argon2.domain,
-                desc->data.chacha20_argon2.token,
-                desc->data.chacha20_argon2.params);
+        case PASSGEN_RANDOM_DESC_MASTER:
+            return random_desc_master_open(random, desc);
 #else
         case PASSGEN_RANDOM_DESC_CHACHA20:
-        case PASSGEN_RANDOM_DESC_CHACHA20_ARGON2:
+        case PASSGEN_RANDOM_DESC_MASTER:
             break;
 #endif
     }

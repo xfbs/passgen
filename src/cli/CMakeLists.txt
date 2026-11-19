@@ -1,4 +1,4 @@
-add_executable(passgen-cli passgen.c main.c tomlc17.c)
+add_executable(passgen-cli passgen.c main.c prompt.c tomlc17.c)
 set_target_properties(passgen-cli PROPERTIES OUTPUT_NAME passgen)
 
 # the command-line interface is linked against the static library by default,

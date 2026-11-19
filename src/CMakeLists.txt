@@ -23,6 +23,7 @@ set(SOURCE_LIST
     "pattern/set.c"
     "pattern/special.c"
     $<$<BOOL:${PASSGEN_MONOCYPHER}>:random/deterministic.c>
+    $<$<BOOL:${PASSGEN_MONOCYPHER}>:random/master.c>
     "random/random.c"
     "random/system.c"
     "random/xorshift.c"

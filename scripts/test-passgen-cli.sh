@@ -39,6 +39,15 @@ function error_lines() {
     "$@" 2>&1 >/dev/null | sed $'s/\033\\[[0-9;]*m//g' || true
 }
 
+# a configuration file which is not valid fails (exit status 14), and the
+# error is printed, without the path of the file.
+function config_error() {
+    printf "$1" > "$tmpdir/bad.toml"
+    fails $passgen -c "$tmpdir/bad.toml" a
+    $passgen -c "$tmpdir/bad.toml" a >/dev/null 2>&1 || test "$?" = 14
+    error_of $passgen -c "$tmpdir/bad.toml" a | sed "s|$tmpdir/||"
+}
+
 # things that should fail, and not print anything to standard output
 function fails() {
     local output
@@ -166,26 +175,90 @@ test "$($passgen --list | wc -l)" -eq 13
 # these only work when built with monocypher (the default).
 key="000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
 if $passgen -r "chacha20:$key" "a" > /dev/null 2>&1; then
-    a="$($passgen -m master -d example.com -t user -p apple2)"
-    test "$a" = "$($passgen -m master -d example.com -t user -p apple2)"
-    test "$a" != "$($passgen -m other -d example.com -t user -p apple2)"
-    test "$a" != "$($passgen -m master -d example.org -t user -p apple2)"
-    test "$a" != "$($passgen -m master -d example.com -t admin -p apple2)"
+    a="$($passgen -r "master:1:1:master::example.com:user" -p apple2)"
 
     # known answer, to notice when the derivation changes (which would change
-    # everyone's passwords).
-    test "$a" = "4pZKYX-4Fxp3h-vOgdGx"
+    # everyone's passwords). this is from scripts/reference-vectors.py.
+    test "$a" = "cwlrWj-PcuVGE-OlCunW"
 
-    # but giving one on the command line is a mistake, as are a domain or a
-    # token without a master passphrase
-    fails $passgen -m master -r zero "a"
-    fails $passgen -r zero -m master "a"
+    test "$a" != "$($passgen -r "master:1:1:other::example.com:user" -p apple2)"
+    test "$a" != "$($passgen -r "master:1:1:master::example.org:user" -p apple2)"
+    test "$a" != "$($passgen -r "master:1:1:master::example.com:admin" -p apple2)"
+    test "$a" != "$($passgen -r "master:1:1:master:00:example.com:user" -p apple2)"
+    test "$a" != "$($passgen -r "master:1:2:master::example.com:user" -p apple2)"
+    # colons and backslashes in the fields are escaped.
+    $passgen -r 'master:1:1:pass\:word\\::example.com\:8443:user' -p apple2 | matches "([a-zA-Z0-9]{6}-){2}[a-zA-Z0-9]{6}"
+    fails $passgen -r 'master:1:1:pa\ss::example.com:user' a
+    fails $passgen -r 'master:1:1:master::example.com' a
+    fails $passgen -r 'master:2:1:master::example.com:user' a
+    fails $passgen -r 'master:1:4:master::example.com:user' a
+
+    # a master passphrase is set up for the configuration, and then used by
+    # its name. it is read from standard input, which is not a terminal here.
+    echo master | $passgen --master-setup main --level 1 > "$tmpdir/master.toml"
+    test "$(cat "$tmpdir/master.toml")" = '[master.main]
+version = 1
+level = 1
+hash = "fd915731"'
+    test "$(echo master | $passgen -c "$tmpdir/master.toml" -m main -d example.com -u user -p apple2)" = "$a"
+    test "$(echo master | $passgen -c "$tmpdir/master.toml" --master main --domain example.com --user user -p apple2)" = "$a"
+    # names which are not bare keys are quoted.
+    test "$(echo master | $passgen --master-setup 'my "key"' --level 1 | head -n 1)" = '[master."my \"key\""]'
+
+    # the hash tells a wrong master passphrase apart, which is an error (exit
+    # status 15), as are a missing one and one which is not configured.
+    fails sh -c "echo other | $passgen -c $tmpdir/master.toml -m main -p apple2"
+    test "$(echo other | error_of $passgen -c "$tmpdir/master.toml" -m main -p apple2)" = "error: wrong master passphrase for \`main\`"
+    (echo other | $passgen -c "$tmpdir/master.toml" -m main -p apple2 >/dev/null 2>&1) || test "$?" = 15
+    test "$(error_of $passgen -c "$tmpdir/master.toml" -m main -p apple2 < /dev/null)" = "error: no master passphrase was entered"
+    test "$(echo | error_of $passgen -c "$tmpdir/master.toml" -m main -p apple2)" = "error: the master passphrase is empty"
+    test "$(echo master | error_of $passgen -c "$tmpdir/master.toml" -m other -p apple2)" = "error: there is no master passphrase \`other\` in the configuration, see --master-setup"
+    # an invalid pattern is noticed before the master passphrase is asked for.
+    test "$(error_of $passgen -c "$tmpdir/master.toml" -m main '[' < /dev/null)" = "error in pattern: set is not closed"
+
+    # any prefix of the hash works, in either case, and so does none.
+    printf '[master.main]\nversion = 1\nlevel = 1\nhash = "FD9"\n' > "$tmpdir/master2.toml"
+    test "$(echo master | $passgen -c "$tmpdir/master2.toml" -m main -d example.com -u user -p apple2)" = "$a"
+    printf '[master.main]\nversion = 1\nlevel = 1\n' > "$tmpdir/master2.toml"
+    test "$(echo master | $passgen -c "$tmpdir/master2.toml" -m main -d example.com -u user -p apple2)" = "$a"
+    test "$(echo other | $passgen -c "$tmpdir/master2.toml" -m main -d example.com -u user -p apple2)" != "$a"
+    # a later file can remove it.
+    printf '[master]\nmain = false\n' > "$tmpdir/master3.toml"
+    fails sh -c "echo master | $passgen -c $tmpdir/master.toml -c $tmpdir/master3.toml -m main a"
+
+    # with a seed, it is the same as with the seed in the description.
+    echo master | $passgen --master-setup main --level 1 --seed > "$tmpdir/seeded.toml"
+    seed="$(sed -n 's/^seed = "\(.*\)"$/\1/p' "$tmpdir/seeded.toml")"
+    test "${#seed}" = 32
+    test "$(echo master | $passgen -c "$tmpdir/seeded.toml" -m main -d example.com -u user -p apple2)" = \
+        "$($passgen -r "master:1:1:master:$seed:example.com:user" -p apple2)"
+    test "$(echo master | $passgen -c "$tmpdir/seeded.toml" -m main -d example.com -u user -p apple2)" != "$a"
+
+    # problems with master passphrases in the configuration.
+    test "$(config_error '[master.main]\nversion = 1\n')" = "error: in configuration \`bad.toml\`: (line 1) master passphrase \`main\` needs a version and a level"
+    test "$(config_error '[master.main]\nversion = 2\nlevel = 1\n')" = "error: in configuration \`bad.toml\`: (line 2) master passphrase \`main\` has to have version 1"
+    test "$(config_error '[master.main]\nversion = 1\nlevel = 4\n')" = "error: in configuration \`bad.toml\`: (line 3) master passphrase \`main\` has to have a level from 1 to 3"
+    test "$(config_error '[master.main]\nversion = 1\nlevel = 1\nhash = "xyz"\n')" = "error: in configuration \`bad.toml\`: (line 4) the hash of master passphrase \`main\` has to be 1 to 64 hex digits"
+    test "$(config_error '[master.main]\nversion = 1\nlevel = 1\nseed = "abc"\n')" = "error: in configuration \`bad.toml\`: (line 4) the seed of master passphrase \`main\` has to be up to 64 bytes in hex"
+    test "$(config_error '[master.main]\nversion = 1\nlevel = 1\ntoken = "x"\n')" = "error: in configuration \`bad.toml\`: (line 4) unknown key \`token\` in master passphrase \`main\`"
+    test "$(config_error '[master]\nmain = "x"\n')" = "error: in configuration \`bad.toml\`: (line 2) master passphrase \`main\` has to be a table, or false"
+
+    # it is a source of randomness itself, so giving another one is a
+    # mistake, as are a domain or a user without a master passphrase, and
+    # options for setting one up without doing so.
+    fails $passgen -c "$tmpdir/master.toml" -m main -r zero "a"
+    fails $passgen -c "$tmpdir/master.toml" -r zero -m main "a"
     fails $passgen -d example.com "a"
-    fails $passgen -t user "a"
+    fails $passgen -u user "a"
+    fails $passgen --level 2 "a"
+    fails $passgen --seed "a"
+    fails sh -c "echo master | $passgen --master-setup main a"
+    fails sh -c "echo master | $passgen --master-setup main --level 4"
+    fails sh -c "echo master | $passgen --master-setup main -m main"
 
     # deriving the key needs more memory than may commonly be locked
     if (ulimit -l 8192) 2> /dev/null; then
-        test "$a" = "$(ulimit -l 8192; $passgen -m master -d example.com -t user -p apple2)"
+        test "$a" = "$(ulimit -l 8192; $passgen -r "master:1:1:master::example.com:user" -p apple2)"
     fi
 
     # the key and IV of chacha20 are exactly 64 and 16 hex digits, and the
@@ -202,16 +275,20 @@ if $passgen -r "chacha20:$key" "a" > /dev/null 2>&1; then
     # overlong keys are rejected
     long="$(printf 'A%.0s' $(seq 1 300))"
     fails $passgen -r "chacha20:$long" "a"
-    fails $passgen -r "chacha20-argon2:$long" "a"
+    fails $passgen -r "master:1:1:$long::example.com:user" "a"
 else
     # without monocypher, the options for master passphrase mode do not
     # exist, so using them is an error rather than being ignored, which would
     # generate something which cannot be generated again.
-    fails $passgen -m master "a"
-    fails $passgen --master master -d example.com -t user -p apple2
+    fails $passgen -m main "a"
+    fails $passgen --master main -d example.com -u user -p apple2
     fails $passgen -d example.com "a"
-    fails $passgen -t user "a"
-    test "$($passgen --help 2>&1 | grep -c -- '--master\|--domain\|--token' || true)" = 0
+    fails $passgen -u user "a"
+    fails $passgen --master-setup main
+    test "$($passgen --help 2>&1 | grep -c -- '--master\|--domain\|--user' || true)" = 0
+    # a configuration with master passphrases is still read.
+    printf '[master.main]\nversion = 1\nlevel = 1\n' > "$tmpdir/master.toml"
+    test "$($passgen -c "$tmpdir/master.toml" a)" = "a"
 fi
 
 # JSON output
@@ -314,12 +391,6 @@ rm -r "$HOME/.config/passgen"
 
 # problems with a configuration file are errors (exit status 14), which say
 # where they are.
-function config_error() {
-    printf "$1" > "$tmpdir/bad.toml"
-    fails $passgen -c "$tmpdir/bad.toml" a
-    $passgen -c "$tmpdir/bad.toml" a >/dev/null 2>&1 || test "$?" = 14
-    error_of $passgen -c "$tmpdir/bad.toml" a | sed "s|$tmpdir/||"
-}
 test "$(config_error '[presets]\nx = \n')" = "error: in configuration \`bad.toml\`: (line 2) missing value"
 test "$(config_error 'random = "system"\n')" = "error: in configuration \`bad.toml\`: (line 1) unknown key \`random\`"
 test "$(config_error '[preset]\nx = "a"\n')" = "error: in configuration \`bad.toml\`: (line 1) unknown key \`preset\`"
@@ -408,7 +479,7 @@ test "$(error_of $passgen 'a\q')" = "error in pattern: unknown escape sequence"
 # in it (a key or a master passphrase) is not printed, also for an unknown kind
 # which may be a typo of one with a secret.
 test "$(error_of $passgen -r "chacha20:secretkey" a)" = "error: cannot use randomness source 'chacha20:...'"
-test "$(error_of $passgen -r "chacha20-argon2:$(printf 'x%.0s' $(seq 200))" a)" = "error: cannot use randomness source 'chacha20-argon2:...'"
+test "$(error_of $passgen -r "master:1:1:$(printf 'x%.0s' $(seq 200))::a:b" a)" = "error: cannot use randomness source 'master:...'"
 test "$(error_of $passgen -r "chacha:secretkey" a)" = "error: cannot use randomness source 'chacha:...'"
 test "$(error_lines $passgen -r "chacha20:secretkey" a | grep -c secretkey)" = 0
 printf 'random = "chacha20:secretkey"\n' > "$tmpdir/random.toml"

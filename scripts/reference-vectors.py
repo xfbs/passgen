@@ -7,9 +7,9 @@ to output. That output must never change, as people rely on it to get their
 passphrases back.
 
 This does not share any code with Passgen: the key derivation uses the
-reference implementation of Argon2 (argon2-cffi), the stream cipher is the
-one from OpenSSL (cryptography), and parsing and generating from patterns is
-reimplemented here. If the tests pass, two independent implementations agree.
+reference implementation of Argon2 (argon2-cffi), BLAKE2b is the one of
+Python, the stream cipher is the one from OpenSSL (cryptography), and parsing
+and generating from patterns is reimplemented here. If the tests pass, two independent implementations agree.
 
 Usage:
 
@@ -21,29 +21,27 @@ Only add vectors. If an existing one changes, that is a bug (in Passgen or in
 here), unless the change is intended and announced as a breaking change.
 """
 
+import hashlib
 import sys
 
 from argon2.low_level import Type, core, ffi
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms
 
-# Version 1 of the key derivation (PASSGEN_ARGON2_CONFIG_V1).
-ARGON2_SALT = b"passgen/argon2id"
-ARGON2_MEMORY_KIB = 19 * 1024
-ARGON2_PASSES = 2
-ARGON2_LANES = 1
+# Version 1 of master passphrase mode (see include/passgen/master.h): the
+# salt, and the memory (in KiB) and passes of Argon2id for every level.
+MASTER_SALT = b"passgen/master/1"
+MASTER_LEVELS = {1: (64 * 1024, 3), 2: (256 * 1024, 3), 3: (1024 * 1024, 3)}
 
 CHACHA20_DEFAULT_IV = b"passgen\0"
 
 
-def argon2id(password, secret, associated_data):
-    """Derives a 32 byte key. Passgen passes the domain as the secret, and
-    the token as the associated data."""
+def argon2id(password, salt, secret, memory, passes):
+    """Derives a 32 byte key, with one lane and no associated data."""
     out = ffi.new("uint8_t[]", 32)
     # these have to be kept alive until the call is done
     c_password = ffi.new("uint8_t[]", password)
-    c_salt = ffi.new("uint8_t[]", ARGON2_SALT)
+    c_salt = ffi.new("uint8_t[]", salt)
     c_secret = ffi.new("uint8_t[]", secret) if secret else ffi.NULL
-    c_ad = ffi.new("uint8_t[]", associated_data) if associated_data else ffi.NULL
     context = ffi.new(
         "argon2_context *",
         dict(
@@ -52,14 +50,14 @@ def argon2id(password, secret, associated_data):
             pwd=c_password,
             pwdlen=len(password),
             salt=c_salt,
-            saltlen=len(ARGON2_SALT),
+            saltlen=len(salt),
             secret=c_secret,
             secretlen=len(secret),
-            ad=c_ad,
-            adlen=len(associated_data),
-            t_cost=ARGON2_PASSES,
-            m_cost=ARGON2_MEMORY_KIB,
-            lanes=ARGON2_LANES,
+            ad=ffi.NULL,
+            adlen=0,
+            t_cost=passes,
+            m_cost=memory,
+            lanes=1,
             threads=1,
             version=0x13,
             allocate_cbk=ffi.NULL,
@@ -71,6 +69,48 @@ def argon2id(password, secret, associated_data):
     if result != 0:
         raise RuntimeError(f"argon2 failed with {result}")
     return bytes(ffi.buffer(out, 32))
+
+
+def master_key(version, level, passphrase, seed):
+    """The master key, from the master passphrase and the seed (bytes)."""
+    assert version == 1
+    memory, passes = MASTER_LEVELS[level]
+    return argon2id(passphrase, MASTER_SALT, seed, memory, passes)
+
+
+def master_hash(key):
+    """What tells whether a master passphrase is the right one."""
+    return hashlib.blake2b(b"passgen/hash", key=key, digest_size=32).digest()
+
+
+def master_site_key(key, domain, user):
+    """The key of the stream cipher, for a domain and a user (bytes)."""
+    message = b"passgen/site"
+    for part in (domain, user):
+        message += len(part).to_bytes(8, "little") + part
+    return hashlib.blake2b(message, key=key, digest_size=32).digest()
+
+
+def master_fields(rest):
+    """Splits what follows `master:` at colons, where `\\:` is a colon and
+    `\\\\` a backslash."""
+    fields = [""]
+    chars = iter(rest)
+    for c in chars:
+        if c == "\\":
+            c = next(chars, None)
+            if c not in (":", "\\"):
+                raise ValueError(rest)
+            fields[-1] += c
+        elif c == ":":
+            fields.append("")
+        else:
+            fields[-1] += c
+    return fields
+
+
+def master_escape(field):
+    return field.replace("\\", "\\\\").replace(":", "\\:")
 
 
 class ChaCha20:
@@ -128,17 +168,23 @@ def open_source(description):
         key = strict_hex(key, 32, description)
         iv = strict_hex(iv, 8, description) if colon else CHACHA20_DEFAULT_IV
         return ChaCha20(key, iv)
-    if kind == "chacha20-argon2":
-        # one colon before the master passphrase is skipped, so that
-        # `chacha20-argon2::x` has the master passphrase `x`.
-        if rest.startswith(":"):
-            rest = rest[1:]
-        # anything after the token is ignored.
-        parts = [part.encode() for part in rest.split(":")] + [b"", b""]
-        if any(len(part) > 128 for part in parts[:3]):
+    if kind == "master":
+        # version, level, passphrase, seed (in hex), domain and user, all of
+        # which are there.
+        fields = master_fields(rest)
+        if len(fields) != 6:
             raise ValueError(description)
-        key = argon2id(parts[0], parts[1], parts[2])
-        return ChaCha20(key, CHACHA20_DEFAULT_IV)
+        version, level, passphrase, seed, domain, user = fields
+        if version != "1" or level not in ("1", "2", "3"):
+            raise ValueError(description)
+        passphrase, domain, user = (x.encode() for x in (passphrase, domain, user))
+        if any(len(part) > 128 for part in (passphrase, domain, user)):
+            raise ValueError(description)
+        seed = bytes.fromhex(seed) if seed else b""
+        if len(seed) > 64:
+            raise ValueError(description)
+        key = master_key(1, int(level), passphrase, seed)
+        return ChaCha20(master_site_key(key, domain, user), CHACHA20_DEFAULT_IV)
     raise ValueError(description)
 
 
@@ -308,25 +354,36 @@ PRESETS = {
     },
 }
 
-MASTER = "chacha20-argon2:"
+def master(passphrase, domain="", user="", level=1, seed=""):
+    fields = [str(level), passphrase, seed, domain, user]
+    for i in (1, 3, 4):
+        fields[i] = master_escape(fields[i])
+    return "master:1:" + ":".join(fields)
+
 
 SOURCES = [
-    # master passphrase only, with a domain, and with a domain and a token
-    MASTER + "master",
-    MASTER + "master:example.com",
-    MASTER + "master:example.com:user",
+    # master passphrase only, with a domain, and with a domain and a user
+    master("master"),
+    master("master", "example.com"),
+    master("master", "example.com", "user"),
     # every input matters
-    MASTER + "other:example.com:user",
-    MASTER + "master:example.org:user",
-    MASTER + "master:example.com:admin",
-    # token without a domain
-    MASTER + "master::user",
-    # one colon before the master passphrase is skipped, so this is the same
-    # as "master:example.com"
-    MASTER + ":master:example.com",
+    master("other", "example.com", "user"),
+    master("master", "example.org", "user"),
+    master("master", "example.com", "admin"),
+    master("master", "example.com", "user", level=2),
+    master("master", "example.com", "user", seed="00"),
+    master("master", "example.com", "user", seed="73656564"),
+    # a user without a domain is not the same as a domain without a user
+    master("master", "", "user"),
+    master("master", "user", ""),
+    # where one field ends and the next starts matters
+    master("master", "ab", "c"),
+    master("master", "a", "bc"),
+    # colons and backslashes, which are escaped
+    master("pass:word\\", "example.com:8443", "us\\er"),
     # not only ASCII
-    MASTER + "pässwörd:exämple.com:üser",
-    MASTER + "correct horse battery staple:example.com",
+    master("pässwörd", "exämple.com", "üser"),
+    master("correct horse battery staple", "example.com"),
     # the other deterministic sources
     # the key and IV are in hex. this key is the bytes of `key`, padded with
     # zeroes, and the IVs are `iv` padded with zeroes, and all zeroes.
@@ -388,8 +445,18 @@ def vectors():
             yield source, pattern, generate(source, pattern, wordlists)
     # every preset, in master passphrase mode
     for name, pattern in PRESETS.items():
-        source = MASTER + "master:example.com:user"
+        source = master("master", "example.com", "user")
         yield source, pattern, generate(source, pattern, wordlists)
+
+
+# master passphrases, levels and seeds, and their hashes.
+HASHES = [
+    ("master", 1, ""),
+    ("master", 2, ""),
+    ("other", 1, ""),
+    ("master", 1, "73656564"),
+    ("pässwörd", 1, ""),
+]
 
 
 def c_string(value):
@@ -416,9 +483,17 @@ def main():
     print("//")
     print("// VECTOR(randomness source, pattern, expected output)")
     print("// WORD(word in the wordlist named `words`)")
+    print("// HASH(master passphrase, level, seed in hex, expected hash in hex)")
     print()
     for word in WORDS:
         print(f"WORD({c_string(word)})")
+    print()
+    for passphrase, level, seed in HASHES:
+        key = master_key(1, level, passphrase.encode(), bytes.fromhex(seed))
+        print(
+            f"HASH({c_string(passphrase)}, {level}, {c_string(seed)}, "
+            f"{c_string(master_hash(key).hex())})"
+        )
     print()
     for source, pattern, expected in vectors():
         print(f"VECTOR({c_string(source)},")

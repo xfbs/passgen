@@ -4,8 +4,8 @@
 /// `--random` option. The input is the description.
 ///
 /// The description is parsed and opened separately, so that keys are derived
-/// from master passphrases with small Argon2 parameters. With the usual ones,
-/// this takes a second, and nearly all of the time would be spent in
+/// from master passphrases with a small Argon2 cost. With the usual ones,
+/// this takes up to a few seconds, and nearly all of the time would be spent in
 /// Monocypher, rather than in what this is about.
 #include "common.h"
 #include <passgen/random.h>
@@ -29,13 +29,12 @@ static void run(const uint8_t *data, size_t size) {
        desc.kind != PASSGEN_RANDOM_DESC_FILE &&
        desc.kind != PASSGEN_RANDOM_DESC_SYSTEM) {
 #ifdef PASSGEN_MONOCYPHER
-        if(desc.kind == PASSGEN_RANDOM_DESC_CHACHA20_ARGON2) {
-            static const passgen_argon2_params params = {
+        if(desc.kind == PASSGEN_RANDOM_DESC_MASTER) {
+            static const passgen_master_cost cost = {
                 .memory = 8,
                 .passes = 1,
-                .lanes = 1,
             };
-            desc.data.chacha20_argon2.params = &params;
+            desc.data.master.cost = &cost;
         }
 #endif
         passgen_random *random = passgen_random_desc_open(NULL, &desc);

@@ -107,19 +107,25 @@ maltry-oblinkgo-Langkor-impularian's-vi
 Every time you run Passgen, it generates completely random output using your
 machine's source of secure randomness. But in some situations, you may want a
 more deterministic output, for example because you want to generate passphrases
-from a master passphrase. For that reason, Passgen has some command-line
-options that you can use to change the source of randomness it uses. In this
-mode, Passgen will always generate the same passphrase when given the same
-master passphrase as input. This means that you only need to remember a single
-master passphrase, and you can generate any kind of passphrase from it. Under
-the hood, it uses [Argon2](https://en.wikipedia.org/wiki/Argon2) to derive a
-key from your inputs, and the
+from a master passphrase. In master passphrase mode, Passgen always generates
+the same passphrase for the same master passphrase, domain and user, so you
+only need to remember a single master passphrase. Under the hood, it uses
+[Argon2](https://en.wikipedia.org/wiki/Argon2) to derive a key from your master
+passphrase, and the
 [ChaCha20](https://en.wikipedia.org/wiki/Salsa20#ChaCha_variant) stream cipher
-as a pseudorandom number generate using the derived key.
+as a pseudorandom number generator using the derived key.
+
+A master passphrase is set up once, which adds how to derive keys from it (and
+a short hash of it, which catches typos) to the configuration. Then it is used
+by its name, and asked for:
 
 ```
-$ passgen -m mymasterpass -d example.com -t username -p apple2
-6xnSzW-8Ptrv0-dngZFU
+$ passgen --master-setup main >> ~/.config/passgen/config.toml
+master passphrase:
+master passphrase again:
+$ passgen -m main -d example.com -u username -p apple2
+master passphrase:
+eINh6m-RhafGJ-JgiKM0
 ```
 
 ## Syntax

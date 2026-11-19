@@ -28,8 +28,7 @@ Generating takes three things:
 1. **A pattern,** which is parsed from a string with @ref passgen_parse.
 2. **A source of randomness,** a @ref passgen_random. For passwords, this is
    the one of the system (@ref passgen_random_system_open). Master passphrase
-   mode derives one from a passphrase instead
-   (@ref passgen_random_chacha20_argon2_open).
+   mode derives one from a passphrase instead (@ref master.h).
 3. **An environment,** a @ref passgen_env, which has the source of randomness
    and the wordlists and presets which patterns can use.
 
@@ -120,6 +119,7 @@ interface. What master passphrase mode generates never changes.
 | @ref generate.h | Generating from a pattern |
 | @ref env.h | Environments and wordlists |
 | @ref random.h | Sources of randomness |
+| @ref master.h | Master passphrase mode: deriving passphrases from a master passphrase |
 | @ref error.h | Errors |
 | @ref allocator.h | Replacing the allocator |
 | @ref version.h | The version of the library |

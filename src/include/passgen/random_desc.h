@@ -7,11 +7,12 @@
 /// what was parsed with cheaper Argon2 parameters.
 #pragma once
 #include <passgen/config.h>
+#include <passgen/master.h>
 #include <passgen/random.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-/// Longest master passphrase, domain or token, in bytes.
+/// Longest master passphrase, domain or user, in bytes.
 #define PASSGEN_RANDOM_DESC_STRING_MAX 128
 
 /// Which kind of source a description is for.
@@ -26,8 +27,9 @@ typedef enum {
     PASSGEN_RANDOM_DESC_XORSHIFT,
     /// `chacha20:<key>[:<iv>]`, with the key and IV in hex
     PASSGEN_RANDOM_DESC_CHACHA20,
-    /// `chacha20-argon2:<master-pass>[:<domain>[:<token>]]`
-    PASSGEN_RANDOM_DESC_CHACHA20_ARGON2,
+    /// `master:<version>:<level>:<passphrase>:<seed>:<domain>:<user>`, with
+    /// the seed in hex, and `\:` and `\\` for colons and backslashes
+    PASSGEN_RANDOM_DESC_MASTER,
 } passgen_random_desc_kind;
 
 /// A parsed description. This may hold a master passphrase or a key, so it
@@ -56,18 +58,27 @@ typedef struct {
             /// The IV, padded with zeroes.
             uint8_t iv[8];
         } chacha20;
-        /// For #PASSGEN_RANDOM_DESC_CHACHA20_ARGON2.
+        /// For #PASSGEN_RANDOM_DESC_MASTER.
         struct {
+            /// The version.
+            unsigned version;
+            /// The level.
+            unsigned level;
             /// The master passphrase, NUL-terminated.
             char passphrase[PASSGEN_RANDOM_DESC_STRING_MAX + 1];
+            /// The seed.
+            uint8_t seed[PASSGEN_MASTER_SEED_MAX];
+            /// The length of the seed, zero if there is none.
+            size_t seed_size;
             /// The domain, NUL-terminated, empty if there is none.
             char domain[PASSGEN_RANDOM_DESC_STRING_MAX + 1];
-            /// The token, NUL-terminated, empty if there is none.
-            char token[PASSGEN_RANDOM_DESC_STRING_MAX + 1];
-            /// The parameters, NULL for the default ones. Parsing sets this
-            /// to NULL, as descriptions cannot have parameters.
-            const passgen_argon2_params *params;
-        } chacha20_argon2;
+            /// The user, NUL-terminated, empty if there is none.
+            char user[PASSGEN_RANDOM_DESC_STRING_MAX + 1];
+            /// The cost to derive the master key with, instead of that of
+            /// the level, or NULL. Parsing sets this to NULL, it is there so
+            /// that fuzzing can use a small cost.
+            const passgen_master_cost *cost;
+        } master;
 #endif
     } data;
 } passgen_random_desc;

@@ -21,5 +21,5 @@
 
 /// Defined if the library is built with Monocypher, which the ChaCha20
 /// sources of randomness need, such as master passphrase mode (see
-/// @ref passgen_random_chacha20_argon2_open).
+/// @ref master.h).
 #cmakedefine PASSGEN_MONOCYPHER

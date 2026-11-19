@@ -127,7 +127,7 @@ int main(void) {
 
     // which descriptions of sources of randomness may hold a secret, which
     // the command-line tool uses to not print them.
-    check(passgen_random_desc_secret("chacha20-argon2:master"));
+    check(passgen_random_desc_secret("master:1:2:pass::example.com:me"));
     check(passgen_random_desc_secret("chacha:mistyped"));
     check(!passgen_random_desc_secret("xorshift:1234"));
 
@@ -157,16 +157,18 @@ int main(void) {
     passgen_random_free(zero);
 
 #ifdef PASSGEN_MONOCYPHER
-    // master passphrase mode, with the default parameters and explicit ones.
-    passgen_argon2_params params = PASSGEN_ARGON2_PARAMS_V1;
-    check(params.memory == PASSGEN_ARGON2_PARAMS_DEFAULT.memory);
-    check(passgen_random_chacha20_argon2_open(
-        &random,
-        "mypassword",
-        "google.com",
-        "",
-        &params));
-    check(passgen_random_u8(&random) == 42);
+    // master passphrase mode, with a small cost so that this is quick.
+    passgen_master_cost cost;
+    check(passgen_master_level(PASSGEN_MASTER_VERSION, PASSGEN_MASTER_LEVEL_DEFAULT, &cost));
+    cost.memory = 8;
+    cost.passes = 1;
+    passgen_master master;
+    check(PASSGEN_OK == passgen_master_derive_cost(&master, 1, &cost, "pass", NULL, 0));
+    uint8_t hash[PASSGEN_MASTER_HASH_SIZE];
+    passgen_master_hash(&master, hash);
+    check(passgen_master_random_open(&random, &master, "example.com", "me"));
+    passgen_master_wipe(&master);
+    (void) passgen_random_u8(&random);
     passgen_random_close(&random);
 #endif
 

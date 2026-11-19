@@ -7,10 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Passwords which change
+
+All passwords derived from a master passphrase change. Master passphrase mode
+derives a key from the master passphrase once, with more effort, and from it
+a key for the domain and the user. To get an old password back, use 0.4.0.
+
 ### Added
 
 - `--config` (`-c`), to read a configuration file instead of the usual ones,
   and `PASSGEN_CONFIG`, a list of them.
+- Master passphrases are set up in the configuration, as `[master.NAME]`, with
+  `--master-setup NAME`. They have a level (`--level`, how much effort deriving
+  the key takes), a short hash, which catches a mistyped master passphrase,
+  and optionally a seed (`--seed`).
 
 ### Changed
 
@@ -20,6 +30,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `/etc/passgen/config.toml`, then `~/.config/passgen/config.toml`, each of
   which can replace or remove (with `false`) what the ones before define.
 - The source of randomness can no longer be set in the configuration.
+- `--master` (`-m`) takes the name of a master passphrase from the
+  configuration, and asks for the passphrase, rather than taking it as an
+  argument.
+- `--token` (`-t`) is now `--user` (`-u`).
+- The `chacha20-argon2` source of randomness is now
+  `master:VERSION:LEVEL:PASSPHRASE:SEED:DOMAIN:USER`, where colons and
+  backslashes are escaped with a backslash.
+- Problems with a master passphrase are errors with the exit status 15.
 - Problems with the configuration are errors, with the exit status 14.
 - A wordlist is only opened when a pattern uses it, so one which does not
   exist is only an error then, which says where it is.

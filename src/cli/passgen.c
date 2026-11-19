@@ -1,4 +1,5 @@
 #include "passgen.h"
+#include "prompt.h"
 #include "tomlc17.h"
 
 #include <assert.h>
@@ -138,10 +139,259 @@ static void passgen_cli_pattern_error(
 
 static int passgen_cli_presets_list(const passgen_cli_opts *opts);
 
+static passgen_cli_master *
+passgen_cli_master_find(const passgen_cli_opts *opts, const char *name);
+
+#ifdef PASSGEN_MONOCYPHER
+// Zeroes memory which held a secret, in a way which the compiler does not
+// optimize away, as it does not know what writing through a volatile pointer
+// does.
+static void passgen_cli_wipe(void *data, size_t size) {
+    volatile uint8_t *bytes = data;
+    for(size_t i = 0; i < size; i++) {
+        bytes[i] = 0;
+    }
+}
+
+// Longest master passphrase which can be entered, in bytes.
+#define PASSGEN_CLI_PASSPHRASE_MAX 1024
+
+// Reads a master passphrase. Prints what went wrong, if anything.
+static int passgen_cli_passphrase(const char *prompt, char *passphrase) {
+    passgen_cli_prompt_status status = passgen_cli_prompt_secret(
+        prompt,
+        passphrase,
+        PASSGEN_CLI_PASSPHRASE_MAX + 1);
+    const char *problem = NULL;
+    if(status == PASSGEN_CLI_PROMPT_EOF) {
+        problem = "no master passphrase was entered";
+    } else if(status == PASSGEN_CLI_PROMPT_TOO_LONG) {
+        problem = "the master passphrase is too long";
+    } else if(!passphrase[0]) {
+        problem = "the master passphrase is empty";
+    }
+    if(problem) {
+        fprintf(stderr, "\033[1;31merror\033[0m: %s\n", problem);
+        return PASSGEN_CLI_ERROR_MASTER;
+    }
+    return 0;
+}
+
+// Derives a master key, and prints what went wrong, if anything.
+static int passgen_cli_master_derive(
+    passgen_master *master,
+    unsigned version,
+    unsigned level,
+    const char *passphrase,
+    const uint8_t *seed,
+    size_t seed_size) {
+    passgen_status status = passgen_master_derive(
+        master,
+        version,
+        level,
+        passphrase,
+        seed,
+        seed_size);
+    if(status == PASSGEN_ERROR_OUT_OF_MEMORY) {
+        return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+    }
+    if(status != PASSGEN_OK) {
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m: cannot derive the master key\n");
+        return PASSGEN_CLI_ERROR_MASTER;
+    }
+    return 0;
+}
+
+// Writes the hash of a master key in hex, with the given number of digits.
+static void passgen_cli_master_hash_hex(
+    const passgen_master *master,
+    char *hex,
+    size_t digits) {
+    uint8_t hash[PASSGEN_MASTER_HASH_SIZE];
+    passgen_master_hash(master, hash);
+    for(size_t i = 0; i < digits; i++) {
+        uint8_t byte = hash[i / 2];
+        hex[i] = "0123456789abcdef"[i % 2 ? byte & 15 : byte >> 4];
+    }
+    hex[digits] = 0;
+}
+
+// Opens the source of randomness for the master passphrase which is asked
+// for, after checking that it is the right one, if the configuration says
+// what its hash starts with.
+static int
+passgen_cli_master_open(const passgen_cli_opts *opts, passgen_random **random) {
+    const passgen_cli_master *config = passgen_cli_master_find(opts, opts->master);
+    if(!config) {
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m: there is no master passphrase `%s` in the "
+            "configuration, see --master-setup\n",
+            opts->master);
+        return PASSGEN_CLI_ERROR_MASTER;
+    }
+
+    char passphrase[PASSGEN_CLI_PASSPHRASE_MAX + 1];
+    int ret = passgen_cli_passphrase("master passphrase: ", passphrase);
+    passgen_master master;
+    if(ret == 0) {
+        ret = passgen_cli_master_derive(
+            &master,
+            config->version,
+            config->level,
+            passphrase,
+            config->seed,
+            config->seed_size);
+    }
+    passgen_cli_wipe(passphrase, sizeof(passphrase));
+    if(ret != 0) {
+        return ret;
+    }
+
+    if(config->hash) {
+        char hash[2 * PASSGEN_MASTER_HASH_SIZE + 1];
+        passgen_cli_master_hash_hex(&master, hash, strlen(config->hash));
+        if(0 != strcmp(hash, config->hash)) {
+            passgen_master_wipe(&master);
+            fprintf(
+                stderr,
+                "\033[1;31merror\033[0m: wrong master passphrase for `%s`\n",
+                config->name);
+            return PASSGEN_CLI_ERROR_MASTER;
+        }
+    }
+
+    *random = passgen_master_random_open(
+        NULL,
+        &master,
+        opts->master_domain,
+        opts->master_user);
+    passgen_master_wipe(&master);
+    if(!*random) {
+        return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+    }
+    return 0;
+}
+
+// Prints a key of a TOML table, which is quoted unless it is a bare key.
+static int passgen_cli_toml_key(const char *key) {
+    bool bare = *key != 0;
+    for(const char *c = key; *c; c++) {
+        bool allowed = (*c >= 'a' && *c <= 'z') || (*c >= 'A' && *c <= 'Z') ||
+                       (*c >= '0' && *c <= '9') || *c == '-' || *c == '_';
+        bare = bare && allowed;
+        if((unsigned char) *c < 0x20 || *c == 0x7f) {
+            return -1;
+        }
+    }
+    if(bare) {
+        printf("%s", key);
+        return 0;
+    }
+    printf("\"");
+    for(const char *c = key; *c; c++) {
+        if(*c == '"' || *c == '\\') {
+            printf("\\");
+        }
+        printf("%c", *c);
+    }
+    printf("\"");
+    return 0;
+}
+
+// Asks for a master passphrase (twice, at a terminal), and prints what the
+// configuration needs to use it.
+static int passgen_cli_master_setup(const passgen_cli_opts *opts) {
+    unsigned level = opts->master_setup_level ? opts->master_setup_level
+                                              : PASSGEN_MASTER_LEVEL_DEFAULT;
+
+    uint8_t seed[16];
+    size_t seed_size = 0;
+    if(opts->master_setup_seed) {
+        passgen_random_read(opts->random, seed, sizeof(seed));
+        if(passgen_random_failed(opts->random)) {
+            return passgen_cli_bail(PASSGEN_CLI_ERROR_RANDOM_ALLOC, NULL);
+        }
+        seed_size = sizeof(seed);
+    }
+
+    char passphrase[PASSGEN_CLI_PASSPHRASE_MAX + 1];
+    char again[PASSGEN_CLI_PASSPHRASE_MAX + 1];
+    int ret = passgen_cli_passphrase("master passphrase: ", passphrase);
+    if(ret == 0 && passgen_cli_prompt_interactive()) {
+        ret = passgen_cli_passphrase("master passphrase again: ", again);
+        if(ret == 0 && 0 != strcmp(passphrase, again)) {
+            fprintf(
+                stderr,
+                "\033[1;31merror\033[0m: the master passphrases are not the "
+                "same\n");
+            ret = PASSGEN_CLI_ERROR_MASTER;
+        }
+    }
+    passgen_cli_wipe(again, sizeof(again));
+
+    passgen_master master;
+    if(ret == 0) {
+        ret = passgen_cli_master_derive(
+            &master,
+            PASSGEN_MASTER_VERSION,
+            level,
+            passphrase,
+            seed,
+            seed_size);
+    }
+    passgen_cli_wipe(passphrase, sizeof(passphrase));
+    if(ret != 0) {
+        passgen_cli_wipe(seed, sizeof(seed));
+        return ret;
+    }
+
+    // a prefix of the hash is enough to tell when a master passphrase is
+    // mistyped, and says less about it.
+    char hash[9];
+    passgen_cli_master_hash_hex(&master, hash, 8);
+    passgen_master_wipe(&master);
+
+    printf("[master.");
+    if(0 != passgen_cli_toml_key(opts->master_setup)) {
+        passgen_cli_wipe(seed, sizeof(seed));
+        fprintf(
+            stderr,
+            "\033[1;31merror\033[0m: the name of a master passphrase cannot "
+            "have control characters\n");
+        return PASSGEN_CLI_ERROR_MASTER;
+    }
+    printf("]\n");
+    printf("version = %u\n", PASSGEN_MASTER_VERSION);
+    printf("level = %u\n", level);
+    printf("hash = \"%s\"\n", hash);
+    if(seed_size) {
+        printf(
+            "# without this seed, nothing which was derived with it can be "
+            "derived again.\n");
+        printf("seed = \"");
+        for(size_t i = 0; i < seed_size; i++) {
+            printf("%02x", seed[i]);
+        }
+        printf("\"\n");
+    }
+    passgen_cli_wipe(seed, sizeof(seed));
+
+    return 0;
+}
+#endif
+
 int passgen_cli_run(passgen_cli_opts opts) {
     if(opts.list) {
         return passgen_cli_presets_list(&opts);
     }
+#ifdef PASSGEN_MONOCYPHER
+    if(opts.master_setup) {
+        return passgen_cli_master_setup(&opts);
+    }
+#endif
 
     passgen_pattern *pattern;
     passgen_error error;
@@ -160,8 +410,29 @@ int passgen_cli_run(passgen_cli_opts opts) {
         return PASSGEN_CLI_ERROR_GENERATE;
     }
 
+#ifdef PASSGEN_MONOCYPHER
+    // the master passphrase is asked for once the pattern is known to be
+    // fine.
+    passgen_random *master = NULL;
+    if(opts.master) {
+        int ret = passgen_cli_master_open(&opts, &master);
+        if(ret != 0) {
+            passgen_pattern_free(pattern);
+            return ret;
+        }
+        passgen_env_random_set(opts.env, master);
+    }
+#endif
+
     int ret = passgen_cli_generate(opts, pattern);
     passgen_pattern_free(pattern);
+
+#ifdef PASSGEN_MONOCYPHER
+    if(master) {
+        passgen_env_random_set(opts.env, opts.random);
+        passgen_random_free(master);
+    }
+#endif
     return ret;
 }
 
@@ -455,10 +726,15 @@ void passgen_cli_opts_init(passgen_cli_opts *opts) {
     opts->json = false;
     opts->entropy = false;
 #ifdef PASSGEN_MONOCYPHER
-    opts->master_passphrase = NULL;
+    opts->master = NULL;
     opts->master_domain = NULL;
-    opts->master_token = NULL;
+    opts->master_user = NULL;
+    opts->master_setup = NULL;
+    opts->master_setup_level = 0;
+    opts->master_setup_seed = false;
 #endif
+    opts->masters = NULL;
+    opts->masters_len = 0;
     opts->random = NULL;
     opts->env = passgen_env_new(NULL);
 
@@ -574,7 +850,14 @@ static int passgen_cli_presets_list(const passgen_cli_opts *opts) {
 // the options for master passphrase mode only exist when it does, which is
 // when building with monocypher.
 #ifdef PASSGEN_MONOCYPHER
-#define PASSGEN_CLI_MASTER_OPTS "d:m:t:"
+#define PASSGEN_CLI_MASTER_OPTS "d:m:u:"
+
+// options which only have a long form.
+enum {
+    PASSGEN_CLI_OPT_MASTER_SETUP = 256,
+    PASSGEN_CLI_OPT_LEVEL,
+    PASSGEN_CLI_OPT_SEED,
+};
 #else
 #define PASSGEN_CLI_MASTER_OPTS ""
 #endif
@@ -608,7 +891,10 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 #ifdef PASSGEN_MONOCYPHER
         {"master", required_argument, NULL, 'm'},
         {"domain", required_argument, NULL, 'd'},
-        {"token", required_argument, NULL, 't'},
+        {"user", required_argument, NULL, 'u'},
+        {"master-setup", required_argument, NULL, PASSGEN_CLI_OPT_MASTER_SETUP},
+        {"level", required_argument, NULL, PASSGEN_CLI_OPT_LEVEL},
+        {"seed", no_argument, NULL, PASSGEN_CLI_OPT_SEED},
 #endif
         {NULL, no_argument, NULL, 0}};
 
@@ -631,13 +917,28 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 break;
 #ifdef PASSGEN_MONOCYPHER
             case 'm':
-                opts->master_passphrase = optarg;
+                opts->master = optarg;
                 break;
             case 'd':
                 opts->master_domain = optarg;
                 break;
-            case 't':
-                opts->master_token = optarg;
+            case 'u':
+                opts->master_user = optarg;
+                break;
+            case PASSGEN_CLI_OPT_MASTER_SETUP:
+                opts->master_setup = optarg;
+                break;
+            case PASSGEN_CLI_OPT_LEVEL:
+                if(optarg[0] < '1' ||
+                   optarg[0] > '0' + PASSGEN_MASTER_LEVEL_MAX || optarg[1]) {
+                    return passgen_cli_bail(
+                        PASSGEN_CLI_ERROR_MASTER_CONFLICT,
+                        "--level has to be from 1 to 3");
+                }
+                opts->master_setup_level = (unsigned) (optarg[0] - '0');
+                break;
+            case PASSGEN_CLI_OPT_SEED:
+                opts->master_setup_seed = true;
                 break;
 #endif
             case 'c':
@@ -702,8 +1003,12 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     }
 
     // if no pattern or preset was given, show help, unless the presets are
-    // to be listed.
-    if(!opts->pattern && !opts->preset && !opts->list) {
+    // to be listed, or a master passphrase is set up.
+    bool setup = false;
+#ifdef PASSGEN_MONOCYPHER
+    setup = opts->master_setup != NULL;
+#endif
+    if(!opts->pattern && !opts->preset && !opts->list && !setup) {
         return PASSGEN_CLI_SHOW_HELP;
     }
 
@@ -711,7 +1016,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
     // master passphrase mode is a source of randomness, so it cannot be
     // combined with another one. silently preferring either of them would
     // result in something other than what was asked for.
-    if(opts->master_passphrase && random_given) {
+    if(opts->master && random_given) {
         return passgen_cli_bail(
             PASSGEN_CLI_ERROR_MASTER_CONFLICT,
             "--master and --random cannot be used together");
@@ -719,22 +1024,29 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 
     // these don't do anything on their own. most likely, the master
     // passphrase was forgotten.
-    if(!opts->master_passphrase && (opts->master_domain || opts->master_token)) {
+    if(!opts->master && (opts->master_domain || opts->master_user)) {
         return passgen_cli_bail(
             PASSGEN_CLI_ERROR_MASTER_CONFLICT,
-            "--domain and --token need --master");
+            "--domain and --user need --master");
     }
 
-    if(opts->master_passphrase) {
-        opts->random = passgen_random_chacha20_argon2_open(
-            NULL,
-            opts->master_passphrase,
-            opts->master_domain,
-            opts->master_token,
-            NULL);
-        if(!opts->random) {
-            return passgen_cli_bail(PASSGEN_CLI_ERROR_RANDOM_ALLOC, NULL);
-        }
+    // setting one up is something else than generating.
+    if(setup && (opts->master || opts->pattern || opts->preset || opts->list)) {
+        return passgen_cli_bail(
+            PASSGEN_CLI_ERROR_MASTER_CONFLICT,
+            "--master-setup cannot be used with a pattern, --preset, --list "
+            "or --master");
+    }
+    if(!setup && (opts->master_setup_level || opts->master_setup_seed)) {
+        return passgen_cli_bail(
+            PASSGEN_CLI_ERROR_MASTER_CONFLICT,
+            "--level and --seed need --master-setup");
+    }
+
+    // the source of randomness is opened once the master passphrase is
+    // entered, which is after the pattern is checked.
+    if(opts->master) {
+        return 0;
     }
 #else
     // only master passphrase mode needs to know about this.
@@ -760,18 +1072,23 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 #ifdef PASSGEN_MONOCYPHER
 #define PASSGEN_CLI_HELP_DOMAIN \
     "    -d, --domain DOMAIN    Domain for master passphrase mode\n"
-#define PASSGEN_CLI_HELP_MASTER \
-    "    -m, --master PASS      Derive the randomness from a master passphrase\n"
-#define PASSGEN_CLI_HELP_TOKEN \
-    "    -t, --token TOKEN      Token for master passphrase mode\n"
+#define PASSGEN_CLI_HELP_MASTER                                               \
+    "    -m, --master NAME      Derive the randomness from a master passphrase,\n" \
+    "                           which is asked for\n"                          \
+    "        --master-setup NAME\n"                                            \
+    "                           Set up a master passphrase for the\n"         \
+    "                           configuration, with --level (1 to 3,\n"       \
+    "                           default: 2), and --seed to generate a seed\n"
+#define PASSGEN_CLI_HELP_USER \
+    "    -u, --user USER        User (login) for master passphrase mode\n"
 #define PASSGEN_CLI_HELP_CHACHA20                                             \
     "    chacha20:KEY[:IV]      ChaCha20, key and IV in hex (64 and 16 digits)\n" \
-    "    chacha20-argon2:PASS[:DOMAIN[:TOKEN]]\n"                              \
-    "                           What --master uses\n"
+    "    master:VERSION:LEVEL:PASS:SEED:DOMAIN:USER\n"                         \
+    "                           What --master uses, with \\: and \\\\ for : and \\\n"
 #else
 #define PASSGEN_CLI_HELP_DOMAIN   ""
 #define PASSGEN_CLI_HELP_MASTER   ""
-#define PASSGEN_CLI_HELP_TOKEN    ""
+#define PASSGEN_CLI_HELP_USER     ""
 #define PASSGEN_CLI_HELP_CHACHA20 ""
 #endif
 
@@ -804,7 +1121,7 @@ void passgen_cli_usage(const char *executable) {
         "                           Define a preset\n"
         "    -r, --random SOURCE    Source of randomness (default: system)\n"
         "    -S, --steps N          Limit on steps to generate (default: 1000000)\n"
-        PASSGEN_CLI_HELP_TOKEN
+        PASSGEN_CLI_HELP_USER
         "    -v, --version          Show the version\n"
         "    -w, --wordlist NAME:PATH\n"
         "                           Load the wordlist NAME from PATH\n"
@@ -901,6 +1218,7 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
             break;
         case PASSGEN_CLI_ERROR_WORDLIST:
         case PASSGEN_CLI_ERROR_CONFIG:
+        case PASSGEN_CLI_ERROR_MASTER:
             // what went wrong was printed by whoever noticed.
             break;
         case PASSGEN_CLI_ERROR_PRESET_NOT_FOUND:
@@ -917,16 +1235,31 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
     return error;
 }
 
+// Frees what a master passphrase from the configuration holds.
+static void passgen_cli_master_free(passgen_cli_master *master) {
+    free(master->name);
+    free(master->hash);
+    memset(master, 0, sizeof(*master));
+}
+
 void passgen_cli_opts_free(passgen_cli_opts *opts) {
     passgen_env_free(opts->env);
     free(opts->definitions);
     free(opts->configs);
+    for(size_t i = 0; i < opts->masters_len; i++) {
+        passgen_cli_master_free(&opts->masters[i]);
+    }
+    free(opts->masters);
 
     // the environment only borrows the source of randomness.
     if(opts->random) {
         passgen_random_free(opts->random);
     }
 }
+
+// the highest level of a master passphrase. the configuration is read the same
+// way without master passphrase mode, so this does not come from it.
+#define PASSGEN_CLI_MASTER_LEVEL_MAX 3
 
 // where the configuration which is installed along with passgen is, and the
 // one for the whole system. these are set when building, according to where
@@ -1034,6 +1367,182 @@ static int passgen_cli_config_presets(
     return 0;
 }
 
+// Finds a master passphrase from the configuration by its name.
+static passgen_cli_master *
+passgen_cli_master_find(const passgen_cli_opts *opts, const char *name) {
+    for(size_t i = 0; i < opts->masters_len; i++) {
+        if(0 == strcmp(opts->masters[i].name, name)) {
+            return &opts->masters[i];
+        }
+    }
+    return NULL;
+}
+
+// Whether a string is only hex digits, of which there are at least one and at
+// most max.
+static bool passgen_cli_hex(const char *string, size_t max) {
+    size_t length = strlen(string);
+    if(length < 1 || length > max) {
+        return false;
+    }
+    for(size_t i = 0; i < length; i++) {
+        if(!strchr("0123456789abcdefABCDEF", string[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Reads one master passphrase of a configuration file, which is a table.
+static int passgen_cli_config_master(
+    const char *path,
+    const char *name,
+    toml_datum_t table,
+    passgen_cli_master *master) {
+    bool version = false, level = false;
+    for(int i = 0; i < table.u.tab.size; i++) {
+        const char *key = table.u.tab.key[i];
+        toml_datum_t value = table.u.tab.value[i];
+
+        if(0 == strcmp(key, "version")) {
+            if(value.type != TOML_INT64 || value.u.int64 != 1) {
+                return passgen_cli_config_error(
+                    path,
+                    &value,
+                    "master passphrase `%s` has to have version 1",
+                    name);
+            }
+            master->version = 1;
+            version = true;
+        } else if(0 == strcmp(key, "level")) {
+            if(value.type != TOML_INT64 || value.u.int64 < 1 ||
+               value.u.int64 > PASSGEN_CLI_MASTER_LEVEL_MAX) {
+                return passgen_cli_config_error(
+                    path,
+                    &value,
+                    "master passphrase `%s` has to have a level from 1 to 3",
+                    name);
+            }
+            master->level = (unsigned) value.u.int64;
+            level = true;
+        } else if(0 == strcmp(key, "hash")) {
+            if(value.type != TOML_STRING || !passgen_cli_hex(value.u.s, 64)) {
+                return passgen_cli_config_error(
+                    path,
+                    &value,
+                    "the hash of master passphrase `%s` has to be 1 to 64 hex "
+                    "digits",
+                    name);
+            }
+            master->hash = strdup(value.u.s);
+            if(!master->hash) {
+                return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+            }
+            for(char *c = master->hash; *c; c++) {
+                if(*c >= 'A' && *c <= 'F') {
+                    *c = (char) (*c - 'A' + 'a');
+                }
+            }
+        } else if(0 == strcmp(key, "seed")) {
+            size_t digits = value.type == TOML_STRING ? strlen(value.u.s) : 0;
+            if(value.type != TOML_STRING ||
+               (digits && (digits % 2 ||
+                           !passgen_cli_hex(value.u.s, 2 * sizeof(master->seed))))) {
+                return passgen_cli_config_error(
+                    path,
+                    &value,
+                    "the seed of master passphrase `%s` has to be up to 64 "
+                    "bytes in hex",
+                    name);
+            }
+            for(size_t j = 0; j < digits / 2; j++) {
+                unsigned byte;
+                sscanf(&value.u.s[2 * j], "%2x", &byte);
+                master->seed[j] = (uint8_t) byte;
+            }
+            master->seed_size = digits / 2;
+        } else {
+            return passgen_cli_config_error(
+                path,
+                &value,
+                "unknown key `%s` in master passphrase `%s`",
+                key,
+                name);
+        }
+    }
+
+    // these change what is derived, so they are not left to defaults, which
+    // may change.
+    if(!version || !level) {
+        return passgen_cli_config_error(
+            path,
+            &table,
+            "master passphrase `%s` needs a version and a level",
+            name);
+    }
+
+    return 0;
+}
+
+// Adds the master passphrases of a configuration file, replacing ones with
+// the same name, or removing them if they are set to false.
+static int passgen_cli_config_masters(
+    passgen_cli_opts *opts,
+    const char *path,
+    toml_datum_t table) {
+    for(int i = 0; i < table.u.tab.size; i++) {
+        const char *name = table.u.tab.key[i];
+        toml_datum_t value = table.u.tab.value[i];
+        passgen_cli_master *existing = passgen_cli_master_find(opts, name);
+
+        if(value.type == TOML_BOOLEAN && !value.u.boolean) {
+            if(existing) {
+                passgen_cli_master_free(existing);
+                *existing = opts->masters[--opts->masters_len];
+            }
+            continue;
+        }
+        if(value.type != TOML_TABLE) {
+            return passgen_cli_config_error(
+                path,
+                &value,
+                "master passphrase `%s` has to be a table, or false",
+                name);
+        }
+
+        passgen_cli_master master;
+        memset(&master, 0, sizeof(master));
+        int ret = passgen_cli_config_master(path, name, value, &master);
+        if(ret == 0) {
+            master.name = strdup(name);
+            if(!master.name) {
+                ret = passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+            }
+        }
+        if(ret != 0) {
+            passgen_cli_master_free(&master);
+            return ret;
+        }
+
+        if(existing) {
+            passgen_cli_master_free(existing);
+            *existing = master;
+            continue;
+        }
+        passgen_cli_master *masters = realloc(
+            opts->masters,
+            (opts->masters_len + 1) * sizeof(passgen_cli_master));
+        if(!masters) {
+            passgen_cli_master_free(&master);
+            return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
+        }
+        opts->masters = masters;
+        opts->masters[opts->masters_len++] = master;
+    }
+
+    return 0;
+}
+
 // Adds what a parsed configuration file defines.
 static int passgen_cli_config_apply(
     passgen_cli_opts *opts,
@@ -1045,7 +1554,8 @@ static int passgen_cli_config_apply(
 
         bool wordlists = 0 == strcmp(key, "wordlists");
         bool presets = 0 == strcmp(key, "presets");
-        if(!wordlists && !presets) {
+        bool master = 0 == strcmp(key, "master");
+        if(!wordlists && !presets && !master) {
             return passgen_cli_config_error(
                 path,
                 &value,
@@ -1062,6 +1572,8 @@ static int passgen_cli_config_apply(
 
         if(wordlists) {
             try(passgen_cli_config_wordlists(opts, path, value));
+        } else if(master) {
+            try(passgen_cli_config_masters(opts, path, value));
         } else {
             try(passgen_cli_config_presets(opts, path, value));
         }
@@ -1372,6 +1884,33 @@ void passgen_cli_seccomp_init(void) {
         1,
         SCMP_CMP(1, SCMP_CMP_EQ, TCGETS2));
 #endif
+
+    // allow turning off showing what is typed in the terminal (and back on),
+    // to read a master passphrase from standard input. newer versions of
+    // glibc use TCSETS2 and friends on some architectures.
+    const unsigned long tcsets[] = {
+        TCSETS,
+        TCSETSW,
+        TCSETSF,
+#ifdef TCSETS2
+        TCSETS2,
+        TCSETSW2,
+        TCSETSF2,
+#endif
+    };
+    for(size_t i = 0; i < sizeof(tcsets) / sizeof(tcsets[0]); i++) {
+        seccomp_rule_add(
+            ctx,
+            SCMP_ACT_ALLOW,
+            SCMP_SYS(ioctl),
+            2,
+            SCMP_CMP(0, SCMP_CMP_EQ, 0),
+            SCMP_CMP(1, SCMP_CMP_EQ, tcsets[i]));
+    }
+
+    // allow setting what happens on being interrupted, which sets the
+    // terminal back while reading a master passphrase.
+    seccomp_rule_add(ctx, SCMP_ACT_ALLOW, SCMP_SYS(rt_sigaction), 0);
 
     // apply rules
     seccomp_load(ctx);

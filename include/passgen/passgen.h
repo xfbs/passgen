@@ -61,5 +61,6 @@ PASSGEN_EXPORT void passgen_pattern_free(passgen_pattern *pattern);
 #include <passgen/config.h>
 #include <passgen/env.h>
 #include <passgen/generate.h>
+#include <passgen/master.h>
 #include <passgen/random.h>
 #include <passgen/version.h>

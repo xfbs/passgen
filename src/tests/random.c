@@ -602,67 +602,139 @@ test_result test_random_chacha20(void) {
     return test_ok;
 }
 
-test_result test_random_chacha20_argon2(void) {
+// A cost which is quick, for the tests which do not check the levels.
+static const passgen_master_cost small_cost = {.memory = 8, .passes = 1};
+
+// Reads the first 64 bit number from the source for a master key, domain and
+// user.
+static uint64_t master_first(
+    const passgen_master *master,
+    const char *domain,
+    const char *user) {
     passgen_random random;
-
-    assert(
-        passgen_random_chacha20_argon2_open(
-            &random,
-            "mypassword",
-            "google.com",
-            "",
-            NULL) != NULL);
-    // these values were computed using other implementations of Argon2 and
-    // ChaCha20. they must never change.
-    assert(passgen_random_u8(&random) == 42);
-    assert(passgen_random_u16(&random) == 54107);
-    assert(passgen_random_u32(&random) == 2702625740);
-    assert(passgen_random_u64(&random) == 11525863459809967624ULL);
+    if(!passgen_master_random_open(&random, master, domain, user)) {
+        return 0;
+    }
+    uint64_t number = passgen_random_u64(&random);
     passgen_random_close(&random);
+    return number;
+}
 
-    // passing the parameters explicitly is the same as the default, and
-    // other parameters result in a different key.
-    passgen_argon2_params config = PASSGEN_ARGON2_PARAMS_V1;
-    assert(
-        passgen_random_chacha20_argon2_open(
-            &random,
-            "mypassword",
-            "google.com",
-            "",
-            &config) != NULL);
-    assert(passgen_random_u8(&random) == 42);
-    assert(passgen_random_u16(&random) == 54107);
-    passgen_random_close(&random);
+/// The levels have fixed costs, and only those of version 1 exist.
+test_result test_random_master_level(void) {
+    passgen_master_cost cost;
+    assert(passgen_master_level(1, 1, &cost));
+    assert_eq(cost.memory, 64 * 1024);
+    assert_eq(cost.passes, 3);
+    assert(passgen_master_level(1, 2, &cost));
+    assert_eq(cost.memory, 256 * 1024);
+    assert_eq(cost.passes, 3);
+    assert(passgen_master_level(1, 3, &cost));
+    assert_eq(cost.memory, 1024 * 1024);
+    assert_eq(cost.passes, 3);
 
-    config.passes += 1;
-    assert(
-        passgen_random_chacha20_argon2_open(
-            &random,
-            "mypassword",
-            "google.com",
-            "",
-            &config) != NULL);
-    assert(passgen_random_u64(&random) != 11525863459809967624ULL);
-    passgen_random_close(&random);
+    assert(!passgen_master_level(1, 0, &cost));
+    assert(!passgen_master_level(1, 4, &cost));
+    assert(!passgen_master_level(0, 1, &cost));
+    assert(!passgen_master_level(2, 1, &cost));
 
-    // parameters which are not valid are rejected.
-    config = PASSGEN_ARGON2_PARAMS_V1;
-    config.passes = 0;
-    assert(!passgen_random_chacha20_argon2_open(&random, "a", NULL, NULL, &config));
+    passgen_master master;
+    assert_eq(
+        PASSGEN_ERROR_INVALID_ARGUMENT,
+        passgen_master_derive(&master, 1, 0, "a", NULL, 0));
+    assert_eq(
+        PASSGEN_ERROR_INVALID_ARGUMENT,
+        passgen_master_derive(&master, 2, 1, "a", NULL, 0));
 
-    config = PASSGEN_ARGON2_PARAMS_V1;
-    config.lanes = 0;
-    assert(!passgen_random_chacha20_argon2_open(&random, "a", NULL, NULL, &config));
+    return test_ok;
+}
 
-    config = PASSGEN_ARGON2_PARAMS_V1;
-    config.memory = 7;
-    assert(!passgen_random_chacha20_argon2_open(&random, "a", NULL, NULL, &config));
+/// Every input of a master key and of the source for a domain and a user
+/// matters, and nothing else does. What the outputs are is checked by the
+/// test vectors.
+test_result test_random_master(void) {
+    passgen_master master, other;
+    assert_eq(
+        PASSGEN_OK,
+        passgen_master_derive_cost(&master, 1, &small_cost, "a", NULL, 0));
+    assert_eq(master.version, 1);
+    uint64_t reference = master_first(&master, "domain", "user");
 
-    // the least that is valid.
-    config.memory = 8;
-    config.passes = 1;
-    assert(passgen_random_chacha20_argon2_open(&random, "a", NULL, NULL, &config));
-    passgen_random_close(&random);
+    // it is the same every time, and an empty seed is the same as none.
+    const uint8_t seed[PASSGEN_MASTER_SEED_MAX + 1] = {1, 2, 3};
+    assert_eq(
+        PASSGEN_OK,
+        passgen_master_derive_cost(&other, 1, &small_cost, "a", seed, 0));
+    assert(0 == memcmp(master.key, other.key, sizeof(master.key)));
+
+    // the passphrase, the seed and the cost matter.
+    assert_eq(
+        PASSGEN_OK,
+        passgen_master_derive_cost(&other, 1, &small_cost, "b", NULL, 0));
+    assert(0 != memcmp(master.key, other.key, sizeof(master.key)));
+    assert_eq(
+        PASSGEN_OK,
+        passgen_master_derive_cost(&other, 1, &small_cost, "a", seed, 1));
+    assert(0 != memcmp(master.key, other.key, sizeof(master.key)));
+    const passgen_master_cost more = {.memory = 8, .passes = 2};
+    assert_eq(
+        PASSGEN_OK,
+        passgen_master_derive_cost(&other, 1, &more, "a", NULL, 0));
+    assert(0 != memcmp(master.key, other.key, sizeof(master.key)));
+
+    // the domain and the user matter, also where one ends and the other
+    // starts, and no domain or user is the same as an empty one.
+    assert_eq(master_first(&master, "domain", "user"), reference);
+    assert(master_first(&master, "domain", "users") != reference);
+    assert(master_first(&master, "domains", "user") != reference);
+    assert(master_first(&master, "ab", "c") != master_first(&master, "a", "bc"));
+    assert(master_first(&master, "x", "") != master_first(&master, "", "x"));
+    assert_eq(master_first(&master, NULL, NULL), master_first(&master, "", ""));
+
+    // the hash is not what the source gives out.
+    uint8_t hash[PASSGEN_MASTER_HASH_SIZE], again[PASSGEN_MASTER_HASH_SIZE];
+    passgen_master_hash(&master, hash);
+    passgen_master_hash(&master, again);
+    assert(0 == memcmp(hash, again, sizeof(hash)));
+    passgen_master_hash(&other, again);
+    assert(0 != memcmp(hash, again, sizeof(hash)));
+
+    // what is not valid.
+    assert_eq(
+        PASSGEN_ERROR_INVALID_ARGUMENT,
+        passgen_master_derive_cost(
+            &other,
+            1,
+            &small_cost,
+            "a",
+            seed,
+            PASSGEN_MASTER_SEED_MAX + 1));
+    assert_eq(
+        PASSGEN_OK,
+        passgen_master_derive_cost(
+            &other,
+            1,
+            &small_cost,
+            "a",
+            seed,
+            PASSGEN_MASTER_SEED_MAX));
+    const passgen_master_cost too_little = {.memory = 7, .passes = 1};
+    const passgen_master_cost no_passes = {.memory = 8, .passes = 0};
+    assert_eq(
+        PASSGEN_ERROR_INVALID_ARGUMENT,
+        passgen_master_derive_cost(&other, 1, &too_little, "a", NULL, 0));
+    assert_eq(
+        PASSGEN_ERROR_INVALID_ARGUMENT,
+        passgen_master_derive_cost(&other, 1, &no_passes, "a", NULL, 0));
+    assert_eq(
+        PASSGEN_ERROR_INVALID_ARGUMENT,
+        passgen_master_derive_cost(&other, 2, &small_cost, "a", NULL, 0));
+
+    // wiping it leaves nothing.
+    passgen_master_wipe(&master);
+    const uint8_t zeroes[PASSGEN_MASTER_KEY_SIZE] = {0};
+    assert(0 == memcmp(master.key, zeroes, sizeof(zeroes)));
+    passgen_master_wipe(&other);
 
     return test_ok;
 }
@@ -731,35 +803,36 @@ test_result test_random_out_of_memory(void) {
 #ifdef PASSGEN_MONOCYPHER
     // deriving a key from a master passphrase allocates the memory for it,
     // which is kept small here so that this is quick.
-    const passgen_argon2_params params = {.memory = 8, .passes = 1, .lanes = 1};
-    passgen_random reference;
-    assert(passgen_random_chacha20_argon2_open(
-        &reference,
-        "master",
-        "example.com",
-        NULL,
-        &params));
-    uint8_t expected[64];
-    passgen_random_read(&reference, expected, sizeof(expected));
-    passgen_random_close(&reference);
+    passgen_master master;
+    assert_eq(
+        PASSGEN_OK,
+        passgen_master_derive_cost(&master, 1, &small_cost, "master", NULL, 0));
+    uint64_t expected = master_first(&master, "example.com", NULL);
+    passgen_master_wipe(&master);
 
     bool done = false;
     for(size_t fail_at = 0; !done; fail_at++) {
         test_allocator allocator;
         test_allocator_install(&allocator, fail_at);
 
-        passgen_random *random = passgen_random_chacha20_argon2_open(
-            NULL,
+        passgen_status status = passgen_master_derive_cost(
+            &master,
+            1,
+            &small_cost,
             "master",
-            "example.com",
             NULL,
-            &params);
-        if(random) {
-            done = true;
-            uint8_t output[64];
-            passgen_random_read(random, output, sizeof(output));
-            assert(0 == memcmp(output, expected, sizeof(output)));
-            passgen_random_free(random);
+            0);
+        if(status == PASSGEN_OK) {
+            passgen_random *random =
+                passgen_master_random_open(NULL, &master, "example.com", NULL);
+            if(random) {
+                done = true;
+                assert_eq(passgen_random_u64(random), expected);
+                passgen_random_free(random);
+            }
+            passgen_master_wipe(&master);
+        } else {
+            assert_eq(status, PASSGEN_ERROR_OUT_OF_MEMORY);
         }
 
         assert(test_allocator_clean(&allocator));
@@ -853,39 +926,93 @@ test_result test_random_desc_parse_chacha20(void) {
         assert(!passgen_random_desc_parse(&desc, invalid[i]));
     }
 
-    assert(passgen_random_desc_parse(&desc, "chacha20-argon2:master:domain:token"));
-    assert_eq(desc.kind, PASSGEN_RANDOM_DESC_CHACHA20_ARGON2);
-    assert_streq(desc.data.chacha20_argon2.passphrase, "master");
-    assert_streq(desc.data.chacha20_argon2.domain, "domain");
-    assert_streq(desc.data.chacha20_argon2.token, "token");
-    assert(desc.data.chacha20_argon2.params == NULL);
+    return test_ok;
+}
 
-    // the domain and the token are optional, and can be empty.
-    assert(passgen_random_desc_parse(&desc, "chacha20-argon2:master"));
-    assert_streq(desc.data.chacha20_argon2.passphrase, "master");
-    assert_streq(desc.data.chacha20_argon2.domain, "");
-    assert_streq(desc.data.chacha20_argon2.token, "");
-    assert(passgen_random_desc_parse(&desc, "chacha20-argon2:master::token"));
-    assert_streq(desc.data.chacha20_argon2.domain, "");
-    assert_streq(desc.data.chacha20_argon2.token, "token");
+/// Master passphrases are described by all of their fields, separated by
+/// colons, which are escaped in the fields.
+test_result test_random_desc_parse_master(void) {
+    passgen_random_desc desc;
 
-    // one colon before the master passphrase is skipped, as it always was.
-    assert(passgen_random_desc_parse(&desc, "chacha20-argon2::master:domain"));
-    assert_streq(desc.data.chacha20_argon2.passphrase, "master");
-    assert_streq(desc.data.chacha20_argon2.domain, "domain");
+    assert(passgen_random_desc_parse(&desc, "master:1:2:pass:0aFF:domain:user"));
+    assert_eq(desc.kind, PASSGEN_RANDOM_DESC_MASTER);
+    assert_eq(desc.data.master.version, 1);
+    assert_eq(desc.data.master.level, 2);
+    assert_streq(desc.data.master.passphrase, "pass");
+    assert_eq(desc.data.master.seed_size, 2);
+    assert_eq(desc.data.master.seed[0], 0x0a);
+    assert_eq(desc.data.master.seed[1], 0xff);
+    assert_streq(desc.data.master.domain, "domain");
+    assert_streq(desc.data.master.user, "user");
+    assert(desc.data.master.cost == NULL);
 
-    // anything after the token is ignored.
-    assert(passgen_random_desc_parse(&desc, "chacha20-argon2:a:b:c:d"));
-    assert_streq(desc.data.chacha20_argon2.token, "c");
+    // all but the version, the level and the passphrase can be empty, and so
+    // can the passphrase.
+    assert(passgen_random_desc_parse(&desc, "master:1:1::::"));
+    assert(!passgen_random_desc_parse(&desc, "master:1:1:::::"));
+    assert_streq(desc.data.master.passphrase, "");
+    assert_eq(desc.data.master.seed_size, 0);
+    assert_streq(desc.data.master.domain, "");
+    assert_streq(desc.data.master.user, "");
 
-    // each of them is at most 128 bytes.
-    char string[16 + 129 + 1] = "chacha20-argon2:";
-    memset(&string[16], 'x', 128);
-    string[16 + 128] = 0;
+    // colons and backslashes are escaped.
+    assert(passgen_random_desc_parse(
+        &desc,
+        "master:1:3:a\\:b\\\\::example.com\\:8443:\\\\"));
+    assert_eq(desc.data.master.level, 3);
+    assert_streq(desc.data.master.passphrase, "a:b\\");
+    assert_streq(desc.data.master.domain, "example.com:8443");
+    assert_streq(desc.data.master.user, "\\");
+
+    const char *invalid[] = {
+        "master:",
+        "master:1:2:pass:",
+        "master:1:2:pass::domain",
+        // one field too many
+        "master:1:2:pass::domain:user:",
+        "master:1:2:pass::domain:user:x",
+        // unknown versions and levels
+        "master:0:2:pass::domain:user",
+        "master:2:2:pass::domain:user",
+        "master:1:0:pass::domain:user",
+        "master:1:4:pass::domain:user",
+        "master::2:pass::domain:user",
+        "master:1::pass::domain:user",
+        "master:01:2:pass::domain:user",
+        "master:1:+2:pass::domain:user",
+        // seeds which are not whole bytes in hex
+        "master:1:2:pass:0:domain:user",
+        "master:1:2:pass:0g:domain:user",
+        "master:1:2:pass:0x00:domain:user",
+        // other backslashes
+        "master:1:2:pa\\ss::domain:user",
+        "master:1:2:pass::domain:user\\",
+    };
+    for(size_t i = 0; i < sizeof(invalid) / sizeof(invalid[0]); i++) {
+        assert(!passgen_random_desc_parse(&desc, invalid[i]));
+    }
+
+    // the passphrase, domain and user are at most 128 bytes each, which an
+    // escape counts as one of, and the seed is at most 64 bytes.
+    char string[256];
+    strcpy(string, "master:1:2:");
+    size_t start = strlen(string);
+    memset(&string[start], 'x', 127);
+    strcpy(&string[start + 127], "\\:::domain:user");
     assert(passgen_random_desc_parse(&desc, string));
-    assert_eq(strlen(desc.data.chacha20_argon2.passphrase), 128);
-    string[16 + 128] = 'x';
-    string[16 + 129] = 0;
+    assert_eq(strlen(desc.data.master.passphrase), 128);
+    memset(&string[start], 'x', 128);
+    strcpy(&string[start + 128], "\\:::domain:user");
+    assert(!passgen_random_desc_parse(&desc, string));
+
+    strcpy(string, "master:1:2:pass:");
+    start = strlen(string);
+    memset(&string[start], 'a', 128);
+    strcpy(&string[start + 128], ":domain:user");
+    assert(passgen_random_desc_parse(&desc, string));
+    assert_eq(desc.data.master.seed_size, 64);
+    memset(&string[start], 'a', 130);
+    strcpy(&string[start + 130], ":domain:user");
     assert(!passgen_random_desc_parse(&desc, string));
 
     return test_ok;
@@ -898,8 +1025,8 @@ test_result test_random_desc_secret(void) {
     const char *secret[] = {
         ("chacha20:" KEY),
         "chacha20:secretkey",
-        "chacha20-argon2:master:example.com:user",
-        "chacha20-argon2:",
+        "master:1:2:pass::example.com:user",
+        "master:",
         // not a known kind, but maybe a mistyped one
         "chacha:secretkey",
         "chacha20",
@@ -957,22 +1084,18 @@ test_result test_random_desc_open(void) {
     // keys are derived with the parameters which it has. the usual ones
     // are slow, and checked by the test vectors.
     passgen_random_desc desc;
-    assert(passgen_random_desc_parse(
-        &desc,
-        "chacha20-argon2:master:example.com:1"));
-    const passgen_argon2_params params = {.memory = 8, .passes = 1, .lanes = 1};
-    desc.data.chacha20_argon2.params = &params;
+    assert(passgen_random_desc_parse(&desc, "master:1:3:pass:00:example.com:1"));
+    desc.data.master.cost = &small_cost;
     passgen_random *parsed = passgen_random_desc_open(NULL, &desc);
-    passgen_random *opened = passgen_random_chacha20_argon2_open(
-        NULL,
-        "master",
-        "example.com",
-        "1",
-        &params);
-    assert(parsed && opened);
-    assert_eq(passgen_random_u64(parsed), passgen_random_u64(opened));
+    passgen_master master;
+    const uint8_t seed[1] = {0};
+    assert_eq(
+        PASSGEN_OK,
+        passgen_master_derive_cost(&master, 1, &small_cost, "pass", seed, 1));
+    assert(parsed);
+    assert_eq(passgen_random_u64(parsed), master_first(&master, "example.com", "1"));
     passgen_random_free(parsed);
-    passgen_random_free(opened);
+    passgen_master_wipe(&master);
 
     return test_ok;
 }

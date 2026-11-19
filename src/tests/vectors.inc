@@ -2,6 +2,7 @@
 //
 // VECTOR(randomness source, pattern, expected output)
 // WORD(word in the wordlist named `words`)
+// HASH(master passphrase, level, seed in hex, expected hash in hex)
 
 WORD("alpha")
 WORD("bravo")
@@ -11,636 +12,1020 @@ WORD("echo")
 WORD("foxtrot")
 WORD("gr\303\266\303\237e")
 
-VECTOR("chacha20-argon2:master",
+HASH("master", 1, "", "fd9157318a906c8d79d4d4b77f6540a88ee15ddbc9ab49f2f9099220e9acaadb")
+HASH("master", 2, "", "e1581cf79b3246e00935ac76cb83bb0b21742ef1d8356b38279b242ad951fb6d")
+HASH("other", 1, "", "d1a052ec47d2cf1e2c711ecb1e66a2e7c9d179012c31af2c48773fb00a5ad7a4")
+HASH("master", 1, "73656564", "5ef09a8c2ff0c6e22c6079ad2e5d04374aee7986660fbe761435b75ef23e574d")
+HASH("p\303\244ssw\303\266rd", 1, "", "414cb9298e1843c4444f35836bc3836d02a4ba56fcd3da62aa660cf8f3407ed5")
+
+VECTOR("master:1:1:master:::",
        "[a-z]{16}",
-       "rurpascoxhbaxodg")
-VECTOR("chacha20-argon2:master",
+       "xcqzohkaqdfkwkwe")
+VECTOR("master:1:1:master:::",
        "[a-zA-Z0-9]{32}",
-       "HqnFWI2EN710NkZ6YhyEJXNYF984RhoR")
-VECTOR("chacha20-argon2:master",
+       "SN2wGvkdAQ0G35AsAMa0tRC5x9D6M1EA")
+VECTOR("master:1:1:master:::",
        "[0-9a-f]{32}",
-       "141f022e77107fe362bce3172f984bb2")
-VECTOR("chacha20-argon2:master",
+       "c7e2a09e7aa0035a6a6407bc5b9d661e")
+VECTOR("master:1:1:master:::",
        "[ab]{16}",
-       "babbaaaabbbabbab")
-VECTOR("chacha20-argon2:master",
+       "abaaaababaaaabba")
+VECTOR("master:1:1:master:::",
        "(abc|def|ghi){4}",
-       "defabcdefabc")
-VECTOR("chacha20-argon2:master",
+       "abcghighighi")
+VECTOR("master:1:1:master:::",
        "(a|b|c|d){8}",
-       "babdaccc")
-VECTOR("chacha20-argon2:master",
+       "adcccabc")
+VECTOR("master:1:1:master:::",
        "[a-z]{4,12}",
-       "urpas")
-VECTOR("chacha20-argon2:master",
+       "cqzohkaqdfk")
+VECTOR("master:1:1:master:::",
        "(ab?c?){6}",
-       "aababcaabca")
-VECTOR("chacha20-argon2:master",
-       "(why|how|what)\\?{1,3}",
-       "how?")
-VECTOR("chacha20-argon2:master",
-       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
-       "[b[-]][----+-,-,ZZ]]\\]\\[")
-VECTOR("chacha20-argon2:master",
-       "([a-z]{2,4}-){3}[0-9]{2}",
-       "urp-sc-xhba-73")
-VECTOR("chacha20-argon2:master",
-       "[ba]{16}",
-       "babbaaaabbbabbab")
-VECTOR("chacha20-argon2:master",
-       "[aab]{24}",
-       "aaaabbbaabbbababaaabbaba")
-VECTOR("chacha20-argon2:master",
-       "[a-zc0-9a-f]{24}",
-       "dcpd2cg710gs6rceqgrc984k")
-VECTOR("chacha20-argon2:master",
-       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
-       "rurpascopsfq")
-VECTOR("chacha20-argon2:master",
-       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
-       "abcab1410x2")
-VECTOR("chacha20-argon2:master",
-       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
-       "g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207g\304\231\305\233l\304\205\305\233\305\274\305\274\305\274")
-VECTOR("chacha20-argon2:master",
-       "\\w{words}(-\\w{words}){3}",
-       "bravo-echo-bravo-alpha")
-VECTOR("chacha20-argon2:master",
-       "\\w{words}{1,3}[0-9]",
-       "echobravo0")
-VECTOR("chacha20-argon2:master",
-       "[a-z]{200}",
-       "rurpascoxhbaxodgclotbxcpjielszgnnmtjztnptrxmjtuemdukkgxperfcfwwloarlvflhbdyobgflojurncckrkrtjnsvodmrpzqyesnbnbjerxclyhqjcnyfmyteckrqnbmfesfutlczatcdnpnxybklawmanmdopzwwtqjkqlyxoiuukoptbzkajmxdmfqgeoxo")
-VECTOR("chacha20-argon2:master",
-       "([a-zA-Z0-9]{8}-){40}",
-       "HqnFWI2E-N710NkZ6-YhyEJXNY-F984RhoR-UPcDUDip-fvpDFpnN-CfzpVqxa-iZqgA6TN-laH5YbzU-MMhwk0Hh-r5h713uE-X65BEfVq-HDYYUgHg-nJ9joLEZ-CwnRFvmO-4wIjXD1f-4Ht2BRud-GfYDO5yi-OJa2gnGD-XRC54I5K-phS2v0JU-Y3QDljtu-1gBWsC0D-CZQEFPMS-sJm9wxAm-BOtE8qqA-kFp1vSgW-wfitZC5R-wGcaEtEl-PpGjmUPR-qeE7yk6Y-9hAkxE6h-bjSEOVoj-OPT6Yd9m-YUzRqoBg-QUZMGIGa-15JTBWD4-QJWoUI8D-vK0pJHUR-kneJF8bM-")
-VECTOR("chacha20-argon2:master:example.com",
-       "[a-z]{16}",
-       "xxrstvbzarpubsur")
-VECTOR("chacha20-argon2:master:example.com",
-       "[a-zA-Z0-9]{32}",
-       "NtHopQr1PV0nFKXoqnIBzElg8KnKqjqm")
-VECTOR("chacha20-argon2:master:example.com",
-       "[0-9a-f]{32}",
-       "7f7123a519f01f41241f2bdefa84144d")
-VECTOR("chacha20-argon2:master:example.com",
-       "[ab]{16}",
-       "bbbbababbbbabbab")
-VECTOR("chacha20-argon2:master:example.com",
-       "(abc|def|ghi){4}",
-       "defghighidef")
-VECTOR("chacha20-argon2:master:example.com",
-       "(a|b|c|d){8}",
-       "dddbcdcb")
-VECTOR("chacha20-argon2:master:example.com",
-       "[a-z]{4,12}",
-       "xrstvbzarpu")
-VECTOR("chacha20-argon2:master:example.com",
-       "(ab?c?){6}",
-       "acabcabacabcac")
-VECTOR("chacha20-argon2:master:example.com",
-       "(why|how|what)\\?{1,3}",
-       "how???")
-VECTOR("chacha20-argon2:master:example.com",
-       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
-       "[]a]c[[-,+,-+,-,\\]\\ZZ[ZZ")
-VECTOR("chacha20-argon2:master:example.com",
-       "([a-z]{2,4}-){3}[0-9]{2}",
-       "stv-zar-bs-41")
-VECTOR("chacha20-argon2:master:example.com",
-       "[ba]{16}",
-       "bbbbababbbbabbab")
-VECTOR("chacha20-argon2:master:example.com",
-       "[aab]{24}",
-       "abbaaaaaaabaababbaaaaaaa")
-VECTOR("chacha20-argon2:master:example.com",
-       "[a-zc0-9a-f]{24}",
-       "gdj1io0ceqdacz8eeg4mgewc")
-VECTOR("chacha20-argon2:master:example.com",
-       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
-       "xxrstvbzjcme")
-VECTOR("chacha20-argon2:master:example.com",
-       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
-       "abcab7712y5")
-VECTOR("chacha20-argon2:master:example.com",
-       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
-       "g\304\231\305\233l\304\205ja\305\272\305\204ja\305\272\305\204\305\273\305\273\305\273\305\233")
-VECTOR("chacha20-argon2:master:example.com",
-       "\\w{words}(-\\w{words}){3}",
-       "bravo-charlie-delta-charlie")
-VECTOR("chacha20-argon2:master:example.com",
-       "\\w{words}{1,3}[0-9]",
-       "charliedelta5")
-VECTOR("chacha20-argon2:master:example.com",
-       "[a-z]{200}",
-       "xxrstvbzarpubsurslopkiuruunuqxexthruqpsmkqkzvdrhowdtnozxdogstoeezwqcgpyllrnjhontpurtpsrmmnwheljwastcejqcogeuhieoefpsaqqxjpfyyqsgcdgaywjijmrjvwczbjvogpltthklsvbqpzfpxigqdrpmsvctzifbfnuqfikwnvurwouluhbg")
-VECTOR("chacha20-argon2:master:example.com",
-       "([a-zA-Z0-9]{8}-){40}",
-       "NtHopQr1-PV0nFKXo-qnIBzElg-8KnKqjqm-N4TNJdzn-qyGlxoTi-AmAPrRZy-HdksZpjE-vt3EcIpk-44PsG2cl-UzOhBwHS-DfdEjpFK-SnplonCC-jxSMd4SB-UT9sWoJy-Y49mYkVc-UaKd8aEw-45wFoSWV-mmt9lbuO-mo6VYZ60-OMyf8fiH-zfxyLTs2-vXfLEclB-pJdghILQ-XGlvblNe-cUmZnlio-rYpPTQRe-bT1bjKG5-xegMDLqS-HMkxKBK7-XcPhr3gr-wG3oE6yD-G05nHtMN-L5HFfzz4-fQQ0B4E8-Y7rJ8q2l-0yetnk2r-BxLVx06i-2CAdH5qe-3ZLeXysl-")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "[a-z]{16}",
-       "etducbeptdlzykhq")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "[a-zA-Z0-9]{32}",
-       "4pZKYX4Fxp3hvOgdGx2esOw6QuWB2D6c")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "[0-9a-f]{32}",
-       "4334214fb33bf98a70b2868a6a80b2d6")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "[ab]{16}",
-       "abbaababbbbbbbaa")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "(abc|def|ghi){4}",
-       "abcabcghidef")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "(a|b|c|d){8}",
-       "addacbad")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "[a-z]{4,12}",
-       "tducbept")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "(ab?c?){6}",
-       "acaabcabcaac")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "(why|how|what)\\?{1,3}",
-       "why?")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
-       "baab][ba,+-+-+-+\\\\\\ZZ]\\[")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "([a-z]{2,4}-){3}[0-9]{2}",
-       "td-cb-pt-39")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "[ba]{16}",
-       "abbaababbbbbbbaa")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "[aab]{24}",
-       "aabaaaababababbbaababbaa")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "[a-zc0-9a-f]{24}",
-       "4serq4c3hzwc2xh6jpa2b6vb")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
-       "etducbepmnjz")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
-       "abcab4334x1")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
-       "za\305\274\303\263\305\202\304\207za\305\274\303\263\305\202\304\207ja\305\272\305\204\305\273\305\233\305\273\305\233")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "\\w{words}(-\\w{words}){3}",
-       "echo-delta-delta-echo")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "\\w{words}{1,3}[0-9]",
-       "delta3")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "[a-z]{200}",
-       "etducbeptdlzykhqciwygyalcnggmfooirdvmwfcynurjtmuottgatzgnqgwsgzsebrucnucofmngjjkvevhdthseutntvdodzpwmfwhdznoclxfykjprczkokvlojjdwtjdskiygqdwlopbgbgzycaxmzebyyornumvduitpfcfawfpnsxlokyigilggtjmtnmnecfa")
-VECTOR("chacha20-argon2:master:example.com:user",
-       "([a-zA-Z0-9]{8}-){40}",
-       "4pZKYX4F-xp3hvOgd-Gx2esOw6-QuWB2D6c-C5ESE8n3-riMb2Ojq-UHfpiKkJ-JRcWpvcj-Vm6Mo6Po-aXTnRqYR-DVKzYSE5-ijc99Ar4-LdZpdo4K-pDJr3k3P-TylzsCbM-d3wPDk2h-TtbOA9Fn-YvgEALBT-USk9fw3s-pf3ogeu6-GZsRhEzl-XcXcUvuY-WNCP4zXu-uEnDKCUr-3qeJl52w-b0Mblwjo-thEAOece-Bc6pfVCp-DCDT4TYb-0ZGpCj8w-kWS6svuo-gVBH8jww-INsEdjfy-cPakgMmW-DBqktR7y-MXsUu03w-WWcSNrq2-QmUS0V9j-Qj0hcBH5-LIKD7AwU-")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "[a-z]{16}",
-       "emfnivdxwntfgtgx")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "[a-zA-Z0-9]{32}",
-       "4C5VjerZtszDJb6J6Ng4jjj9HvyfsWoD")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "[0-9a-f]{32}",
-       "4c5fd85376ded356367a4dded919c960")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "[ab]{16}",
-       "aabbbabbbababbba")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "(abc|def|ghi){4}",
-       "abcabcdefdef")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "(a|b|c|d){8}",
-       "aabdbabd")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "[a-z]{4,12}",
-       "mfnivdxw")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "(ab?c?){6}",
-       "acabaaacab")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "(why|how|what)\\?{1,3}",
-       "why?")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
-       "bbcc-cac-,,---+,[\\[[[[Z[")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "([a-z]{2,4}-){3}[0-9]{2}",
-       "mf-ivd-ntfg-36")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "[ba]{16}",
-       "aabbbabbbababbba")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "[aab]{24}",
-       "aaaaaababaabbbaaabaaaaaa")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "[a-zc0-9a-f]{24}",
-       "4b5oxsbeu6e6gz49dypbx33a")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
-       "emfnivdxqzxy")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
-       "abcab4585y7")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
-       "za\305\274\303\263\305\202\304\207za\305\274\303\263\305\202\304\207g\304\231\305\233l\304\205\305\273\305\233\305\273\305\274")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "\\w{words}(-\\w{words}){3}",
-       "echo-echo-foxtrot-foxtrot")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "\\w{words}{1,3}[0-9]",
-       "echo5")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "[a-z]{200}",
-       "emfnivdxwntfgtgxkennnjrzjwasnziddkcmjzrpqcshrathupucpgkplvybmzbzarevnyhswdddrqxxliztccfugovcfwmitjxihmydfwrsfgsmmvhjbcmsmqbjudzsplanwdsizvbxuyciupsxqvlhwejocynpkzpylgxodxwusuybsstlqsghcoiloajiqvywkxoi")
-VECTOR("chacha20-argon2:other:example.com:user",
-       "([a-zA-Z0-9]{8}-){40}",
-       "4C5VjerZ-tszDJb6J-6Ng4jjj9-HvyfsWoD-ve3y3AYi-fPnlG2I7-HWpS7Klq-YFz6AlBr-uXiv1PWn-4rDOdRRI-s3ZSZHGz-NNB8vp2R-VYV5K6kL-2bMRieJf-t87iu35M-HoRbQ6oC-ziL79R1Y-ioim1fqZ-PIFBWDzs-3oePzrXN-quYUyw8q-FotGLRB7-Ma9E2uDl-gPFuhctk-3tsqoKuz-XoIphmoU-67YkeBEW-f8mLusAN-EeE3DshR-xP2KBqTU-KqeCezvy-UTnCw58Y-xSeGd4p5-PtRKJF92-JJDaI9h0-A2HwuwHE-eNbfkjXx-1KTSoxCj-RMNejKx0-QOGex7W2-")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "[a-z]{16}",
-       "jmnpalnrvljlaepv")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "[a-zA-Z0-9]{32}",
-       "fCzDFWhjHLQh9hRWaFTrkhFjXPYrMWfg")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "[0-9a-f]{32}",
-       "9cddf0bd15ab9bb04fd5ebfd19e2560e")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "[ab]{16}",
-       "babbbabbbbabbbba")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "(abc|def|ghi){4}",
-       "defabcdefdef")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "(a|b|c|d){8}",
-       "babbdadb")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "[a-z]{4,12}",
-       "lnrv")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "(ab?c?){6}",
-       "acaacababca")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "(why|how|what)\\?{1,3}",
-       "how?")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
-       "[bcc-ac[,-,++,,-]][[[\\\\[")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "([a-z]{2,4}-){3}[0-9]{2}",
-       "mnp-ln-vlj-04")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "[ba]{16}",
-       "babbbabbbbabbbba")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "[aab]{24}",
-       "aaaaaaaabaaaaabaaabbabab")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "[a-zc0-9a-f]{24}",
-       "ybbcpdfj9kptcmcqirfpyzgu")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
-       "jmnpalnrqmmu")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
-       "abcab9015x9")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
-       "g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207g\304\231\305\233l\304\205\305\273\305\233\305\273\305\273")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "\\w{words}(-\\w{words}){3}",
-       "bravo-echo-foxtrot-foxtrot")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "\\w{words}{1,3}[0-9]",
-       "echofoxtrot0")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "[a-z]{200}",
-       "jmnpalnrvljlaepvolpnbzcvwajkxvflqmddiwfxnrawjtxlgrviwvngggqrhseddjkmllimfhztcspibgwrcodxoaslnkeqvjbpdbzwhoxfxaheotpzduyjstjevdgwsmlixfmfashtpegatjjlbythutqnbeevhmkgzzxnpvsjhwrfymfvhlssdsgjvcztvsanairi")
-VECTOR("chacha20-argon2:master:example.org:user",
-       "([a-zA-Z0-9]{8}-){40}",
-       "fCzDFWhj-HLQh9hRW-aFTrkhFj-XPYrMWfg-NrbhmQyC-338TsbtV-DTn0ysfp-Nh6nL8sL-jcc6GHdI-aw3ZfAih-BeC57vJ2-oUF816MQ-SH2EZNSk-0SIhDA4x-mUrfXlZU-1Ps7EtVw-btWdaEJl-P3qQOwfy-zIpfaLZT-6MICB8yQ-t5i5WodJ-l4y6WJxf-y9hQT1yO-JdyqpGVD-X44SL7Cg-QcvPtDlL-of7sHy5O-i5L7hII3-o6fLYvyp-rI0DW8He-ugFEum9p-VjRLQnXx-U3lJ1BqJ-Pc21Grp8-WxiFPX8d-EwL3IOya-YO5NdEMn-ueMSARGP-Swv6NB0e-Y2U7UuZF-")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "[a-z]{16}",
-       "myspfozfkrptjqfq")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "[a-zA-Z0-9]{32}",
-       "COolbkP5gHFpzfG5Gxed79pTifGXItW6")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "[0-9a-f]{32}",
-       "c82f5e95a1f3d9050b87793dc9012706")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "[ab]{16}",
-       "aaabbabbabbbbbab")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "(abc|def|ghi){4}",
-       "abcabcghidef")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "(a|b|c|d){8}",
-       "aacdbcbb")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "[a-z]{4,12}",
-       "spfozfkrptjq")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "(ab?c?){6}",
-       "abaaabaca")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "(why|how|what)\\?{1,3}",
-       "why?")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
-       "b-]c[c][,,+,++,,Z[Z[\\]Z\\")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "([a-z]{2,4}-){3}[0-9]{2}",
-       "ys-ozf-rptj-05")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "[ba]{16}",
-       "aaabbabbabbbbbab")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "[aab]{24}",
-       "aababaabaaaaaaaaaaaaabab")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "[a-zc0-9a-f]{24}",
-       "bhui5zdcyc5cxw79mycqdp65")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
-       "myspfozfcfzu")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
-       "abcab8259y1")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
-       "za\305\274\303\263\305\202\304\207za\305\274\303\263\305\202\304\207ja\305\272\305\204\305\273\305\274\305\273\305\273")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "\\w{words}(-\\w{words}){3}",
-       "echo-alpha-charlie-foxtrot")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "\\w{words}{1,3}[0-9]",
-       "alpha2")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "[a-z]{200}",
-       "myspfozfkrptjqfqihhjtmjqbsxagpffxxotqiosuizdxpitqgmavfzlilxrxlyugpicfyazsatjdhiwrgtbhkqssutpvfrngkmppokucvxtvmmmxypfbhdcshdhgnkzpdvofpgalanwmntllxkusruatatimdkssxvpjcyirapassfguwxsrjqnxzdtivjdkirhkpso")
-VECTOR("chacha20-argon2:master:example.com:admin",
-       "([a-zA-Z0-9]{8}-){40}",
-       "COolbkP5-gHFpzfG5-Gxed79pT-ifGXItW6-l55UtNEp-GweQEIQq-8wv3NyTl-8JmVcC0L-bUPSTh8B-NHthTOKc-F8YbOWRP-oWJ93d8M-ncp1dgmS-IoKJFrbH-DcgCFlEA-SKYLNprC-iCyNuF5X-Qd32o7wZ-7cjgvzlZ-rkbl6WB0-jsiDphhN-xgqonqQW-JxWpeyiZ-AoIVtTLF-fYO8HWFW-II5cqsNo-nfxGSUwR-DNv3peLV-9ZAeVn7g-Fokvl0pr-IqAVyUNT-NO5sLj7h-TFVbQm6V-Zsdu4fLl-EkTkDCNs-j34F7wwM-5We2EzKn-1jTC2IpB-R2CvHSdK-YQmVf0Se-")
-VECTOR("chacha20-argon2:master::user",
-       "[a-z]{16}",
-       "jtyxzrxcqqsvuymc")
-VECTOR("chacha20-argon2:master::user",
-       "[a-zA-Z0-9]{32}",
-       "SQfpuwtPHNYmSGyILqOyi2EGmYUEz5d7")
-VECTOR("chacha20-argon2:master::user",
-       "[0-9a-f]{32}",
-       "ca938a791720c0c2548cc2e002eed577")
-VECTOR("chacha20-argon2:master::user",
-       "[ab]{16}",
-       "aabbaabbbbaaaaaa")
-VECTOR("chacha20-argon2:master::user",
-       "(abc|def|ghi){4}",
-       "abcghidefabc")
-VECTOR("chacha20-argon2:master::user",
-       "(a|b|c|d){8}",
-       "acbdacdb")
-VECTOR("chacha20-argon2:master::user",
-       "[a-z]{4,12}",
-       "yxzrxcq")
-VECTOR("chacha20-argon2:master::user",
-       "(ab?c?){6}",
-       "abcabcabcacacac")
-VECTOR("chacha20-argon2:master::user",
+       "ababcabaaac")
+VECTOR("master:1:1:master:::",
        "(why|how|what)\\?{1,3}",
        "why???")
-VECTOR("chacha20-argon2:master::user",
+VECTOR("master:1:1:master:::",
        "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
-       "b][a-][[-++++-,+ZZZ\\\\ZZ\\")
-VECTOR("chacha20-argon2:master::user",
+       "b]]-[]]-+,----++]]Z[][[\\")
+VECTOR("master:1:1:master:::",
        "([a-z]{2,4}-){3}[0-9]{2}",
-       "jt-xz-xcq-02")
-VECTOR("chacha20-argon2:master::user",
+       "xc-qzoh-aqdf-66")
+VECTOR("master:1:1:master:::",
        "[ba]{16}",
-       "aabbaabbbbaaaaaa")
-VECTOR("chacha20-argon2:master::user",
+       "abaaaababaaaabba")
+VECTOR("master:1:1:master:::",
        "[aab]{24}",
-       "abaabaabaaaabaaaaabbaabb")
-VECTOR("chacha20-argon2:master::user",
+       "abbbaabbbaaabbbbaaaaaabb")
+VECTOR("master:1:1:master:::",
        "[a-zc0-9a-f]{24}",
-       "ljyidgrlcdfh2ccrnc5w76lf")
-VECTOR("chacha20-argon2:master::user",
+       "lg2cwaj0c35aaft0kb59b6f1")
+VECTOR("master:1:1:master:::",
        "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
-       "jtyxzrxcllpt")
-VECTOR("chacha20-argon2:master::user",
+       "xcqzohkauptz")
+VECTOR("master:1:1:master:::",
        "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
-       "abcab9387y1")
-VECTOR("chacha20-argon2:master::user",
+       "abcab7209x7")
+VECTOR("master:1:1:master:::",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
-       "za\305\274\303\263\305\202\304\207ja\305\272\305\204g\304\231\305\233l\304\205\305\233\305\274\305\273\305\273")
-VECTOR("chacha20-argon2:master::user",
+       "za\305\274\303\263\305\202\304\207ja\305\272\305\204ja\305\272\305\204\305\274\305\233\305\273\305\274")
+VECTOR("master:1:1:master:::",
        "\\w{words}(-\\w{words}){3}",
-       "echo-charlie-bravo-delta")
-VECTOR("chacha20-argon2:master::user",
+       "echo-gr\303\266\303\237e-charlie-charlie")
+VECTOR("master:1:1:master:::",
        "\\w{words}{1,3}[0-9]",
-       "charlie9")
-VECTOR("chacha20-argon2:master::user",
+       "gr\303\266\303\237e2")
+VECTOR("master:1:1:master:::",
        "[a-z]{200}",
-       "jtyxzrxcqqsvuymcoqqcofhhgwdynqabvdeufvqymgxknnxjjwjedoufaplbzlummfmbpgxmqofslvocvorsgqstppbixwshlravjmdfmvcibvrsyvjuuvpovccyumudctauwizsjtpcngyevpxefzghykttifqayxcwbpuvinbwvvuornstteblmuckzuxzjlylpyug")
-VECTOR("chacha20-argon2:master::user",
+       "xcqzohkaqdfkwkweaxmfjngwbokmrdbtptqvaxkyapfmxoecibzrdefijkuefurcdgjrijzdevdwbrtfftkqnmaxzhyigteluynxihdfmhdgworxnqyfnqnqbopiscvyplvtfovkrmmsvwarqffllfjyvukrzitutkizvzmekxonqbzupsnhjxxdszomnjnfldbudzkh")
+VECTOR("master:1:1:master:::",
        "([a-zA-Z0-9]{8}-){40}",
-       "SQfpuwtP-HNYmSGyI-LqOyi2EG-mYUEz5d7-6SM3OjG0-1LZaq5Lm-OC6NgUjD-Vt99M94Z-EQK5WlBX-PBqCTi5V-Tiw1l6wy-tiGk5VxT-oBLkYULE-HIR6mowp-FFX8NQMo-7hnQ0rfi-Z5Cry281-VrnIROLf-KyKLFkr2-YOKUUiqR-Z2wJWqM8-PI9wJyl2-j6u4rlVt-4zbv67ug-JJe5Vm0Q-uNYQs1Rl-qrej1Mrr-qkHjoJJa-1hCK2gvq-NPSxTfhz-OBlOqcrj-SSLdZ8MU-e6scczEJ-jNCWfYdF-NbiMvOF0-SF6GX56x-NNbderVm-CXTmvBm8-ysX7d2yY-a80fNnCt-")
-VECTOR("chacha20-argon2::master:example.com",
+       "SN2wGvkd-AQ0G35As-AMa0tRC5-x9D6M1EA-SCHZXRwp-lJGr0tAO-Wxl5itE4-2e1vHZay-x589gKab-KH2Zcx9n-e9P3arZM-XnpbbJRg-GDi0Nv7O-e6J4BqOj-NwSeSd3R-bi7ZcysE-TnztjGVu-bjmjGXEF-eRIYLuFy-BrpxbkLg-HiCoLQs0-Hm55hxB5-9urKAnPy-8pqpA8Px-LPCzaANk-jG1PKFoj-dfNt3IPk-CD9DbB3X-UKZPgddb-d9ZeBCm7-sTph6uH6-9uC3wzsh-wvxopwyA-AxvgVqgn-gUVe8bT6-YWCy1PXY-coSqytih-xlsfADOt-QCTgHZ91-TVMxs8Qz-")
+VECTOR("master:1:1:master::example.com:",
        "[a-z]{16}",
-       "xxrstvbzarpubsur")
-VECTOR("chacha20-argon2::master:example.com",
+       "skaqjxtmiqlzjmju")
+VECTOR("master:1:1:master::example.com:",
        "[a-zA-Z0-9]{32}",
-       "NtHopQr1PV0nFKXoqnIBzElg8KnKqjqm")
-VECTOR("chacha20-argon2::master:example.com",
+       "IxgTzWmftpieGhRP9iTT9Uq52NzN74EU")
+VECTOR("master:1:1:master::example.com:",
        "[0-9a-f]{32}",
-       "7f7123a519f01f41241f2bdefa84144d")
-VECTOR("chacha20-argon2::master:example.com",
+       "2badd00973c80bb99cdd9e45e27d774e")
+VECTOR("master:1:1:master::example.com:",
        "[ab]{16}",
-       "bbbbababbbbabbab")
-VECTOR("chacha20-argon2::master:example.com",
+       "ababbaabbbaaabbb")
+VECTOR("master:1:1:master::example.com:",
        "(abc|def|ghi){4}",
-       "defghighidef")
-VECTOR("chacha20-argon2::master:example.com",
+       "ghighidefdef")
+VECTOR("master:1:1:master::example.com:",
        "(a|b|c|d){8}",
-       "dddbcdcb")
-VECTOR("chacha20-argon2::master:example.com",
+       "cdcbbaab")
+VECTOR("master:1:1:master::example.com:",
        "[a-z]{4,12}",
-       "xrstvbzarpu")
-VECTOR("chacha20-argon2::master:example.com",
+       "kaqjxt")
+VECTOR("master:1:1:master::example.com:",
        "(ab?c?){6}",
-       "acabcabacabcac")
-VECTOR("chacha20-argon2::master:example.com",
+       "abcaacaaba")
+VECTOR("master:1:1:master::example.com:",
+       "(why|how|what)\\?{1,3}",
+       "what???")
+VECTOR("master:1:1:master::example.com:",
+       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
+       "]a]cc--[+++,,+,,[\\Z[\\\\][")
+VECTOR("master:1:1:master::example.com:",
+       "([a-z]{2,4}-){3}[0-9]{2}",
+       "kaqj-iq-jmj-45")
+VECTOR("master:1:1:master::example.com:",
+       "[ba]{16}",
+       "ababbaabbbaaabbb")
+VECTOR("master:1:1:master::example.com:",
+       "[aab]{24}",
+       "bbaaaaaaaaaaaaaabaabbaab")
+VECTOR("master:1:1:master::example.com:",
+       "[a-zc0-9a-f]{24}",
+       "dzmpyxcki9mm9n52gg74cnch")
+VECTOR("master:1:1:master::example.com:",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "skaqjxtmlqvz")
+VECTOR("master:1:1:master::example.com:",
+       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
+       "abcab2009y3")
+VECTOR("master:1:1:master::example.com:",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "ja\305\272\305\204ja\305\272\305\204g\304\231\305\233l\304\205\305\273\305\233\305\233\305\273")
+VECTOR("master:1:1:master::example.com:",
+       "\\w{words}(-\\w{words}){3}",
+       "charlie-delta-charlie-foxtrot")
+VECTOR("master:1:1:master::example.com:",
+       "\\w{words}{1,3}[0-9]",
+       "deltacharliefoxtrot0")
+VECTOR("master:1:1:master::example.com:",
+       "[a-z]{200}",
+       "skaqjxtmiqlzjmjufcxxheoqpyohqqcntmftxijnfyaupciqsmtgmbczezjywppgfjifciatrnisdiburcdyloujvodmjuexkljhfsvpwbxihdacgqkxcdhdogrsbweyiiwojsoyacvuvrvapyhlgzmldchnmvfooemjfxdzlzpmfsmlaipjevhyfkowxpfklykiybgg")
+VECTOR("master:1:1:master::example.com:",
+       "([a-zA-Z0-9]{8}-){40}",
+       "IxgTzWmf-tpieGhRP-9iTT9Uq5-2NzN74EU-mFOE7GmY-jpC5JRNe-9D5O0KFY-emoip6C1-YRPTaPfz-OMFFw6Rb-febyz2e0-pnzSyD8I-y3e1KnY3-OhEKfrEw-3CVx9Kx4-NgTBf7bI-rlsXtU8T-73026yRG-gt2Z73k6-xynI1M4u-88skfIku-W2zrKrnr-WlOdhcvC-B32djixL-5Ekw4CfT-zbTN3xPB-PlC5oih0-el94L7xV-ObAkVstl-bghOAeOX-Qc6Kmoey-49X2UM9G-YeaMhqkT-E8EMnEXB-vRzf8pGL-1YqLVS4v-8LkIGkUf-Te9qCB7o-LbyVJSZg-GMWvfLvW-")
+VECTOR("master:1:1:master::example.com:user",
+       "[a-z]{16}",
+       "gpvanzgyqoypmyra")
+VECTOR("master:1:1:master::example.com:user",
+       "[a-zA-Z0-9]{32}",
+       "cwlrWjPcuVGEOlCunW79jBSLCQLSuoRL")
+VECTOR("master:1:1:master::example.com:user",
+       "[0-9a-f]{32}",
+       "6af50d968f0e8fc81e079dbc5ca5fc82")
+VECTOR("master:1:1:master::example.com:user",
+       "[ab]{16}",
+       "aabbabbaabaaabaa")
+VECTOR("master:1:1:master::example.com:user",
+       "(abc|def|ghi){4}",
+       "ghighidefabc")
+VECTOR("master:1:1:master::example.com:user",
+       "(a|b|c|d){8}",
+       "ccdbabbc")
+VECTOR("master:1:1:master::example.com:user",
+       "[a-z]{4,12}",
+       "pvanzgyqoy")
+VECTOR("master:1:1:master::example.com:user",
+       "(ab?c?){6}",
+       "aabaababa")
+VECTOR("master:1:1:master::example.com:user",
+       "(why|how|what)\\?{1,3}",
+       "what???")
+VECTOR("master:1:1:master::example.com:user",
+       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
+       "]c-c[---++,-+,,+[Z\\[]ZZ\\")
+VECTOR("master:1:1:master::example.com:user",
+       "([a-z]{2,4}-){3}[0-9]{2}",
+       "pvan-gyq-ypmy-10")
+VECTOR("master:1:1:master::example.com:user",
+       "[ba]{16}",
+       "aabbabbaabaaabaa")
+VECTOR("master:1:1:master::example.com:user",
+       "[aab]{24}",
+       "bbaaaabaabaaaabaaaaaabaa")
+VECTOR("master:1:1:master::example.com:user",
+       "[a-zc0-9a-f]{24}",
+       "vpivocchbp79alfbjflkfp57")
+VECTOR("master:1:1:master::example.com:user",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "gpvanzgyugzw")
+VECTOR("master:1:1:master::example.com:user",
+       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
+       "abcab6509x8")
+VECTOR("master:1:1:master::example.com:user",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "ja\305\272\305\204ja\305\272\305\204g\304\231\305\233l\304\205\305\233\305\273\305\273\305\274")
+VECTOR("master:1:1:master::example.com:user",
+       "\\w{words}(-\\w{words}){3}",
+       "gr\303\266\303\237e-charlie-foxtrot-alpha")
+VECTOR("master:1:1:master::example.com:user",
+       "\\w{words}{1,3}[0-9]",
+       "charliefoxtrotalpha9")
+VECTOR("master:1:1:master::example.com:user",
+       "[a-z]{200}",
+       "gpvanzgyqoypmyrahjnlvmvysvwafhqaacyezmpraryuaisdejvcovhkzxxgckzlubhabbkibxmpwnmqedswinsudpjtrglucxukcwiukebobsdtjrlyvztlaoeqkdulrhxrkewynooodbxevsatwtwhnifkkzdyrxfmgywyotfcvqbomcnrfmuylshooskoknyosbxz")
+VECTOR("master:1:1:master::example.com:user",
+       "([a-zA-Z0-9]{8}-){40}",
+       "cwlrWjPc-uVGEOlCu-nW79jBSL-CQLSuoRL-sW57GWW2-xu4Pwwzi-lHWnuK08-I3aSU9r2-kLdgvNtc-2xAPBqX7-QWX1ge1t-CFsDCm4y-ZoM8DIqU-ZlfpncUh-q2tKzgYs-8qg4XEXI-3pfHBxOL-vJB0k4mU-gwZSqSBn-dRtng4sO-DkkEV3Xt-4LIWzJsJ-MdD8bAgP-ZOHNbCw6-uMROkUpz-52TrQG1E-CYUjHbiU-KuUBRo7E-EogEADuE-oTXNv0qA-8jddpr0G-cbX995IG-T7b9IpU1-TyhIhd7o-baV3iasW-j55QAGaZ-OCJkhMLI-NqkVmSAf-YPD7f6aC-GIp3rvGK-")
+VECTOR("master:1:1:other::example.com:user",
+       "[a-z]{16}",
+       "vkwqlmufdzkqqxkw")
+VECTOR("master:1:1:other::example.com:user",
+       "[a-zA-Z0-9]{32}",
+       "rgsQRUmhCq5ZvAzmGNgs3msywUBpplsS")
+VECTOR("master:1:1:other::example.com:user",
+       "[0-9a-f]{32}",
+       "5a6abe0bc4539ad007a6306caeb33fe6")
+VECTOR("master:1:1:other::example.com:user",
+       "[ab]{16}",
+       "baaabaabaabbbaba")
+VECTOR("master:1:1:other::example.com:user",
+       "(abc|def|ghi){4}",
+       "defghighighi")
+VECTOR("master:1:1:other::example.com:user",
+       "(a|b|c|d){8}",
+       "bcccdcad")
+VECTOR("master:1:1:other::example.com:user",
+       "[a-z]{4,12}",
+       "kwqlmufdz")
+VECTOR("master:1:1:other::example.com:user",
+       "(ab?c?){6}",
+       "acabaaaba")
+VECTOR("master:1:1:other::example.com:user",
        "(why|how|what)\\?{1,3}",
        "how???")
-VECTOR("chacha20-argon2::master:example.com",
+VECTOR("master:1:1:other::example.com:user",
        "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
-       "[]a]c[[-,+,-+,-,\\]\\ZZ[ZZ")
-VECTOR("chacha20-argon2::master:example.com",
+       "c]]a-abb,,-,++--]Z\\Z\\\\]]")
+VECTOR("master:1:1:other::example.com:user",
        "([a-z]{2,4}-){3}[0-9]{2}",
-       "stv-zar-bs-41")
-VECTOR("chacha20-argon2::master:example.com",
+       "kwq-uf-kqq-76")
+VECTOR("master:1:1:other::example.com:user",
        "[ba]{16}",
-       "bbbbababbbbabbab")
-VECTOR("chacha20-argon2::master:example.com",
+       "baaabaabaabbbaba")
+VECTOR("master:1:1:other::example.com:user",
        "[aab]{24}",
-       "abbaaaaaaabaababbaaaaaaa")
-VECTOR("chacha20-argon2::master:example.com",
+       "abbbbaaaaabaaabbababbbba")
+VECTOR("master:1:1:other::example.com:user",
        "[a-zc0-9a-f]{24}",
-       "gdj1io0ceqdacz8eeg4mgewc")
-VECTOR("chacha20-argon2::master:example.com",
+       "zjknb5sacgz3nalcolazd6ee")
+VECTOR("master:1:1:other::example.com:user",
        "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
-       "xxrstvbzjcme")
-VECTOR("chacha20-argon2::master:example.com",
+       "vkwqlmuftyvr")
+VECTOR("master:1:1:other::example.com:user",
        "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
-       "abcab7712y5")
-VECTOR("chacha20-argon2::master:example.com",
+       "abcab5604y3")
+VECTOR("master:1:1:other::example.com:user",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
-       "g\304\231\305\233l\304\205ja\305\272\305\204ja\305\272\305\204\305\273\305\273\305\273\305\233")
-VECTOR("chacha20-argon2::master:example.com",
+       "g\304\231\305\233l\304\205ja\305\272\305\204ja\305\272\305\204\305\274\305\274\305\233\305\233")
+VECTOR("master:1:1:other::example.com:user",
        "\\w{words}(-\\w{words}){3}",
-       "bravo-charlie-delta-charlie")
-VECTOR("chacha20-argon2::master:example.com",
+       "foxtrot-charlie-gr\303\266\303\237e-charlie")
+VECTOR("master:1:1:other::example.com:user",
        "\\w{words}{1,3}[0-9]",
-       "charliedelta5")
-VECTOR("chacha20-argon2::master:example.com",
+       "charliegr\303\266\303\237e0")
+VECTOR("master:1:1:other::example.com:user",
        "[a-z]{200}",
-       "xxrstvbzarpubsurslopkiuruunuqxexthruqpsmkqkzvdrhowdtnozxdogstoeezwqcgpyllrnjhontpurtpsrmmnwheljwastcejqcogeuhieoefpsaqqxjpfyyqsgcdgaywjijmrjvwczbjvogpltthklsvbqpzfpxigqdrpmsvctzifbfnuqfikwnvurwouluhbg")
-VECTOR("chacha20-argon2::master:example.com",
+       "vkwqlmufdzkqqxkwdqwlttpwpmvlkuszgmutqhgbdpdoismhftblixlhyxnzrskrljrqjestwalwxyhufnyzdglhzifvtgtzdrynydahhvescidpvihvdanguaaiohwkmfedlrnqvtaytvwuctftdevtrbpuzyngyompayogimezckyaklbmzljjfrqlvqovwdppzllt")
+VECTOR("master:1:1:other::example.com:user",
        "([a-zA-Z0-9]{8}-){40}",
-       "NtHopQr1-PV0nFKXo-qnIBzElg-8KnKqjqm-N4TNJdzn-qyGlxoTi-AmAPrRZy-HdksZpjE-vt3EcIpk-44PsG2cl-UzOhBwHS-DfdEjpFK-SnplonCC-jxSMd4SB-UT9sWoJy-Y49mYkVc-UaKd8aEw-45wFoSWV-mmt9lbuO-mo6VYZ60-OMyf8fiH-zfxyLTs2-vXfLEclB-pJdghILQ-XGlvblNe-cUmZnlio-rYpPTQRe-bT1bjKG5-xegMDLqS-HMkxKBK7-XcPhr3gr-wG3oE6yD-G05nHtMN-L5HFfzz4-fQQ0B4E8-Y7rJ8q2l-0yetnk2r-BxLVx06i-2CAdH5qe-3ZLeXysl-")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "rgsQRUmh-Cq5ZvAzm-GNgs3msy-wUBpplsS-FirVSBgq-Iv6iKJGd-c13FVZk8-Ii75xJxX-heNh7utj-vQnoAHhf-SHG94IwJ-sTWhQsUz-NOdq5DUO-PQz36Bz7-P8bRrJcx-pPz3nuzj-OZx07dSL-4IYe3Slr-87LZWD6K-TW0exkdx-sAC5aZhH-QjmLpT0O-pQLsqRw2-JbJ34rJH-1FqvOj6O-ECFy0uE6-8UyCavYg-u0AB1iPB-VffbnmBL-GErMZSFl-vhhJRfTr-0QTBLipm-mU3hCErf-2wUZatT0-U4WdqEwj-kODkdzhw-NQHRtkgm-B3RUJkqk-o8RF95jF-v65P4sY1-")
+VECTOR("master:1:1:master::example.org:user",
        "[a-z]{16}",
-       "xczyzyvyrzbgqfva")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "ccjkyppzycwzojak")
+VECTOR("master:1:1:master::example.org:user",
        "[a-zA-Z0-9]{32}",
-       "tR2vOvOrOnTSvUX6m5rW0ha4k80utSND")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "Y2fAOFFvwu2svk90SAmF4avTw5qKUDmb")
+VECTOR("master:1:1:master::example.org:user",
        "[0-9a-f]{32}",
-       "7b2989f8581dc9fe1605500bf44e8087")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "229a8ff9a8269e90ca0f449da544efd0")
+VECTOR("master:1:1:master::example.org:user",
        "[ab]{16}",
-       "bbababbababbabba")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "aabaabbbaaaababa")
+VECTOR("master:1:1:master::example.org:user",
        "(abc|def|ghi){4}",
-       "ghidefabcdef")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "ghighidefghi")
+VECTOR("master:1:1:master::example.org:user",
        "(a|b|c|d){8}",
-       "ddcbabda")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "ccbcaddb")
+VECTOR("master:1:1:master::example.org:user",
        "[a-z]{4,12}",
-       "czyzyvyrzbg")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "cjkypp")
+VECTOR("master:1:1:master::example.org:user",
        "(ab?c?){6}",
-       "ababcabcabacab")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "abababcababcac")
+VECTOR("master:1:1:master::example.org:user",
        "(why|how|what)\\?{1,3}",
-       "what??")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "what???")
+VECTOR("master:1:1:master::example.org:user",
        "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
-       "a][-[-c-,,+,-,-+[[ZZ]]ZZ")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "]][]-[]---,-,++-Z]ZZ[[\\[")
+VECTOR("master:1:1:master::example.org:user",
        "([a-z]{2,4}-){3}[0-9]{2}",
-       "zyzy-yrz-bgqf-50")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "cjky-ycw-oja-04")
+VECTOR("master:1:1:master::example.org:user",
        "[ba]{16}",
-       "bbababbababbabba")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "aabaabbbaaaababa")
+VECTOR("master:1:1:master::example.org:user",
        "[aab]{24}",
-       "baaaaaaaaaababaaaaaaabaa")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "bbabaababbabaaabaaaaabaa")
+VECTOR("master:1:1:master::example.org:user",
        "[a-zc0-9a-f]{24}",
-       "k2hhhmlnq65p0t480lgb55vf")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "r2yahcc290lac4tm5enbuple")
+VECTOR("master:1:1:master::example.org:user",
        "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
-       "xczyzyvynpyn")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "ccjkyppzgteb")
+VECTOR("master:1:1:master::example.org:user",
        "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
-       "abcab7298y8")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "abcab2298y9")
+VECTOR("master:1:1:master::example.org:user",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
-       "ja\305\272\305\204g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207\305\273\305\233\305\273\305\233")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "ja\305\272\305\204ja\305\272\305\204g\304\231\305\233l\304\205\305\274\305\233\305\273\305\274")
+VECTOR("master:1:1:master::example.org:user",
        "\\w{words}(-\\w{words}){3}",
-       "delta-charlie-bravo-alpha")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "charlie-charlie-bravo-charlie")
+VECTOR("master:1:1:master::example.org:user",
        "\\w{words}{1,3}[0-9]",
-       "bravoalphabravo8")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "charliebravocharlie8")
+VECTOR("master:1:1:master::example.org:user",
        "[a-z]{200}",
-       "xczyzyvyrzbgqfvaaleeoiayxxnffgywcyqxuxifejvifmgzvkccicdulmxxxufwplhvrvyxdjvcjfummbwttsmoaxakmyiwsdfkrqbkgjpqcofxtyfdjyvoxtzqxqswgrffckdhnnmukouabigwvriqdlqdgmxmmxqqahaalfoarbrgaefhfqydzwutttxuijmhizae")
-VECTOR("chacha20-argon2:p\303\244ssw\303\266rd:ex\303\244mple.com:\303\274ser",
+       "ccjkyppzycwzojakqpeezfuunqfatdogbvuzyqybmmgculwfkokvmvppuqtrqwccwvfkfvbbfjturqebljtumwyuejjuqabeyotwrraddmssdqxgbhbcjufdgudcpwhlrdvmchusuasyywtomornjhxuojjfpbebnvbgelwrmxryykrkhcfpavokegdcfmyuckmqkscg")
+VECTOR("master:1:1:master::example.org:user",
        "([a-zA-Z0-9]{8}-){40}",
-       "tR2vOvOr-OnTSvUX6-m5rW0ha4-k80utSND-55cuM2um-wtqyNe5z-49Lz85i6-RRPLgY2e-YZKhiNtt-q5MlBQdr-HLUVuN39-r295KCiX-wsJpICEW-NWgiO8Mo-3byygnG1-g6fVVlG2-EUbNJu5w-39OrENpv-mtGTIMU6-H5bYg3Rd-RDjCqAEy-K0U1VecM-rneG3BGZ-cCNiCNmm-W70z0hwb-E0wn1H6W-Sz45dbGO-3PMKpppt-q8fi7ev0-as0lHwis-qEor1wyo-tuXhGXnp-7wrfnzbi-oL11dacw-GmJFgiAj-8D7jVPDR-7Eqy5Uau-Px5RIY2j-DwaESOwW-iMud3deN-")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "Y2fAOFFv-wu2svk90-SAmF4avT-w5qKUDmb-WSJZEcXL-KvuGu1ii-c2qBM5Ay-VkALiLFF-qGpHGsYz-2sQrbA5L-XRXbVRV9-JqHmT4Xh-9pqiswuK-aV99UKG0-1aOkpsHn-W3ZiII3m-t6X7z12f-K5ZcyK3Y-lxM7hH3r-C2dKoK0I-SOuMJxEC-UEnUD9R7-RTNKEffw-5l141jL1-caBMHCtn-OugHgd2b-lWrkg463-25ViOK2Q-ACmAoY61-BXjsxx79-EICYWFBo-o5IAPQG6-hLOd0n3s-CJhFzLAr-gNd6gpJE-EVv04ZPx-2fRhjzTu-5jM9yNvg-yC0Jl9jL-qKIUtsKL-")
+VECTOR("master:1:1:master::example.com:admin",
        "[a-z]{16}",
-       "khrekwhpksmjacii")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "fmjnwprsczoxrrxf")
+VECTOR("master:1:1:master::example.com:admin",
        "[a-zA-Z0-9]{32}",
-       "Adn4gVMdlAQICx9R0Y88vXDIEIPn2VAY")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "VS5ySi9DMFQnRo2PEStnnN5BDMKOwreS")
+VECTOR("master:1:1:master::example.com:admin",
        "[0-9a-f]{32}",
-       "a714aff67faa2ceb9b028891d2e2912f")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "fc5ccc9d6fa1b229ec7e1175bd648a58")
+VECTOR("master:1:1:master::example.com:admin",
        "[ab]{16}",
-       "abbaabbabbaaaaab")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "babaaabbababbaab")
+VECTOR("master:1:1:master::example.com:admin",
+       "(abc|def|ghi){4}",
+       "abcdefabcabc")
+VECTOR("master:1:1:master::example.com:admin",
+       "(a|b|c|d){8}",
+       "dabaaabb")
+VECTOR("master:1:1:master::example.com:admin",
+       "[a-z]{4,12}",
+       "mjnwprscz")
+VECTOR("master:1:1:master::example.com:admin",
+       "(ab?c?){6}",
+       "aabcacacaabc")
+VECTOR("master:1:1:master::example.com:admin",
+       "(why|how|what)\\?{1,3}",
+       "why??")
+VECTOR("master:1:1:master::example.com:admin",
+       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
+       "bcbbb[c],--,-+-,[][][\\ZZ")
+VECTOR("master:1:1:master::example.com:admin",
+       "([a-z]{2,4}-){3}[0-9]{2}",
+       "fm-nwp-rscz-71")
+VECTOR("master:1:1:master::example.com:admin",
+       "[ba]{16}",
+       "babaaabbababbaab")
+VECTOR("master:1:1:master::example.com:admin",
+       "[aab]{24}",
+       "aaaaaaabbabbababaaaabaab")
+VECTOR("master:1:1:master::example.com:admin",
+       "[a-zc0-9a-f]{24}",
+       "ol5l9bfcjk2iclg5abfehxl4")
+VECTOR("master:1:1:master::example.com:admin",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "fmjnwprslifz")
+VECTOR("master:1:1:master::example.com:admin",
+       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
+       "abcab5961y2")
+VECTOR("master:1:1:master::example.com:admin",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207\305\233\305\233\305\273\305\273")
+VECTOR("master:1:1:master::example.com:admin",
+       "\\w{words}(-\\w{words}){3}",
+       "echo-foxtrot-echo-echo")
+VECTOR("master:1:1:master::example.com:admin",
+       "\\w{words}{1,3}[0-9]",
+       "foxtrot9")
+VECTOR("master:1:1:master::example.com:admin",
+       "[a-z]{200}",
+       "fmjnwprsczoxrrxflnwuyviuewpbemplmwlzwywpvdnfxtnofsgqdvzdhkgkehdpmtpnebpilpzzftcnxngeycqrdyauhnvduwnkodmorialpirgouynjegtpeyjkhfeezxptbfzdpourctmtcgktzavdaenpgiwatbjhxsxbhfonnunxjiriykduojdoajmykbielpm")
+VECTOR("master:1:1:master::example.com:admin",
+       "([a-zA-Z0-9]{8}-){40}",
+       "VS5ySi9D-MFQnRo2P-EStnnN5B-DMKOwreS-q4MFXU4C-lxUhiSTs-yhTvMOxs-lwQLZDbN-pjE5o6G3-Lv3dgcSU-Rga73RVl-ipwlD41U-l8zhFPPb-pYjtD64u-YGHZxOWT-QKdDr3qM-jgxyk3Ck-H80Bl8n6-EyTquyzj-9a6pFau9-AUdT5zaa-vNlJxXbw-zvZQFEwK-n2JCpY6g-pP0LZT04-Dlc8sWpX-y97NwItX-75EDDKjt-T9UeTH8u-zASwZVKE-f3TER09i-ugVV18aB-liH17gO9-Kz7O1mRc-ahdgPT1c-rBekFC26-HpQppzLs-Y5UJFAxd-knzCi6A5-gx5xUiwn-")
+VECTOR("master:1:2:master::example.com:user",
+       "[a-z]{16}",
+       "ivddksbagmufsswc")
+VECTOR("master:1:2:master::example.com:user",
+       "[a-zA-Z0-9]{32}",
+       "8VLyZ3gIQ1WyScCK5oosY38a0eCQAyke")
+VECTOR("master:1:2:master::example.com:user",
+       "[0-9a-f]{32}",
+       "8f5c33a2a10cc6c4e5226238408caace")
+VECTOR("master:1:2:master::example.com:user",
+       "[ab]{16}",
+       "abbabbaaabaaaaaa")
+VECTOR("master:1:2:master::example.com:user",
+       "(abc|def|ghi){4}",
+       "abcdefabcghi")
+VECTOR("master:1:2:master::example.com:user",
+       "(a|b|c|d){8}",
+       "adbaddcc")
+VECTOR("master:1:2:master::example.com:user",
+       "[a-z]{4,12}",
+       "vddksbagmufs")
+VECTOR("master:1:2:master::example.com:user",
+       "(ab?c?){6}",
+       "abaababcaca")
+VECTOR("master:1:2:master::example.com:user",
+       "(why|how|what)\\?{1,3}",
+       "why??")
+VECTOR("master:1:2:master::example.com:user",
+       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
+       "-cbaa]]],+++-++-[\\\\\\\\]ZZ")
+VECTOR("master:1:2:master::example.com:user",
+       "([a-z]{2,4}-){3}[0-9]{2}",
+       "vd-sbag-uf-22")
+VECTOR("master:1:2:master::example.com:user",
+       "[ba]{16}",
+       "abbabbaaabaaaaaa")
+VECTOR("master:1:2:master::example.com:user",
+       "[aab]{24}",
+       "aaabbbaaaabaababbbbaaaaa")
+VECTOR("master:1:2:master::example.com:user",
+       "[a-zc0-9a-f]{24}",
+       "8ofs3zdj1plvbe5r38t0xbja")
+VECTOR("master:1:2:master::example.com:user",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "ivddksbafxfj")
+VECTOR("master:1:2:master::example.com:user",
+       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
+       "abcab8533x2")
+VECTOR("master:1:2:master::example.com:user",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207\305\274\305\274\305\274\305\273")
+VECTOR("master:1:2:master::example.com:user",
+       "\\w{words}(-\\w{words}){3}",
+       "alpha-foxtrot-echo-delta")
+VECTOR("master:1:2:master::example.com:user",
+       "\\w{words}{1,3}[0-9]",
+       "foxtrot3")
+VECTOR("master:1:2:master::example.com:user",
+       "[a-z]{200}",
+       "ivddksbagmufsswcdieaimkoilihtwquskrnpeglmvqmarimgvtfjayitzpubozppflcigzutnvecnywppnpeuzoyupqhghvdiwwzoohlimlwsqgwewtcnutcqhtzveolfzmgzqcllnvnqecpkpjkntyhajajtbizteogqrkulxgnastodqtdrsaabzlzhcqfprpaeme")
+VECTOR("master:1:2:master::example.com:user",
+       "([a-zA-Z0-9]{8}-){40}",
+       "8VLyZ3gI-Q1WyScCK-5oosY38a-0eCQAyke-BedpMGKo-Anjl4chC-LyQmiWHe-C6wwwyLJ-590O8pPF-Ky1EQPFF-bBYweRcP-KpDry42j-usllDTFa-qPkOqRyF-GdT6T7rZ-8ssPkEwd-hQ8iBsIm-cs4sJ2UT-RDqJ2GQd-pvLaEhy5-vicvGYhB-jLDUmaYl-QQAlfgDJ-Od0f09pX-8TTxvJ4S-EcxGHAKh-N6DWzoJE-ZGpZnI0W-XvhSvdYy-mbxlTHTF-04CahecJ-tdtorfrC-1KiZvwtx-Wpl812Ki-4zpg5hrB-ZCVx8NMY-1yvJNgSw-udkqF7zx-awA4jzDq-XHcaFbXV-")
+VECTOR("master:1:1:master:00:example.com:user",
+       "[a-z]{16}",
+       "pugthmkqbxtagnex")
+VECTOR("master:1:1:master:00:example.com:user",
+       "[a-zA-Z0-9]{32}",
+       "FqcVpdVCgVGXtxpW6D4NIKSIoLHZovBK")
+VECTOR("master:1:1:master:00:example.com:user",
+       "[0-9a-f]{32}",
+       "f46f37fcaf017b306d4724c2251329b4")
+VECTOR("master:1:1:master:00:example.com:user",
+       "[ab]{16}",
+       "baabbbbaababbbba")
+VECTOR("master:1:1:master:00:example.com:user",
+       "(abc|def|ghi){4}",
+       "abcghiabcghi")
+VECTOR("master:1:1:master:00:example.com:user",
+       "(a|b|c|d){8}",
+       "dacdddda")
+VECTOR("master:1:1:master:00:example.com:user",
+       "[a-z]{4,12}",
+       "gthmkqbx")
+VECTOR("master:1:1:master:00:example.com:user",
+       "(ab?c?){6}",
+       "aabaabcabca")
+VECTOR("master:1:1:master:00:example.com:user",
+       "(why|how|what)\\?{1,3}",
+       "why???")
+VECTOR("master:1:1:master:00:example.com:user",
+       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
+       "bab]-[aa+-,+-++-\\[[]\\[]Z")
+VECTOR("master:1:1:master:00:example.com:user",
+       "([a-z]{2,4}-){3}[0-9]{2}",
+       "gt-kq-xta-64")
+VECTOR("master:1:1:master:00:example.com:user",
+       "[ba]{16}",
+       "baabbbbaababbbba")
+VECTOR("master:1:1:master:00:example.com:user",
+       "[aab]{24}",
+       "ababaaabaabaabbaabaaaabb")
+VECTOR("master:1:1:master:00:example.com:user",
+       "[a-zc0-9a-f]{24}",
+       "cvowobzocqp6b4gdeldfdsae")
+VECTOR("master:1:1:master:00:example.com:user",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "pugthmkqjkad")
+VECTOR("master:1:1:master:00:example.com:user",
+       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
+       "abcab4637y0")
+VECTOR("master:1:1:master:00:example.com:user",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207ja\305\272\305\204za\305\274\303\263\305\202\304\207\305\274\305\233\305\273\305\233")
+VECTOR("master:1:1:master:00:example.com:user",
+       "\\w{words}(-\\w{words}){3}",
+       "echo-gr\303\266\303\237e-delta-echo")
+VECTOR("master:1:1:master:00:example.com:user",
+       "\\w{words}{1,3}[0-9]",
+       "gr\303\266\303\237e3")
+VECTOR("master:1:1:master:00:example.com:user",
+       "[a-z]{200}",
+       "pugthmkqbxtagnexsussvrdszlubutksxmmpcwpmcgluogkdyjojtqfthguxlcjsxlshshgjluxxtwrurjsmbpzfzumwvrlfrhseeqoynrwblbxvwuklkwbrhvyfhnpbsiogingwvpwdsbbhztufcfmkefixyxxmelggycurmwngryazlgqfnxrpmrddghjqoacfnqtp")
+VECTOR("master:1:1:master:00:example.com:user",
+       "([a-zA-Z0-9]{8}-){40}",
+       "FqcVpdVC-gVGXtxpW-6D4NIKSI-oLHZovBK-XqJgoNUi-ilYMlyiY-R6BKEw6A-ZOfEQfJR-GbJ7cqNh-Y9QItVBI-7od6yfww-SBqttJsH-TqnfIiUX-FyPbPKiy-MLnBSbn7-oz4aGkuj-nzzs1BXN-rysRqghg-M1HRdRLO-57jlQ1o8-E68jcsLF-MZI1y1dv-Jzqby2bC-gQ4b8tut-txCaB6cu-YqnCyMDz-cwnu0PUh-6GbDtHlC-nTwZVZ6d-fmkWzYz5-jGJlrzpP-OsoXYqeE-BuR1aJqG-g0vXz1Or-VpNUhN1l-PLN6Hvn7-zRDSv4bn-BbkDRGZA-HyHmy5Ol-rewLuQek-")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "[a-z]{16}",
+       "tfdzkifspnqowavm")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "[a-zA-Z0-9]{32}",
+       "pTb3Pyg8bIQUljVmks0SLCxXrPQbLZ7t")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "[0-9a-f]{32}",
+       "3d539ca852aefdf0e60c5cb159a55377")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "[ab]{16}",
+       "bbbbbaaabaaabbba")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "(abc|def|ghi){4}",
+       "defdefdefabc")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "(a|b|c|d){8}",
+       "dbbdbaca")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "[a-z]{4,12}",
+       "fdzkifs")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "(ab?c?){6}",
+       "acabababcabcac")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "(why|how|what)\\?{1,3}",
+       "how??")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
+       "acca[b]-,---,+--ZZ[Z][[[")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "([a-z]{2,4}-){3}[0-9]{2}",
+       "fdz-ki-spn-06")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "[ba]{16}",
+       "bbbbbaaabaaabbba")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "[aab]{24}",
+       "aaaabaabbbaabbaaaaaaabaa")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "[a-zc0-9a-f]{24}",
+       "mu3iz8udjno0lfbqijufs7e2")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "tfdzkifsxczw")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
+       "abcab3539x8")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "g\304\231\305\233l\304\205g\304\231\305\233l\304\205g\304\231\305\233l\304\205\305\233\305\274\305\233\305\273")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "\\w{words}(-\\w{words}){3}",
+       "delta-foxtrot-foxtrot-delta")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "\\w{words}{1,3}[0-9]",
+       "foxtrotdelta9")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "[a-z]{200}",
+       "tfdzkifspnqowavmbvzfvdhxtcffywtlmqpczofucplkycdhxnnoolnzjkzqfnmmpnylggvujlbxcgvmxwhrryynypedzhbutrdebnakbfvshcgimktnnswgnobhlznsijxigkmfovkgfvcinfaqpsxjopqsdrydxbzhsudtqehjsdfaclbtvvznecdvperhreazwusp")
+VECTOR("master:1:1:master:73656564:example.com:user",
+       "([a-zA-Z0-9]{8}-){40}",
+       "pTb3Pyg8-bIQUljVm-ks0SLCxX-rPQbLZ7t-Jw2bwbVS-uMJhCmFy-YwPkbKYl-hSAu2Z7R-NyDDEEhD-vSVfQAPG-bDCClDuB-6cLqfhXt-2cLCts7n-RHOuDOl4-3P7XKpHZ-aXDWAX5Q-ro7YV6ei-wgpDjIsc-jk17hPjI-eft86ACb-krAR65LY-8jbWTmlI-tURTfElm-I3nQOx3t-1PdIK3JG-Q47fIZb0-YzTBXJRr-rPD4zSYZ-rF4nydna-0vMqISFa-3MTzoGYb-J0imANU4-vLoSwmxx-Z7uzv0pV-rglAQMHZ-td6GcC3o-Tz4ExLvw-quSBGkCN-gzG2pYeo-h7T7RhgU-")
+VECTOR("master:1:1:master:::user",
+       "[a-z]{16}",
+       "hlmzfxnbvhmylfbr")
+VECTOR("master:1:1:master:::user",
+       "[a-zA-Z0-9]{32}",
+       "dhiv5NDXL7iuBbXHzWFUbNZdxkKhq0lo")
+VECTOR("master:1:1:master:::user",
+       "[0-9a-f]{32}",
+       "7bc957d157c8b511d0fe5f737bfe4b40")
+VECTOR("master:1:1:master:::user",
+       "[ab]{16}",
+       "bbabbbbbbbaabbbb")
+VECTOR("master:1:1:master:::user",
+       "(abc|def|ghi){4}",
+       "abcdefdefdef")
+VECTOR("master:1:1:master:::user",
+       "(a|b|c|d){8}",
+       "ddabbdbb")
+VECTOR("master:1:1:master:::user",
+       "[a-z]{4,12}",
+       "lmzfxnbvhmy")
+VECTOR("master:1:1:master:::user",
+       "(ab?c?){6}",
+       "abcababcabaac")
+VECTOR("master:1:1:master:::user",
+       "(why|how|what)\\?{1,3}",
+       "why??")
+VECTOR("master:1:1:master:::user",
+       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
+       "ab[cc[cb+,,,,+-,]]]]]]\\Z")
+VECTOR("master:1:1:master:::user",
+       "([a-z]{2,4}-){3}[0-9]{2}",
+       "zf-bvh-yl-51")
+VECTOR("master:1:1:master:::user",
+       "[ba]{16}",
+       "bbabbbbbbbaabbbb")
+VECTOR("master:1:1:master:::user",
+       "[aab]{24}",
+       "aaaaaaaaaaaaababaaabbbaa")
+VECTOR("master:1:1:master:::user",
+       "[a-zc0-9a-f]{24}",
+       "w5gbqf7auqdpcnugswe0vbd4")
+VECTOR("master:1:1:master:::user",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "hlmzfxnbvjrn")
+VECTOR("master:1:1:master:::user",
+       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
+       "abcab7957y1")
+VECTOR("master:1:1:master:::user",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207g\304\231\305\233l\304\205g\304\231\305\233l\304\205\305\273\305\273\305\273\305\233")
+VECTOR("master:1:1:master:::user",
+       "\\w{words}(-\\w{words}){3}",
+       "delta-echo-bravo-foxtrot")
+VECTOR("master:1:1:master:::user",
+       "\\w{words}{1,3}[0-9]",
+       "bravo5")
+VECTOR("master:1:1:master:::user",
+       "[a-z]{200}",
+       "hlmzfxnbvhmylfbrapfxdhouluapsgwmrselanafloququonsojpdkxnzpdknbyaxueutpqomgyipczyafjiwctiddfvuoyvrfjdkynrrmtfobrwdsbwwczlshavjjusxizvusxssniubtkfridjyyqskxpnfgfpllwfpeyafbmrhksaarqkfisrsthsryhixlhvzmnq")
+VECTOR("master:1:1:master:::user",
+       "([a-zA-Z0-9]{8}-){40}",
+       "dhiv5NDX-L7iuBbXH-zWFUbNZd-xkKhq0lo-csCnI4BW-j05hkGKG-KkjokfF3-VygNDTQQ-vl3AwjXO-UV0tRKaK-plGEicu8-lYvu05f8-sU2peRZZ-5LKkOrnb-9ZAuxRjn-HCJbk1HM-3oXMSM2v-hodWVrf9-qoTN8vQr-wqINoIDU-8K1pgV5n-8ZfuuRGo-ygNljbc5-lhhs5xl4-O051iVH7-gI0WHmAb-8oRTHoJd-ownxudeN-yBdxQLPC-UDG1WT1i-qAXkLior-EO6dCTTB-OlJQgybx-0ifZxydU-xMYW5J37-bAUg1vce-8a36Rt37-d0h9S3dR-Duf4dZ1H-YYN7PNkl-")
+VECTOR("master:1:1:master::user:",
+       "[a-z]{16}",
+       "bvaiitxadthnywzg")
+VECTOR("master:1:1:master::user:",
+       "[a-zA-Z0-9]{32}",
+       "1LW8UeJNWZJ7DOMvciBREbp0FzX39EuG")
+VECTOR("master:1:1:master::user:",
+       "[0-9a-f]{32}",
+       "1508e8370337d8696cbbe530fd139e80")
+VECTOR("master:1:1:master::user:",
+       "[ab]{16}",
+       "bbaaaabbabbbbaab")
+VECTOR("master:1:1:master::user:",
+       "(abc|def|ghi){4}",
+       "defdefabcabc")
+VECTOR("master:1:1:master::user:",
+       "(a|b|c|d){8}",
+       "bbaacadd")
+VECTOR("master:1:1:master::user:",
+       "[a-z]{4,12}",
+       "vaiit")
+VECTOR("master:1:1:master::user:",
+       "(ab?c?){6}",
+       "aacabcacaa")
+VECTOR("master:1:1:master::user:",
+       "(why|how|what)\\?{1,3}",
+       "how??")
+VECTOR("master:1:1:master::user:",
+       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
+       "[c---a-a,+-,-+-,]Z][[][\\")
+VECTOR("master:1:1:master::user:",
+       "([a-z]{2,4}-){3}[0-9]{2}",
+       "vai-itxa-ywz-65")
+VECTOR("master:1:1:master::user:",
+       "[ba]{16}",
+       "bbaaaabbabbbbaab")
+VECTOR("master:1:1:master::user:",
+       "[aab]{24}",
+       "aaaabaaaabababaaaaabaaaa")
+VECTOR("master:1:1:master::user:",
+       "[a-zc0-9a-f]{24}",
+       "1fp8nxegpse7bhfvakcu0cq3")
+VECTOR("master:1:1:master::user:",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "bvaiitxafoyk")
+VECTOR("master:1:1:master::user:",
+       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
+       "abcab1508x8")
+VECTOR("master:1:1:master::user:",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "g\304\231\305\233l\304\205g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207\305\233\305\274\305\233\305\233")
+VECTOR("master:1:1:master::user:",
+       "\\w{words}(-\\w{words}){3}",
+       "bravo-foxtrot-alpha-alpha")
+VECTOR("master:1:1:master::user:",
+       "\\w{words}{1,3}[0-9]",
+       "foxtrotalpha8")
+VECTOR("master:1:1:master::user:",
+       "[a-z]{200}",
+       "bvaiitxadthnywzgmloftapbdjoyqejdyiygbipebgunphelwugpafjqwhellkjevtcusqhwmwottppqjpqxjsckcofogrruhewnwxvmvjubpcpflrecuwizcqwtxcvjjmnplrtaeppwffaeswtwarzrnvtmtqaonyauacooskkshyplumayxjzsigzmhciilqgpicec")
+VECTOR("master:1:1:master::user:",
+       "([a-zA-Z0-9]{8}-){40}",
+       "1LW8UeJN-WZJ7DOMv-ciBREbp0-FzX39EuG-a93u8OcX-el41UcUq-jFdQ4BMq-Vcl0bQfm-M7ahBA9a-rJzYKIG7-VMisSEpV-pFlzmT9l-mtfIYgSY-kyT5wk6n-HQK7asjM-NryCr9qR-1xF2lbBH-a2qsevYm-MptYr9x9-iDlyVyhH-pW4FlM5b-WaxoMpsS-0HQPnDLJ-Cpm0EDO0-KWYkxkIg-SgUo7Olh-KziWONfv-RoeT6vC7-Y8eBG6Fe-xY4YQPUG-XnkIXRMU-4HYjhAwU-IA1NdED6-pfZeNUTM-dkDP37zf-BgwDDF2J-tUFlZo1I-20kQiat6-tQ9yUJDF-Dom9Q5wE-")
+VECTOR("master:1:1:master::ab:c",
+       "[a-z]{16}",
+       "xpmgrtzzxngmfdze")
+VECTOR("master:1:1:master::ab:c",
+       "[a-zA-Z0-9]{32}",
+       "tFC6nJvvtD6CbVZvS4aU9cihlbeiB8KV")
+VECTOR("master:1:1:master::ab:c",
+       "[0-9a-f]{32}",
+       "7fc613997d6c5f39c44e96cbf58cb84f")
+VECTOR("master:1:1:master::ab:c",
+       "[ab]{16}",
+       "bbaabbbbbbaabbbb")
+VECTOR("master:1:1:master::ab:c",
+       "(abc|def|ghi){4}",
+       "abcghidefdef")
+VECTOR("master:1:1:master::ab:c",
+       "(a|b|c|d){8}",
+       "ddacbdbb")
+VECTOR("master:1:1:master::ab:c",
+       "[a-z]{4,12}",
+       "pmgrtzzxngm")
+VECTOR("master:1:1:master::ab:c",
+       "(ab?c?){6}",
+       "acabcabababcabc")
+VECTOR("master:1:1:master::ab:c",
+       "(why|how|what)\\?{1,3}",
+       "why???")
+VECTOR("master:1:1:master::ab:c",
+       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
+       "b[a[[cbc,+++-,-+]][ZZ]ZZ")
+VECTOR("master:1:1:master::ab:c",
+       "([a-z]{2,4}-){3}[0-9]{2}",
+       "gr-zxn-mfdz-44")
+VECTOR("master:1:1:master::ab:c",
+       "[ba]{16}",
+       "bbaabbbbbbaabbbb")
+VECTOR("master:1:1:master::ab:c",
+       "[aab]{24}",
+       "abaaaabaaaaaababaaaaaaba")
+VECTOR("master:1:1:master::ab:c",
+       "[a-zc0-9a-f]{24}",
+       "cb6eb6buosl4tn9vuxa8eo7q")
+VECTOR("master:1:1:master::ab:c",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "xpmgrtzzgquy")
+VECTOR("master:1:1:master::ab:c",
+       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
+       "abcab7613y9")
+VECTOR("master:1:1:master::ab:c",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207ja\305\272\305\204g\304\231\305\233l\304\205\305\273\305\273\305\273\305\274")
+VECTOR("master:1:1:master::ab:c",
+       "\\w{words}(-\\w{words}){3}",
+       "echo-gr\303\266\303\237e-bravo-delta")
+VECTOR("master:1:1:master::ab:c",
+       "\\w{words}{1,3}[0-9]",
+       "gr\303\266\303\237e1")
+VECTOR("master:1:1:master::ab:c",
+       "[a-z]{200}",
+       "xpmgrtzzxngmfdzeejgmlpfimliuwhbxnhjdpngyveysdfrtpgvhzknlqbgmfwbqngeskgwxihuqzygcpqsyinzbdeknumrtxlrjmhhcuhkwjmmozeojbhwjovljevqdfmpyizfoficlcrebspmeblyjkkdyladitjcdnelfpggqjrzamgwrgtnyxjuwpvfhvdqovjpi")
+VECTOR("master:1:1:master::ab:c",
+       "([a-zA-Z0-9]{8}-){40}",
+       "tFC6nJvv-tD6CbVZv-S4aU9cih-lbeiB8KV-sz7XND7w-93ljcOra-uI35npF6-r7vAjhGX-6ibs1mTj-caIA6QMz-tedqTmPu-c2FmIyuR-UexDPX3Q-agxyjKTC-nRpNhnfV-Cd72qdAs-9CikPakf-1dQM9krB-9arGZbiF-ROevQbk5-8YBYxn41-IlC4SXhu-fgA3uBW3-8UJ9Y3Da-h5l66m9H-P0i6MUHx-cpjutfRK-sFQrb7rw-ZGEr9l8r-TsDXJdAc-gGJU2zcL-MJQEm5LZ-E5mKSWX9-Gb6sm90d-GOoAP1s0-8qsnMU7P-YlwcYeF3-RCiAw9A9-072rIkJ9-1bO6wM8d-")
+VECTOR("master:1:1:master::a:bc",
+       "[a-z]{16}",
+       "gjtcyanilurwahqi")
+VECTOR("master:1:1:master::a:bc",
+       "[a-zA-Z0-9]{32}",
+       "6fypYO0DezBKnsWdGeP8491mWmyZ9lwx")
+VECTOR("master:1:1:master::a:bc",
+       "[0-9a-f]{32}",
+       "f69c3280d8db416070898491000c39fa")
+VECTOR("master:1:1:master::a:bc",
+       "[ab]{16}",
+       "bababaaababbabaa")
+VECTOR("master:1:1:master::a:bc",
        "(abc|def|ghi){4}",
        "ghidefabcghi")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+VECTOR("master:1:1:master::a:bc",
        "(a|b|c|d){8}",
-       "cdbacddc")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "dcbadcaa")
+VECTOR("master:1:1:master::a:bc",
        "[a-z]{4,12}",
-       "rekwhpksmja")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "jtcyanilur")
+VECTOR("master:1:1:master::a:bc",
        "(ab?c?){6}",
-       "abcacabaaa")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "aabcacababcac")
+VECTOR("master:1:1:master::a:bc",
        "(why|how|what)\\?{1,3}",
        "what??")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+VECTOR("master:1:1:master::a:bc",
        "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
-       "][b]]]]b-,+-++,,[\\\\\\[[\\]")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "[ba]--c-,+,-+++,ZZ[[ZZZZ")
+VECTOR("master:1:1:master::a:bc",
        "([a-z]{2,4}-){3}[0-9]{2}",
-       "hrek-hpks-ja-28")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "jtcy-ni-lur-60")
+VECTOR("master:1:1:master::a:bc",
        "[ba]{16}",
-       "abbaabbabbaaaaab")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "bababaaababbabaa")
+VECTOR("master:1:1:master::a:bc",
        "[aab]{24}",
-       "baabbbbbabaabaaaaabbbaab")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "baabaaaaaaabaaaaaaaaaaaa")
+VECTOR("master:1:1:master::a:bc",
        "[a-zc0-9a-f]{24}",
-       "aw4zofwajdb9k0r88qbdcdi2")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "6yrh0bxaepwcxi8491ps9z6q")
+VECTOR("master:1:1:master::a:bc",
        "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
-       "khrekwhpyeoa")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "gjtcyaniswdt")
+VECTOR("master:1:1:master::a:bc",
        "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
-       "abcab7146y2")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "abcab6932x0")
+VECTOR("master:1:1:master::a:bc",
        "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
-       "ja\305\272\305\204g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207\305\274\305\274\305\274\305\274")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "ja\305\272\305\204g\304\231\305\233l\304\205za\305\274\303\263\305\202\304\207\305\274\305\233\305\233\305\273")
+VECTOR("master:1:1:master::a:bc",
        "\\w{words}(-\\w{words}){3}",
-       "charlie-bravo-echo-charlie")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "gr\303\266\303\237e-bravo-echo-delta")
+VECTOR("master:1:1:master::a:bc",
        "\\w{words}{1,3}[0-9]",
-       "bravoechocharlie6")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "bravoechodelta2")
+VECTOR("master:1:1:master::a:bc",
        "[a-z]{200}",
-       "khrekwhpksmjaciizbnsoszrckcobgpoktavmefjjisfhsuolfjuzrcfxlhbunwcvuknhjqpqqurlonwjnuhfksnpssxgklzdjyfnfumulihkzenuapjiplqujxftqujilrokslhkuxtcvrbpmbsmxrynrixapqcwelnxjlcjwhratukmoafyozvixuzwziidaqwxten")
-VECTOR("chacha20-argon2:correct horse battery staple:example.com",
+       "gjtcyanilurwahqiziejbqaqdjpkgbtljkdvkjepqiuhegolgtsgsrdrvilfnxqxfthtzjnsnddmbqvfycipxgfordzbquidwirtrrisvnlferchcnfaqrplkrgiwxrfgdirbkxccizzkyqsfwpnvocdehenuydysmpxhiraioxrsuzfksdlwtkdksugnimlieyhbbkj")
+VECTOR("master:1:1:master::a:bc",
        "([a-zA-Z0-9]{8}-){40}",
-       "Adn4gVMd-lAQICx9R-0Y88vXDI-EIPn2VAY-E16lSkAJ-0rCVa599-8IbdIKEB-U59qPRH2-bNB7XqjM-YULqgD7f-mlGxmTqH-hEDMfjqd-zQbAIDlo-oN6wAhvZ-fu5Qj5Ki-qhe7gP4y-jqWFfw8l-hmTK9t5p-GKf8BHTk-gIBdRAqT-UtyJU2rH-1FCVXoCN-HwODH8ty-WlGxYMaB-xjtfh2fs-dn0pqgiV-kQWbxOEv-L8NKvMve-T8ZS0mws-SSNJ4jRm-Os4RPKM4-be1P9vEt-AIzIkO51-xTvbbujg-ZBpn20RF-LY34nu3X-diywyHZh-RrRus6Rq-TFMemu8U-GA2d07kZ-")
+       "6fypYO0D-ezBKnsWd-GeP8491m-WmyZ9lwx-yg6XJhfg-3rgfalme-qd4ckB6p-I6InZnL8-hS5jNGN5-JdJvS9jo-jyZZiXGL-5OY8ltTc-bkxTHxw3-v1GUK8Zs-8HJHn8or-DhbaHYd2-j50mHwlh-AH68stRn-56ZwzenX-AtQYY8PP-guSTmI5M-FDyrE2V3-adajKuZO-ToCwFtd8-H0ekzUNH-IqPQ5AIZ-hMJgZgoK-cD8Ch8aO-711gfRS5-gVWchXjn-Xwy93Fta-DYttw7XK-Cx8Zz3jd-N6MOoGme-vlbdtjrl-gIKvG0Er-1w7nahcP-y2ZYkFAR-oxFvxytK-H7qBkjXo-")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "[a-z]{16}",
+       "uvfqvmrtkosopgqx")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "[a-zA-Z0-9]{32}",
+       "yKrbmrxCnpgkIEF6mt53OtDzpvi1grTF")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "[0-9a-f]{32}",
+       "c45505bcf13ae2ef6075387dd39c1a5d")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "[ab]{16}",
+       "aabbabbabbbaaaab")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "(abc|def|ghi){4}",
+       "abcabcdefdef")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "(a|b|c|d){8}",
+       "aabbabda")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "[a-z]{4,12}",
+       "vfqvmrtk")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "(ab?c?){6}",
+       "abaaabacab")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "(why|how|what)\\?{1,3}",
+       "why?")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
+       "bbcc-cab,-----+,]Z][[][Z")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "([a-z]{2,4}-){3}[0-9]{2}",
+       "uv-qvm-tko-26")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "[ba]{16}",
+       "aabbabbabbbaaaab")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "[aab]{24}",
+       "aaaaaaaabbbbbaaaaaaaabaa")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "[a-zc0-9a-f]{24}",
+       "eubzdcc653hb1zmcv0ubpddh")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "uvfqvmrtzegj")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
+       "abcab4550y1")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207za\305\274\303\263\305\202\304\207g\304\231\305\233l\304\205\305\273\305\233\305\273\305\233")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "\\w{words}(-\\w{words}){3}",
+       "echo-echo-foxtrot-foxtrot")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "\\w{words}{1,3}[0-9]",
+       "echo5")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "[a-z]{200}",
+       "uvfqvmrtkosopgqxfdyxntzmbkvpgwafnpazssycpbwwqxmpyyeyqtixwaoretqblstqtajhihafsgcvlhijfgqduaojtuafpvaljprxlzvpnwdidoswdtfbishpwqjjjsdfcvilynqgxmhhvggodzmjpczhdbsdqsyfwhlxbannrhgitkotylwxvpqwewzgyiwulwgk")
+VECTOR("master:1:1:pass\\:word\\\\::example.com\\:8443:us\\\\er",
+       "([a-zA-Z0-9]{8}-){40}",
+       "yKrbmrxC-npgkIEF6-mt53OtDz-pvi1grTF-cs0bDlWv-IIOYFXwM-smNilzuu-U4uQGzp8-Ns0EnSSa-pGXUBIUp-GpWV97ed-0boc2Lh7-8f5T6ymZ-xKzw0Efp-q0bVlrz0-BQfFHthy-PUxrlRDM-Z8ZkIMy3-pb1eRI7F-sG9ffo3b-2reQhODm-6NTC7V7r-6yckZPCf-l2TPdZ1w-oZmIQwzS-u5M7hSNX-S0DDH7ce-pAEpOwBV-stULlGUM-zaMvcO8M-KBs6g511-N1k0bkCt-nO9RvjZP-3EpEoDXx-EX9K9ULR-Cl1Qk7ec-5qbQPMsW-qBNt0jfF-qUiokauO-ffGeb4x7-")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "[a-z]{16}",
+       "hueoqnpwtzwbxetl")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "[a-zA-Z0-9]{32}",
+       "VdqakmzjFMJvsx1N4pB1XuAVqsKytJgk")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "[0-9a-f]{32}",
+       "f744e0ddf6396b1743b118af464c73ae")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "[ab]{16}",
+       "bbaaaabbbabbabbb")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "(abc|def|ghi){4}",
+       "abcabcghiabc")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "(a|b|c|d){8}",
+       "ddaacabb")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "[a-z]{4,12}",
+       "ueoqnpwtzwb")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "(ab?c?){6}",
+       "abaabcaabcabc")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "(why|how|what)\\?{1,3}",
+       "why?")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
+       "bb-cca[a,+,,+-+-ZZ]]\\\\][")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "([a-z]{2,4}-){3}[0-9]{2}",
+       "eo-np-tzwb-74")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "[ba]{16}",
+       "bbaaaabbbabbabbb")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "[aab]{24}",
+       "aabaaababaaaaababaabbaab")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "[a-zc0-9a-f]{24}",
+       "owtcfe1g4a1qaoeezsfrtisf")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "hueoqnpwzjdy")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
+       "abcab7440y6")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "za\305\274\303\263\305\202\304\207za\305\274\303\263\305\202\304\207ja\305\272\305\204\305\233\305\273\305\273\305\274")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "\\w{words}(-\\w{words}){3}",
+       "echo-echo-gr\303\266\303\237e-alpha")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "\\w{words}{1,3}[0-9]",
+       "echo0")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "[a-z]{200}",
+       "hueoqnpwtzwbxetlbbykuwuxtkodvcezdwpkcgkevtpiefaprdbgvyjqduqpxfspdtbiklrastodpmpjrownmxvohyewymnvovxakornpyfvqfziuqlxrjujyzmtuejwdaadrumwzyavfnjhkbunpbdabxqdbfhvmrqysxiczcoitcuhmdixtzvlngwzwzxrdzzftslj")
+VECTOR("master:1:1:p\303\244ssw\303\266rd::ex\303\244mple.com:\303\274ser",
+       "([a-zA-Z0-9]{8}-){40}",
+       "Vdqakmzj-FMJvsx1N-4pB1XuAV-qsKytJgk-ZLyYaPZM-lAYcAaLp-leab0TlH-ZX6ruRfm-ZqSmVUwF-NbyIFQZp-T1eghHx0-IpTEz3FC-F9nEsjCN-LE7OaMuQ-ijLkLRt0-gknDylu5-rmbP8Kmh-NHzfK9OP-CJq49MZW-WZHKisPT-ORWrQbDf-7g1KDF1x-VxZW1tVV-m31bUdVL-inGOINTe-2v2keJ2q-di3Tetpz-PLhD6MvQ-MPtnZPvb-poB9XT84-hbkWDII5-tDapWnxP-H34vFgLQ-2hxFsf66-tUOkh1In-HvG0MLa2-aWZfnZwg-miMaGhCx-llH5TJfm-jZ2RPgYq-")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "[a-z]{16}",
+       "dqeszevpoegttorx")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "[a-zA-Z0-9]{32}",
+       "RZwm4Iv4LFkacJVpEHt7d77TZk87SepU")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "[0-9a-f]{32}",
+       "b3a042945fe463f3e177777d3e87ec83")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "[ab]{16}",
+       "bbaaaababbaaabbb")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "(abc|def|ghi){4}",
+       "ghiabcabcghi")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "(a|b|c|d){8}",
+       "ddcaacba")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "[a-z]{4,12}",
+       "qeszevp")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "(ab?c?){6}",
+       "abcaaacaca")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "(why|how|what)\\?{1,3}",
+       "what?")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "[a-c\\]\\[\\-]{8}[+-\\-]{8}[Z-\\]]{8}",
+       "aa]-b][b,-+--,,-Z]\\ZZ]\\Z")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "([a-z]{2,4}-){3}[0-9]{2}",
+       "qesz-vp-egtt-17")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "[ba]{16}",
+       "bbaaaababbaaabbb")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "[aab]{24}",
+       "baabaaababbaababaabaaaaa")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "[a-zc0-9a-f]{24}",
+       "ks4d4fctveocd7w77ms87lxn")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "[a-z]{4}(){3}[a-z]{4}(|)?[a-z]{4}(){0,2}",
+       "dqeszevprcuj")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "(abc)[a][bb]([0-9]{2}){2}(x|y)[0-9]",
+       "abcab3042y4")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "(za\305\274\303\263\305\202\304\207|g\304\231\305\233l\304\205|ja\305\272\305\204){3}[\305\274\305\233\305\273]{4}",
+       "ja\305\272\305\204za\305\274\303\263\305\202\304\207za\305\274\303\263\305\202\304\207\305\274\305\273\305\233\305\273")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "\\w{words}(-\\w{words}){3}",
+       "delta-delta-charlie-alpha")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "\\w{words}{1,3}[0-9]",
+       "alphaechocharlie9")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "[a-z]{200}",
+       "dqeszevpoegttorxhhhhdoihitqlarfpemyoaenidleszvenqxhkqmcuofeirfqrbxxpyvyhzumhzuowytnnmmdvqqsywnrgfbgbrriuupnyalrpifoqjjphmdzybfesvsbnrtcxvhjitugvnfgkyonsvfdhdkpfpzqovjjjkkhklawmpqmvsjwfeqtdgefjgwrqyast")
+VECTOR("master:1:1:correct horse battery staple::example.com:",
+       "([a-zA-Z0-9]{8}-){40}",
+       "RZwm4Iv4-LFkacJVp-EHt7d77T-Zk87SepU-mB0Hblai-OkWaD83B-aIPrazwR-DmtdARmi-Ywqk5aeH-bGRH1tNl-uxru7vKi-7vqEsuJz-DDiCZRrR-GmIOSsjH-6bXcXHn8-RKqFju0B-Hl8QT5SR-kmQ99Fdi-3PuXbaIT-xroXDHJ2-QtLdfeJK-6rD56AOE-DoL53dZg-FblwvmkL-f9fgzgdg-Bx0siTyT-lmCrIfVM-bamJ3cab-fcMHUmuW-IJme9oc9-y99zjXjR-2Sm4WNsx-h0ah0PeR-iD3FdQFZ-xnK8OXgn-gg8V7swU-NMDf7J1O-LzdNQ3FJ-94a18Itp-iecurp2j-")
 VECTOR("chacha20:6b65790000000000000000000000000000000000000000000000000000000000",
        "[a-z]{16}",
        "tlgsglbthczhdlnr")
@@ -1208,42 +1593,42 @@ VECTOR("xorshift:18446744073709551615",
 VECTOR("xorshift:18446744073709551615",
        "([a-zA-Z0-9]{8}-){40}",
        "0Wxaans4-mFWIR56a-xGa81rks-nX8NYwue-EjNKTx3N-tZuxpdeF-RjfMr7gG-Hq4GzfGf-noPCpleh-oL6j0IX8-C52izLnS-2HtKO27g-XzOxRxP6-JE4MezTn-en2BkBvX-9pGowV2U-IDIPApuC-ZVdVmh1A-LdF4YDx8-eta5C9M5-w88JSQLG-RDZdCPM0-qewEZGuF-OGavEKQg-yEYFZKPG-hVeiLfxZ-DK6Xlxgn-0tgb2kGO-xEZN9viR-CPxc8OnJ-UQrXpVqd-oXMRTbHn-jyBJlVnM-ntk0EiMI-LsIhA3An-RSCFrdRi-1Q6s0QBa-v73Xo2x3-9fMCKUM9-qtG6VTYC-")
-VECTOR("chacha20-argon2:master:example.com:user",
+VECTOR("master:1:1:master::example.com:user",
        "([a-zA-Z0-9]{3}-){3}[a-zA-Z0-9]{3}",
-       "4pZ-KYX-4Fx-p3h")
-VECTOR("chacha20-argon2:master:example.com:user",
+       "cwl-rWj-Pcu-VGE")
+VECTOR("master:1:1:master::example.com:user",
        "([a-zA-Z0-9]{6}-){2}[a-zA-Z0-9]{6}",
-       "4pZKYX-4Fxp3h-vOgdGx")
-VECTOR("chacha20-argon2:master:example.com:user",
+       "cwlrWj-PcuVGE-OlCunW")
+VECTOR("master:1:1:master::example.com:user",
        "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}",
-       "4334214f-b33b-4f98-a70b-2868a6a80b2d")
-VECTOR("chacha20-argon2:master:example.com:user",
+       "6af50d96-8f0e-48fc-81e0-79dbc5ca5fc8")
+VECTOR("master:1:1:master::example.com:user",
        "[A-Za-f0-9:_\\-]{15}",
-       "3XIWV3D2eMdaE1b")
-VECTOR("chacha20-argon2:master:example.com:user",
+       "_UN_TECMAU68:QJ")
+VECTOR("master:1:1:master::example.com:user",
        "[a-zA-Z0-9]{15}",
-       "4pZKYX4Fxp3hvOg")
-VECTOR("chacha20-argon2:master:example.com:user",
+       "cwlrWjPcuVGEOlC")
+VECTOR("master:1:1:master::example.com:user",
        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){0}",
-       "hugaf")
-VECTOR("chacha20-argon2:master:example.com:user",
+       "kozib")
+VECTOR("master:1:1:master::example.com:user",
        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){1}",
-       "hugaf-dazug")
-VECTOR("chacha20-argon2:master:example.com:user",
+       "kozib-tikaz")
+VECTOR("master:1:1:master::example.com:user",
        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){2}",
-       "hugaf-dazug-guzim")
-VECTOR("chacha20-argon2:master:example.com:user",
+       "kozib-tikaz-bomus")
+VECTOR("master:1:1:master::example.com:user",
        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){3}",
-       "hugaf-dazug-guzim-pubuf")
-VECTOR("chacha20-argon2:master:example.com:user",
+       "kozib-tikaz-bomus-mival")
+VECTOR("master:1:1:master::example.com:user",
        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){4}",
-       "hugaf-dazug-guzim-pubuf-momok")
-VECTOR("chacha20-argon2:master:example.com:user",
+       "kozib-tikaz-bomus-mival-niraj")
+VECTOR("master:1:1:master::example.com:user",
        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){5}",
-       "hugaf-dazug-guzim-pubuf-momok-pabuf")
-VECTOR("chacha20-argon2:master:example.com:user",
+       "kozib-tikaz-bomus-mival-niraj-sojus")
+VECTOR("master:1:1:master::example.com:user",
        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){6}",
-       "hugaf-dazug-guzim-pubuf-momok-pabuf-tokus")
-VECTOR("chacha20-argon2:master:example.com:user",
+       "kozib-tikaz-bomus-mival-niraj-sojus-morik")
+VECTOR("master:1:1:master::example.com:user",
        "([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz](-([bdfghjklmnprstvz][aiou]){2}[bdfghjklmnprstvz]){7}",
-       "hugaf-dazug-guzim-pubuf-momok-pabuf-tokus-josoz")
+       "kozib-tikaz-bomus-mival-niraj-sojus-morik-bilab")

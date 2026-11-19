@@ -181,17 +181,22 @@ test_result test_regression_random_open_overlong(void) {
     memcpy(desc, "chacha20:", 9);
     assert(!passgen_random_open(&random, desc));
 
-    // same for the fields of chacha20-argon2.
+    // same for the fields of master passphrases.
     memset(desc, 'A', sizeof(desc) - 1);
-    memcpy(desc, "chacha20-argon2:", 16);
+    memcpy(desc, "master:1:1:", 11);
     assert(!passgen_random_open(&random, desc));
 
-    strcpy(desc, "chacha20-argon2:pass:");
+    strcpy(desc, "master:1:1:pass::");
     memset(desc + strlen(desc), 'B', 500);
-    desc[21 + 500] = 0;
+    strcpy(desc + 17 + 500, ":user");
     assert(!passgen_random_open(&random, desc));
 
-    assert(passgen_random_open(&random, "chacha20-argon2:pass:domain:token"));
+    strcpy(desc, "master:1:1:pass:");
+    memset(desc + strlen(desc), 'C', 500);
+    strcpy(desc + 16 + 500, ":domain:user");
+    assert(!passgen_random_open(&random, desc));
+
+    assert(passgen_random_open(&random, "master:1:1:pass::domain:user"));
     passgen_random_close(&random);
 
     return test_ok;

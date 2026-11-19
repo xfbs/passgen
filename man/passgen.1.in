@@ -12,10 +12,14 @@
 .Op Fl r Ar random
 .Op Fl S Ar steps
 .Op Fl w Ar name:path
-.Op Fl m Ar master Op Fl d Ar domain Op Fl t Ar token
+.Op Fl m Ar name Op Fl d Ar domain Op Fl u Ar user
 .Ar pattern | Fl p Ar preset
 .Nm
 .Fl l
+.Nm
+.Fl -master-setup Ar name
+.Op Fl -level Ar level
+.Op Fl -seed
 .Nm
 .Fl h | v
 .Sh DESCRIPTION
@@ -104,25 +108,41 @@ Separate the sequences by a NUL character instead of a newline.
 .Pp
 The following options are for master passphrase mode, in which the sequences
 are not random, but derived from a master passphrase.
-The same master passphrase, domain, token and pattern always result in the
+The same master passphrase, domain, user and pattern always result in the
 same sequence, so there is no need to store it anywhere.
 .Bl -tag -width Ds
-.It Fl m , Fl -master Ar master
-The master passphrase.
+.It Fl m , Fl -master Ar name
+Use the master passphrase with this name in the configuration, which says how
+sequences are derived from it.
+It is asked for, see
+.Sx MASTER PASSPHRASE MODE .
 Giving this option is what enables master passphrase mode.
 .It Fl d , Fl -domain Ar domain
 What the sequence is for, typically the domain of a website.
+It is used as it is, so
+.Ql example.com
+and
+.Ql Example.com
+result in different sequences.
 Optional.
-.It Fl t , Fl -token Ar token
-Anything else which should result in a different sequence, such as the name of
-an account when there is more than one for a domain, or a counter to change a
-passphrase.
+.It Fl u , Fl -user Ar user
+Who the sequence is for, typically the login on the website, when there is
+more than one for a domain.
+It can also be a counter, to change a passphrase.
 Optional.
+.It Fl -master-setup Ar name
+Ask for a master passphrase, twice when reading it from a terminal, and print
+what the configuration needs to use it as
+.Ar name ,
+which can be appended to it.
+.It Fl -level Ar level
+How much effort deriving a key from the master passphrase that is set up
+takes, from 1 to 3.
+The default is 2.
+.It Fl -seed
+Generate a seed for the master passphrase that is set up.
 .El
 .Pp
-See
-.Sx MASTER PASSPHRASE MODE
-for how the sequences are derived.
 .Sh PATTERNS
 A pattern describes what to generate.
 It may contain any Unicode characters, and has to be valid UTF-8.
@@ -289,10 +309,16 @@ Read random data from a file.
 It has to supply as much data as is needed:
 .Nm
 aborts when it runs out.
-.It Li chacha20-argon2\&: Ns Ar master Ns Op : Ns Ar domain Ns Op : Ns Ar token
+.It Li master\&: Ns Ar version Ns : Ns Ar level Ns : Ns Ar passphrase Ns : Ns Ar seed Ns : Ns Ar domain Ns : Ns Ar user
 What master passphrase mode uses, see
-.Sx MASTER PASSPHRASE MODE .
-Every part can be up to 128 bytes long, and cannot contain colons.
+.Sx MASTER PASSPHRASE MODE ,
+without needing a configuration.
+All parts have to be there, the seed (in hex), domain and user may be empty.
+The passphrase, domain and user can be up to 128 bytes long, and colons and
+backslashes in them are written as
+.Ql \e:
+and
+.Ql \e\e .
 .It Li chacha20\&: Ns Ar key Ns Op : Ns Ar iv
 The ChaCha20 stream cipher, with a key of 32 bytes and an initialization
 vector of 8 bytes, written in hex: exactly 64 hex digits for the key, and 16
@@ -310,23 +336,72 @@ Only zeroes.
 This is deterministic, and not random at all.
 .El
 .Sh MASTER PASSPHRASE MODE
-In master passphrase mode, a key is derived from the master passphrase, the
-domain and the token.
-The key is used to generate a stream of pseudorandom data, which takes the
+In master passphrase mode, a key is derived from the master passphrase, which
+is then used to derive a key for the domain and the user.
+That key is used to generate a stream of pseudorandom data, which takes the
 place of the randomness of the system.
 .Pp
-The key is derived with Argon2id, using 19 MiB of memory, 2 passes and 1 lane.
+A master passphrase is set up once, with
+.Fl -master-setup ,
+which prints a table like this for the configuration:
+.Bd -literal -offset indent
+[master.main]
+version = 1
+level = 2
+hash = "ceece14b"
+.Ed
+.Pp
+With
+.Fl -master Ar main ,
+the master passphrase is then asked for, without showing what is typed.
+When standard input is not a terminal, it is read from there, as a line.
+.Bl -tag -width Ds
+.It Li version
+How keys are derived, as described below.
+Required.
+.It Li level
+How much effort deriving the key from the master passphrase takes, which is
+how much effort it takes to guess it: 1 takes 64 MiB of memory, 2 takes
+256 MiB, and 3 takes 1 GiB.
+Required.
+.It Li hash
+The start of a hash of the key derived from the master passphrase, in hex.
+When it does not match, the master passphrase was mistyped, which is an
+error.
+The longer it is, the more it tells about the master passphrase to someone
+who is trying to guess it: eight digits catch all but one in four billion
+mistakes.
+Optional.
+.It Li seed
+Up to 64 bytes in hex, which the key is derived with as well.
+Then the master passphrase alone is not enough to derive anything, neither
+for an attacker nor without the configuration.
+Optional.
+.El
+.Pp
+Nothing else is stored, so the same can be derived without a configuration,
+with
+.Fl -random Li master: Ns Ar version Ns : Ns Ar level Ns : Ns Ar passphrase Ns : Ns Ar seed Ns : Ns Ar domain Ns : Ns Ar user .
+.Pp
+In version 1, the key is derived with Argon2id, using the memory of the level,
+3 passes and 1 lane.
 The master passphrase is the password, the salt is the fixed string
-.Ql passgen/argon2id ,
-the domain is the secret key and the token is the associated data.
-The 32 byte result is the key for the ChaCha20 stream cipher (the original
-variant, with a 64 bit counter starting at zero), with the initialization
-vector
+.Ql passgen/master/1 ,
+and the seed is the secret key.
+For the domain and the user, a key is derived with BLAKE2b, keyed with that
+key, from the string
+.Ql passgen/site ,
+the length of the domain in bytes (as 64 bits, little-endian), the domain, the
+length of the user and the user.
+This key is used for the ChaCha20 stream cipher (the original variant, with a
+64 bit counter starting at zero), with the initialization vector
 .Ql passgen
 followed by a NUL byte.
+The hash is BLAKE2b, keyed with the key from the master passphrase, of
+.Ql passgen/hash .
 .Pp
-What is generated depends on all of the master passphrase, the domain, the
-token and the pattern.
+What is generated depends on all of the master passphrase, the seed, the
+level, the domain, the user and the pattern.
 When the pattern uses a wordlist, it also depends on the contents of the
 wordlist.
 .Pp
@@ -447,11 +522,16 @@ The definition of a wordlist is not valid.
 .It 12
 The options for master passphrase mode cannot be used this way: together with
 .Fl -random ,
-or a domain or token without a master passphrase.
+a domain or user without a master passphrase, or the options for setting one
+up without
+.Fl -master-setup .
 .It 13
 The number of steps is not valid.
 .It 14
 A configuration file cannot be read, or is not valid.
+.It 15
+The master passphrase is not in the configuration, was not entered, or is
+not the right one.
 .El
 .Pp
 If a source of randomness does not supply enough data,
@@ -514,11 +594,15 @@ $ passgen -P 'pin:[0-9]{6}' -p pin
 402918
 .Ed
 .Pp
-Derive a passphrase for an account from a master passphrase.
+Set up a master passphrase, and derive a passphrase for an account from it.
 This always results in the same passphrase:
 .Bd -literal -offset indent
-$ passgen -m mymasterpass -d example.com -t username -p apple2
-6xnSzW-8Ptrv0-dngZFU
+$ passgen --master-setup main >> ~/.config/passgen/config.toml
+master passphrase:
+master passphrase again:
+$ passgen -m main -d example.com -u username -p apple2
+master passphrase:
+eINh6m-RhafGJ-JgiKM0
 .Ed
 .Sh SEE ALSO
 .Xr apg 1 ,
@@ -534,11 +618,15 @@ Master passphrase mode is not stable before version 1.0.0: another version of
 may generate something else for the same inputs.
 Keep a copy of the passphrases, or of the version which generated them.
 .Pp
-The master passphrase is given as an argument on the command line.
+A master passphrase given with
+.Fl -random
+is an argument on the command line.
 While
 .Nm
 is running, other users of the system may be able to see it in the list of
 processes, and it may be saved in the history of the shell.
+.Fl -master
+asks for it instead.
 .Pp
 What patterns which use Markov chains generate may change between versions of
 .Nm ,

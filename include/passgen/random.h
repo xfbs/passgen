@@ -6,7 +6,7 @@
 /// @ref passgen_random. Most of the time, this is the one of the system (see
 /// @ref passgen_random_system_open). The others give out the same data every
 /// time, which is what master passphrase mode is built on (see
-/// @ref passgen_random_chacha20_argon2_open), and what the tests use.
+/// `passgen/master.h`), and what the tests use.
 #pragma once
 #include <passgen/config.h>
 #include <passgen/export.h>
@@ -105,16 +105,18 @@ typedef struct {
 /// | Xorshift | `xorshift:<seed>` | `xorshift:123` | @ref passgen_random_xorshift_open |
 /// | Zero | `zero` | `zero` | @ref passgen_random_zero_open |
 /// | ChaCha20 | `chacha20:<key>[:<iv>]` | `chacha20:00010203...1e1f:0001020304050607` | @ref passgen_random_chacha20_open |
-/// | Master passphrase | `chacha20-argon2:<passphrase>[:<domain>[:<token>]]` | `chacha20-argon2:passphrase:example.com:1` | @ref passgen_random_chacha20_argon2_open |
+/// | Master passphrase | `master:<version>:<level>:<passphrase>:<seed>:<domain>:<user>` | `master:1:2:passphrase::example.com:me` | @ref passgen_master_random_open |
 ///
 /// - The seed of xorshift is a number from 1 to 2^64 - 1, in decimal.
 /// - The key and IV of ChaCha20 are in hex (in either case): exactly 64 hex
 ///   digits for the 32 bytes of the key, and exactly 16 for the 8 bytes of the
 ///   IV. Without an IV, it is `passgen` (followed by a zero byte).
-/// - The master passphrase, the domain and the token are at most 128 bytes
-///   each, and cannot contain colons. One colon right after
-///   `chacha20-argon2:` is skipped. Keys are derived with
-///   ::PASSGEN_ARGON2_PARAMS_DEFAULT.
+/// - For a master passphrase, all fields have to be there. The version is 1,
+///   and the level is from 1 to 3 (see @ref passgen_master_level). The seed
+///   is in hex (in either case), and may be empty, as may be the domain and
+///   the user. The master passphrase, the domain and the user are at most 128
+///   bytes each, in which `\:` is a colon and `\\` a backslash. Any other
+///   backslash is not valid.
 /// - The ChaCha20 sources are only there when the library is built with
 ///   Monocypher (`PASSGEN_MONOCYPHER` in `passgen/config.h`).
 ///
@@ -129,7 +131,7 @@ PASSGEN_EXPORT passgen_random *passgen_random_open(passgen_random *random, const
 
 /// Whether a description of a source of randomness (see
 /// @ref passgen_random_open) may hold a secret: the key of `chacha20`, or the
-/// master passphrase of `chacha20-argon2`. Such a description must not be
+/// master passphrase of `master`. Such a description must not be
 /// shown, such as in an error message saying that it cannot be opened.
 ///
 /// This only looks at the kind of source, so it works for descriptions which
@@ -214,8 +216,8 @@ passgen_random_zero_open(passgen_random *random);
 /// is the stream of the ChaCha20 cipher.
 ///
 /// What it gives out cannot be predicted without the key, so this can be used
-/// for secrets, if the key is one. To get the key from a passphrase, use
-/// @ref passgen_random_chacha20_argon2_open.
+/// for secrets, if the key is one. To get one from a passphrase, see
+/// `passgen/master.h`.
 ///
 /// Only there when the library is built with Monocypher.
 ///
@@ -230,75 +232,6 @@ PASSGEN_EXPORT passgen_random *passgen_random_chacha20_open(
     passgen_random *random,
     const uint8_t key[32],
     const uint8_t iv[8]);
-
-/// Parameters for deriving a key from a master passphrase with Argon2id.
-///
-/// These determine how expensive it is to derive the key, and with that, how
-/// expensive it is to guess a master passphrase. Changing any of them results
-/// in another key.
-typedef struct {
-    /// How much memory to use, in KiB. Has to be at least eight times the
-    /// number of lanes.
-    uint32_t memory;
-    /// How many passes to make over the memory. Has to be at least one.
-    uint32_t passes;
-    /// How many lanes to use. Has to be at least one. This is what other
-    /// implementations of Argon2 call parallelism, but they are computed one
-    /// after another here.
-    uint32_t lanes;
-} passgen_argon2_params;
-
-/// Version 1 of the Argon2 parameters used to derive a key from a master
-/// passphrase: Argon2id with 19 MiB of memory, 2 passes and 1 lane. This is the
-/// minimum that OWASP recommends.
-///
-/// These are never changed, as that would change every passphrase derived
-/// from a master passphrase. Stronger parameters get a new version.
-PASSGEN_EXPORT extern const passgen_argon2_params PASSGEN_ARGON2_PARAMS_V1;
-
-/// The Argon2 parameters which ::passgen_random_chacha20_argon2_open uses
-/// when it is not given any. This is the latest version, so it changes when a
-/// new version is added. Use a specific version to always get the same output.
-PASSGEN_EXPORT extern const passgen_argon2_params PASSGEN_ARGON2_PARAMS_DEFAULT;
-
-/// Opens a source which gives out the same data for the same master
-/// passphrase, domain and token. This is master passphrase mode: everything
-/// which is generated with it can be generated again from the passphrase.
-///
-/// The key is derived using Argon2id, with the fixed salt `passgen/argon2id`,
-/// the domain as the secret key and the token as the associated data. It is
-/// then used for ChaCha20 with the IV `passgen` (followed by a zero byte), as
-/// with @ref passgen_random_chacha20_open. Deriving the key takes as much
-/// memory as the parameters say (19 MiB by default), and takes a while, on
-/// purpose. The derived key is wiped once it is not needed.
-///
-/// The domain and the token are optional. They give different passphrases
-/// for the same master passphrase: the domain for different websites, the
-/// token for different accounts on the same one, or as a counter to change a
-/// passphrase.
-///
-/// What this gives out for the same inputs and parameters never changes
-/// between versions of the library.
-///
-/// Only there when the library is built with Monocypher.
-///
-/// @param random Where to open the source, or NULL to allocate it. See
-///   @ref passgen_random for who closes or frees it.
-/// @param passphrase Master passphrase, as a NUL-terminated string
-/// @param domain Domain name, as a NUL-terminated string (may be NULL)
-/// @param token Token, used as additional input, as a NUL-terminated string
-///   (may be NULL)
-/// @param params Argon2 parameters to use, or NULL for
-///   ::PASSGEN_ARGON2_PARAMS_DEFAULT
-/// @returns The random object, or NULL if the parameters are not valid, or
-///   the memory for deriving the key could not be allocated
-/// @relatesalso passgen_random
-PASSGEN_EXPORT passgen_random *passgen_random_chacha20_argon2_open(
-    passgen_random *random,
-    const char *passphrase,
-    const char *domain,
-    const char *token,
-    const passgen_argon2_params *params);
 #endif
 
 /// Closes a source which was opened in place, and clears it.

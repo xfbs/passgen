@@ -8,6 +8,7 @@
 #pragma once
 #include <passgen/passgen.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -43,6 +44,7 @@ typedef enum {
     PASSGEN_CLI_ERROR_MASTER_CONFLICT,
     PASSGEN_CLI_ERROR_ILLEGAL_STEPS,
     PASSGEN_CLI_ERROR_CONFIG,
+    PASSGEN_CLI_ERROR_MASTER,
 
     PASSGEN_CLI_SHOW_HELP,
     PASSGEN_CLI_SHOW_VERSION,
@@ -57,6 +59,23 @@ typedef struct {
     /// Its argument, as `name:pattern` or `name:path`.
     const char *argument;
 } passgen_cli_definition;
+
+/// A master passphrase which is defined in the configuration, as
+/// `[master.name]`.
+typedef struct {
+    /// Its name.
+    char *name;
+    /// The version of how passphrases are derived from it.
+    unsigned version;
+    /// The level, which is how expensive deriving the master key is.
+    unsigned level;
+    /// A prefix of its hash, in lowercase hex, or NULL if there is none.
+    char *hash;
+    /// The seed, which may be empty.
+    uint8_t seed[64];
+    /// The length of the seed in bytes.
+    size_t seed_size;
+} passgen_cli_master;
 
 /// Options parsed from the command line.
 typedef struct {
@@ -86,13 +105,24 @@ typedef struct {
     bool entropy;
 
 #ifdef PASSGEN_MONOCYPHER
-    /// Master passphrase to use for master-passphrase mode
-    const char *master_passphrase;
-    /// Domain name to use for master-passphrase mode
+    /// Name of the master passphrase to use for master passphrase mode.
+    const char *master;
+    /// Domain for master passphrase mode.
     const char *master_domain;
-    /// Token to use for master-passphrase mode
-    const char *master_token;
+    /// User for master passphrase mode.
+    const char *master_user;
+    /// Name of a master passphrase to set up, instead of generating.
+    const char *master_setup;
+    /// Level of the master passphrase to set up.
+    unsigned master_setup_level;
+    /// Whether to generate a seed for the master passphrase to set up.
+    bool master_setup_seed;
 #endif
+    /// Master passphrases defined in the configuration. These are read even
+    /// without master passphrase mode, so that the configuration is the same.
+    passgen_cli_master *masters;
+    /// How many master passphrases are defined in the configuration.
+    size_t masters_len;
 
     /// Source of randomness to generate from. This is what the environment
     /// uses, but it is owned by the options.
