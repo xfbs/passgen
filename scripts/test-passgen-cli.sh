@@ -402,7 +402,7 @@ else
     fails $passgen -d example.com "a"
     fails $passgen -u user "a"
     fails $passgen --master-setup main
-    test "$($passgen --help 2>&1 | grep -c -- '--master\|--domain\|--user' || true)" = 0
+    test "$($passgen --help 2>&1 | grep -c -E -- '--master|--domain|--user' || true)" = 0
     # hashes of wordlists cannot be checked, so they are ignored.
     mkdir -p "$tmpdir/conf/lists"
     printf 'alpha\n' > "$tmpdir/conf/lists/hashed.txt"
@@ -424,7 +424,7 @@ for i in 1 2 3; do
 done
 test "$($passgen -r xorshift:1 --offset 2 -a 2 '[a-z]{8}(-[a-z0-9]{0,8})?')" = "$(echo "$all" | sed -n 3,4p)"
 # from scripts/reference-vectors.py.
-test "$($passgen -r xorshift:1 --offset 1000 '[a-z]{16}')" = "$(sed -n '/STREAM("xorshift:1", UINT64_C(1000),/{n;n;p;q}' "$(dirname "$0")/../src/tests/vectors.inc" | sed 's/^ *"\(.*\)")$/\1/')"
+test "$($passgen -r xorshift:1 --offset 1000 '[a-z]{16}')" = "$(grep -F -A2 'STREAM("xorshift:1", UINT64_C(1000),' "$(dirname "$0")/../src/tests/vectors.inc" | sed -n 3p | sed 's/^ *"\(.*\)")$/\1/')"
 test "$($passgen -r zero --offset 5 '[a-z]{4}')" = "aaaa"
 $passgen -r xorshift:1 --offset 18446744073709551615 a > /dev/null
 # sources without streams cannot start at another one (exit status 16), and
