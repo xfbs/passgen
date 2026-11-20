@@ -666,7 +666,10 @@ $passgen -P 'broken:[' -P 'fine:abc' -p fine | matches abc
 test "$(error_lines $passgen 'ab\w{undefined}c' | sed -n 3p)" = "           ^^^^^^^^^^^^^"
 test -z "$($passgen -a 3 'a(b|\w{undefined}){0}' 2>/dev/null)"
 test "$(error_of $passgen "$(nested 1025)")" = "error in pattern: nested too deeply"
-test "$(error_of $passgen '{0}a')" = "error: nothing to choose from"
+# a group with nothing to choose from is found when parsing, also when it is
+# repeated zero times, and the whole group is marked.
+test "$(error_of $passgen '{0}a')" = "error in pattern: nothing to choose from"
+test "$(error_lines $passgen 'x({0}a){0}y' | sed -n 3p)" = "          ^^^^^^"
 test "$(error_of $passgen "(){999999999}")" = "error: takes too many steps"
 test "$(error_of $passgen -S 0 a)" = "error: illegal number of steps entered (0)"
 

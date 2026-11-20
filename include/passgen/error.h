@@ -116,7 +116,8 @@ typedef enum passgen_status {
     /// name.
     PASSGEN_ERROR_PRESET_CYCLE,
     /// All of the segments of a group have a multiplier of zero, such as
-    /// `{0}a`, so there is nothing to choose from.
+    /// `({0}a)`, so there is nothing to choose from. This is an error when
+    /// parsing, also for a group which is repeated zero times.
     PASSGEN_ERROR_GROUP_EMPTY,
     /// The source of randomness did not have as much data as was needed.
     PASSGEN_ERROR_RANDOM,

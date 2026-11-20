@@ -128,12 +128,13 @@ passgen_status passgen_pattern_parse(
                     return passgen_error_set(error, status);
                 }
                 if(status != PASSGEN_OK) {
+                    // some errors are about more than this token, such as
+                    // a group, which they start at.
+                    passgen_error_offset start = parser.error_start_given
+                                                     ? parser.error_start
+                                                     : token_start;
                     passgen_parser_free(&parser);
-                    return passgen_error_set_at(
-                        error,
-                        status,
-                        token_start,
-                        next);
+                    return passgen_error_set_at(error, status, start, next);
                 }
             }
 
@@ -169,9 +170,11 @@ passgen_status passgen_pattern_parse(
 
     // make sure we are done parsing
     passgen_status status = passgen_parse_finish(&parser);
+    passgen_error_offset start =
+        parser.error_start_given ? parser.error_start : decoded;
     passgen_parser_free(&parser);
     if(status != PASSGEN_OK) {
-        return passgen_error_set_at(error, status, decoded, decoded);
+        return passgen_error_set_at(error, status, start, decoded);
     }
 
     return PASSGEN_OK;

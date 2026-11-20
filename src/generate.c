@@ -587,7 +587,8 @@ static int passgen_generate_segment(
 static int passgen_generate_group(
     passgen_generate_context *context,
     const passgen_pattern_group *group) {
-    // every segment of the group has a multiplier of zero.
+    // every segment of the group has a multiplier of zero. the parser does
+    // not accept such a group, so this is only a safeguard.
     if(group->multiplier_sum == 0) {
         return fail(context, PASSGEN_ERROR_GROUP_EMPTY);
     }

@@ -77,6 +77,7 @@ passgen_parser_state *passgen_parser_state_push_group(
     state->data.group.group = group;
     state->data.group.segment = segment;
     state->data.group.weighted = false;
+    state->data.group.start = (passgen_error_offset){0, 0};
 
     return state;
 }
@@ -147,6 +148,7 @@ passgen_parser_init(passgen_parser *parser, passgen_pattern *pattern) {
     passgen_stack_init(&parser->state, sizeof(passgen_parser_state));
     parser->limit = PASSGEN_PARSER_DEPTH_LIMIT;
     parser->pattern = pattern;
+    parser->error_start_given = false;
     passgen_pattern_init(pattern);
 
     passgen_pattern_segment *segment =
@@ -329,6 +331,14 @@ int passgen_parse_group(
                 if(parser->state.len <= 1) {
                     return PASSGEN_ERROR_GROUP_UNOPENED;
                 }
+                // every segment has a weight of zero, as in `({0}a)`. this
+                // is a mistake in the pattern, also if the group happens to
+                // be repeated zero times, so it is one when parsing.
+                if(state->data.group.group->multiplier_sum == 0) {
+                    parser->error_start_given = true;
+                    parser->error_start = state->data.group.start;
+                    return PASSGEN_ERROR_GROUP_EMPTY;
+                }
                 passgen_stack_pop(&parser->state, NULL);
                 return 0;
             case '(':
@@ -349,9 +359,15 @@ int passgen_parse_group(
                 if(!segment) {
                     return PASSGEN_ERROR_OUT_OF_MEMORY;
                 }
-                if(!passgen_parser_state_push_group(parser, group, segment)) {
+                passgen_parser_state *pushed =
+                    passgen_parser_state_push_group(parser, group, segment);
+                if(!pushed) {
                     return PASSGEN_ERROR_OUT_OF_MEMORY;
                 }
+                pushed->data.group.start = (passgen_error_offset){
+                    token->offset,
+                    token->byte_offset,
+                };
                 return 0;
             case '[': {
                 passgen_pattern_set *set =
@@ -740,6 +756,14 @@ int passgen_parse_finish(passgen_parser *parser) {
             default:
                 return PASSGEN_ERROR_INTERNAL;
         }
+    }
+
+    // the pattern itself is a group, which has to have something to choose
+    // from, as in `{0}a`.
+    if(state->data.group.group->multiplier_sum == 0) {
+        parser->error_start_given = true;
+        parser->error_start = state->data.group.start;
+        return PASSGEN_ERROR_GROUP_EMPTY;
     }
 
     return 0;

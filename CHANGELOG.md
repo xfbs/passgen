@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A segment with more than one weight, such as `({2}{3}a|b)`, is an error.
   The last one used to count.
+- A group with nothing to choose from, such as `({0}a)`, is an error when the
+  pattern is parsed, also when it is repeated zero times. It used to be one
+  only when it was generated.
 
 ## [0.5.0] - 2026-11-20
 

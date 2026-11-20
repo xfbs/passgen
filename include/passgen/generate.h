@@ -180,8 +180,6 @@ PASSGEN_EXPORT passgen_status passgen_generate_fill_json_utf8(
 ///     with this environment, or a wordlist or preset was added to it since,
 ///   - @ref PASSGEN_ERROR_STEP_LIMIT, if it takes more steps than the step
 ///     limit of the environment,
-///   - @ref PASSGEN_ERROR_GROUP_EMPTY, if there is a group with nothing to
-///     choose from,
 ///   - @ref PASSGEN_ERROR_RANDOM, if the source of randomness ran out (see
 ///     @ref passgen_random_failed),
 ///   - @ref PASSGEN_ERROR_ABORTED, if the callback returns nonzero.

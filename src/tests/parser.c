@@ -142,12 +142,17 @@ test_result test_parser_skip_zero_segment(void) {
     PARSE_CODEPOINT('{');
     PARSE_CODEPOINT('0');
     PARSE_CODEPOINT('}');
-    PARSE_CODEPOINT(')');
 
-    // final segment is also removed, leaving no segments
+    // the final segment is also removed, leaving no segments, so there is
+    // nothing to choose from, which is an error.
+    assert(
+        passgen_token_parse(&token_parser, &token, 1, ')') ==
+        PASSGEN_TOKEN_INIT);
+    assert_eq(PASSGEN_ERROR_GROUP_EMPTY, passgen_parse_token(&parser, &token));
     assert_eq(item->data.group.segments.len, 0);
 
-    POSTAMBLE();
+    passgen_parser_free(&parser);
+    passgen_pattern_deinit(&parsed_pattern);
     return test_ok;
 }
 

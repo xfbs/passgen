@@ -34,6 +34,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "passgen/error.h"
 #include "passgen/parser/token.h"
 #include "passgen/pattern/group.h"
 #include "passgen/pattern/pattern.h"
@@ -90,6 +91,9 @@ typedef struct {
             /// Whether the current segment was given a weight, as in
             /// `{2}a`, which it can only be once.
             bool weighted;
+            /// Where the group starts, at its opening parenthesis (or at the
+            /// start, for the pattern itself).
+            passgen_error_offset start;
         } group;
         /// Data for #PASSGEN_PARSER_REPEAT and #PASSGEN_PARSER_REPEAT_RANGE
         /// types.
@@ -147,6 +151,12 @@ typedef struct passgen_parser {
     /// The current, possibly incomplete parsed pattern.
     /// The parser does not own this and will not deallocate it.
     passgen_pattern *pattern;
+    /// Whether the last error is about more than the last token, such as a
+    /// group with nothing to choose from, and starts at @ref error_start.
+    bool error_start_given;
+    /// Where the last error starts, if @ref error_start_given is set. It ends
+    /// with the last token.
+    passgen_error_offset error_start;
 } passgen_parser;
 
 /// Get the nth memeber of the parsing stack.

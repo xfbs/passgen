@@ -22,8 +22,8 @@ test_result test_sizes_builtin(void) {
 }
 
 test_result test_sizes_parser(void) {
-    assert_eq(sizeof(passgen_parser), 64);
-    assert_eq(sizeof(passgen_parser_state), 32);
+    assert_eq(sizeof(passgen_parser), 88);
+    assert_eq(sizeof(passgen_parser_state), 48);
     return test_ok;
 }
 

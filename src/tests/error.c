@@ -55,6 +55,13 @@ test_result test_error_parse(void) {
         {"{}a", PASSGEN_ERROR_REPEAT, 1, 2},
         {"({2}{3}a|b)", PASSGEN_ERROR_WEIGHT, 4, 5},
         {"(a|{0}{1}b)", PASSGEN_ERROR_WEIGHT, 6, 7},
+        // nothing to choose from: the error is the whole group.
+        {"{0}a", PASSGEN_ERROR_GROUP_EMPTY, 0, 4},
+        {"{0}a|{0}b", PASSGEN_ERROR_GROUP_EMPTY, 0, 9},
+        {"x({0}a)y", PASSGEN_ERROR_GROUP_EMPTY, 1, 7},
+        {"x({0}a|{0}b)", PASSGEN_ERROR_GROUP_EMPTY, 1, 12},
+        {"x({0}a){0}y", PASSGEN_ERROR_GROUP_EMPTY, 1, 7},
+        {"(({0}a))", PASSGEN_ERROR_GROUP_EMPTY, 1, 7},
         {"a{2,x}", PASSGEN_ERROR_REPEAT, 4, 5},
         {"a{3", PASSGEN_ERROR_REPEAT, 3, 3},
         {"{x}a", PASSGEN_ERROR_REPEAT, 1, 2},
@@ -505,33 +512,6 @@ test_result test_error_generate(void) {
     // the error is not needed to find out what went wrong.
     assert(
         PASSGEN_ERROR_PRESET_NOT_FOUND == passgen_resolve(pattern, env, NULL));
-    passgen_pattern_free(pattern);
-
-    // a group in which every segment has a multiplier of zero, also when it
-    // is not the whole pattern.
-    const char *empty_groups[] = {"{0}a", "x({0}a)y", "x({0}a|{0}b)"};
-    for(size_t i = 0; i < 3; i++) {
-        assert(PASSGEN_OK == passgen_parse(&pattern, NULL, empty_groups[i]));
-        assert(0 == passgen_resolve(pattern, env, NULL));
-        assert(
-            PASSGEN_ERROR_GROUP_EMPTY == passgen_generate(
-                                             pattern,
-                                             env,
-                                             &error,
-                                             NULL,
-                                             &count,
-                                             count_callback));
-        assert(error.kind == PASSGEN_ERROR_GROUP_EMPTY);
-        passgen_error_free(&error);
-        passgen_pattern_free(pattern);
-    }
-
-    // which is not a problem if it is never generated.
-    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "x({0}a){0}y"));
-    assert(0 == passgen_resolve(pattern, env, NULL));
-    assert(
-        PASSGEN_OK ==
-        passgen_generate(pattern, env, &error, NULL, &count, count_callback));
     passgen_pattern_free(pattern);
 
     // taking more steps than the limit
