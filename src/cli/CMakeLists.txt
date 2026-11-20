@@ -1,5 +1,8 @@
 add_executable(passgen-cli passgen.c main.c prompt.c tomlc17.c)
 set_target_properties(passgen-cli PROPERTIES OUTPUT_NAME passgen)
+# tomlc17 is vendored, so it is not part of the unity build, like monocypher.
+set_source_files_properties(tomlc17.c PROPERTIES
+    SKIP_UNITY_BUILD_INCLUSION YES)
 
 # the command-line interface is linked against the static library by default,
 # so that it is a single binary. it can also be linked against the shared

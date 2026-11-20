@@ -326,7 +326,7 @@ int passgen_bench_run(const options *options) {
 
         double total_time = 0;
         clock_t start = clock();
-        clock_t before, after;
+        clock_t before, after = start;
         clock_t target = options->time * CLOCKS_PER_SEC;
         clock_t progress = 0;
 
@@ -434,8 +434,13 @@ void measure_name_col(options *options) {
     }
 }
 
-void add_option(options *options, const char *arg) {
+// Adds an option given as `name=value`, which is split in place.
+void add_option(options *options, char *arg) {
     char *value = strchr(arg, '=');
+    if(!value) {
+        fprintf(stderr, "Option '%s' needs to be name=value\n", arg);
+        exit(1);
+    }
     *value = 0;
     value++;
     if(options->verbose) {
@@ -560,7 +565,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    int ret;
+    int ret = 0;
     switch(options.mode) {
         case MODE_BENCH:
             ret = passgen_bench_run(&options);

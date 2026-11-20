@@ -34,6 +34,11 @@ set(SOURCE_LIST
     "wordlist.c"
 )
 
+# monocypher is vendored, and defines macros (such as MIN) which are not meant
+# to be seen by other files, so it is not part of the unity build.
+set_source_files_properties(monocypher.c PROPERTIES
+    SKIP_UNITY_BUILD_INCLUSION YES)
+
 configure_file(version.c.in version.c)
 configure_file(../include/passgen/config.h.in passgen/config.h)
 
