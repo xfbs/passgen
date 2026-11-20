@@ -273,7 +273,7 @@ static char *nested(size_t count, const char *inner) {
     return string;
 }
 
-/// Groups can be nested 1024 deep in a pattern, which is what keeps
+/// Groups can be nested 256 deep in a pattern, which is what keeps
 /// generating from it from running out of stack. This is the case through
 /// presets as well, where each preset counts as a group.
 test_result test_preset_depth(void) {
@@ -281,10 +281,10 @@ test_result test_preset_depth(void) {
     assert(env);
     char output[256];
 
-    // the pattern, a preset in it, and 1023 groups in that are as deep as it
+    // the pattern, a preset in it, and 255 groups in that are as deep as it
     // can go.
-    char *deepest = nested(1023, "a");
-    char *too_deep = nested(1024, "a");
+    char *deepest = nested(255, "a");
+    char *too_deep = nested(256, "a");
     assert(deepest && too_deep);
     assert(PASSGEN_OK == passgen_env_preset_add(env, "deepest", deepest));
     assert(PASSGEN_OK == passgen_env_preset_add(env, "too-deep", too_deep));
@@ -319,7 +319,7 @@ test_result test_preset_depth(void) {
     for(int i = 1; i < 1000; i++) {
         snprintf(name, sizeof(name), "chain%d", i);
         snprintf(inner, sizeof(inner), "\\p{chain%d}", i - 1);
-        char *string = nested(500, inner);
+        char *string = nested(100, inner);
         assert(string);
         assert(PASSGEN_OK == passgen_env_preset_add(env, name, string));
         free(string);

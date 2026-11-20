@@ -180,7 +180,7 @@ static char *nested(size_t depth, bool closed) {
     return string;
 }
 
-/// Groups can be nested 1024 deep. Patterns nested more deeply are an error,
+/// Groups can be nested 256 deep. Patterns nested more deeply are an error,
 /// at the group which is one too many, however deep they are: freeing (and
 /// generating from) a pattern recurses into its groups, and would run out of
 /// stack if they were nested deeply enough.
@@ -188,12 +188,12 @@ test_result test_error_parse_depth(void) {
     passgen_pattern *pattern;
     passgen_error error;
 
-    char *string = nested(1024, true);
+    char *string = nested(256, true);
     assert(PASSGEN_OK == passgen_parse(&pattern, &error, string));
     passgen_pattern_free(pattern);
     free(string);
 
-    size_t depths[] = {1025, 2000, 100000, 1000000};
+    size_t depths[] = {257, 1025, 100000, 1000000};
     for(size_t i = 0; i < sizeof(depths) / sizeof(depths[0]); i++) {
         for(int closed = 0; closed < 2; closed++) {
             string = nested(depths[i], closed);
@@ -202,8 +202,8 @@ test_result test_error_parse_depth(void) {
                 passgen_parse(&pattern, &error, string));
             assert(pattern == NULL);
             assert(error.kind == PASSGEN_ERROR_DEPTH_LIMIT);
-            assert(error.start.codepoint == 1024);
-            assert(error.end.codepoint == 1025);
+            assert(error.start.codepoint == 256);
+            assert(error.end.codepoint == 257);
             passgen_error_free(&error);
             free(string);
         }

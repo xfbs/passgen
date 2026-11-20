@@ -556,7 +556,7 @@ cp "$tmpdir/bad.toml" "$XDG_CONFIG_HOME/passgen/config.toml"
 fails env -u PASSGEN_CONFIG $passgen a
 rm "$XDG_CONFIG_HOME/passgen/config.toml"
 
-# groups can be nested up to 1024 deep. more is an error in the pattern (exit
+# groups can be nested up to 256 deep. more is an error in the pattern (exit
 # status 3), also for patterns nested so deeply that freeing them used to run
 # out of stack.
 function nested() {
@@ -564,9 +564,9 @@ function nested() {
     printf a
     printf ')%.0s' $(seq "$1")
 }
-$passgen "$(nested 1024)" | matches "a"
-fails $passgen "$(nested 1025)"
-$passgen "$(nested 1025)" >/dev/null 2>&1 || test "$?" = 3
+$passgen "$(nested 256)" | matches "a"
+fails $passgen "$(nested 257)"
+$passgen "$(nested 257)" >/dev/null 2>&1 || test "$?" = 3
 fails $passgen "$(nested 50000)"
 $passgen "$(nested 50000)" >/dev/null 2>&1 || test "$?" = 3
 
@@ -668,7 +668,7 @@ $passgen -P 'broken:[' -P 'fine:abc' -p fine | matches abc
 # anything is generated (so also when it is not used in the end).
 test "$(error_lines $passgen 'ab\w{undefined}c' | sed -n 3p)" = "           ^^^^^^^^^^^^^"
 test -z "$($passgen -a 3 'a(b|\w{undefined}){0}' 2>/dev/null)"
-test "$(error_of $passgen "$(nested 1025)")" = "error in pattern: nested too deeply"
+test "$(error_of $passgen "$(nested 257)")" = "error in pattern: nested too deeply"
 # a group with nothing to choose from is found when parsing, also when it is
 # repeated zero times, and the whole group is marked.
 test "$(error_of $passgen '{0}a')" = "error in pattern: nothing to choose from"

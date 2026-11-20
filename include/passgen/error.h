@@ -87,8 +87,8 @@ typedef enum passgen_status {
     /// Something which is not a Markov chain has a parameter after a colon,
     /// such as `\w{english:2}`. To have a colon in a name, escape it.
     PASSGEN_ERROR_SPECIAL_PARAMETER,
-    /// Groups are nested more than 1024 deep, such as in a pattern which
-    /// starts with 1025 opening parentheses.
+    /// Groups are nested more than 256 deep, such as in a pattern which
+    /// starts with 257 opening parentheses.
     PASSGEN_ERROR_DEPTH_LIMIT,
     /// Generating takes more steps than the limit, such as `(a{1000}){1000}`
     /// with the default limit. See @ref passgen_env_step_limit_set.

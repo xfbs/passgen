@@ -136,7 +136,7 @@ typedef struct {
 /// How deeply groups may be nested in a pattern. Freeing and generating from
 /// a pattern recurses into its groups, so this is what keeps them from
 /// running out of stack.
-#define PASSGEN_PARSER_DEPTH_LIMIT 1024
+#define PASSGEN_PARSER_DEPTH_LIMIT 256
 
 /// Represents a parser. Contains a parsing stack, as well as a pattern, which
 /// is dynamically built, and should not be used until the parsing is finalized.

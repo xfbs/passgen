@@ -198,7 +198,7 @@ three times out of four.
 Group: outputs what is inside of it.
 Groups are used to limit how far alternatives extend, and to repeat or make
 optional more than a single character.
-They can be nested, up to 1024 deep.
+They can be nested, up to 256 deep.
 .It Li [abc] , [a-z] , [a-zA-Z0-9_]
 Set: outputs one of the characters in it, chosen at random.
 It has to have at least one.
@@ -296,7 +296,7 @@ Presets whose names start with an underscore are meant to be parts of others,
 and are not listed by
 .Fl -list .
 A preset cannot use itself, also not through other presets, and groups can
-only be nested 1024 deep in all.
+only be nested 256 deep in all.
 A preset is only parsed when it is used, so one which is not valid is not an
 error until then.
 .Pp
