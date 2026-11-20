@@ -36,8 +36,13 @@ set(SOURCE_LIST
 
 # monocypher is vendored, and defines macros (such as MIN) which are not meant
 # to be seen by other files, so it is not part of the unity build.
+#
+# it is also always optimized, even in debug builds: deriving keys from master
+# passphrases is slow on purpose, and the tests derive many of them, which
+# takes minutes without optimizations (and under valgrind or sanitizers).
 set_source_files_properties(monocypher.c PROPERTIES
-    SKIP_UNITY_BUILD_INCLUSION YES)
+    SKIP_UNITY_BUILD_INCLUSION YES
+    COMPILE_OPTIONS "$<$<NOT:$<C_COMPILER_ID:MSVC>>:-O2>")
 
 configure_file(version.c.in version.c)
 configure_file(../include/passgen/config.h.in passgen/config.h)
