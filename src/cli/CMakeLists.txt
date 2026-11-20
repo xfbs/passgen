@@ -42,6 +42,10 @@ endif()
 if(PASSGEN_SECCOMP)
     target_link_libraries(passgen-cli PUBLIC ${libseccomp})
     target_compile_definitions(passgen-cli PUBLIC PASSGEN_SECCOMP)
+    target_sources(passgen-cli PRIVATE seccomp.c)
+    # it includes <asm/termbits.h>, which conflicts with <termios.h>.
+    set_source_files_properties(seccomp.c PROPERTIES
+        SKIP_UNITY_BUILD_INCLUSION YES)
 endif()
 
 # enable static linking when requested
