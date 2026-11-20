@@ -62,6 +62,26 @@ test_result test_wordlist_load_long(void) {
     return test_ok;
 }
 
+// a line can end in a carriage return before the newline (as on Windows),
+// which is not part of the word. it is only removed before a newline, and
+// only once.
+test_result test_wordlist_load_crlf(void) {
+    const char data[] = "apple\r\n\r\nbanana\r\r\nche\rrry\r\ndate\r";
+    FILE *file = fmemopen((void *) data, strlen(data), "r");
+    assert(file);
+
+    passgen_wordlist wordlist;
+    assert(PASSGEN_OK == passgen_wordlist_load(&wordlist, NULL, file));
+    assert_eq(wordlist.count, 4);
+    assert_streq(wordlist.words[0], "apple");
+    assert_streq(wordlist.words[1], "banana\r");
+    assert_streq(wordlist.words[2], "che\rrry");
+    assert_streq(wordlist.words[3], "date\r");
+    passgen_wordlist_free(&wordlist);
+
+    return test_ok;
+}
+
 // a word which is not valid UTF-8 is an error when the wordlist is read, which
 // says what line it is on (counting blank lines, which are skipped).
 test_result test_wordlist_load_invalid_utf8(void) {

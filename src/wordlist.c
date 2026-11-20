@@ -260,7 +260,9 @@ passgen_wordlist_scan(passgen_wordlist *wordlist, passgen_error *error) {
     wordlist->capacity = ALLOC_INITIAL;
 
     // every line is a word, which ends where the line does (the data ends
-    // with a NUL character). blank lines are skipped.
+    // with a NUL character). a line can end in a carriage return and a
+    // newline, as on Windows, and the carriage return is not part of the
+    // word. blank lines are skipped.
     char *pos = wordlist->data;
     char *end = wordlist->data + wordlist->size;
     for(size_t line = 1; pos < end; line++) {
@@ -268,6 +270,9 @@ passgen_wordlist_scan(passgen_wordlist *wordlist, passgen_error *error) {
         char *newline = memchr(pos, '\n', end - pos);
         if(newline) {
             *newline = 0;
+            if(newline > token && newline[-1] == '\r') {
+                newline[-1] = 0;
+            }
             pos = newline + 1;
         } else {
             pos = end;
