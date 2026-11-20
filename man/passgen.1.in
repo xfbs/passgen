@@ -560,13 +560,14 @@ eff = { path = "eff-large.txt", hash = "8cc9e1a3257ee992" }
 .Pp
 This is BLAKE2b, as
 .Xr b2sum 1
-prints it, or any start of it.
+prints it, or any start of it, such as the first 16 digits, which is plenty to
+tell that it changed.
 As what is generated from a wordlist depends on all of it, this makes sure
 that a passphrase does not change because the wordlist did, which is an error
 instead.
 Checking it needs Monocypher, which
 .Nm
-is usually built with.
+is usually built with: without it, the hash is ignored.
 .Pp
 The table
 .Li presets

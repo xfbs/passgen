@@ -31,7 +31,8 @@ not depend on the ones before it.
   passphrase mode.
 - A wordlist in the configuration can have the hash of its file, as
   `{ path = "...", hash = "..." }`, which it then has to have. The hash is
-  what `b2sum` prints, or any start of it.
+  what `b2sum` prints, or any start of it. The EFF wordlists which are
+  installed are checked this way.
 - Logins in the configuration, as `[[login]]`, which say which master
   passphrase, preset or pattern and offset a domain and user use, so that
   `passgen -d DOMAIN -u USER` is enough.

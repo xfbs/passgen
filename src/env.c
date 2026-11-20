@@ -130,17 +130,13 @@ passgen_status passgen_env_wordlist_add_path(
     const char *name,
     const char *path,
     const char *hash) {
-    if(hash) {
-#ifdef PASSGEN_MONOCYPHER
-        if(!wordlist_hash_valid(hash)) {
-            return PASSGEN_ERROR_INVALID_ARGUMENT;
-        }
-#else
-        // there is nothing to check it with.
-        (void) wordlist_hash_valid;
+    if(hash && !wordlist_hash_valid(hash)) {
         return PASSGEN_ERROR_INVALID_ARGUMENT;
-#endif
     }
+#ifndef PASSGEN_MONOCYPHER
+    // there is nothing to check it with.
+    hash = NULL;
+#endif
 
     char *path_copy = passgen_alloc_string(path);
     char *hash_copy = hash ? passgen_alloc_string(hash) : NULL;

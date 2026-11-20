@@ -1632,24 +1632,15 @@ static int passgen_cli_config_wordlists(
                 "hash), or false",
                 name);
         }
-        if(hash) {
-#ifdef PASSGEN_MONOCYPHER
-            if(!passgen_cli_hex(hash, 128)) {
-                return passgen_cli_config_error(
-                    path,
-                    &value,
-                    "the hash of wordlist `%s` has to be 1 to 128 hex digits, "
-                    "as b2sum prints it",
-                    name);
-            }
-#else
+        // without monocypher, it is not checked, but it has to be valid,
+        // so that the configuration is the same.
+        if(hash && !passgen_cli_hex(hash, 128)) {
             return passgen_cli_config_error(
                 path,
                 &value,
-                "checking the hash of wordlist `%s` needs Monocypher, which "
-                "this is built without",
+                "the hash of wordlist `%s` has to be 1 to 128 hex digits, as "
+                "b2sum prints it",
                 name);
-#endif
         }
 
         size_t prefix = wordlist[0] == '/' ? 0 : directory_len;

@@ -68,8 +68,9 @@ wordlist_hash_check(passgen_wordlist *wordlist, passgen_error *error) {
     }
     return PASSGEN_OK;
 #else
-    // it cannot be added with a hash then.
-    return passgen_error_set(error, PASSGEN_ERROR_INTERNAL);
+    // it is not kept then.
+    (void) error;
+    return PASSGEN_OK;
 #endif
 }
 

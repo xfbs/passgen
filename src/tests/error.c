@@ -1061,25 +1061,28 @@ test_result test_error_wordlist_hash(void) {
 #endif
 
     // hashes which are not hex digits, or longer than all of them, are not
-    // valid, and without monocypher, there are no hashes at all.
+    // valid.
     char longer[130];
     memcpy(longer, full, 128);
     strcpy(&longer[128], "0");
-    const char *invalid[] = {
-        "",
-        "xyz",
-        "eae19bac ",
-        longer,
-#ifndef PASSGEN_MONOCYPHER
-        full,
-#endif
-    };
+    const char *invalid[] = {"", "xyz", "eae19bac ", longer};
     for(size_t i = 0; i < sizeof(invalid) / sizeof(invalid[0]); i++) {
         assert_eq(
             PASSGEN_ERROR_INVALID_ARGUMENT,
             passgen_env_wordlist_add_path(env, "other", path, invalid[i]));
     }
     assert(passgen_env_wordlist_path(env, "other") == NULL);
+
+#ifndef PASSGEN_MONOCYPHER
+    // without monocypher, there is nothing to check a hash with, so it is
+    // ignored.
+    assert(
+        PASSGEN_OK == passgen_env_wordlist_add_path(env, "words", path, "00"));
+    passgen_pattern *pattern;
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\w{words}"));
+    assert_eq(PASSGEN_OK, passgen_resolve(pattern, env, NULL));
+    passgen_pattern_free(pattern);
+#endif
 
     passgen_env_free(env);
     passgen_random_close(&random);

@@ -108,7 +108,8 @@ passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file);
 /// It can be checked to be the file it is meant to be, with its hash: then
 /// a file with other contents is not used, as what is generated from it would
 /// be different. The hash is BLAKE2b with 64 bytes, of all of the file, as
-/// `b2sum` prints it, which needs Monocypher.
+/// `b2sum` prints it. Checking it needs Monocypher: without it, the hash is
+/// ignored.
 ///
 /// @relatesalso passgen_env
 /// @param env Environment to add the wordlist to
@@ -121,7 +122,7 @@ passgen_env_wordlist_add(passgen_env *env, const char *name, FILE *file);
 ///   at least one digit and at most all 128 of them, as a NUL-terminated
 ///   string. NULL to not check it.
 /// @returns @ref PASSGEN_OK, @ref PASSGEN_ERROR_INVALID_ARGUMENT if the hash
-///   is not valid or the library is built without Monocypher, or
+///   is not valid, or
 ///   @ref PASSGEN_ERROR_OUT_OF_MEMORY. A file which cannot be opened or read,
 ///   or does not have the hash, is not noticed here, but when resolving a
 ///   pattern which uses it, which then fails with @ref

@@ -8,11 +8,12 @@
 # eff wordlists, sourced from https://www.eff.org/dice. these are installed
 # next to this file if they were downloaded with scripts/fetch-wordlists.sh
 # before building. a wordlist is only read when it is used, so these are not
-# a problem if they are not there.
+# a problem if they are not there. the hashes (the start of what b2sum prints)
+# make sure that they are what passphrases were generated from.
 [wordlists]
-eff-large = "eff-large.txt"
-eff-short-1 = "eff-short-1.txt"
-eff-short-2 = "eff-short-2.txt"
+eff-large = { path = "eff-large.txt", hash = "8cc9e1a3257ee992" }
+eff-short-1 = { path = "eff-short-1.txt", hash = "c2657392ddeebc14" }
+eff-short-2 = { path = "eff-short-2.txt", hash = "20b7bc29789ac60e" }
 
 [presets]
 # six words from the large eff wordlist, as recommended by the eff

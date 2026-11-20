@@ -403,8 +403,12 @@ else
     fails $passgen -u user "a"
     fails $passgen --master-setup main
     test "$($passgen --help 2>&1 | grep -c -- '--master\|--domain\|--user' || true)" = 0
-    # hashes of wordlists cannot be checked.
-    test "$(config_error '[wordlists]\nx = { path = "a", hash = "ab" }\n')" = "error: in configuration \`bad.toml\`: (line 2) checking the hash of wordlist \`x\` needs Monocypher, which this is built without"
+    # hashes of wordlists cannot be checked, so they are ignored.
+    mkdir -p "$tmpdir/conf/lists"
+    printf 'alpha\n' > "$tmpdir/conf/lists/hashed.txt"
+    printf '[wordlists]\nx = { path = "lists/hashed.txt", hash = "00" }\n' > "$tmpdir/conf/hashed.toml"
+    test "$($passgen -c "$tmpdir/conf/hashed.toml" '\w{x}')" = "alpha"
+    test "$(config_error '[wordlists]\nx = { path = "a", hash = "xyz" }\n')" = "error: in configuration \`bad.toml\`: (line 2) the hash of wordlist \`x\` has to be 1 to 128 hex digits, as b2sum prints it"
     # a configuration with master passphrases and logins is still read.
     printf '[master.main]\nversion = 1\nlevel = 1\n[[login]]\ndomain = "example.com"\n' > "$tmpdir/master.toml"
     test "$($passgen -c "$tmpdir/master.toml" a)" = "a"
