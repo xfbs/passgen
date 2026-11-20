@@ -46,7 +46,8 @@ typedef enum passgen_status {
     /// A file could not be read. The detail of the error is the reason.
     PASSGEN_ERROR_IO,
 
-    /// The pattern is not valid UTF-8.
+    /// The pattern is not valid UTF-8, or a word of a wordlist is not (then
+    /// the detail of the error is its line).
     PASSGEN_ERROR_UTF8,
     /// A backslash is followed by something which is not an escape sequence,
     /// such as `\q`.

@@ -1151,19 +1151,23 @@ test_result test_error_wordlist_utf8(void) {
     fputs("\xff\xfe\n", file);
     assert(PASSGEN_OK == passgen_env_wordlist_add(env, "broken", file));
 
-    passgen_pattern *pattern;
-    passgen_error error;
-    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "\\w{broken}"));
-    assert(PASSGEN_OK == passgen_resolve(pattern, env, NULL));
-    size_t count = 0;
-    assert(
-        PASSGEN_ERROR_WORDLIST_READ ==
-        passgen_generate(pattern, env, &error, NULL, &count, count_callback));
-    assert_streq(error.detail, "broken");
-    assert(error.cause);
-    assert(error.cause->kind == PASSGEN_ERROR_UTF8);
-    passgen_error_free(&error);
-    passgen_pattern_free(pattern);
+    // this is found when the wordlist is read, before anything is generated,
+    // and also for a Markov chain.
+    const char *patterns[] = {"\\w{broken}", "\\m{broken}", "a|\\w{broken}"};
+    for(size_t i = 0; i < 3; i++) {
+        passgen_pattern *pattern;
+        passgen_error error;
+        assert(PASSGEN_OK == passgen_parse(&pattern, NULL, patterns[i]));
+        assert(
+            PASSGEN_ERROR_WORDLIST_READ ==
+            passgen_resolve(pattern, env, &error));
+        assert_streq(error.detail, "broken");
+        assert(error.cause);
+        assert(error.cause->kind == PASSGEN_ERROR_UTF8);
+        assert_streq(error.cause->detail, "line 1");
+        passgen_error_free(&error);
+        passgen_pattern_free(pattern);
+    }
 
     passgen_env_free(env);
     passgen_random_close(&random);

@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A group with nothing to choose from, such as `({0}a)`, is an error when the
   pattern is parsed, also when it is repeated zero times. It used to be one
   only when it was generated.
+- A wordlist with a word which is not valid UTF-8 is an error when it is
+  read, which says the line. It used to be one only when the word was chosen
+  (and the word was left out of Markov chains).
 
 ## [0.5.0] - 2026-11-20
 

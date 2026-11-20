@@ -6,6 +6,7 @@
 #include "passgen/util/error.h"
 #include "passgen/util/utf8.h"
 #include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -163,10 +164,8 @@ passgen_status passgen_wordlist_parse_markov(
             &word,
             word_length);
 
-        // skip words that are not valid UTF-8.
-        if(ret != PASSGEN_UTF8_SUCCESS) {
-            continue;
-        }
+        // reading the wordlist made sure that every word is valid UTF-8.
+        passgen_assert(ret == PASSGEN_UTF8_SUCCESS);
 
         // add word to markov chain
         status = passgen_markov_add(
@@ -237,10 +236,22 @@ passgen_wordlist_read(passgen_wordlist *wordlist, passgen_error *error) {
     return PASSGEN_OK;
 }
 
+// Whether a word is valid UTF-8. It is decoded in chunks, so that words of
+// any length work.
+static bool wordlist_word_valid(const char *word) {
+    const uint8_t *pos = (const uint8_t *) word;
+    const uint8_t *end = pos + strlen(word);
+    uint32_t codepoints[64];
+    int ret;
+    do {
+        uint32_t *codepoints_pos = &codepoints[0];
+        ret = passgen_utf8_decode(&codepoints_pos, 64, NULL, &pos, end - pos);
+    } while(ret > PASSGEN_UTF8_SUCCESS);
+    return ret == PASSGEN_UTF8_SUCCESS;
+}
+
 passgen_status
 passgen_wordlist_scan(passgen_wordlist *wordlist, passgen_error *error) {
-    char *state = NULL, *token;
-
     wordlist->words = passgen_alloc(sizeof(char *) * ALLOC_INITIAL);
     wordlist->count = 0;
     if(!wordlist->words) {
@@ -248,8 +259,34 @@ passgen_wordlist_scan(passgen_wordlist *wordlist, passgen_error *error) {
     }
     wordlist->capacity = ALLOC_INITIAL;
 
-    token = strtok_r(wordlist->data, "\n", &state);
-    while(token) {
+    // every line is a word, which ends where the line does (the data ends
+    // with a NUL character). blank lines are skipped.
+    char *pos = wordlist->data;
+    char *end = wordlist->data + wordlist->size;
+    for(size_t line = 1; pos < end; line++) {
+        char *token = pos;
+        char *newline = memchr(pos, '\n', end - pos);
+        if(newline) {
+            *newline = 0;
+            pos = newline + 1;
+        } else {
+            pos = end;
+        }
+        if(!*token) {
+            continue;
+        }
+
+        // a word which is not valid UTF-8 is a mistake in the wordlist. it
+        // is found when the wordlist is read, and not only when the word
+        // happens to be chosen.
+        if(!wordlist_word_valid(token)) {
+            passgen_error_set(error, PASSGEN_ERROR_UTF8);
+            char detail[32];
+            snprintf(detail, sizeof(detail), "line %zu", line);
+            passgen_error_detail_set(error, detail);
+            return PASSGEN_ERROR_UTF8;
+        }
+
         // expand array if needed
         if(wordlist->capacity == wordlist->count) {
             size_t capacity = wordlist->capacity * ALLOC_INCREASE;
@@ -269,9 +306,6 @@ passgen_wordlist_scan(passgen_wordlist *wordlist, passgen_error *error) {
         // save word
         wordlist->words[wordlist->count] = token;
         wordlist->count++;
-
-        // get next word
-        token = strtok_r(NULL, "\n", &state);
     }
 
     // resize array finally (shrink it down to what is really needed)

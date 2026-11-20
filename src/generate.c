@@ -481,7 +481,8 @@ static int passgen_generate_special_wordlist(
             &word_pos,
             word_end - word_pos);
         if(decode_ret < PASSGEN_UTF8_SUCCESS) {
-            // the word which was picked is not valid UTF-8.
+            // the word which was picked is not valid UTF-8. reading the
+            // wordlist checks this, so this is only a safeguard.
             passgen_error cause;
             passgen_error_init(&cause);
             passgen_error_set(&cause, PASSGEN_ERROR_UTF8);

@@ -93,8 +93,9 @@ void passgen_wordlist_init_path(
 /// @memberof passgen_wordlist
 /// @param error Set to what went wrong on failure, may be NULL
 /// @returns @ref PASSGEN_OK, @ref PASSGEN_ERROR_IO if the file cannot be
-///   opened or read (the detail of the error is the reason), or
-///   @ref PASSGEN_ERROR_OUT_OF_MEMORY
+///   opened or read (the detail of the error is the reason),
+///   @ref PASSGEN_ERROR_UTF8 if a word is not valid UTF-8 (the detail of the
+///   error is its line), or @ref PASSGEN_ERROR_OUT_OF_MEMORY
 passgen_status
 passgen_wordlist_parse(passgen_wordlist *wordlist, passgen_error *error);
 

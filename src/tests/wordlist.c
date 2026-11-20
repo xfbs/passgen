@@ -62,6 +62,35 @@ test_result test_wordlist_load_long(void) {
     return test_ok;
 }
 
+// a word which is not valid UTF-8 is an error when the wordlist is read, which
+// says what line it is on (counting blank lines, which are skipped).
+test_result test_wordlist_load_invalid_utf8(void) {
+    const char data[] = "apple\n\nb\xff"
+                        "ad\ncherry\n";
+    FILE *file = fmemopen((void *) data, strlen(data), "r");
+    assert(file);
+
+    passgen_wordlist wordlist;
+    passgen_error error;
+    assert(
+        PASSGEN_ERROR_UTF8 == passgen_wordlist_load(&wordlist, &error, file));
+    assert(error.kind == PASSGEN_ERROR_UTF8);
+    assert_streq(error.detail, "line 3");
+    assert_eq(wordlist.count, 0);
+    passgen_error_free(&error);
+    passgen_wordlist_free(&wordlist);
+
+    // valid UTF-8 which is not ASCII is fine.
+    const char valid[] = "\xc3\xa4pfel\nbirne\n";
+    file = fmemopen((void *) valid, strlen(valid), "r");
+    assert(file);
+    assert(PASSGEN_OK == passgen_wordlist_load(&wordlist, NULL, file));
+    assert_eq(wordlist.count, 2);
+    passgen_wordlist_free(&wordlist);
+
+    return test_ok;
+}
+
 test_result test_wordlist_random(void) {
     FILE *file =
         fmemopen((void *) example_wordlist, example_wordlist_size, "r");
