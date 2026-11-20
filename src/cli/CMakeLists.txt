@@ -1,4 +1,13 @@
-add_executable(passgen-cli passgen.c main.c prompt.c tomlc17.c)
+add_executable(passgen-cli
+    main.c
+    config.c
+    login.c
+    master.c
+    options.c
+    output.c
+    passgen.c
+    prompt.c
+    tomlc17.c)
 set_target_properties(passgen-cli PROPERTIES OUTPUT_NAME passgen)
 # tomlc17 is vendored, so it is not part of the unity build, like monocypher.
 set_source_files_properties(tomlc17.c PROPERTIES

@@ -166,6 +166,8 @@ typedef struct {
     passgen_env *env;
 } passgen_cli_opts;
 
+// options.c
+
 /// Initialize passgen_cli_opts to default values.
 void passgen_cli_opts_init(passgen_cli_opts *opts);
 
@@ -178,21 +180,17 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input);
 /// Parse a randomness definition, like `system` or `xorshift:2342322`
 int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random);
 
-/// Load the configuration files: the ones given with `--config`, or else
-/// the ones in `PASSGEN_CONFIG`, or else the usual ones.
-int passgen_cli_opts_config(passgen_cli_opts *opts);
-
-/// Load a configuration file. One which does not exist is skipped, unless it
-/// is required.
-int passgen_cli_opts_config_file(
-    passgen_cli_opts *opts,
-    const char *path,
-    bool required);
+/// Parse the options passed on the command line, @p argc and @p argv, and
+/// return the parsed result.
+int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]);
 
 /// Load the configuration, add the presets and wordlists from the command
 /// line, and find the preset to use. This is done after parsing the options,
 /// which say which configuration to load.
 int passgen_cli_opts_load(passgen_cli_opts *opts);
+
+/// Free data from passgen ops.
+void passgen_cli_opts_free(passgen_cli_opts *opts);
 
 /// Print usage (help text) using @p executable as the name of the program.
 ///
@@ -205,20 +203,66 @@ void passgen_cli_show_version(void);
 /// Exit the program early using the specified error and data.
 int passgen_cli_bail(passgen_cli_error error, const void *data);
 
-/// Parse the options passed on the command line, @p argc and @p argv, and
-/// return the parsed result.
-int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]);
+// config.c
+
+/// Load the configuration files: the ones given with `--config`, or else
+/// the ones in `PASSGEN_CONFIG`, or else the usual ones.
+int passgen_cli_opts_config(passgen_cli_opts *opts);
+
+/// Load a configuration file. One which does not exist is skipped, unless it
+/// is required.
+int passgen_cli_opts_config_file(
+    passgen_cli_opts *opts,
+    const char *path,
+    bool required);
+
+/// Find a master passphrase from the configuration by its name, or NULL if
+/// there is none with it.
+passgen_cli_master *
+passgen_cli_master_find(const passgen_cli_opts *opts, const char *name);
+
+/// Free what a master passphrase from the configuration holds.
+void passgen_cli_master_free(passgen_cli_master *master);
+
+/// Free what a login from the configuration holds.
+void passgen_cli_login_free(passgen_cli_login *login);
+
+// passgen.c
 
 /// Run passgen with @p opts.
 int passgen_cli_run(passgen_cli_opts opts);
 
+// output.c
+
 /// Generate passgen passwords.
 int passgen_cli_generate(passgen_cli_opts opts, passgen_pattern *pattern);
 
-/// Free data from passgen ops.
-void passgen_cli_opts_free(passgen_cli_opts *opts);
+#ifdef PASSGEN_MONOCYPHER
+// master.c
+
+/// Set up a master passphrase: ask for what was not given as options (at a
+/// terminal), and for the master passphrase, and print what the
+/// configuration needs to use it.
+int passgen_cli_master_setup(const passgen_cli_opts *opts);
+
+/// Ask for the master passphrase, check it against the hash in the
+/// configuration (if there is one), and open the source of randomness for
+/// it, for the domain and user.
+int passgen_cli_master_open(
+    const passgen_cli_opts *opts,
+    passgen_random **random);
+
+// login.c
+
+/// Find the login for the domain (and user, if it is given), and fill in
+/// what was not given on the command line: the master passphrase, the user,
+/// the preset or pattern, and the offset.
+int passgen_cli_login_apply(passgen_cli_opts *opts);
+#endif
 
 #ifdef PASSGEN_SECCOMP
+// seccomp.c
+
 /// Initialize seccomp filters
 void passgen_cli_seccomp_init(void);
 #endif
