@@ -16,16 +16,12 @@
 static void passgen_cli_random_error(const char *random) {
     const char *colon = strchr(random, ':');
     if(colon && passgen_random_desc_secret(random)) {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: cannot use randomness source '%.*s:...'\n",
+        passgen_cli_error_print(
+            "cannot use randomness source '%.*s:...'\n",
             (int) (colon - random),
             random);
     } else {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: cannot use randomness source '%s'\n",
-            random);
+        passgen_cli_error_print("cannot use randomness source '%s'\n", random);
     }
 }
 
@@ -48,9 +44,8 @@ int passgen_cli_opts_random(passgen_cli_opts *opts, const char *random) {
 int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
     const char *colon = strstr(input, ":");
     if(!colon) {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: expected NAME:PATH for wordlist "
+        passgen_cli_error_print(
+            "expected NAME:PATH for wordlist "
             "definition `%s`\n",
             input);
         return PASSGEN_CLI_ERROR_WORDLIST;
@@ -75,9 +70,8 @@ int passgen_cli_opts_wordlist(passgen_cli_opts *opt, const char *input) {
 int passgen_cli_opts_preset(passgen_cli_opts *opts, const char *arg) {
     const char *colon = strchr(arg, ':');
     if(!colon) {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: expected NAME:PATTERN for preset "
+        passgen_cli_error_print(
+            "expected NAME:PATTERN for preset "
             "definition `%s`\n",
             arg);
         return PASSGEN_CLI_ERROR_PRESET_NOT_FOUND;
@@ -292,9 +286,8 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
                 unsigned long long offset = strtoull(optarg, &end, 10);
                 if(*optarg < '0' || *optarg > '9' || *end || errno ||
                    offset > UINT64_MAX) {
-                    fprintf(
-                        stderr,
-                        "\033[1;31merror\033[0m: illegal offset entered "
+                    passgen_cli_error_print(
+                        "illegal offset entered "
                         "(%s)\n",
                         optarg);
                     return PASSGEN_CLI_ERROR_ILLEGAL_OFFSET;
@@ -350,9 +343,7 @@ int passgen_cli_opts_parse(passgen_cli_opts *opts, int argc, char *argv[]) {
 
     // the stream of the last sequence has to exist.
     if(opts->amount - 1 > UINT64_MAX - opts->offset) {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: the offset is too large for the amount\n");
+        passgen_cli_error_print("the offset is too large for the amount\n");
         return PASSGEN_CLI_ERROR_ILLEGAL_OFFSET;
     }
 
@@ -600,25 +591,20 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
         case PASSGEN_CLI_ERROR_PATTERN_PARSE:
             break;
         case PASSGEN_CLI_ERROR_ILLEGAL_AMOUNT:
-            fprintf(
-                stderr,
-                "\033[1;31merror\033[0m: illegal amount entered (%i)\n",
+            passgen_cli_error_print(
+                "illegal amount entered (%i)\n",
                 *((const int *) data));
             break;
         case PASSGEN_CLI_ERROR_UNRECOGNIZED:
             break;
         case PASSGEN_CLI_ERROR_MASTER_CONFLICT:
-            fprintf(
-                stderr,
-                "\033[1;31merror\033[0m: %s\n",
-                (const char *) data);
+            passgen_cli_error_print("%s\n", (const char *) data);
             break;
         case PASSGEN_CLI_ERROR_UNUSED_11:
             break;
         case PASSGEN_CLI_ERROR_ILLEGAL_STEPS:
-            fprintf(
-                stderr,
-                "\033[1;31merror\033[0m: illegal number of steps entered "
+            passgen_cli_error_print(
+                "illegal number of steps entered "
                 "(%s)\n",
                 (const char *) data);
             break;
@@ -626,7 +612,7 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
             // what went wrong was printed by whoever noticed.
             break;
         case PASSGEN_CLI_ERROR_ALLOC:
-            fprintf(stderr, "\033[1;31merror\033[0m: out of memory\n");
+            passgen_cli_error_print("out of memory\n");
             break;
         case PASSGEN_CLI_ERROR_WORDLIST:
         case PASSGEN_CLI_ERROR_CONFIG:
@@ -635,9 +621,8 @@ int passgen_cli_bail(passgen_cli_error error, const void *data) {
             // what went wrong was printed by whoever noticed.
             break;
         case PASSGEN_CLI_ERROR_PRESET_NOT_FOUND:
-            fprintf(
-                stderr,
-                "\033[1;31merror\033[0m: preset `%s` not found\n",
+            passgen_cli_error_print(
+                "preset `%s` not found\n",
                 (const char *) data);
             break;
         default:
@@ -686,9 +671,8 @@ int passgen_cli_opts_load(passgen_cli_opts *opts) {
     if(opts->master_domain) {
         try(passgen_cli_login_apply(opts));
         if(!opts->pattern && !opts->preset) {
-            fprintf(
-                stderr,
-                "\033[1;31merror\033[0m: there is no login for `%s` which says "
+            passgen_cli_error_print(
+                "there is no login for `%s` which says "
                 "which pattern to use, give one\n",
                 opts->master_domain);
             return PASSGEN_CLI_ERROR_MASTER;

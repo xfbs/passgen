@@ -28,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   read, which says the line. It used to be one only when the word was chosen
   (and the word was left out of Markov chains).
 - Groups can be nested 256 deep, also through presets, rather than 1024.
+- Errors only have colors when they are printed to a terminal, and not when
+  `NO_COLOR` is set.
 
 ## [0.5.0] - 2026-11-20
 

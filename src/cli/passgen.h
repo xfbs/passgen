@@ -237,6 +237,30 @@ int passgen_cli_run(passgen_cli_opts opts);
 /// Generate passgen passwords.
 int passgen_cli_generate(passgen_cli_opts opts, passgen_pattern *pattern);
 
+// color.c
+
+/// Styles of what is printed to standard error.
+typedef enum {
+    /// The label of an error, and what marks where in a pattern it is.
+    PASSGEN_CLI_STYLE_ERROR,
+    /// Where something is, such as the pattern or the path of a wordlist.
+    PASSGEN_CLI_STYLE_NOTE,
+    /// Back to no style.
+    PASSGEN_CLI_STYLE_RESET,
+} passgen_cli_style_kind;
+
+/// The escape sequence for a style, or an empty string if standard error is
+/// not a terminal, or `NO_COLOR` is set.
+const char *passgen_cli_style(passgen_cli_style_kind style);
+
+/// Print an error to standard error: `error: ` (in color, if it is used),
+/// followed by the message, which is a format for printf. It does not add a
+/// newline.
+#ifdef __GNUC__
+__attribute__((format(printf, 1, 2)))
+#endif
+void passgen_cli_error_print(const char *format, ...);
+
 #ifdef PASSGEN_MONOCYPHER
 // master.c
 

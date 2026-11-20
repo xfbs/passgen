@@ -13,7 +13,13 @@ static void passgen_cli_pattern_mark(
     const char *prefix,
     const char *pattern,
     const passgen_error *error) {
-    fprintf(stderr, "\033[1;33m%s\033[0m%s\n", prefix, pattern);
+    fprintf(
+        stderr,
+        "%s%s%s%s\n",
+        passgen_cli_style(PASSGEN_CLI_STYLE_NOTE),
+        prefix,
+        passgen_cli_style(PASSGEN_CLI_STYLE_RESET),
+        pattern);
 
     // this lines up as long as every character is as wide as the others,
     // which is not the case for all of them. it is good enough to find the
@@ -25,11 +31,11 @@ static void passgen_cli_pattern_mark(
     // errors at the end of the pattern, where something is missing, don't
     // have a length.
     size_t length = error->end.codepoint - error->start.codepoint;
-    fprintf(stderr, "\033[1;31m");
+    fputs(passgen_cli_style(PASSGEN_CLI_STYLE_ERROR), stderr);
     for(size_t i = 0; i < (length ? length : 1); i++) {
         fputc('^', stderr);
     }
-    fprintf(stderr, "\033[0m\n");
+    fprintf(stderr, "%s\n", passgen_cli_style(PASSGEN_CLI_STYLE_RESET));
 }
 
 /// Prints what is wrong with a pattern, and marks where in the pattern it is.
@@ -39,7 +45,11 @@ static void passgen_cli_pattern_error(
     const passgen_error *error,
     const char *pattern,
     const passgen_env *env) {
-    fprintf(stderr, "\033[1;31merror\033[0m in pattern: ");
+    fprintf(
+        stderr,
+        "%serror%s in pattern: ",
+        passgen_cli_style(PASSGEN_CLI_STYLE_ERROR),
+        passgen_cli_style(PASSGEN_CLI_STYLE_RESET));
     passgen_error_print(error, stderr);
 
     if(error->has_position) {
@@ -77,8 +87,10 @@ static void passgen_cli_pattern_error(
         if(path) {
             fprintf(
                 stderr,
-                "\033[1;33mwordlist %s: \033[0m%s\n",
+                "%swordlist %s: %s%s\n",
+                passgen_cli_style(PASSGEN_CLI_STYLE_NOTE),
                 current->detail,
+                passgen_cli_style(PASSGEN_CLI_STYLE_RESET),
                 path);
         }
     }

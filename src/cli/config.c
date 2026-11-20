@@ -49,7 +49,7 @@ static int passgen_cli_config_error(
     const toml_datum_t *datum,
     const char *format,
     ...) {
-    fprintf(stderr, "\033[1;31merror\033[0m: in configuration `%s`: ", path);
+    passgen_cli_error_print("in configuration `%s`: ", path);
     if(datum && datum->lineno) {
         fprintf(stderr, "(line %d) ", datum->lineno);
     }

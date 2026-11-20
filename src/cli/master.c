@@ -36,7 +36,7 @@ static int passgen_cli_passphrase(const char *prompt, char *passphrase) {
         problem = "the master passphrase is empty";
     }
     if(problem) {
-        fprintf(stderr, "\033[1;31merror\033[0m: %s\n", problem);
+        passgen_cli_error_print("%s\n", problem);
         return PASSGEN_CLI_ERROR_MASTER;
     }
     return 0;
@@ -61,9 +61,7 @@ static int passgen_cli_master_derive(
         return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
     }
     if(status != PASSGEN_OK) {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: cannot derive the master key\n");
+        passgen_cli_error_print("cannot derive the master key\n");
         return PASSGEN_CLI_ERROR_MASTER;
     }
     return 0;
@@ -92,9 +90,8 @@ int passgen_cli_master_open(
     const passgen_cli_master *config =
         passgen_cli_master_find(opts, opts->master);
     if(!config) {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: there is no master passphrase `%s` in the "
+        passgen_cli_error_print(
+            "there is no master passphrase `%s` in the "
             "configuration, see --master-setup\n",
             opts->master);
         return PASSGEN_CLI_ERROR_MASTER;
@@ -122,9 +119,8 @@ int passgen_cli_master_open(
         passgen_cli_master_hash_hex(&master, hash, strlen(config->hash));
         if(0 != strcmp(hash, config->hash)) {
             passgen_master_wipe(&master);
-            fprintf(
-                stderr,
-                "\033[1;31merror\033[0m: wrong master passphrase for `%s`\n",
+            passgen_cli_error_print(
+                "wrong master passphrase for `%s`\n",
                 config->name);
             return PASSGEN_CLI_ERROR_MASTER;
         }
@@ -250,9 +246,8 @@ int passgen_cli_master_setup(const passgen_cli_opts *opts) {
         chosen = PASSGEN_CLI_MASTER_NAME_DEFAULT;
     }
     if(!passgen_cli_master_name_valid(chosen)) {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: the name of a master passphrase cannot "
+        passgen_cli_error_print(
+            "the name of a master passphrase cannot "
             "be empty or have control characters\n");
         return PASSGEN_CLI_ERROR_MASTER;
     }
@@ -319,9 +314,8 @@ int passgen_cli_master_setup(const passgen_cli_opts *opts) {
     if(ret == 0 && interactive) {
         ret = passgen_cli_passphrase("master passphrase again: ", again);
         if(ret == 0 && 0 != strcmp(passphrase, again)) {
-            fprintf(
-                stderr,
-                "\033[1;31merror\033[0m: the master passphrases are not the "
+            passgen_cli_error_print(
+                "the master passphrases are not the "
                 "same\n");
             ret = PASSGEN_CLI_ERROR_MASTER;
         }

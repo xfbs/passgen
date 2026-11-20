@@ -37,9 +37,8 @@ int passgen_cli_login_apply(passgen_cli_opts *opts) {
         if(opts->master) {
             return 0;
         }
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: there is more than one login for `%s`, "
+        passgen_cli_error_print(
+            "there is more than one login for `%s`, "
             "choose one with --user:",
             opts->master_domain);
         const char *separator = " ";
@@ -59,16 +58,14 @@ int passgen_cli_login_apply(passgen_cli_opts *opts) {
             return 0;
         }
         if(opts->master_user) {
-            fprintf(
-                stderr,
-                "\033[1;31merror\033[0m: there is no login for `%s` and user "
+            passgen_cli_error_print(
+                "there is no login for `%s` and user "
                 "`%s` in the configuration, give --master\n",
                 opts->master_domain,
                 opts->master_user);
         } else {
-            fprintf(
-                stderr,
-                "\033[1;31merror\033[0m: there is no login for `%s` in the "
+            passgen_cli_error_print(
+                "there is no login for `%s` in the "
                 "configuration, give --master\n",
                 opts->master_domain);
         }
@@ -82,9 +79,8 @@ int passgen_cli_login_apply(passgen_cli_opts *opts) {
             opts->master = opts->masters[0].name;
         }
         if(!opts->master) {
-            fprintf(
-                stderr,
-                "\033[1;31merror\033[0m: the login for `%s` does not say which "
+            passgen_cli_error_print(
+                "the login for `%s` does not say which "
                 "master passphrase it uses, and there is %s, give --master\n",
                 opts->master_domain,
                 opts->masters_len ? "more than one" : "none");
@@ -103,9 +99,8 @@ int passgen_cli_login_apply(passgen_cli_opts *opts) {
     }
 
     if(!opts->pattern && !opts->preset) {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: the login for `%s` has no preset or "
+        passgen_cli_error_print(
+            "the login for `%s` has no preset or "
             "pattern, give one\n",
             opts->master_domain);
         return PASSGEN_CLI_ERROR_MASTER;
@@ -113,9 +108,7 @@ int passgen_cli_login_apply(passgen_cli_opts *opts) {
 
     // the stream of the last sequence has to exist.
     if(opts->amount - 1 > UINT64_MAX - opts->offset) {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: the offset is too large for the amount\n");
+        passgen_cli_error_print("the offset is too large for the amount\n");
         return PASSGEN_CLI_ERROR_ILLEGAL_OFFSET;
     }
     return 0;

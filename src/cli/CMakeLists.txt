@@ -1,5 +1,6 @@
 add_executable(passgen-cli
     main.c
+    color.c
     config.c
     login.c
     master.c

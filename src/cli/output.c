@@ -121,7 +121,7 @@ passgen_cli_generate_error(passgen_status status, passgen_error *error) {
         return passgen_cli_bail(PASSGEN_CLI_ERROR_ALLOC, NULL);
     }
 
-    fprintf(stderr, "\033[1;31merror\033[0m: ");
+    passgen_cli_error_print("%s", "");
     passgen_error_print(error, stderr);
     passgen_error_free(error);
 
@@ -135,9 +135,8 @@ passgen_cli_generate_error(passgen_status status, passgen_error *error) {
 static int passgen_cli_stream(passgen_cli_opts *opts, size_t index) {
     if(!passgen_random_stream(opts->random, opts->offset + index) &&
        opts->offset_given) {
-        fprintf(
-            stderr,
-            "\033[1;31merror\033[0m: --offset needs a deterministic source "
+        passgen_cli_error_print(
+            "--offset needs a deterministic source "
             "of randomness, such as --master\n");
         return PASSGEN_CLI_ERROR_ILLEGAL_OFFSET;
     }

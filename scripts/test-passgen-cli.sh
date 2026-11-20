@@ -669,6 +669,11 @@ $passgen -P 'broken:[' -P 'fine:abc' -p fine | matches abc
 test "$(error_lines $passgen 'ab\w{undefined}c' | sed -n 3p)" = "           ^^^^^^^^^^^^^"
 test -z "$($passgen -a 3 'a(b|\w{undefined}){0}' 2>/dev/null)"
 test "$(error_of $passgen "$(nested 257)")" = "error in pattern: nested too deeply"
+
+# errors only have colors on a terminal, so there are none when they are
+# piped or written to a file.
+test "$($passgen 'ab(' 2>&1 | grep -c $'\033')" = 0
+test "$($passgen -a 0 a 2>&1 | grep -c $'\033')" = 0
 # a group with nothing to choose from is found when parsing, also when it is
 # repeated zero times, and the whole group is marked.
 test "$(error_of $passgen '{0}a')" = "error in pattern: nothing to choose from"
