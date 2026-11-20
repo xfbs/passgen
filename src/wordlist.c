@@ -33,8 +33,8 @@ void passgen_wordlist_init(passgen_wordlist *wordlist, FILE *file) {
     wordlist->words = NULL;
     wordlist->capacity = 0;
     wordlist->count = 0;
-    for(size_t i = 0; i < PASSGEN_MARKOV_LENGTH_MAX; i++) {
-        passgen_markov_init(&wordlist->markov[i], i + 1);
+    for(size_t i = 0; i <= PASSGEN_MARKOV_LENGTH_MAX; i++) {
+        passgen_markov_init(&wordlist->markov[i], i);
     }
 }
 
@@ -126,9 +126,9 @@ passgen_status passgen_wordlist_parse_markov(
     size_t length,
     passgen_error *error) {
     passgen_assert(wordlist->parsed);
-    passgen_require(length >= 1 && length <= PASSGEN_MARKOV_LENGTH_MAX);
+    passgen_require(length <= PASSGEN_MARKOV_LENGTH_MAX);
 
-    uint8_t bit = 1 << (length - 1);
+    uint16_t bit = 1 << length;
     if(wordlist->parsed_markov & bit) {
         return PASSGEN_OK;
     }
@@ -345,7 +345,7 @@ passgen_wordlist_random(passgen_wordlist *wordlist, passgen_random *random) {
 }
 
 void passgen_wordlist_free(passgen_wordlist *wordlist) {
-    for(size_t i = 0; i < PASSGEN_MARKOV_LENGTH_MAX; i++) {
+    for(size_t i = 0; i <= PASSGEN_MARKOV_LENGTH_MAX; i++) {
         passgen_markov_free(&wordlist->markov[i]);
     }
 

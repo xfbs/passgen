@@ -237,7 +237,9 @@ resembles the words in the wordlist
 These words are pronounceable, but mostly not real words, and their length is
 not fixed.
 .It Li \em{name:length}
-The same, with a Markov chain of the given length, from 1 to 8.
+The same, with a Markov chain of the given length, from 0 to 8.
+A length of 0 chooses every character by how often it is in the words alone,
+which can rarely be pronounced.
 This is how many of the previous letters are taken into account when choosing
 the next one, which is 3 without a length.
 Longer chains generate words which are closer to those in the wordlist, but

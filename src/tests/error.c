@@ -1108,11 +1108,9 @@ test_result test_error_wordlist_markov_length(void) {
     assert(length > 0);
     passgen_pattern_free(pattern);
 
-    // a length which is not from 1 to 8 is an error in the pattern, at the
-    // first character of it which makes it so. zero is only known to be
-    // invalid once the length ends.
+    // a length which is not from 0 to 8 is an error in the pattern, at the
+    // first character of it which makes it so.
     const char *invalid[][2] = {
-        {"\\m{words:0}", "          ^"},
         {"\\m{words:9}", "         ^"},
         {"\\m{words:10}", "          ^"},
         {"\\m{words:}", "         ^"},
@@ -1130,7 +1128,7 @@ test_result test_error_wordlist_markov_length(void) {
 
     assert_streq(
         passgen_status_string(PASSGEN_ERROR_MARKOV_LENGTH),
-        "length of a Markov chain must be a number from 1 to 8");
+        "length of a Markov chain must be a number from 0 to 8");
 
     passgen_env_free(env);
     passgen_random_close(&random);

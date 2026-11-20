@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A wordlist with Windows line endings (`\r\n`) no longer has the carriage
   return at the end of every word, which changes what is generated from it.
 
+### Added
+
+- Markov chains of length zero, as in `\m{name:0}`, which choose every
+  character by how often it is in the words alone.
+
 ### Changed
 
 - A segment with more than one weight, such as `({2}{3}a|b)`, is an error.

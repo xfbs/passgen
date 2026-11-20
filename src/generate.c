@@ -449,8 +449,11 @@ static int passgen_generate_special_markov(
             break;
         }
         try(emit(context, next));
-        memmove(&window[0], &window[1], (level - 1) * sizeof(window[0]));
-        window[level - 1] = next;
+        // a chain of length zero does not look at what came before.
+        if(level > 0) {
+            memmove(&window[0], &window[1], (level - 1) * sizeof(window[0]));
+            window[level - 1] = next;
+        }
     }
 
     return 0;

@@ -226,10 +226,9 @@ passgen_markov_node_child(const passgen_markov_node *node, uint32_t codepoint) {
 // Initialize new markov chain with a given level. The root node is only
 // allocated once something is added, so this cannot fail.
 void passgen_markov_init(passgen_markov *markov, uint8_t level) {
-    passgen_assert(level);
     memset(markov, 0, sizeof(*markov));
     markov->level = level;
-    markov->root = NULL;
+    markov->root.node = NULL;
 }
 
 passgen_markov_leaf *passgen_markov_leaf_insert(
@@ -396,8 +395,33 @@ static passgen_status passgen_markov_insert(
     passgen_markov *markov,
     const uint32_t *sequence,
     size_t weight) {
+    // a chain of length zero only counts the codepoints, in its leaf.
+    if(markov->level == 0) {
+        if(weight == 0) {
+            return PASSGEN_OK;
+        }
+        passgen_markov_leaf *leaf = markov->root.leaf;
+        if(!leaf) {
+            leaf = passgen_markov_leaf_new();
+            if(!leaf) {
+                return PASSGEN_ERROR_OUT_OF_MEMORY;
+            }
+        }
+        passgen_markov_leaf *grown =
+            passgen_markov_leaf_insert(leaf, sequence[0], weight);
+        if(!grown) {
+            if(!markov->root.leaf) {
+                passgen_markov_leaf_free(leaf);
+            }
+            return PASSGEN_ERROR_OUT_OF_MEMORY;
+        }
+        markov->root.leaf = grown;
+        markov->count += weight;
+        return PASSGEN_OK;
+    }
+
     passgen_status status = passgen_markov_node_insert_word(
-        &markov->root,
+        &markov->root.node,
         sequence,
         markov->level + 1,
         weight);
@@ -445,8 +469,12 @@ passgen_status passgen_markov_add(
 
 // Free a markov chain
 void passgen_markov_free(passgen_markov *markov) {
-    if(markov->root) {
-        passgen_markov_node_free(markov->root, markov->level);
+    if(markov->level == 0) {
+        if(markov->root.leaf) {
+            passgen_markov_leaf_free(markov->root.leaf);
+        }
+    } else if(markov->root.node) {
+        passgen_markov_node_free(markov->root.node, markov->level);
     }
     PASSGEN_CLEAR(markov);
 }
@@ -456,21 +484,24 @@ uint32_t passgen_markov_generate(
     const uint32_t *current,
     passgen_random *random,
     double *entropy) {
-    passgen_markov_node *node = markov->root;
-    passgen_assert(node);
+    passgen_markov_leaf *leaf = markov->root.leaf;
+    if(markov->level > 0) {
+        passgen_markov_node *node = markov->root.node;
+        passgen_assert(node);
 
-    // the last of the previous codepoints leads to the leaf.
-    for(size_t i = 0; i + 1 < markov->level; i++) {
+        // the last of the previous codepoints leads to the leaf.
+        for(size_t i = 0; i + 1 < markov->level; i++) {
+            passgen_markov_child *child =
+                passgen_markov_node_child(node, current[i]);
+            passgen_assert(child);
+            node = child->node;
+        }
         passgen_markov_child *child =
-            passgen_markov_node_child(node, current[i]);
+            passgen_markov_node_child(node, current[markov->level - 1]);
         passgen_assert(child);
-        node = child->node;
+        leaf = child->leaf;
     }
-    passgen_markov_child *child =
-        passgen_markov_node_child(node, current[markov->level - 1]);
-    passgen_assert(child);
-    passgen_markov_leaf *leaf = child->leaf;
-    passgen_assert(leaf->len);
+    passgen_assert(leaf && leaf->len);
 
     // with only one codepoint which can follow (however often it was seen),
     // there is nothing to choose from, so this takes no randomness. the

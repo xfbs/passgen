@@ -9,10 +9,11 @@
 ///
 /// The chain is a tree: the nodes are keyed by the previous codepoints, one
 /// level for each, and the leaves have the counts of the codepoints which
-/// followed them. Both keep their entries in arrays which are sorted by
-/// codepoint, which are searched with a binary search, and which grow by one
-/// entry at a time. This needs as little memory as possible, which matters
-/// for longer chains, which have many nodes with few entries each.
+/// followed them. A chain of length zero does not look at the previous
+/// codepoints, so it is only a leaf. Both keep their entries in arrays which
+/// are sorted by codepoint, which are searched with a binary search, and which
+/// grow by one entry at a time. This needs as little memory as possible, which
+/// matters for longer chains, which have many nodes with few entries each.
 #pragma once
 #include "passgen/random.h"
 #include <passgen/error.h>
@@ -88,8 +89,9 @@ typedef struct {
     size_t level;
     /// How many words are in this Markov chain
     size_t count;
-    /// Root node of markov chain, or NULL if nothing was added yet.
-    passgen_markov_node *root;
+    /// Root of the Markov chain, which is NULL if nothing was added yet. It
+    /// is a node, or a leaf for a level of zero.
+    passgen_markov_child root;
 } passgen_markov;
 
 /// The codepoints of a node, which follow its children.

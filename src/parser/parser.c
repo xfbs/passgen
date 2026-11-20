@@ -682,9 +682,8 @@ int passgen_parse_special_name(
         if(special->parameters_len == 0) {
             return PASSGEN_ERROR_SPECIAL;
         }
-        // and a length after a colon, which is not zero.
-        if(state->data.special.length &&
-           (!state->data.special.digits || special->markov_length == 0)) {
+        // and a length after a colon.
+        if(state->data.special.length && !state->data.special.digits) {
             return PASSGEN_ERROR_MARKOV_LENGTH;
         }
         // the closing brace is one byte long.

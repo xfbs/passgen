@@ -16,7 +16,7 @@ typedef struct passgen_wordlist {
     bool parsed;
 
     /// Which of the Markov chains are built: bit n is for the length n + 1.
-    uint8_t parsed_markov;
+    uint16_t parsed_markov;
 
     /// Should close file when done reading.
     bool should_close_file;
@@ -52,7 +52,7 @@ typedef struct passgen_wordlist {
     /// Markov chains built from this wordlist, one for every length (the
     /// first is of length 1). They are built when they are first needed, see
     /// @ref passgen_wordlist_parse_markov.
-    passgen_markov markov[PASSGEN_MARKOV_LENGTH_MAX];
+    passgen_markov markov[PASSGEN_MARKOV_LENGTH_MAX + 1];
 } passgen_wordlist;
 
 /// Read a wordlist from a file. The file is closed.
@@ -105,7 +105,7 @@ passgen_wordlist_parse(passgen_wordlist *wordlist, passgen_error *error);
 /// If this fails, the Markov chain is empty, and this can be tried again.
 ///
 /// @memberof passgen_wordlist
-/// @param length Length of the chain, from 1 to @ref PASSGEN_MARKOV_LENGTH_MAX
+/// @param length Length of the chain, from 0 to @ref PASSGEN_MARKOV_LENGTH_MAX
 /// @param error Set to what went wrong on failure, may be NULL
 /// @returns @ref PASSGEN_OK or @ref PASSGEN_ERROR_OUT_OF_MEMORY
 passgen_status passgen_wordlist_parse_markov(
@@ -119,7 +119,7 @@ passgen_status passgen_wordlist_parse_markov(
 /// @memberof passgen_wordlist
 static inline passgen_markov *
 passgen_wordlist_markov(passgen_wordlist *wordlist, size_t length) {
-    return &wordlist->markov[length - 1];
+    return &wordlist->markov[length];
 }
 
 /// Generate random word from this wordlist.

@@ -459,6 +459,9 @@ $passgen -w "test:$tmpdir/words.txt" '\m{test}' | matches "[a-z]+"
 $passgen -w "test:$tmpdir/words.txt" '\m{test:2}' | matches "[a-z]+"
 # chains of every length can be used together, from the same wordlist.
 $passgen -w "test:$tmpdir/words.txt" '\m{test:1}-\m{test:8}-\m{test}' | matches "[a-z]+-[a-z]+-[a-z]+"
+# a chain of length zero only chooses letters by how often they are in the
+# words, which can also end a word right away.
+$passgen -a 5 -w "test:$tmpdir/words.txt" 'x\m{test:0}' | matches "x[a-z]*"
 # a chain as long as the words only generates them.
 $passgen -a 5 -w "test:$tmpdir/words.txt" '\m{test:8}' | matches "(alpha|bravo|charlie)"
 
@@ -597,7 +600,7 @@ $passgen "a{,3}" | matches "a{0,3}"
 fails $passgen "a[]{3}"
 fails $passgen -a 0 "a"
 fails $passgen -M 2 "a"
-for length in 0 9 10 "" x -1 "2:3"; do
+for length in 9 10 "" x -1 "2:3"; do
     fails $passgen -w "test:$tmpdir/words.txt" "\\m{test:$length}"
 done
 fails $passgen -p doesnotexist
@@ -637,7 +640,7 @@ test "$(error_of $passgen -r "xorshift:0" a)" = "error: cannot use randomness so
 test "$(error_lines $passgen -w "test:$tmpdir/doesnotexist" '\w{test}' | head -n 2)" = "error in pattern: wordlist could not be read: test
 caused by: cannot read file: No such file or directory"
 test "$(error_of $passgen '\w{}')" = "error in pattern: expected a name in braces"
-test "$(error_of $passgen '\m{test:9}')" = "error in pattern: length of a Markov chain must be a number from 1 to 8"
+test "$(error_of $passgen '\m{test:9}')" = "error in pattern: length of a Markov chain must be a number from 0 to 8"
 test "$(error_of $passgen '\w{test:2}')" = "error in pattern: only a Markov chain takes a parameter"
 test "$(error_of $passgen '\p{apple1:2}')" = "error in pattern: only a Markov chain takes a parameter"
 test "$(error_of $passgen '\w{undefined}')" = "error in pattern: wordlist not found: undefined"

@@ -81,8 +81,8 @@ typedef enum passgen_status {
     /// A wordlist is referred to without a name in braces following it, such
     /// as `\wabc`, `\w{abc` or `\w{}`.
     PASSGEN_ERROR_SPECIAL,
-    /// The length of a Markov chain is not a number from 1 to 8, such as in
-    /// `\m{english:0}` or `\m{english:abc}`.
+    /// The length of a Markov chain is not a number from 0 to 8, such as in
+    /// `\m{english:9}` or `\m{english:abc}`.
     PASSGEN_ERROR_MARKOV_LENGTH,
     /// Something which is not a Markov chain has a parameter after a colon,
     /// such as `\w{english:2}`. To have a colon in a name, escape it.

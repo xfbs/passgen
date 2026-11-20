@@ -553,7 +553,7 @@ void passgen_cli_usage(const char *executable) {
         "    a?                     Optional: 'a' or nothing\n"
         "    \\w{name}               Word: a word from the wordlist\n"
         "    \\m{name}               Markov: a pronounceable word from the wordlist\n"
-        "    \\m{name:2}             The same, with a chain of length 2 (1 to 8,\n"
+        "    \\m{name:2}             The same, with a chain of length 2 (0 to 8,\n"
         "                           default: 3)\n"
         "    \\p{name}               Preset: the pattern of the preset\n"
         "    \\u{e4}                 A character, by its codepoint in hex\n"

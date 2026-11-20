@@ -1,5 +1,6 @@
 #include "passgen/markov.h"
 #include "tests.h"
+#include <math.h>
 #include <stdlib.h>
 
 #define SEED 234720984723
@@ -112,7 +113,7 @@ test_result test_markov_node_insert_word(void) {
 static passgen_markov_leaf *
 leaf_of(passgen_markov *markov, uint32_t first, uint32_t second) {
     passgen_markov_child *child =
-        passgen_markov_node_child(markov->root, first);
+        passgen_markov_node_child(markov->root.node, first);
     if(!child) {
         return NULL;
     }
@@ -168,13 +169,52 @@ test_result test_markov_add(void) {
         1);
 
     // the root has the codepoints which words start with, sorted.
-    uint32_t *codepoints = passgen_markov_node_codepoints(markov.root);
-    for(size_t i = 1; i < markov.root->len; i++) {
+    uint32_t *codepoints = passgen_markov_node_codepoints(markov.root.node);
+    for(size_t i = 1; i < markov.root.node->len; i++) {
         assert(codepoints[i - 1] < codepoints[i]);
     }
 
     passgen_markov_free(&markov);
 
+    return test_ok;
+}
+
+// a chain of length zero does not look at the previous codepoints: it only
+// counts how often every codepoint is in the words, and how many words end.
+test_result test_markov_level_zero(void) {
+    passgen_markov markov;
+    passgen_markov_init(&markov, 0);
+
+    passgen_markov_add(&markov, (const uint32_t[]){'a', 'b'}, 2, 1);
+    passgen_markov_add(&markov, (const uint32_t[]){'a'}, 1, 1);
+    assert_eq(markov.count, 5);
+
+    passgen_markov_leaf *leaf = markov.root.leaf;
+    assert(leaf);
+    assert_eq(leaf->total_count, 5);
+    assert_eq(passgen_markov_leaf_count(leaf, 0), 2);
+    assert_eq(passgen_markov_leaf_count(leaf, 'a'), 2);
+    assert_eq(passgen_markov_leaf_count(leaf, 'b'), 1);
+
+    // every codepoint is chosen from the same leaf, whatever came before.
+    passgen_random random;
+    assert(passgen_random_open(&random, "xorshift:1"));
+    size_t seen[3] = {0};
+    for(size_t i = 0; i < 1000; i++) {
+        double entropy = 0;
+        uint32_t next =
+            passgen_markov_generate(&markov, NULL, &random, &entropy);
+        size_t index = next == 0 ? 0 : next == 'a' ? 1 : 2;
+        assert(next == 0 || next == 'a' || next == 'b');
+        seen[index] += 1;
+        double expected =
+            log2(5.0) - log2((double) passgen_markov_leaf_count(leaf, next));
+        assert(fabs(entropy - expected) < 1e-9);
+    }
+    assert(seen[0] > 0 && seen[1] > 0 && seen[2] > 0);
+    passgen_random_close(&random);
+
+    passgen_markov_free(&markov);
     return test_ok;
 }
 

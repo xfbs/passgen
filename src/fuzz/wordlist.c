@@ -12,7 +12,7 @@
 static void run(const uint8_t *data, size_t size) {
     // the length of the chain is kept small, as the memory needed grows with
     // it.
-    size_t markov_length = 1 + data[0] % 4;
+    size_t markov_length = data[0] % 5;
     data += 1;
     size -= 1;
 
