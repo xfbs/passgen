@@ -236,17 +236,27 @@ test_result test_regression_parse_repeat_range(void) {
 
 /// Giving a segment more than one multiplier (as in `{4}{1}a`) used to leave
 /// the group with a sum of multipliers which did not match the segments, so
-/// that choosing a segment could run past the last one.
+/// that choosing a segment could run past the last one. It is an error now,
+/// and the sum has to be right for the segments that have one.
 test_result test_regression_parse_multiplier_twice(void) {
     passgen_pattern *pattern;
     passgen_error error;
 
-    assert(0 == passgen_parse(&pattern, &error, "{4}{1}a|b"));
-    assert(pattern->group.multiplier_sum == 2);
+    assert(
+        PASSGEN_ERROR_WEIGHT == passgen_parse(&pattern, &error, "{4}{1}a|b"));
     passgen_pattern_free(pattern);
 
-    assert(0 == passgen_parse(&pattern, &error, "{1}{4}a|{2}b"));
-    assert(pattern->group.multiplier_sum == 6);
+    assert(
+        PASSGEN_ERROR_WEIGHT ==
+        passgen_parse(&pattern, &error, "{1}a|{2}{4}b"));
+    passgen_pattern_free(pattern);
+
+    assert(0 == passgen_parse(&pattern, &error, "{4}a|b|{2}c"));
+    assert(pattern->group.multiplier_sum == 7);
+    passgen_pattern_free(pattern);
+
+    // a weight of zero is recycled at the next `|`, which can have its own.
+    assert(0 == passgen_parse(&pattern, &error, "({0}a|{3}b|c)"));
     passgen_pattern_free(pattern);
 
     // the sum must not overflow either.

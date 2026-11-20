@@ -53,6 +53,8 @@ test_result test_error_parse(void) {
         {"a{}", PASSGEN_ERROR_REPEAT, 2, 3},
         {"a{,}", PASSGEN_ERROR_REPEAT, 3, 4},
         {"{}a", PASSGEN_ERROR_REPEAT, 1, 2},
+        {"({2}{3}a|b)", PASSGEN_ERROR_WEIGHT, 4, 5},
+        {"(a|{0}{1}b)", PASSGEN_ERROR_WEIGHT, 6, 7},
         {"a{2,x}", PASSGEN_ERROR_REPEAT, 4, 5},
         {"a{3", PASSGEN_ERROR_REPEAT, 3, 3},
         {"{x}a", PASSGEN_ERROR_REPEAT, 1, 2},

@@ -76,6 +76,7 @@ passgen_parser_state *passgen_parser_state_push_group(
     state->type = PASSGEN_PARSER_GROUP;
     state->data.group.group = group;
     state->data.group.segment = segment;
+    state->data.group.weighted = false;
 
     return state;
 }
@@ -299,6 +300,7 @@ int passgen_parse_group(
     } else {
         switch(codepoint) {
             case '|':
+                state->data.group.weighted = false;
                 if(state->data.group.segment->multiplier > 0) {
                     // create new segment and parser state
                     passgen_pattern_segment *segment =
@@ -373,10 +375,15 @@ int passgen_parse_group(
                     }
                     return 0;
                 } else {
-                    // the multiplier of this segment is about to be replaced,
-                    // so take whatever it is right now out of the sum (it
-                    // is not always one: there may have been a multiplier
-                    // already, as in `{2}{3}a`).
+                    // a segment has one weight, so `{2}{3}a` is a mistake.
+                    if(state->data.group.weighted) {
+                        return PASSGEN_ERROR_WEIGHT;
+                    }
+                    state->data.group.weighted = true;
+
+                    // the multiplier of this segment (which is one until it
+                    // has a weight) is about to be replaced, so take it out
+                    // of the sum.
                     state->data.group.group->multiplier_sum -=
                         state->data.group.segment->multiplier;
                     state->data.group.segment->multiplier = 0;

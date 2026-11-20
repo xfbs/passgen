@@ -87,6 +87,9 @@ typedef struct {
             passgen_pattern_group *group;
             /// Current segment
             passgen_pattern_segment *segment;
+            /// Whether the current segment was given a weight, as in
+            /// `{2}a`, which it can only be once.
+            bool weighted;
         } group;
         /// Data for #PASSGEN_PARSER_REPEAT and #PASSGEN_PARSER_REPEAT_RANGE
         /// types.

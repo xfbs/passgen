@@ -40,6 +40,8 @@ const char *passgen_status_string(passgen_status status) {
             return "invalid range in set";
         case PASSGEN_ERROR_REPEAT:
             return "invalid repetition";
+        case PASSGEN_ERROR_WEIGHT:
+            return "a segment can only have one weight";
         case PASSGEN_ERROR_OPTIONAL:
             return "nothing to make optional";
         case PASSGEN_ERROR_SPECIAL:

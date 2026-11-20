@@ -72,6 +72,8 @@ typedef enum passgen_status {
     /// number is too large, the maximum is smaller than the minimum (such as
     /// `a{5,2}`), or it is not closed.
     PASSGEN_ERROR_REPEAT,
+    /// A segment of a group has more than one weight, such as `({2}{3}a|b)`.
+    PASSGEN_ERROR_WEIGHT,
     /// A question mark does not follow anything which it could make
     /// optional, such as `?a`.
     PASSGEN_ERROR_OPTIONAL,

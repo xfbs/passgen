@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- A segment with more than one weight, such as `({2}{3}a|b)`, is an error.
+  The last one used to count.
+
 ## [0.5.0] - 2026-11-20
 
 ### Passwords which change
