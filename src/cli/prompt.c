@@ -1,10 +1,17 @@
 #include "prompt.h"
-#include <signal.h>
 #include <stdio.h>
 #include <string.h>
-#include <termios.h>
 #include <unistd.h>
 
+// WASI has no terminal settings and no signals: the terminal belongs to the
+// runtime, so what is typed cannot be hidden there.
+#ifndef __wasi__
+#define PROMPT_HIDE
+#include <signal.h>
+#include <termios.h>
+#endif
+
+#ifdef PROMPT_HIDE
 // what the terminal was set to before echoing was turned off, which is set
 // back when being interrupted.
 static struct termios prompt_saved;
@@ -15,6 +22,7 @@ static void prompt_restore(int signal) {
     (void) !write(STDERR_FILENO, "\n", 1);
     _exit(128 + signal);
 }
+#endif
 
 // Reads a line from standard input, one byte at a time, without the newline
 // (or CRLF) at its end. Sets any to whether there was anything to read, and
@@ -58,12 +66,15 @@ bool passgen_cli_prompt_output_terminal(void) {
 passgen_cli_prompt_status
 passgen_cli_prompt_secret(const char *prompt, char *buffer, size_t size) {
     bool terminal = passgen_cli_prompt_interactive();
+#ifdef PROMPT_HIDE
     struct sigaction previous_int, previous_term;
+#endif
 
     if(terminal) {
         fprintf(stderr, "%s", prompt);
         fflush(stderr);
 
+#ifdef PROMPT_HIDE
         // what is typed is not shown, but the newline at its end is.
         if(0 == tcgetattr(STDIN_FILENO, &prompt_saved)) {
             struct termios hidden = prompt_saved;
@@ -82,16 +93,19 @@ passgen_cli_prompt_secret(const char *prompt, char *buffer, size_t size) {
         } else {
             terminal = false;
         }
+#endif
     }
 
     bool any = false, too_long = false;
     prompt_read_line(buffer, size, &any, &too_long);
 
+#ifdef PROMPT_HIDE
     if(terminal) {
         tcsetattr(STDIN_FILENO, TCSAFLUSH, &prompt_saved);
         sigaction(SIGINT, &previous_int, NULL);
         sigaction(SIGTERM, &previous_term, NULL);
     }
+#endif
 
     if(!any) {
         return PASSGEN_CLI_PROMPT_EOF;

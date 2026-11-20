@@ -51,9 +51,11 @@ static void passgen_random_close_file(void *context) {
     fclose(context);
 }
 
+#ifdef PASSGEN_RANDOM_HAVE_SYSTEM
 static void passgen_random_system_close(void *context) {
     (void) context;
 }
+#endif
 
 // Fills the buffer for the first time. If that does not work, the source is
 // closed (and released, if it was allocated here).
