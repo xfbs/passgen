@@ -20,9 +20,14 @@ typedef struct bench {
     /// which is not part of the time it takes. The result of the iteration
     /// is given to `cleanup`, which frees it.
     bool consumes;
+    /// Whether the benchmark only runs when it is asked for by name, such as
+    /// for one which takes long and is not meant to get faster.
+    bool optional;
     /// Prepares the input of the benchmark, from the options given with `-o`.
     ///
-    /// If this is not NULL, its result is given to every iteration.
+    /// If this is not NULL, its result is given to every iteration. If it
+    /// returns NULL, the benchmark is skipped, such as when a file it needs
+    /// is not there (which it says why).
     void *(*prepare)(const passgen_hashmap *opts);
     /// Runs a single iteration of the benchmark, with the prepared input (or
     /// NULL).

@@ -43,6 +43,13 @@ typedef struct options {
     const char *oneshot;
 } options;
 
+/// Whether a benchmark was measured.
+typedef enum outcome {
+    OUTCOME_MEASURED,
+    OUTCOME_SKIPPED,
+    OUTCOME_OUT_OF_MEMORY,
+} outcome;
+
 /// What was measured for a benchmark.
 typedef struct result {
     size_t samples;
@@ -120,8 +127,27 @@ extern const bench hashmap_lookup;
 extern const bench token_parse;
 extern const bench bench_passgen_parse;
 extern const bench bench_utf8_decode;
+extern const bench wordlist_load;
+extern const bench markov_build_0;
+extern const bench markov_build_1;
+extern const bench markov_build_2;
+extern const bench markov_build_3;
+extern const bench markov_build_4;
+extern const bench markov_build_5;
+extern const bench markov_build_6;
+extern const bench markov_build_7;
+extern const bench markov_build_8;
+extern const bench resolve_presets;
+extern const bench generate_apple2;
+extern const bench generate_apple2_entropy;
+extern const bench generate_apple2_streams;
+extern const bench generate_words;
+extern const bench generate_words_entropy;
+extern const bench generate_markov;
+extern const bench generate_markov_entropy;
 
 #ifdef PASSGEN_MONOCYPHER
+extern const bench master_derive;
 extern const bench random_chacha20_u8;
 extern const bench random_chacha20_u16;
 extern const bench random_chacha20_u32;
@@ -130,23 +156,58 @@ extern const bench random_chacha20_read;
 #endif
 
 static const bench *benches[] = {
-    &stack_push,           &stack_pop,
-    &random_system_u8,     &random_system_u16,
-    &random_system_u32,    &random_system_u64,
-    &random_system_read,   &random_xorshift_u8,
-    &random_xorshift_u16,  &random_xorshift_u32,
-    &random_xorshift_u64,  &random_xorshift_read,
-    &random_zero_u8,       &random_zero_u16,
-    &random_zero_u32,      &random_zero_u64,
+    &stack_push,
+    &stack_pop,
+    &random_system_u8,
+    &random_system_u16,
+    &random_system_u32,
+    &random_system_u64,
+    &random_system_read,
+    &random_xorshift_u8,
+    &random_xorshift_u16,
+    &random_xorshift_u32,
+    &random_xorshift_u64,
+    &random_xorshift_read,
+    &random_zero_u8,
+    &random_zero_u16,
+    &random_zero_u32,
+    &random_zero_u64,
     &random_zero_read,
 #ifdef PASSGEN_MONOCYPHER
-    &random_chacha20_u8,   &random_chacha20_u16,
-    &random_chacha20_u32,  &random_chacha20_u64,
+    &random_chacha20_u8,
+    &random_chacha20_u16,
+    &random_chacha20_u32,
+    &random_chacha20_u64,
     &random_chacha20_read,
 #endif
-    &hashmap_insert,       &hashmap_lookup,
-    &token_parse,          &bench_passgen_parse,
-    &bench_utf8_decode,    NULL,
+    &hashmap_insert,
+    &hashmap_lookup,
+    &token_parse,
+    &bench_passgen_parse,
+    &bench_utf8_decode,
+    &wordlist_load,
+    &markov_build_0,
+    &markov_build_1,
+    &markov_build_2,
+    &markov_build_3,
+    &markov_build_4,
+    &markov_build_5,
+    &markov_build_6,
+    &markov_build_7,
+    &markov_build_8,
+    &resolve_presets,
+    &generate_apple2,
+    &generate_apple2_entropy,
+    &generate_apple2_streams,
+    &generate_words,
+    &generate_words_entropy,
+    &generate_markov,
+    &generate_markov_entropy,
+#ifdef PASSGEN_MONOCYPHER
+    &master_derive,
+#endif
+    // the end of the list.
+    NULL,
 };
 
 /// Parses a duration, in seconds unless it has a unit (ns, us, ms, s, m or
@@ -245,8 +306,8 @@ static double quantile(const double *sorted, size_t count, double fraction) {
     return sorted[index] * (1 - weight) + sorted[index + 1] * weight;
 }
 
-/// Measures a benchmark. Returns false if it runs out of memory.
-static bool
+/// Measures a benchmark.
+static outcome
 measure(const bench *bench, const options *options, result *result) {
     void *data = NULL;
     if(bench->prepare && !bench->consumes) {
@@ -256,6 +317,9 @@ measure(const bench *bench, const options *options, result *result) {
     // how much an iteration processes is the same for every input, so it is
     // taken from the input of the first one, which is not measured.
     void *input = bench->consumes ? bench->prepare(&options->options) : data;
+    if(bench->prepare && !input) {
+        return OUTCOME_SKIPPED;
+    }
     result->multiplier = bench->multiplier ? bench->multiplier(input) : 1;
     void *output = bench->iterate(input);
     if(output && bench->cleanup) {
@@ -322,7 +386,7 @@ measure(const bench *bench, const options *options, result *result) {
     }
     free(outputs);
     free(samples);
-    return ok;
+    return ok ? OUTCOME_MEASURED : OUTCOME_OUT_OF_MEMORY;
 }
 
 /// Formats a throughput with an SI prefix, such as 2.10 Mbytes/s.
@@ -382,9 +446,16 @@ static int passgen_bench_run(const options *options) {
         const bench *bench = options->benches[b];
 
         result result;
-        if(!measure(bench, options, &result)) {
+        outcome outcome = measure(bench, options, &result);
+        if(outcome == OUTCOME_OUT_OF_MEMORY) {
             fprintf(stderr, "error: out of memory running %s\n", bench->name);
             return EXIT_FAILURE;
+        }
+        if(outcome == OUTCOME_SKIPPED) {
+            if(!options->tsv) {
+                printf("%-24s %21s\n", bench->name, "skipped");
+            }
+            continue;
         }
 
         if(options->tsv) {
@@ -439,11 +510,23 @@ static int passgen_bench_oneshot(const options *options) {
     void *data = NULL;
     if(bench->prepare && !bench->consumes) {
         data = bench->prepare(&options->options);
+        if(!data) {
+            return EXIT_FAILURE;
+        }
     }
 
     for(size_t i = 0; i < options->iterations; i++) {
-        void *output = NULL;
-        run_batch(bench, options, data, &output, 1);
+        void *input = data;
+        if(bench->consumes) {
+            input = bench->prepare(&options->options);
+            if(!input) {
+                return EXIT_FAILURE;
+            }
+        }
+        void *output = bench->iterate(input);
+        if(output && bench->cleanup) {
+            bench->cleanup(output);
+        }
     }
 
     if(data && bench->release) {
@@ -546,9 +629,9 @@ int main(int argc, char *argv[]) {
     options.iterations = iterations ? iterations : 1;
 
     // the benchmarks whose names contain one of the arguments are run, or
-    // all of them if there are none.
+    // all of them if there are none (except for the optional ones).
     for(size_t i = 0; i < count; i++) {
-        options.enabled[i] = optind >= argc;
+        options.enabled[i] = optind >= argc && !options.benches[i]->optional;
     }
     for(int arg = optind; arg < argc; arg++) {
         bool found = false;
