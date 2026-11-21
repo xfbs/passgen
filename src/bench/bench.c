@@ -1,8 +1,14 @@
+/// @file bench.c
+///
+/// Runs the benchmarks. Each one is run in batches of iterations which take
+/// long enough to be timed precisely, and the time of an iteration is
+/// measured once per batch (a sample). This is repeated until the time for
+/// the benchmark is used up, and what is reported is the median of the
+/// samples, with how much they spread.
 #include "bench.h"
 #include "passgen/config.h"
+#include <errno.h>
 #include <getopt.h>
-#include <inttypes.h>
-#include <locale.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -10,13 +16,17 @@
 #include <string.h>
 #include <time.h>
 
-#define MAX(a, b) ((a > b) ? (a) : (b))
-#define MIN(a, b) ((a > b) ? (b) : (a))
+/// How long a batch of iterations has to take at least, in seconds. Timing
+/// something shorter than this is not precise.
+#define BATCH_TIME 1e-3
+
+/// The most iterations which are prepared for one batch of a benchmark which
+/// consumes its input, as they are all kept in memory.
+#define BATCH_CONSUMES_MAX 64
 
 typedef enum mode {
     MODE_BENCH,
     MODE_ONESHOT,
-    MODE_VALGRIND,
     MODE_LIST,
 } mode;
 
@@ -26,102 +36,67 @@ typedef struct options {
     passgen_hashmap options;
     mode mode;
     double time;
-    uint64_t iter;
-    bool verbose;
-    size_t name_col;
-    FILE *write;
-    passgen_hashmap *checkpoint;
-    const char *valgrind;
+    size_t samples;
+    size_t iterations;
+    bool tsv;
     const char *program;
     const char *oneshot;
 } options;
 
+/// What was measured for a benchmark.
+typedef struct result {
+    size_t samples;
+    size_t batch;
+    double median;
+    double q1;
+    double q3;
+    double multiplier;
+} result;
+
 static int show_help(const options *options) {
     const char *prog = options->program;
     printf(
-        "Usage: %s [-t TIME] [-i ITER] [-o NAME=VALUE...] [NAME...]\n",
+        "Usage: %s [-t TIME] [-i SAMPLES] [-o NAME=VALUE...] [--tsv] "
+        "[NAME...]\n",
         prog);
-    printf("       %s -s [-o NAME=VALUE...] NAME\n", prog);
-    printf("       %s -l [NAME...]\n", prog);
-    printf("Runs the benchmarks, generating a report.\n\n");
+    printf("       %s -s NAME [-i ITERATIONS] [-o NAME=VALUE...]\n", prog);
+    printf("       %s -l\n", prog);
+    printf(
+        "Runs the benchmarks whose names contain one of the NAMEs, or all of "
+        "them.\n\n");
     printf("OPTIONS\n");
     printf("    -l, --list\n");
-    printf("        List available benchmarks and quit.\n");
-    printf("    -s, --oneshot\n");
+    printf("        Lists the benchmarks.\n");
+    printf("    -s, --oneshot NAME\n");
     printf(
-        "        Run in oneshot mode. This will run the benchmark only once "
-        "and will not\n");
+        "        Runs the benchmark NAME once (or ITERATIONS times), "
+        "without\n");
     printf(
-        "        generate a report. Useful for running a benchmark under "
-        "Cachegrind to\n");
-    printf("        measure instructions and cache behaviour.\n");
+        "        measuring it, such as to run it under perf or cachegrind.\n");
     printf("    -t, --time TIME\n");
     printf(
-        "        Runs benchmark for specified TIME. This will increase the "
-        "iteration count\n");
+        "        How long to run each benchmark, such as 2, 2s, 500ms or "
+        "1m.\n");
+    printf("        Defaults to 1s.\n");
+    printf("    -i, --iterations N\n");
     printf(
-        "        until the benchmark has run for the specified time, in "
-        "order to generate\n");
+        "        The fewest samples to take of each benchmark, also if that\n");
     printf(
-        "        more samples and have more confidence in the measured "
-        "throughput. It will\n");
-    printf(
-        "        never decrease the number of iterations. Can be set to "
-        "zero to strictly\n");
-    printf("        run benchmarks ITER times. Defaults to 1s.\n");
-    printf("    -i, --iterations ITER\n");
-    printf(
-        "        Run the benchmarks for at least the specified iteration "
-        "count. Benchmarks\n");
-    printf(
-        "        will run longer if the alotted TIME has not been used up. "
-        "Has to be a\n");
-    printf("        positive, non-zero integer. Defaults to 100.\n");
+        "        takes longer than TIME. Defaults to 10. With --oneshot, "
+        "how\n");
+    printf("        often to run it, which defaults to 1.\n");
     printf("    -o, --option NAME=VALUE\n");
     printf(
-        "        Overrides the benchmark option NAME with VALUE. This "
-        "option can be set\n");
-    printf("        multiple times to override multiple options.\n");
-    printf("    -w, --checkpoint FILE\n");
+        "        Sets the option NAME of the benchmarks, which can be given\n");
+    printf("        more than once.\n");
+    printf("    --tsv\n");
     printf(
-        "        Write a checkpoint to the given FILE. This will write out "
-        "the current\n");
-    printf(
-        "        benchmark stats to the file in a CSV format for detecting "
-        "regressions.\n");
-    printf("        Recommended to use with the --valgrind flag.\n");
-    printf("    -r, --check FILE\n");
-    printf(
-        "        Read current benchmark state from the given FILE and warn "
-        "if a regression\n");
-    printf(
-        "        is detected. It is recommended to only use checkpoints "
-        "generated on the\n");
-    printf(
-        "        same machine or to use the --valgrind flag to get "
-        "machine-independent\n");
-    printf("        data.\n");
-    printf("    -c, --valgrind PATH\n");
-    printf(
-        "        Use the valgrind tool at the given PATH to compute "
-        "machine-indepdendent\n");
-    printf("        benchmark statistics, used to detect regressions.\n");
-    printf("    -v, --verbose\n");
-    printf("        Enables verbose logging output.\n");
+        "        Prints the results as tab-separated values, with times in\n");
+    printf("        seconds, for scripts/bench-compare.py.\n");
+    printf("    -h, --help\n");
+    printf("        Shows this help.\n");
     return EXIT_SUCCESS;
 }
-
-static void *dummy_iterate(void *data) {
-    (void) data;
-    return NULL;
-}
-
-const bench dummy = {
-    .name = "dummy_iteration",
-    .desc = "Benchmark iterations.",
-    .unit = "runs",
-    .iterate = &dummy_iterate,
-};
 
 extern const bench stack_push;
 extern const bench stack_pop;
@@ -154,231 +129,301 @@ extern const bench random_chacha20_u64;
 extern const bench random_chacha20_read;
 #endif
 
-const bench *benches[] = {
-    &dummy,
-    &stack_push,
-    &stack_pop,
-    &random_system_u8,
-    &random_system_u16,
-    &random_system_u32,
-    &random_system_u64,
-    &random_system_read,
-    &random_xorshift_u8,
-    &random_xorshift_u16,
-    &random_xorshift_u32,
-    &random_xorshift_u64,
-    &random_xorshift_read,
-    &random_zero_u8,
-    &random_zero_u16,
-    &random_zero_u32,
-    &random_zero_u64,
+static const bench *benches[] = {
+    &stack_push,           &stack_pop,
+    &random_system_u8,     &random_system_u16,
+    &random_system_u32,    &random_system_u64,
+    &random_system_read,   &random_xorshift_u8,
+    &random_xorshift_u16,  &random_xorshift_u32,
+    &random_xorshift_u64,  &random_xorshift_read,
+    &random_zero_u8,       &random_zero_u16,
+    &random_zero_u32,      &random_zero_u64,
     &random_zero_read,
 #ifdef PASSGEN_MONOCYPHER
-    &random_chacha20_u8,
-    &random_chacha20_u16,
-    &random_chacha20_u32,
-    &random_chacha20_u64,
+    &random_chacha20_u8,   &random_chacha20_u16,
+    &random_chacha20_u32,  &random_chacha20_u64,
     &random_chacha20_read,
 #endif
-    &hashmap_insert,
-    &hashmap_lookup,
-    &token_parse,
-    &bench_passgen_parse,
-    &bench_utf8_decode,
-    NULL,
+    &hashmap_insert,       &hashmap_lookup,
+    &token_parse,          &bench_passgen_parse,
+    &bench_utf8_decode,    NULL,
 };
 
+/// Parses a duration, in seconds unless it has a unit (ns, us, ms, s, m or
+/// h). Returns NAN if it is not one.
 static double parse_time(const char *str) {
-    double number;
-    char prefix[3];
-    int ret =
-        sscanf(str, "%lf%c%c%c", &number, &prefix[0], &prefix[1], &prefix[2]);
-
-    if(ret < 2) {
+    char *end;
+    errno = 0;
+    double number = strtod(str, &end);
+    if(errno || end == str || !isfinite(number) || number < 0) {
         return NAN;
     }
 
-    if(ret == 2) {
-        switch(prefix[0]) {
-            case 'd':
-                number *= 24;
-                // fall through
-            case 'h':
-                number *= 60;
-                // fall through
-            case 'm':
-                number *= 60;
-                // fall through
-            case 's':
-                return number;
-            default:
-                break;
+    static const struct {
+        const char *suffix;
+        double factor;
+    } units[] = {
+        {"", 1},
+        {"s", 1},
+        {"ms", 1e-3},
+        {"us", 1e-6},
+        {"ns", 1e-9},
+        {"m", 60},
+        {"h", 3600},
+    };
+    for(size_t i = 0; i < sizeof(units) / sizeof(units[0]); i++) {
+        if(0 == strcmp(end, units[i].suffix)) {
+            return number * units[i].factor;
         }
     }
-
-    if(ret == 3 && prefix[1] == 's') {
-        switch(prefix[0]) {
-            case 'n':
-                number /= 1000;
-                // fall through
-            case 'u':
-                number /= 1000;
-                // fall through
-            case 'm':
-                number /= 1000;
-                return number;
-            default:
-                break;
-        }
-    }
-
     return NAN;
 }
 
-static size_t bench_len(const bench *benches[]) {
-    size_t len = 0;
-    while(benches[len]) len++;
-    return len;
+/// Parses a positive count. Returns zero if it is not one.
+static size_t parse_count(const char *str) {
+    char *end;
+    errno = 0;
+    unsigned long long count = strtoull(str, &end, 10);
+    if(errno || end == str || *end || str[0] == '-') {
+        return 0;
+    }
+    return count;
 }
 
-int passgen_bench_list(const options *options) {
-    int name_col = options->name_col;
+/// The time now, in seconds, from a clock which only goes forward.
+static double now(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return ts.tv_sec + ts.tv_nsec * 1e-9;
+}
 
-    size_t line_len = 80;
-    char line[line_len + 1];
-    for(size_t i = 0; options->benches[i]; i++) {
-        const bench *bench = options->benches[i];
-        size_t desc_offset = 0;
-        size_t desc_len = strlen(bench->desc);
-
-        size_t pos = 0;
-        pos += snprintf(line, sizeof(line), "%s", bench->name);
-        pos += snprintf(
-            line + pos,
-            sizeof(line) - pos,
-            "%*c",
-            (int) (name_col + 2 - pos),
-            ' ');
-
-        if(desc_len > (line_len - pos)) {
-            while((desc_len - desc_offset) > (line_len - pos)) {
-                size_t copy_bytes = MIN(line_len - pos, desc_len - desc_offset);
-                memcpy(line + pos, bench->desc + desc_offset, copy_bytes);
-                size_t break_pos = line_len - pos;
-                while(break_pos && line[pos + break_pos] != ' ') break_pos--;
-                while(break_pos && line[pos + break_pos] == ' ') break_pos--;
-                break_pos++;
-                line[pos + break_pos] = 0;
-                printf("%s\n", line);
-                desc_offset += break_pos;
-                pos = snprintf(line, sizeof(line), "%*c", name_col + 1, ' ');
-            }
-
-            if(desc_offset != desc_len) {
-                snprintf(
-                    line,
-                    sizeof(line),
-                    "%*c%s",
-                    name_col + 1,
-                    ' ',
-                    bench->desc + desc_offset);
-                printf("%s\n", line);
-            }
-        } else {
-            printf("%s%s\n", line, bench->desc);
+/// Runs a batch of iterations, and returns how long it took. A benchmark
+/// which consumes its input gets one prepared for every iteration. The
+/// results are kept in `outputs` until the batch is done, so that freeing
+/// them is not part of the time it took.
+static double run_batch(
+    const bench *bench,
+    const options *options,
+    void *data,
+    void **outputs,
+    size_t count) {
+    if(bench->consumes) {
+        for(size_t i = 0; i < count; i++) {
+            outputs[i] = bench->prepare(&options->options);
         }
     }
 
+    double start = now();
+    for(size_t i = 0; i < count; i++) {
+        outputs[i] = bench->iterate(bench->consumes ? outputs[i] : data);
+    }
+    double time = now() - start;
+
+    for(size_t i = 0; i < count; i++) {
+        if(outputs[i] && bench->cleanup) {
+            bench->cleanup(outputs[i]);
+        }
+    }
+    return time;
+}
+
+static int compare_double(const void *lhs, const void *rhs) {
+    double a = *(const double *) lhs;
+    double b = *(const double *) rhs;
+    return (a > b) - (a < b);
+}
+
+/// The value at a fraction of the way through sorted samples, interpolating
+/// between the two closest.
+static double quantile(const double *sorted, size_t count, double fraction) {
+    double position = fraction * (count - 1);
+    size_t index = (size_t) position;
+    if(index + 1 >= count) {
+        return sorted[count - 1];
+    }
+    double weight = position - index;
+    return sorted[index] * (1 - weight) + sorted[index + 1] * weight;
+}
+
+/// Measures a benchmark. Returns false if it runs out of memory.
+static bool
+measure(const bench *bench, const options *options, result *result) {
+    void *data = NULL;
+    if(bench->prepare && !bench->consumes) {
+        data = bench->prepare(&options->options);
+    }
+
+    // how much an iteration processes is the same for every input, so it is
+    // taken from the input of the first one, which is not measured.
+    void *input = bench->consumes ? bench->prepare(&options->options) : data;
+    result->multiplier = bench->multiplier ? bench->multiplier(input) : 1;
+    void *output = bench->iterate(input);
+    if(output && bench->cleanup) {
+        bench->cleanup(output);
+    }
+
+    size_t batch_max = bench->consumes ? BATCH_CONSUMES_MAX : SIZE_MAX;
+    size_t outputs_count = 1;
+    void **outputs = malloc(sizeof(void *));
+    size_t samples_capacity = 64;
+    double *samples = malloc(samples_capacity * sizeof(double));
+    bool ok = outputs && samples;
+
+    // the batch doubles until it takes long enough to be timed. this also
+    // warms up caches and the branch predictor, so it is not measured.
+    size_t batch = 1;
+    while(ok) {
+        if(batch > outputs_count) {
+            void **resized = realloc(outputs, batch * sizeof(void *));
+            if(!resized) {
+                ok = false;
+                break;
+            }
+            outputs = resized;
+            outputs_count = batch;
+        }
+        double time = run_batch(bench, options, data, outputs, batch);
+        if(time >= BATCH_TIME || batch >= batch_max) {
+            break;
+        }
+        batch = batch * 2 > batch_max ? batch_max : batch * 2;
+    }
+
+    // the time for the benchmark starts once the batch size is known.
+    double start = now();
+    result->samples = 0;
+    while(ok && (result->samples < options->samples ||
+                 now() - start < options->time)) {
+        if(result->samples == samples_capacity) {
+            samples_capacity *= 2;
+            double *resized =
+                realloc(samples, samples_capacity * sizeof(double));
+            if(!resized) {
+                ok = false;
+                break;
+            }
+            samples = resized;
+        }
+        double time = run_batch(bench, options, data, outputs, batch);
+        samples[result->samples] = time / batch;
+        result->samples += 1;
+    }
+
+    if(ok) {
+        qsort(samples, result->samples, sizeof(double), compare_double);
+        result->batch = batch;
+        result->median = quantile(samples, result->samples, 0.5);
+        result->q1 = quantile(samples, result->samples, 0.25);
+        result->q3 = quantile(samples, result->samples, 0.75);
+    }
+
+    if(data && bench->release) {
+        bench->release(data);
+    }
+    free(outputs);
+    free(samples);
+    return ok;
+}
+
+/// Formats a throughput with an SI prefix, such as 2.10 Mbytes/s.
+static void
+format_throughput(char *out, size_t size, double value, const char *unit) {
+    static const char *prefixes[] = {"", "k", "M", "G", "T"};
+    size_t prefix = 0;
+    while(value >= 1000 &&
+          prefix + 1 < sizeof(prefixes) / sizeof(prefixes[0])) {
+        value /= 1000;
+        prefix++;
+    }
+    snprintf(out, size, "%7.2f %s%s/s", value, prefixes[prefix], unit);
+}
+
+/// Formats a duration in seconds, in a unit which suits it.
+static void format_time(char *out, size_t size, double time) {
+    if(time < 1e-6) {
+        snprintf(out, size, "%7.2f ns", time * 1e9);
+    } else if(time < 1e-3) {
+        snprintf(out, size, "%7.2f us", time * 1e6);
+    } else if(time < 1) {
+        snprintf(out, size, "%7.2f ms", time * 1e3);
+    } else {
+        snprintf(out, size, "%7.2f s ", time);
+    }
+}
+
+static int passgen_bench_list(const options *options) {
+    for(size_t i = 0; options->benches[i]; i++) {
+        printf(
+            "%-24s %s\n",
+            options->benches[i]->name,
+            options->benches[i]->desc);
+    }
     return EXIT_SUCCESS;
 }
 
-int passgen_bench_run(const options *options) {
-    setlocale(LC_NUMERIC, "");
-    fprintf(
-        stderr,
-        "BENCHMARK NAME                 BENCHMARK RESULT         CHANGE\n");
+static int passgen_bench_run(const options *options) {
+    if(options->tsv) {
+        printf("name\tunit\tmultiplier\tsamples\tbatch\tmedian\tq1\tq3\n");
+    } else {
+        printf(
+            "%-24s %21s %12s %8s %8s\n",
+            "benchmark",
+            "throughput",
+            "iteration",
+            "spread",
+            "samples");
+    }
+    fflush(stdout);
+
     for(size_t b = 0; options->benches[b]; b++) {
         if(!options->enabled[b]) {
             continue;
         }
-
         const bench *bench = options->benches[b];
 
-        if(options->verbose) {
-            fprintf(stderr, "Running benchmark %s\n", bench->name);
+        result result;
+        if(!measure(bench, options, &result)) {
+            fprintf(stderr, "error: out of memory running %s\n", bench->name);
+            return EXIT_FAILURE;
         }
 
-        void *data = NULL;
-        if(bench->prepare) {
-            data = bench->prepare(&options->options);
+        if(options->tsv) {
+            printf(
+                "%s\t%s\t%.17g\t%zu\t%zu\t%.6e\t%.6e\t%.6e\n",
+                bench->name,
+                bench->unit,
+                result.multiplier,
+                result.samples,
+                result.batch,
+                result.median,
+                result.q1,
+                result.q3);
+        } else {
+            // the spread is half of the range the middle half of the samples
+            // are in, relative to the median.
+            char throughput[64];
+            char iteration[32];
+            format_throughput(
+                throughput,
+                sizeof(throughput),
+                result.multiplier / result.median,
+                bench->unit);
+            format_time(iteration, sizeof(iteration), result.median);
+            printf(
+                "%-24s %21s %12s %7.1f%% %8zu\n",
+                bench->name,
+                throughput,
+                iteration,
+                100 * (result.q3 - result.q1) / 2 / result.median,
+                result.samples);
         }
-
-        double multiplier = 1.0;
-        if(bench->multiplier) {
-            multiplier = bench->multiplier(data);
-        }
-
-        // warmup
-        void *output = bench->iterate(data);
-        if(output) {
-            bench->cleanup(output);
-        }
-
-        double total_time = 0;
-        clock_t start = clock();
-        clock_t before, after = start;
-        clock_t target = options->time * CLOCKS_PER_SEC;
-        clock_t progress = 0;
-
-        size_t padding = options->name_col - strlen(bench->name);
-
-        size_t iterations = 0;
-        for(; iterations < options->iter || (after - start) < target;
-            iterations++) {
-            if(bench->consumes) {
-                data = bench->prepare(&options->options);
-            }
-
-            before = clock();
-            void *output = bench->iterate(data);
-            after = clock();
-
-            total_time += (after - before) / (double) CLOCKS_PER_SEC;
-
-            if(output) {
-                bench->cleanup(output);
-            }
-
-            if(after >= progress) {
-                fprintf(
-                    stderr,
-                    "\r%s:%*c %'24.2lf %s/s",
-                    bench->name,
-                    (int) padding,
-                    ' ',
-                    multiplier * iterations / total_time,
-                    bench->unit);
-                progress = after + CLOCKS_PER_SEC / 10;
-            }
-        }
-
-        if(data && !bench->consumes) {
-            bench->release(data);
-        }
-
-        printf(
-            "\r%s:%*c %'24.2lf %s/s\n",
-            bench->name,
-            (int) padding,
-            ' ',
-            multiplier * iterations / total_time,
-            bench->unit);
+        fflush(stdout);
     }
 
     return EXIT_SUCCESS;
 }
 
-int passgen_bench_oneshot(const options *options) {
+static int passgen_bench_oneshot(const options *options) {
     const bench *bench = NULL;
     for(size_t b = 0; options->benches[b]; b++) {
         if(0 == strcmp(options->oneshot, options->benches[b]->name)) {
@@ -387,185 +432,138 @@ int passgen_bench_oneshot(const options *options) {
     }
 
     if(!bench) {
-        fprintf(stderr, "Error: benchmark '%s' not found\n", options->oneshot);
+        fprintf(stderr, "error: there is no benchmark %s\n", options->oneshot);
         return EXIT_FAILURE;
     }
 
-    if(options->verbose) {
-        fprintf(stderr, "Running benchmark %s\n", bench->name);
-    }
-
     void *data = NULL;
-    if(bench->prepare) {
+    if(bench->prepare && !bench->consumes) {
         data = bench->prepare(&options->options);
     }
 
-    for(size_t i = 0; i < options->iter; i++) {
-        if(bench->consumes) {
-            data = bench->prepare(&options->options);
-        }
-
-        void *output = bench->iterate(data);
-
-        if(output) {
-            bench->cleanup(output);
-        }
+    for(size_t i = 0; i < options->iterations; i++) {
+        void *output = NULL;
+        run_batch(bench, options, data, &output, 1);
     }
 
-    if(data && !bench->consumes) {
+    if(data && bench->release) {
         bench->release(data);
     }
 
     return EXIT_SUCCESS;
 }
 
-int passgen_bench_valgrind(const options *options) {
-    (void) options;
-    printf("Not implemented\n");
-    return EXIT_SUCCESS;
-}
-
-void measure_name_col(options *options) {
-    options->name_col = 1;
-    for(size_t i = 0; options->benches[i]; i++) {
-        const bench *bench = options->benches[i];
-        size_t current = strlen(bench->name) + 1;
-        options->name_col = MAX(options->name_col, current);
-    }
-}
-
 // Adds an option given as `name=value`, which is split in place.
-void add_option(options *options, char *arg) {
+static bool add_option(options *options, char *arg) {
     char *value = strchr(arg, '=');
     if(!value) {
-        fprintf(stderr, "Option '%s' needs to be name=value\n", arg);
-        exit(1);
+        fprintf(stderr, "error: option %s has to be NAME=VALUE\n", arg);
+        return false;
     }
     *value = 0;
     value++;
-    if(options->verbose) {
-        fprintf(stderr, "Parsed option '%s' as '%s'\n", arg, value);
-    }
     passgen_hashmap_insert(&options->options, arg, value, NULL);
+    return true;
 }
 
+enum {
+    OPTION_TSV = 256,
+};
+
 int main(int argc, char *argv[]) {
-    // define command-line options
-    const char *short_opts = "o:t:i:w:r:c:s:hlv";
+    const char *short_opts = "o:t:i:s:hl";
     static struct option long_opts[] = {
         {"list", no_argument, NULL, 'l'},
         {"oneshot", required_argument, NULL, 's'},
         {"help", no_argument, NULL, 'h'},
-        {"verbose", no_argument, NULL, 'v'},
         {"time", required_argument, NULL, 't'},
         {"option", required_argument, NULL, 'o'},
         {"iterations", required_argument, NULL, 'i'},
-        {"valgrind", required_argument, NULL, 'c'},
-        {"checkpoint", required_argument, NULL, 'w'},
-        {"check", required_argument, NULL, 'r'},
+        {"tsv", no_argument, NULL, OPTION_TSV},
         {NULL, no_argument, NULL, 0}};
 
-    size_t benchlen = bench_len(benches);
+    size_t count = 0;
+    while(benches[count]) count++;
 
-    // parse command-line options
     options options = {
         .benches = benches,
-        .enabled = calloc(benchlen, sizeof(bool)),
+        .enabled = calloc(count, sizeof(bool)),
         .mode = MODE_BENCH,
-        .iter = 100,
         .time = 1.0,
-        .verbose = false,
         .program = argv[0],
     };
-
+    size_t iterations = 0;
     passgen_hashmap_init(&options.options, &passgen_hashmap_context_utf8);
-    measure_name_col(&options);
 
+    int ret = EXIT_FAILURE;
     while(true) {
-        // parse next command-line option
         int opt = getopt_long(argc, argv, short_opts, long_opts, NULL);
-
-        // done parsing options
         if(opt < 0) break;
 
         switch(opt) {
             case 'h':
-                return show_help(&options);
+                ret = show_help(&options);
+                goto done;
             case 's':
                 options.mode = MODE_ONESHOT;
                 options.oneshot = optarg;
                 break;
             case 'i':
-                options.iter = atoi(optarg);
-                if(options.iter == 0) {
-                    fprintf(stderr, "Error: iter '%s' is invalid\n", optarg);
-                    return EXIT_FAILURE;
+                iterations = parse_count(optarg);
+                if(!iterations) {
+                    fprintf(
+                        stderr,
+                        "error: %s is not a positive count\n",
+                        optarg);
+                    goto done;
                 }
                 break;
             case 't':
                 options.time = parse_time(optarg);
                 if(isnan(options.time)) {
-                    fprintf(stderr, "Error: time '%s' is invalid\n", optarg);
-                    return EXIT_FAILURE;
+                    fprintf(stderr, "error: %s is not a time\n", optarg);
+                    goto done;
                 }
-                break;
-            case 'v':
-                options.verbose = true;
-                break;
-            case 'c':
-                options.mode = MODE_VALGRIND;
-                options.valgrind = optarg;
-                break;
-            case 'r':
-                break;
-            case 'w':
-                options.write = fopen(optarg, "w");
                 break;
             case 'l':
                 options.mode = MODE_LIST;
                 break;
             case 'o':
-                add_option(&options, optarg);
+                if(!add_option(&options, optarg)) {
+                    goto done;
+                }
+                break;
+            case OPTION_TSV:
+                options.tsv = true;
                 break;
             case '?':
             default:
-                return EXIT_FAILURE;
+                goto done;
         }
     }
 
-    if(options.verbose) {
-        fprintf(stderr, "Loaded %zu benches\n", benchlen);
-    }
+    options.samples = iterations ? iterations : 10;
+    options.iterations = iterations ? iterations : 1;
 
-    // initialize enabled
-    for(size_t i = 0; i < benchlen; i++) {
+    // the benchmarks whose names contain one of the arguments are run, or
+    // all of them if there are none.
+    for(size_t i = 0; i < count; i++) {
         options.enabled[i] = optind >= argc;
     }
-
-    while(optind < argc) {
-        for(size_t i = 0; i < benchlen; i++) {
-            if(strstr(options.benches[i]->name, argv[optind])) {
+    for(int arg = optind; arg < argc; arg++) {
+        bool found = false;
+        for(size_t i = 0; i < count; i++) {
+            if(strstr(options.benches[i]->name, argv[arg])) {
                 options.enabled[i] = true;
+                found = true;
             }
         }
-        optind++;
-    }
-
-    if(options.verbose) {
-        if(options.mode == MODE_BENCH) {
-            fprintf(
-                stderr,
-                "Mode: Benchmark (%" PRIu64 " it, %lfs\n",
-                options.iter,
-                options.time);
-        }
-
-        if(options.mode == MODE_ONESHOT) {
-            fprintf(stderr, "Mode: Oneshot (%" PRIu64 " it)\n", options.iter);
+        if(!found) {
+            fprintf(stderr, "error: no benchmark matches %s\n", argv[arg]);
+            goto done;
         }
     }
 
-    int ret = 0;
     switch(options.mode) {
         case MODE_BENCH:
             ret = passgen_bench_run(&options);
@@ -573,16 +571,13 @@ int main(int argc, char *argv[]) {
         case MODE_ONESHOT:
             ret = passgen_bench_oneshot(&options);
             break;
-        case MODE_VALGRIND:
-            ret = passgen_bench_valgrind(&options);
-            break;
         case MODE_LIST:
             ret = passgen_bench_list(&options);
             break;
     }
 
+done:
     free(options.enabled);
     passgen_hashmap_free(&options.options);
-
     return ret;
 }

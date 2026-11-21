@@ -70,7 +70,7 @@ static void *hashmap_prepare_insert(const passgen_hashmap *opts) {
 
 const bench hashmap_insert = {
     .name = "hashmap_insert",
-    .desc = "Insert data into hashmap",
+    .desc = "Inserts keys into a hashmap",
     .prepare = &hashmap_prepare,
     .iterate = &bench_hashmap_insert,
     .cleanup = &hashmap_cleanup,
@@ -82,7 +82,7 @@ const bench hashmap_insert = {
 
 const bench hashmap_lookup = {
     .name = "hashmap_lookup",
-    .desc = "Lookup data in hashmap",
+    .desc = "Looks up keys in a hashmap",
     .prepare = &hashmap_prepare_insert,
     .iterate = &bench_hashmap_lookup,
     .cleanup = &hashmap_cleanup,

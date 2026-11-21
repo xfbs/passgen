@@ -55,7 +55,7 @@ static void bench_parser_cleanup(void *raw_data) {
 
 const bench bench_passgen_parse = {
     .name = "passgen_parse",
-    .desc = "Passgen parse utf8",
+    .desc = "Parses a long pattern",
     .prepare = &bench_parser_prepare,
     .iterate = &bench_parser_iterate,
     .cleanup = &bench_parser_cleanup,

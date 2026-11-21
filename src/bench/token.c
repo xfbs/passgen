@@ -134,7 +134,7 @@ static void bench_token_release(void *data) {
 
 const bench token_parse = {
     .name = "token_parse",
-    .desc = "Token parse",
+    .desc = "Tokenizes a pattern",
     .prepare = &bench_token_prepare,
     .iterate = &bench_token_iterate,
     .cleanup = NULL,

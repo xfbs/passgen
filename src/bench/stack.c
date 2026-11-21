@@ -90,7 +90,7 @@ static void *stack_pop_iterate(void *raw_data) {
 
 const bench stack_push = {
     .name = "stack_push",
-    .desc = "Stack push benchmark",
+    .desc = "Pushes items onto a stack",
     .prepare = &stack_push_prepare,
     .iterate = &stack_push_iterate,
     .cleanup = &stack_push_release,
@@ -102,7 +102,7 @@ const bench stack_push = {
 
 const bench stack_pop = {
     .name = "stack_pop",
-    .desc = "Stack pop benchmark",
+    .desc = "Pops items off a stack",
     .prepare = &stack_pop_prepare,
     .iterate = &stack_pop_iterate,
     .cleanup = &stack_push_release,

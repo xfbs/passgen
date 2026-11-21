@@ -4368,6 +4368,7 @@ static void *bench_utf8_prepare(const passgen_hashmap *opts) {
 static void bench_utf8_release(void *raw_data) {
     bench_utf8_data *data = raw_data;
     free(data->output);
+    free(data);
 }
 
 static void *bench_utf8_iter(void *raw_data) {
