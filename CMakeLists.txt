@@ -201,6 +201,21 @@ if(BUILD_TESTING)
     add_test(NAME passgen-cli COMMAND ${CMAKE_SOURCE_DIR}/scripts/test-passgen-cli.sh
                                       $<TARGET_FILE:passgen-cli>)
 
+    # every benchmark is run once, so that they keep working (and are run
+    # with sanitizers as well). this does not measure anything. the small
+    # wordlist of the examples is used, so that none are skipped.
+    if(BUILD_BENCH)
+        add_test(NAME passgen-bench
+                 COMMAND passgen-bench -t 0 -i 1
+                         -o wordlist=${CMAKE_SOURCE_DIR}/examples/words.txt)
+        set_tests_properties(passgen-bench
+                             PROPERTIES FAIL_REGULAR_EXPRESSION "skipped")
+        if(PASSGEN_MONOCYPHER)
+            add_test(NAME passgen-bench-master
+                     COMMAND passgen-bench -t 0 -i 1 master_derive)
+        endif()
+    endif()
+
     # fuzzing harnesses, which are run over their corpus as tests. these use
     # POSIX functions which are not there on Windows.
     if(NOT WIN32)

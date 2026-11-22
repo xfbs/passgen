@@ -5,9 +5,9 @@ is, by default), a `passgen-test` binary will be built which runs unit tests
 against the codebase.
 
 The tests are registered with CTest, so after building, they can be run with
-`ctest` (or the `test` target of the build system). This runs both the unit
-tests and the tests of the command-line interface
-(`scripts/test-passgen-cli.sh`).
+`ctest` (or the `test` target of the build system). This runs the unit tests,
+the tests of the command-line interface (`scripts/test-passgen-cli.sh`), and
+every [benchmark](benchmarks.md) once, so that they keep working.
 
     ctest --test-dir build --output-on-failure
 
