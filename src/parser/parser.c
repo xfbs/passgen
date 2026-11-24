@@ -182,6 +182,17 @@ passgen_parser_state *passgen_parser_state_last(passgen_parser *parser) {
     return passgen_stack_top(&parser->state);
 }
 
+// at the end of a group, or of the pattern, drops the last segment if it has
+// a weight of zero, as in `(a|{0}b)`. a group with one segment left takes no
+// randomness, so that this is the same as `(a)`. the segments before the last
+// were already dropped at the `|` after them.
+static void passgen_parser_group_finish(passgen_parser_state *state) {
+    if(state->data.group.segment->multiplier == 0) {
+        passgen_pattern_segment_free(state->data.group.segment);
+        passgen_stack_pop(&state->data.group.group->segments, NULL);
+    }
+}
+
 // get the last item, making sure that it's only a single character.
 // in case of characters, mark it as tainted. the item is NULL if there is
 // none.
@@ -324,10 +335,7 @@ int passgen_parse_group(
                 }
                 return 0;
             case ')':
-                if(state->data.group.segment->multiplier == 0) {
-                    passgen_pattern_segment_free(state->data.group.segment);
-                    passgen_stack_pop(&state->data.group.group->segments, NULL);
-                }
+                passgen_parser_group_finish(state);
                 if(parser->state.len <= 1) {
                     return PASSGEN_ERROR_GROUP_UNOPENED;
                 }
@@ -759,6 +767,7 @@ int passgen_parse_finish(passgen_parser *parser) {
 
     // the pattern itself is a group, which has to have something to choose
     // from, as in `{0}a`.
+    passgen_parser_group_finish(state);
     if(state->data.group.group->multiplier_sum == 0) {
         parser->error_start_given = true;
         parser->error_start = state->data.group.start;

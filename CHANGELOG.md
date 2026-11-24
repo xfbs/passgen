@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A wordlist with Windows line endings (`\r\n`) no longer has the carriage
   return at the end of every word, which changes what is generated from it.
+- A pattern whose last segment has a weight of zero, such as `a|{0}b`, no
+  longer uses randomness to choose between its segments when there is only
+  one left, as it already did in a group, such as `(a|{0}b)`.
 
 ### Added
 

@@ -306,6 +306,64 @@ test_result test_regression_parse_multiplier_zero_recycled(void) {
     return test_ok;
 }
 
+/// A last segment with a weight of zero was only dropped at the end of a
+/// group, and not at the end of the pattern, so that `a|{0}b` had two
+/// segments and took randomness to choose `a`, while `(a|{0}b)` took none.
+test_result test_regression_parse_multiplier_zero_last(void) {
+    passgen_pattern *pattern;
+    passgen_error error;
+
+    assert(0 == passgen_parse(&pattern, &error, "a|{0}b"));
+    assert(pattern->group.segments.len == 1);
+    assert(pattern->group.multiplier_sum == 1);
+    passgen_pattern_free(pattern);
+
+    assert(0 == passgen_parse(&pattern, &error, "a|b|{0}"));
+    assert(pattern->group.segments.len == 2);
+    assert(pattern->group.multiplier_sum == 2);
+    passgen_pattern_free(pattern);
+
+    // so it takes no randomness, the same as `a`.
+    passgen_random random;
+    assert(passgen_random_xorshift_open(&random, 1234));
+    passgen_env *env = passgen_env_new(&random);
+    assert(0 == passgen_parse(&pattern, &error, "[a-c]|{0}"));
+    assert(0 == passgen_resolve(pattern, env, &error));
+    uint8_t output[8];
+    size_t written;
+    assert(
+        0 == passgen_generate_fill_utf8(
+                 pattern,
+                 env,
+                 &error,
+                 NULL,
+                 output,
+                 sizeof(output),
+                 &written));
+    passgen_pattern_free(pattern);
+    uint64_t after_pattern = passgen_random_u64(&random);
+
+    passgen_random_close(&random);
+    assert(passgen_random_xorshift_open(&random, 1234));
+    assert(0 == passgen_parse(&pattern, &error, "[a-c]"));
+    assert(0 == passgen_resolve(pattern, env, &error));
+    assert(
+        0 == passgen_generate_fill_utf8(
+                 pattern,
+                 env,
+                 &error,
+                 NULL,
+                 output,
+                 sizeof(output),
+                 &written));
+    passgen_pattern_free(pattern);
+    assert(passgen_random_u64(&random) == after_pattern);
+
+    passgen_env_free(env);
+    passgen_random_close(&random);
+    return test_ok;
+}
+
 /// Parses a pattern which consists of a single set, and checks that it has
 /// exactly the given ranges, as triples of start, end and multiplier.
 static bool
