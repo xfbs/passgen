@@ -102,6 +102,48 @@ under a profiler, so that it only sees that benchmark:
 Cachegrind counts instructions rather than measuring time, so it gives the
 same result on every run, which is useful for small changes.
 
+## What was tried
+
+### Building Markov chains
+
+Building a Markov chain from the large EFF wordlist takes 2 to 3 ms at any
+length, so it is only slow for large wordlists. With `/usr/share/dict/words`
+(480,000 words), `markov_build_3` takes about 160 ms and `markov_build_8`
+about 300 ms. This was measured in November 2026 on a virtual machine on
+Apple silicon, so only the ratios mean much.
+
+The time goes to following pointers through the nodes of the chain: every
+character of every word walks from the root down through as many nodes as
+the length of the chain, and most of those are not in the cache. It does not
+go to growing the arrays (by one entry at a time) or searching them:
+
+- The same words in a random order take much longer, 1.8 s rather than
+  0.6 s at length 8, because in sorted order consecutive words share most of
+  their path.
+- At length 3, there are 4.95 million insertions, but only 135,669 entries
+  in 23,556 leaves. Almost every insertion only counts one up.
+
+Other ways to build the chain were tried in a prototype, in ms, with the
+words sorted and shuffled:
+
+| | Length 3 | shuffled | Length 8 | shuffled |
+| --- | --- | --- | --- | --- |
+| As it is | 182 | 301 | 624 | 1,762 |
+| Sort every sequence, then insert | 523 | | 1,753 | |
+| Count sequences in a hash table, sort, insert | 71 | 69 | 968 | 996 |
+| Count sequences in a hash table, insert | 66 | 63 | 1,235 | 1,249 |
+
+Counting in a hash table first makes length 3 about 2.5 times as fast for a
+sorted wordlist and 4 times for a shuffled one, as the order of the words no
+longer matters. At length 8 it is slower for a
+sorted wordlist, because there are 1.6 million different sequences to sort
+(qsort alone takes 600 ms). It would need about 150 lines and more memory
+while building: about 10 MB at length 3, where a whole run of `passgen`
+needs 14.5 MB at most, and 85 to 160 MB at length 8, where it needs 120 MB.
+
+So the chains are built as they were: it saves a tenth of a second or two
+on unusual wordlists, and nothing on the ones that are installed.
+
 ## Tests
 
 Every benchmark is run once as part of the tests (`passgen-bench` and
