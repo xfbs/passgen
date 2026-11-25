@@ -117,6 +117,7 @@ extern const bench random_xorshift_u16;
 extern const bench random_xorshift_u32;
 extern const bench random_xorshift_u64;
 extern const bench random_xorshift_read;
+extern const bench random_xorshift_stream;
 extern const bench random_zero_u8;
 extern const bench random_zero_u16;
 extern const bench random_zero_u32;
@@ -153,6 +154,7 @@ extern const bench random_chacha20_u16;
 extern const bench random_chacha20_u32;
 extern const bench random_chacha20_u64;
 extern const bench random_chacha20_read;
+extern const bench random_chacha20_stream;
 #endif
 
 static const bench *benches[] = {
@@ -168,6 +170,7 @@ static const bench *benches[] = {
     &random_xorshift_u32,
     &random_xorshift_u64,
     &random_xorshift_read,
+    &random_xorshift_stream,
     &random_zero_u8,
     &random_zero_u16,
     &random_zero_u32,
@@ -179,6 +182,7 @@ static const bench *benches[] = {
     &random_chacha20_u32,
     &random_chacha20_u64,
     &random_chacha20_read,
+    &random_chacha20_stream,
 #endif
     &hashmap_insert,
     &hashmap_lookup,

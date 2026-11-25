@@ -394,3 +394,44 @@ const bench random_chacha20_read = {
     .unit = "bytes",
 };
 #endif
+
+/// How many streams one iteration switches to.
+#define BENCH_STREAM_COUNT 1000
+
+// switches to a stream, and reads one number from it, as generating a
+// sequence from its own stream does at the least.
+static void *bench_random_stream(void *raw_data) {
+    struct bench_data *data = raw_data;
+    for(size_t i = 0; i < BENCH_STREAM_COUNT; i++) {
+        passgen_random_stream(&data->random, i);
+        passgen_random_u64(&data->random);
+    }
+    return NULL;
+}
+
+static double bench_mult_stream(void *raw_data) {
+    (void) raw_data;
+    return BENCH_STREAM_COUNT;
+}
+
+const bench random_xorshift_stream = {
+    .name = "random_xorshift_stream",
+    .desc = "Switches to a stream of xorshift randomness, and reads from it",
+    .prepare = &bench_data_prepare_xorshift,
+    .iterate = &bench_random_stream,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_stream,
+    .unit = "streams",
+};
+
+#ifdef PASSGEN_MONOCYPHER
+const bench random_chacha20_stream = {
+    .name = "random_chacha20_stream",
+    .desc = "Switches to a stream of ChaCha20 randomness, and reads from it",
+    .prepare = &bench_data_prepare_chacha20,
+    .iterate = &bench_random_stream,
+    .release = &bench_data_release,
+    .multiplier = &bench_mult_stream,
+    .unit = "streams",
+};
+#endif
