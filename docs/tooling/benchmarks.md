@@ -144,6 +144,43 @@ needs 14.5 MB at most, and 85 to 160 MB at length 8, where it needs 120 MB.
 So the chains are built as they were: it saves a tenth of a second or two
 on unusual wordlists, and nothing on the ones that are installed.
 
+### Switching streams
+
+Switching to a stream fills the buffer of randomness from the new stream,
+which is what made generating every output from its own stream (as `-a`
+does) about 3 times as slow as generating all of them from one: the buffer was
+1024 bytes, and a password often needs less than 200. It is 256 bytes now,
+which makes reading a number at a time a few percent slower, and generating
+no slower.
+
+Filling only 64 bytes after a switch, and twice as much at every refill
+after that, was a little faster still (1.43 rather than 1.36 million apple2
+passwords a second), but needed another field and about 30 lines.
+
+### Generating from Markov chains
+
+Generating six words from a Markov chain of length 3 is about 7 times as slow
+as six words from the wordlist, and takes 4.8 times as many instructions
+(measured with callgrind on the large EFF wordlist):
+
+- Half of them are for randomness. A Markov chain draws a random number for
+  every character and for the end of the word, 7.6 for every word, where the
+  wordlist draws one.
+- A fifth are for finding the leaf of the characters before, and a twentieth
+  for choosing the character from its counts.
+
+The rest of the difference in time is likely that walking the chain does not
+stay in the cache, as when building it.
+
+Every random number is drawn as 64 bits, also when it is below a small
+limit. Drawing as few bits as fit the limit (8, 16, 32 or 64) made apple2
+passwords 27% faster, Markov words 9%, and words from the wordlist 5%; with a
+shortcut for reading a few bytes from the buffer, 40%, 19% and 7%. It would
+change every password, also those from a master passphrase, and the test
+vectors, the reference implementation and the Rust implementation with them,
+to save less than a microsecond on a password. So it was left as it is, until
+the sampling changes for another reason.
+
 ## Tests
 
 Every benchmark is run once as part of the tests (`passgen-bench` and
