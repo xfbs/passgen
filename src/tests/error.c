@@ -666,8 +666,14 @@ test_result test_error_generate_random(void) {
     uint8_t output[512];
     size_t written = 99;
 
-    // every character takes eight bytes, so this is fine.
-    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "[a-z]{100}"));
+    // every character takes eight bytes, so half of the buffer is fine.
+    char fine[32];
+    snprintf(
+        fine,
+        sizeof(fine),
+        "[a-z]{%d}",
+        PASSGEN_RANDOM_BUFFER_LENGTH / 16);
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, fine));
     assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
         PASSGEN_OK == passgen_generate_fill_utf8(
@@ -678,12 +684,18 @@ test_result test_error_generate_random(void) {
                           output,
                           512,
                           &written));
-    assert(written == 100);
+    assert(written == PASSGEN_RANDOM_BUFFER_LENGTH / 16);
     assert(!passgen_random_failed(&random));
     passgen_pattern_free(pattern);
 
-    // this needs more than there is.
-    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, "[a-z]{300}"));
+    // three buffers need more than the one and a half there are left.
+    char excess[32];
+    snprintf(
+        excess,
+        sizeof(excess),
+        "[a-z]{%d}",
+        3 * PASSGEN_RANDOM_BUFFER_LENGTH / 8);
+    assert(PASSGEN_OK == passgen_parse(&pattern, NULL, excess));
     assert(0 == passgen_resolve(pattern, env, NULL));
     assert(
         PASSGEN_ERROR_RANDOM == passgen_generate_fill_utf8(

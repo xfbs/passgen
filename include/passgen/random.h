@@ -23,7 +23,7 @@ extern "C" {
 /// The source is read from in blocks of this size. Reading more than this at
 /// once reads from the source directly. A file has to have at least this many
 /// bytes in it to be used as a source.
-#define PASSGEN_RANDOM_BUFFER_LENGTH 1024
+#define PASSGEN_RANDOM_BUFFER_LENGTH 256
 
 /// Function which reads data from a source of randomness.
 ///
